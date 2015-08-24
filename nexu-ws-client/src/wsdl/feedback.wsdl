@@ -1,0 +1,90 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://api.nexu.nowina.lu/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="FeedbackEndpointService" targetNamespace="http://api.nexu.nowina.lu/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://api.nexu.nowina.lu/" elementFormDefault="unqualified" targetNamespace="http://api.nexu.nowina.lu/" version="1.0">
+
+  <xs:element name="reportError" type="tns:reportError"/>
+
+  <xs:element name="reportErrorResponse" type="tns:reportErrorResponse"/>
+
+  <xs:complexType name="reportError">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="tns:feedback"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="feedback">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="apiParameter" type="xs:string"/>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="detected" nillable="true" type="tns:detectedCard"/>
+      <xs:element minOccurs="0" name="feedbackStatus" type="tns:feedbackStatus"/>
+      <xs:element minOccurs="0" name="selectedAPI" type="tns:scAPI"/>
+      <xs:element minOccurs="0" name="selectedCard" type="tns:detectedCard"/>
+      <xs:element minOccurs="0" name="stacktrace" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="detectedCard">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="atr" type="xs:string"/>
+      <xs:element name="terminalIndex" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="reportErrorResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:simpleType name="feedbackStatus">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NO_PRODUCT_FOUND"/>
+      <xs:enumeration value="PRODUCT_NOT_SUPPORTED"/>
+      <xs:enumeration value="NO_KEYS"/>
+      <xs:enumeration value="EXCEPTION"/>
+      <xs:enumeration value="SUCCESS"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="scAPI">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="MSCAPI"/>
+      <xs:enumeration value="PKCS11"/>
+      <xs:enumeration value="PKCS12"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="reportError">
+    <wsdl:part element="tns:reportError" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="reportErrorResponse">
+    <wsdl:part element="tns:reportErrorResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="FeedbackEndpoint">
+    <wsdl:operation name="reportError">
+      <wsdl:input message="tns:reportError" name="reportError">
+    </wsdl:input>
+      <wsdl:output message="tns:reportErrorResponse" name="reportErrorResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="FeedbackEndpointServiceSoapBinding" type="tns:FeedbackEndpoint">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="reportError">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="reportError">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="reportErrorResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="FeedbackEndpointService">
+    <wsdl:port binding="tns:FeedbackEndpointServiceSoapBinding" name="FeedbackEndpointPort">
+      <soap:address location="http://localhost:8070/api/v1/feedback"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

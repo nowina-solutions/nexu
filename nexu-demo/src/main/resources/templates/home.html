@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+<title>NexU demo</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="stylesheet"
+	href="/webjars/bootstrap/3.3.4/css/bootstrap.min.css" />
+<link rel="stylesheet"
+	href="/webjars/bootstrap/3.3.4/css/bootstrap-theme.min.css" />
+
+</head>
+<body>
+
+	<div class="container">
+
+		<div class="page-header">
+			<h1>NexU demo</h1>
+		</div>
+
+		<div class="row">
+
+			<div class="col-md-6">
+			
+				<form role="form" class="form" name="form">
+
+					<div class="input-group">
+						<label for="tbs">Data to be signed</label>
+						<input class="form-control" type="text" name="tbs" id="tbs"/>
+					</div>
+
+					<button class="nexu-sign-button btn btn-lg btn-success" style="margin-top:10px" onclick="return sign()"></button>
+				</form>
+			
+				<div id="success" style="display:none" class="alert alert-success" role="alert">Signature has been performed. Value <span id="signatureValue"></span></div>
+			
+				<div id="error" style="display:none" class="alert alert-danger" role="danger">Error while signing</div>
+
+			</div>
+			
+			<div class="col-md-6">
+
+				<h2>How to use ? </h2>
+			
+				<h3>1. Import NexU Javascript</h3>
+				
+				Import the Javascript required by NexU
+				
+<pre>
+&lt;script src="///lab.nowina.solutions/nexu/nexu.js">&lt;/script>
+</pre>
+			
+				<h3>2. Create the signing script</h3>
+				
+				Use the "nexu_sign" method in your code. By example: 
+
+<pre>
+&lt;script type="text/javascript">
+
+function sign() {
+	var data = $('#tbs').val();
+	nexu_sign(data, success, error);
+	return false;
+}
+
+function success(signature) {
+	$("#error").hide();
+	$("#signatureValue").html(signature);
+	$("#success").show();
+}
+
+function error(error) {
+	$("#error").show();
+	$("#success").hide();
+}
+
+&lt;/script>
+</pre>
+			
+				<h3>3. Mark the signing button</h3>
+			
+				The signing button should be marked with a class "nexu-sign-button". The NexU script will
+				decorate the button. 
+
+<pre>
+&lt;button class="nexu-sign-button" onclick="return sign()"&gt;&lt;/button&gt;<br />
+</pre>
+
+			</div>
+
+		</div>
+		
+		<script type="text/javascript">
+		
+			function sign() {
+				var data = $('#tbs').val();
+				nexu_sign(data, success, error);
+				return false;
+			}
+		
+			function success(signature) {
+				$("#error").hide();
+				$("#signatureValue").html(signature);
+				$("#success").show();
+			}
+			
+			function error(error) {
+				$("#error").show();
+				$("#success").hide();
+			}
+		
+		</script>
+
+	</div>
+
+	<script src="/webjars/jquery/1.11.1/jquery.js"></script>
+	<script src="/webjars/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+	<script src="///lab.nowina.solutions/nexu/nexu.js"></script>
+
+</body>
+</html>

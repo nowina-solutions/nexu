@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ © Nowina Solutions, 2015-2015
+
+ Concédée sous licence EUPL, version 1.1 ou – dès leur approbation par la Commission européenne - versions ultérieures de l’EUPL (la «Licence»).
+ Vous ne pouvez utiliser la présente œuvre que conformément à la Licence.
+ Vous pouvez obtenir une copie de la Licence à l’adresse suivante:
+
+ http://ec.europa.eu/idabc/eupl5
+
+ Sauf obligation légale ou contractuelle écrite, le logiciel distribué sous la Licence est distribué «en l’état»,
+ SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
+ Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
+-->
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="unsupported-product" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.UnsupportedProductController">
+    <stylesheets>
+        <URL value="@/styles/nexu.css"/>
+    </stylesheets>
+
+	<center>
+		<VBox BorderPane.alignment="CENTER">
+			<children>
+				<Label styleClass="message" wrapText="true" text="NexU don't know your Signature Product yet. We cannot autoconfigure the connection for you. You can request more support for your product, or try to connect it yourself with more advanced features."/>
+			</children>
+		</VBox>
+	</center>
+
+	<bottom>
+		<HBox styleClass="btn-container">
+			<children>
+				<Button fx:id="requestSupport" wrapText="true" styleClass="btn-primary" mnemonicParsing="false" text="Request support" />
+				<Button fx:id="hicSuntDracones" wrapText="true" styleClass="btn-danger" mnemonicParsing="false" text="I know what I'm doing" />
+			</children>
+		</HBox>
+	</bottom>
+
+</BorderPane>
