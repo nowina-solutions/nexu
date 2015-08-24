@@ -72,7 +72,7 @@
 								<argument>lu.nowina.nexu.NexUApp</argument>
 								<argument>-srcfiles</argument>
 								<argument>
-									${project.build.directory}\${project.build.finalName}.jar
+									${project.build.directory}/${project.build.finalName}.jar
 								</argument>
 								<argument>-outdir</argument>
 								<argument>./target</argument>
@@ -86,35 +86,45 @@
 								<argument>-title</argument>
 								<argument>NexU</argument>
 								<argument>-native</argument>
-								<argument>msi</argument>
+								<argument>${installer.format}</argument>
 							</arguments>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.9.1</version>
-				<executions>
-					<execution>
-						<id>attach-artifacts</id>
-						<phase>package</phase>
-						<goals>
-							<goal>attach-artifact</goal>
-						</goals>
-						<configuration>
-							<artifacts>
-								<artifact>
-									<file>${project.build.directory}/bundles/NexU-1.0.msi</file>
-									<type>msi</type>
-								</artifact>
-							</artifacts>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+
+		<profile>
+			<id>windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+				</os>
+			</activation>
+
+			<properties>
+				<installer.format>msi</installer.format>
+			</properties>
+
+		</profile>
+
+		<profile>
+			<id>macosx</id>
+			<activation>
+				<os>
+					<family>mac</family>
+				</os>
+			</activation>
+
+			<properties>
+				<installer.format>dmg</installer.format>
+			</properties>
+
+		</profile>
+
+	</profiles>
 
 </project>
