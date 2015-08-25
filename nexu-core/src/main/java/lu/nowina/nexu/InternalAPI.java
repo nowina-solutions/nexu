@@ -28,7 +28,6 @@ import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
-import lu.nowina.nexu.api.OS;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
@@ -108,20 +107,7 @@ public class InternalAPI implements NexuAPI {
 	@Override
 	public EnvironmentInfo getEnvironmentInfo() {
 
-		EnvironmentInfo info = new EnvironmentInfo();
-
-		String os = System.getProperty("os.name");
-		logger.fine("Open connection for " + os);
-		if (os.startsWith("Mac")) {
-			info.setOs(OS.MACOSX);
-		} else if (os.toLowerCase().contains("windows")) {
-			info.setOs(OS.WINDOWS);
-		} else if (os.toLowerCase().contains("linux")) {
-			info.setOs(OS.LINUX);
-		} else {
-			info.setOs(OS.NOT_RECOGNIZED);
-		}
-
+		EnvironmentInfo info = EnvironmentInfo.get();
 		return info;
 	}
 

@@ -18,30 +18,21 @@ import java.util.logging.Logger;
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlType;
 
-/**
- * Enumerates OS detected by NexU
- * @author David Naramski
- *
- */
-@XmlType(name = "osName")
+@XmlType(name = "osArch")
 @XmlEnum
-public enum OS {
+public enum Arch {
 
-	MACOSX, LINUX, WINDOWS, NOT_RECOGNIZED;
-	
-    private static final Logger logger = Logger.getLogger(OS.class.getName());
-    
-	public static OS forOSName(String osName) {
-        if (osName.startsWith("Mac")) {
-            return MACOSX;
-        } else if (osName.toLowerCase().contains("windows")) {
-            return WINDOWS;
-        } else if (osName.toLowerCase().contains("linux")) {
-            return LINUX;
+    X86, AMD64, NOT_RECOGNIZED;
+
+    private static final Logger logger = Logger.getLogger(Arch.class.getName());
+
+    public static Arch forOSArch(String osArch) {
+        if("amd64".equals(osArch)) {
+            return AMD64;
         } else {
-            logger.warning("OS name not recognized " + osName);
-            return NOT_RECOGNIZED;
+            logger.warning("Arch not recognized " + osArch);
+            return Arch.NOT_RECOGNIZED;
         }
-	}
-	
+    }
+
 }

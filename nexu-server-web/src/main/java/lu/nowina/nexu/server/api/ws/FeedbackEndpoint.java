@@ -19,6 +19,7 @@ import java.io.FileOutputStream;
 import java.util.UUID;
 
 import javax.annotation.PostConstruct;
+import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.xml.bind.JAXBContext;
 
@@ -58,6 +59,7 @@ public class FeedbackEndpoint {
 		
 	}
 	
+	@WebMethod
 	public void reportError(Feedback feedback) throws Exception {
 		File reportFile = new File(repositoryDir, UUID.randomUUID().toString());
 		BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(reportFile));

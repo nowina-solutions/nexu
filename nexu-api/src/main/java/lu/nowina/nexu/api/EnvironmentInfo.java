@@ -13,53 +13,69 @@
  */
 package lu.nowina.nexu.api;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
 /**
  * Represents the information collected on the user environment
  * 
  * @author David Naramski
  *
  */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "environment", propOrder = {
+    "jreVendor",
+    "osName",
+    "osArch",
+    "osVersion",
+    "arch",
+    "os"
+})
 public class EnvironmentInfo {
 
-	/**
-	 * The JRE vendor.
-	 */
-	public JREVendor jreVendor = JREVendor.NOT_RECOGNIZED;
+	private JREVendor jreVendor;
+	
+	private String osName;
+	
+	private String osArch;
 
-	/**
-	 * The JRE version.
-	 */
-	public String jreVersion;
+	private String osVersion;
 
-	/**
-	 * The OS version.
-	 */
-	public String osVersion;
+	private Arch arch;
 
-	/**
-	 * The arch.
-	 */
-	public String arch;
+	private OS os;
 
-	/**
-	 * The OS.
-	 */
-	public OS os = OS.NOT_RECOGNIZED;
+	public EnvironmentInfo() {
+    }
+	
+	public static EnvironmentInfo get() {
+	    EnvironmentInfo info = new EnvironmentInfo();
 
+	    String osArch = System.getProperty("os.arch");
+        info.setOsArch(osArch);
+        info.setArch(Arch.forOSArch(osArch));
+	    
+        info.setJreVendor(JREVendor.forJREVendor(System.getProperty("java.vendor")));
+	    
+        String osName = System.getProperty("os.name");
+        info.setOsName(osName);
+        info.setOs(OS.forOSName(osName));
+
+        String osVersion = System.getProperty("os.version");
+        info.setOsVersion(osVersion);
+        
+	    return info;
+	}
+	
 	public JREVendor getJreVendor() {
 		return jreVendor;
 	}
 
 	public void setJreVendor(JREVendor jreVendor) {
 		this.jreVendor = jreVendor;
-	}
-
-	public String getJreVersion() {
-		return jreVersion;
-	}
-
-	public void setJreVersion(String jreVersion) {
-		this.jreVersion = jreVersion;
 	}
 
 	public String getOsVersion() {
@@ -70,11 +86,11 @@ public class EnvironmentInfo {
 		this.osVersion = osVersion;
 	}
 
-	public String getArch() {
+	public Arch getArch() {
 		return arch;
 	}
 
-	public void setArch(String arch) {
+	public void setArch(Arch arch) {
 		this.arch = arch;
 	}
 
@@ -85,5 +101,21 @@ public class EnvironmentInfo {
 	public void setOs(OS os) {
 		this.os = os;
 	}
+
+    public String getOsName() {
+        return osName;
+    }
+
+    public void setOsName(String osName) {
+        this.osName = osName;
+    }
+
+    public String getOsArch() {
+        return osArch;
+    }
+
+    public void setOsArch(String osArch) {
+        this.osArch = osArch;
+    }
 
 }

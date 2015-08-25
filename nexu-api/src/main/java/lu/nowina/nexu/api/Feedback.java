@@ -30,7 +30,8 @@ import javax.xml.bind.annotation.XmlType;
     "selectedAPI",
     "selectedCard",
     "stacktrace", 
-    "userComment"
+    "userComment",
+    "info"
 })
 public class Feedback {
 
@@ -42,6 +43,7 @@ public class Feedback {
     protected DetectedCard selectedCard;
     protected String stacktrace;
     protected String userComment;
+    protected EnvironmentInfo info;
 
     /**
      * Gets the value of the apiParameter property.
@@ -199,5 +201,13 @@ public class Feedback {
 	public void setUserComment(String userComment) {
 		this.userComment = userComment;
 	}
+
+    public EnvironmentInfo getInfo() {
+        return info;
+    }
+
+    public void setInfo(EnvironmentInfo info) {
+        this.info = info;
+    }
 
 }

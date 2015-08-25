@@ -13,32 +13,18 @@
  */
 package lu.nowina.nexu.api;
 
-import java.util.logging.Logger;
+import org.junit.Assert;
+import org.junit.Test;
 
-import javax.xml.bind.annotation.XmlEnum;
-import javax.xml.bind.annotation.XmlType;
+public class ArchTest {
 
-/**
- * Enumerate JRE Vendors detected by NexU
- * 
- * @author David Naramski
- *
- */
-@XmlType(name = "javaVendor")
-@XmlEnum
-public enum JREVendor {
+    @Test
+    public void test1() {
+        
+        Arch arch = Arch.forOSArch(System.getProperty("os.arch"));
+        Assert.assertNotNull(arch);
+        Assert.assertNotEquals(Arch.NOT_RECOGNIZED, arch);
+        
+    }
 
-	ORACLE, NOT_RECOGNIZED;
-	
-    private static Logger logger = Logger.getLogger(JREVendor.class.getName());
-    
-	public static JREVendor forJREVendor(String jreVendor) {
-	    if(jreVendor.toLowerCase().contains("oracle")) {
-	        return ORACLE;
-	    } else {
-	        logger.warning("JRE not recognized " + jreVendor);
-	        return NOT_RECOGNIZED;
-	    }
-	}
-	
 }
