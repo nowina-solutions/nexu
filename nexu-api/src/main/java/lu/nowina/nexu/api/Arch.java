@@ -27,7 +27,7 @@ public enum Arch {
     private static final Logger logger = Logger.getLogger(Arch.class.getName());
 
     public static Arch forOSArch(String osArch) {
-        if("amd64".equals(osArch)) {
+        if("amd64".equals(osArch) || "x86_64".equals(osArch)) {
             return AMD64;
         } else {
             logger.warning("Arch not recognized " + osArch);
