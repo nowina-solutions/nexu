@@ -26,6 +26,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import lu.nowina.nexu.api.Feedback;
+import lu.nowina.nexu.api.FeedbackClient;
 import lu.nowina.nexu.view.core.UIOperation;
 
 public class StoreResultController extends UIOperation<Feedback>implements Initializable {
@@ -54,6 +55,8 @@ public class StoreResultController extends UIOperation<Feedback>implements Initi
 			logger.info(new File(".").getAbsolutePath());
 			if (publish.isSelected()) {
 				try {
+					FeedbackClient client = new FeedbackClient("http://lab.nowina.solutions/nexu/");
+					client.reportError(feedback);
 					signalEnd(feedback);
 				} catch (Exception ex) {
 					logger.log(Level.SEVERE, "Cannot send feedback", ex);
