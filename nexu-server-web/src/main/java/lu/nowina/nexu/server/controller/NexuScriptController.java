@@ -31,7 +31,7 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 
 @Controller
-public class PageController {
+public class NexuScriptController {
 
 	@Value("${baseUrl}")
 	private String baseUrl;
@@ -41,7 +41,7 @@ public class PageController {
 
 	private Template template;
 
-	public PageController() {
+	public NexuScriptController() {
 		try {
 			Configuration cfg = new Configuration();
 			cfg.setClassForTemplateLoading(getClass(), "/");
@@ -49,11 +49,6 @@ public class PageController {
 		} catch (IOException e) {
 			throw new RuntimeException();
 		}
-	}
-
-	@RequestMapping("/")
-	public String home() {
-		return "index";
 	}
 
 	@RequestMapping("/nexu.js")

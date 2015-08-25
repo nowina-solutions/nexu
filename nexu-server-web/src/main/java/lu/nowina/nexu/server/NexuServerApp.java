@@ -22,7 +22,6 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.transport.servlet.CXFServlet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.actuate.system.ApplicationPidFileWriter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.embedded.ServletRegistrationBean;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
@@ -58,7 +57,6 @@ public class NexuServerApp extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
         SpringApplication app = new SpringApplication(NexuServerApp.class);
-        app.addListeners(new ApplicationPidFileWriter());
         app.run();
 	}
 
