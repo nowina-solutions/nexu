@@ -25,12 +25,10 @@ import org.apache.commons.lang.StringUtils;
 import com.google.gson.Gson;
 
 import eu.europa.esig.dss.ToBeSigned;
-import lu.nowina.nexu.api.GetCertificateRequest;
-import lu.nowina.nexu.api.GetCertificateResponse;
-import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.Execution;
+import lu.nowina.nexu.api.GetCertificateRequest;
+import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SignatureRequest;
-import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
 
 /**

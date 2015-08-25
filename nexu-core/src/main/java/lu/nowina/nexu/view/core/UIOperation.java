@@ -15,8 +15,16 @@ package lu.nowina.nexu.view.core;
 
 import java.util.logging.Logger;
 
-import lu.nowina.nexu.InternalAPI;
-
+/**
+ * A UIOperation control the user interaction with the UIFlow. The UIFlow
+ * trigger the UIOperation and call the method "waitEnd()". When the user
+ * finished the operation, the UIOperation notify the UIFlow through the method
+ * "signalEnd()".
+ * 
+ * @author david.naramski
+ *
+ * @param <R>
+ */
 public abstract class UIOperation<R> {
 
 	private static final Logger logger = Logger.getLogger(UIOperation.class.getName());
@@ -25,6 +33,13 @@ public abstract class UIOperation<R> {
 
 	private volatile R result = null;
 	
+    /**
+     * Once the UIOperation has been instanciated and initialized, the UIFlow
+     * will call the "waitEnd()" method.
+     * 
+     * @return
+     * @throws InterruptedException
+     */
 	public final R waitEnd() throws InterruptedException {
 		String name = getOperationName();
 
@@ -36,6 +51,12 @@ public abstract class UIOperation<R> {
 		return result;
 	}
 
+    /**
+     * When the user has finished performing the operation, the UIOperation must
+     * call the "signalEnd()" method to resume the UIFlow.
+     * 
+     * @param result
+     */
 	protected final void signalEnd(R result) {
 		String name = getOperationName();
 

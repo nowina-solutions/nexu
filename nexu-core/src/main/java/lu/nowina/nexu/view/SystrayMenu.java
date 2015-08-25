@@ -22,20 +22,23 @@ import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
-import lu.nowina.nexu.UserPreferences;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import lu.nowina.nexu.view.core.UIDisplay;
+import lu.nowina.nexu.view.ui.AboutController;
 
 public class SystrayMenu {
-
-	private UserPreferences config;
 
 	private TrayIcon trayIcon;
 
 	private MenuItem exitItem;
 
-	private MenuItem configItem;
-
-	public SystrayMenu() {
+	private MenuItem aboutItem;
+	
+	public SystrayMenu(UIDisplay display) {
 
 		if (SystemTray.isSupported()) {
 
@@ -47,17 +50,31 @@ public class SystrayMenu {
 					if (e.getSource() == exitItem) {
 						System.out.println("Exiting...");
 						System.exit(0);
-					} else if (e.getSource() == configItem) {
-						ConfigFrame frame = new ConfigFrame(config);
-						frame.setVisible(true);
+					} else if (e.getSource() == aboutItem) {
+
+				        FXMLLoader loader = new FXMLLoader();
+				        try {
+				            loader.load(getClass().getResourceAsStream("/fxml/about.fxml"));
+
+	                        Parent root = loader.getRoot();
+	                        AboutController controller = loader.getController();
+	                        controller.setDisplay(display);
+	                        
+	                        Platform.runLater(() -> {
+	                            display.display(root);
+	                        });
+	                        
+				        } catch (IOException ex) {
+				            throw new RuntimeException(ex);
+				        }
 					}
 				}
 			};
 
 			PopupMenu popup = new PopupMenu();
-			configItem = new MenuItem("Config");
-			configItem.addActionListener(actionListener);
-			popup.add(configItem);
+			aboutItem = new MenuItem("About");
+			aboutItem.addActionListener(actionListener);
+			popup.add(aboutItem);
 			exitItem = new MenuItem("Exit");
 			exitItem.addActionListener(actionListener);
 			popup.add(exitItem);
@@ -75,10 +92,6 @@ public class SystrayMenu {
 		} else {
 			System.err.println("System tray is currently not supported.");
 		}
-	}
-
-	public void setConfig(UserPreferences config) {
-		this.config = config;
 	}
 
 }

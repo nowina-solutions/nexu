@@ -27,7 +27,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
-import javafx.util.Callback;
 import lu.nowina.nexu.view.core.UIOperation;
 
 public class KeySelectionController extends UIOperation<DSSPrivateKeyEntry>implements Initializable {

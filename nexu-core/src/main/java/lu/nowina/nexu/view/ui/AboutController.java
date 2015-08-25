@@ -11,24 +11,32 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu;
+package lu.nowina.nexu.view.ui;
 
-public class State {
+import java.net.URL;
+import java.util.ResourceBundle;
 
-	private UserPreferences preferences;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import lu.nowina.nexu.view.core.UIDisplay;
 
-	private boolean connected;
+public class AboutController implements Initializable {
 
-	public State(UserPreferences preferences) {
-		this.preferences = preferences;
+	@FXML
+	private Button ok;
+	
+	private UIDisplay display;
+
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		ok.setOnAction((e) -> {
+		    display.close();
+		});
 	}
 
-	public void setConnectedToInternet(boolean connected) {
-		this.connected = connected;
-	}
-
-	public boolean isConnected() {
-		return connected;
-	}
-
+	public void setDisplay(UIDisplay display) {
+        this.display = display;
+    }
+	
 }

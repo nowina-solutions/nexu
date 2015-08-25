@@ -175,7 +175,6 @@ public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 		case PKCS_11:
 			Pkcs11Params pkcs11Params = displayAndWaitUIOperation("/fxml/pkcs11-params.fxml");
 			String absolutePath = pkcs11Params.getPkcs11Lib().getAbsolutePath();
-			absolutePath = absolutePath.replaceAll("\\s", "\\\\ ");
 			this.apiParams = absolutePath;
 			return api.registerTokenConnection(new Pkcs11SignatureToken(absolutePath,
 					getPasswordInputCallback()));
