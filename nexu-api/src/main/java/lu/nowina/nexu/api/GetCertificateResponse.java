@@ -13,17 +13,17 @@
  */
 package lu.nowina.nexu.api;
 
+import java.util.List;
+
 import lu.nowina.nexu.api.signature.smartcard.TokenId;
 
 public class GetCertificateResponse {
 
 	private String certificate;
-	
-	private TokenId tokenId;
 
-	public TokenId getTokenId() {
-		return tokenId;
-	}
+	private List<String> certificateChain;
+
+	private TokenId tokenId;
 
 	public String getCertificate() {
 		return certificate;
@@ -33,8 +33,20 @@ public class GetCertificateResponse {
 		this.certificate = certificate;
 	}
 
+	public List<String> getCertificateChain() {
+		return certificateChain;
+	}
+
+	public void setCertificateChain(List<String> certificateChain) {
+		this.certificateChain = certificateChain;
+	}
+
+	public TokenId getTokenId() {
+		return tokenId;
+	}
+
 	public void setTokenId(TokenId tokenId) {
 		this.tokenId = tokenId;
 	}
-	
+
 }

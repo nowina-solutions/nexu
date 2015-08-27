@@ -15,11 +15,11 @@ package lu.nowina.nexu.flow;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
-import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.InternalAPI;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackStatus;
@@ -29,6 +29,9 @@ import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.signature.smartcard.TokenId;
 import lu.nowina.nexu.view.core.UIDisplay;
+import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
+import eu.europa.esig.dss.token.SignatureTokenConnection;
+import eu.europa.esig.dss.x509.CertificateToken;
 
 public class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCertificateResponse> {
 
@@ -60,14 +63,12 @@ public class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCert
 							feedback.setSelectedAPI(getSelectedApi());
 							feedback.setSelectedCard(getSelectedCard());
 
-							if (feedback.getSelectedCard() != null && feedback.getSelectedAPI() != null
-									&& (feedback.getSelectedAPI() == ScAPI.MSCAPI
-											|| feedback.getApiParameter() != null)) {
+							if ((feedback.getSelectedCard() != null) && (feedback.getSelectedAPI() != null)
+									&& ((feedback.getSelectedAPI() == ScAPI.MSCAPI) || (feedback.getApiParameter() != null))) {
 
 								Feedback back = displayAndWaitUIOperation("/fxml/store-result.fxml", feedback);
 								if (back != null) {
-									((InternalAPI) api).store(back.getSelectedCard().getAtr(), back.getSelectedAPI(),
-											back.getApiParameter());
+									((InternalAPI) api).store(back.getSelectedCard().getAtr(), back.getSelectedAPI(), back.getApiParameter());
 								}
 
 							} else {
@@ -78,6 +79,15 @@ public class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCert
 
 						GetCertificateResponse resp = new GetCertificateResponse();
 						resp.setCertificate(key.getCertificate().getBase64Encoded());
+
+						CertificateToken[] certificateChain = key.getCertificateChain();
+						if (certificateChain != null) {
+							List<String> listCertificates = new ArrayList<String>();
+							for (CertificateToken certificateToken : certificateChain) {
+								listCertificates.add(certificateToken.getBase64Encoded());
+							}
+							resp.setCertificateChain(listCertificates);
+						}
 						resp.setTokenId(tokenId);
 						return resp;
 

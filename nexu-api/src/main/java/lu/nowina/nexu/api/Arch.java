@@ -22,17 +22,20 @@ import javax.xml.bind.annotation.XmlType;
 @XmlEnum
 public enum Arch {
 
-    X86, AMD64, NOT_RECOGNIZED;
+	X86,
+	AMD64,
+	NOT_RECOGNIZED;
 
-    private static final Logger logger = Logger.getLogger(Arch.class.getName());
+	private static final Logger logger = Logger.getLogger(Arch.class.getName());
 
-    public static Arch forOSArch(String osArch) {
-        if("amd64".equals(osArch) || "x86_64".equals(osArch)) {
-            return AMD64;
-        } else {
-            logger.warning("Arch not recognized " + osArch);
-            return Arch.NOT_RECOGNIZED;
-        }
-    }
-
+	public static Arch forOSArch(String osArch) {
+		if ("amd64".equals(osArch) || "x86_64".equals(osArch)) {
+			return AMD64;
+		} else if ("x86".equals(osArch)) {
+			return X86;
+		} else {
+			logger.warning("Arch not recognized " + osArch);
+			return Arch.NOT_RECOGNIZED;
+		}
+	}
 }

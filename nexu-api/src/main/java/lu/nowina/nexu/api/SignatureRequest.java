@@ -13,26 +13,21 @@
  */
 package lu.nowina.nexu.api;
 
-import eu.europa.esig.dss.ToBeSigned;
 import lu.nowina.nexu.api.signature.smartcard.TokenId;
+import eu.europa.esig.dss.DigestAlgorithm;
+import eu.europa.esig.dss.ToBeSigned;
 
 public class SignatureRequest extends NexuRequest {
 
 	private TokenId tokenId;
-	
-	private ToBeSigned tbs;
-	
+
+	private ToBeSigned toBeSigned;
+
+	private DigestAlgorithm digestAlgorithm;
+
 	private String keyId;
-	
+
 	public SignatureRequest() {
-	}
-	
-	public SignatureRequest(ToBeSigned tbs) {
-		this.tbs = tbs;
-	}
-	
-	public ToBeSigned getToBeSigned() {
-		return tbs;
 	}
 
 	public TokenId getTokenId() {
@@ -43,12 +38,20 @@ public class SignatureRequest extends NexuRequest {
 		this.tokenId = tokenId;
 	}
 
-	public ToBeSigned getTbs() {
-		return tbs;
+	public ToBeSigned getToBeSigned() {
+		return toBeSigned;
 	}
 
-	public void setTbs(ToBeSigned tbs) {
-		this.tbs = tbs;
+	public void setToBeSigned(ToBeSigned toBeSigned) {
+		this.toBeSigned = toBeSigned;
+	}
+
+	public DigestAlgorithm getDigestAlgorithm() {
+		return digestAlgorithm;
+	}
+
+	public void setDigestAlgorithm(DigestAlgorithm digestAlgorithm) {
+		this.digestAlgorithm = digestAlgorithm;
 	}
 
 	public String getKeyId() {
@@ -58,5 +61,5 @@ public class SignatureRequest extends NexuRequest {
 	public void setKeyId(String keyId) {
 		this.keyId = keyId;
 	}
-	
+
 }

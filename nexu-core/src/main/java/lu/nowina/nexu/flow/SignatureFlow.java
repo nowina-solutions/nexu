@@ -18,10 +18,6 @@ import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import eu.europa.esig.dss.DigestAlgorithm;
-import eu.europa.esig.dss.SignatureValue;
-import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
-import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.InternalAPI;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackStatus;
@@ -31,6 +27,9 @@ import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.signature.smartcard.TokenId;
 import lu.nowina.nexu.view.core.UIDisplay;
+import eu.europa.esig.dss.SignatureValue;
+import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
+import eu.europa.esig.dss.token.SignatureTokenConnection;
 
 public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse> {
 
@@ -43,7 +42,7 @@ public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse
 	@Override
 	protected SignatureResponse start(NexuAPI api, SignatureRequest req) {
 
-		if (req.getToBeSigned() == null || req.getToBeSigned().getBytes() == null) {
+		if ((req.getToBeSigned() == null) || (req.getToBeSigned().getBytes() == null)) {
 			throw new IllegalArgumentException("ToBeSigned is null");
 		}
 
@@ -62,20 +61,20 @@ public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse
 
 						logger.info("Key " + key + " " + key.getCertificate().getSubjectDN() + " from "
 								+ key.getCertificate().getIssuerDN());
-						SignatureValue value = token.sign(req.getToBeSigned(), DigestAlgorithm.SHA1, key);
+						SignatureValue value = token.sign(req.getToBeSigned(), req.getDigestAlgorithm(), key);
 						logger.info("Signature performed " + value);
 
 						if (isAdvancedCreation()) {
-							
+
 							Feedback feedback = new Feedback();
 							feedback.setFeedbackStatus(FeedbackStatus.SUCCESS);
 							feedback.setApiParameter(getApiParams());
 							feedback.setSelectedAPI(getSelectedApi());
 							feedback.setSelectedCard(getSelectedCard());
 
-							if (feedback.getSelectedCard() != null && feedback.getSelectedAPI() != null
-									&& (feedback.getSelectedAPI() == ScAPI.MSCAPI
-											|| feedback.getApiParameter() != null)) {
+							if ((feedback.getSelectedCard() != null) && (feedback.getSelectedAPI() != null)
+									&& ((feedback.getSelectedAPI() == ScAPI.MSCAPI)
+											|| (feedback.getApiParameter() != null))) {
 
 								Feedback back = displayAndWaitUIOperation("/fxml/store-result.fxml", feedback);
 								if (back != null) {
@@ -86,14 +85,14 @@ public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse
 							} else {
 								displayAndWaitUIOperation("/fxml/message.fxml", "Signature performed");
 							}
-							
+
 						} else {
 							displayAndWaitUIOperation("/fxml/message.fxml", "Signature performed");
 						}
 
 						SignatureResponse resp = new SignatureResponse(value);
 						return resp;
-						
+
 					} else {
 
 						displayAndWaitUIOperation("/fxml/message.fxml", "Error - No keys");

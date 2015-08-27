@@ -14,23 +14,30 @@
 
 var nexuVersion = "1.0";
 
-function nexu_sign(data, success_callback, error_callback) {
+function nexu_get_certificates(success_callback, error_callback) {
+	callUrl("${nexuUrl}/rest/certificates", "GET", {}, success_callback, error_callback);
+}
 
+function nexu_sign(dataToSign, digestAlgo, success_callback, error_callback) {
+	var data = { data : dataToSign, digestAlgo : digestAlgo };
+	callUrl("${nexuUrl}/rest/sign", "GET", data, success_callback, error_callback);
+}
+
+function callUrl(url, type, data, success_callback, error_callback) {
 	$.ajax({
-		  url: "${nexuUrl}/rest/sign",
-		  data: {
-			  data : data
-		  },
+		  type: type,
+		  url: url,
+		  data: data,
 		  dataType: "json",
-		  success: function (data) {
-			  console.log("ok");
-			  success_callback.call(this, data);
+		  success: function (result) {
+			  console.log(url + " : ok");
+			  success_callback.call(this, result);
 		  }
 		}).fail(function (error) {
-			eval(error_callback);
+			eval(error);
+			error_callback.call(this, error);
 		});
-	
-}
+} 
 
 $.get("${nexuUrl}/nexu-info", function(data) {
 	// something responded

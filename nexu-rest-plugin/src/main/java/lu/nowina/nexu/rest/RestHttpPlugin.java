@@ -19,86 +19,92 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-
-import com.google.gson.Gson;
-
-import eu.europa.esig.dss.ToBeSigned;
 import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+
+import com.google.gson.Gson;
+
+import eu.europa.esig.dss.DigestAlgorithm;
+import eu.europa.esig.dss.ToBeSigned;
+
 /**
- * Default implementation of HttpPlugin for NexU. 
- * 
- * @author David Naramski
+ * Default implementation of HttpPlugin for NexU.
  *
+ * @author David Naramski
  */
 public class RestHttpPlugin implements HttpPlugin {
 
 	private static final Logger logger = Logger.getLogger(RestHttpPlugin.class.getName());
-	
+
 	private static final Gson gson = new Gson();
-	
+
 	@Override
 	public void init(String pluginId, NexuAPI api) {
 	}
-	
+
 	@Override
 	public void process(NexuAPI api, HttpServletRequest req, HttpServletResponse resp) throws Exception {
 
 		String uri = req.getRequestURI();
 		logger.info("URI " + uri);
-		
+
 		String target = req.getPathInfo();
 		logger.info("PathInfo " + target);
 
 		String payload = IOUtils.toString(req.getInputStream());
 		logger.info("Payload '" + payload + "'");
-		
+
 		if ("/sign".equals(target)) {
 
 			logger.info("Signature");
 			SignatureRequest r = new SignatureRequest();
-			if(StringUtils.isEmpty(payload)) {
+			if (StringUtils.isEmpty(payload)) {
 				r = new SignatureRequest();
-				
+
 				String data = req.getParameter("data");
-				if(data != null) {
+				if (data != null) {
 					logger.info("Data to sign " + data);
-					
 					ToBeSigned tbs = new ToBeSigned();
 					tbs.setBytes(data.getBytes());
-					r.setTbs(tbs);
+					r.setToBeSigned(tbs);
 				}
-				
+
+				String digestAlgo = req.getParameter("digestAlgo");
+				if (digestAlgo != null) {
+					logger.info("digestAlgo " + digestAlgo);
+					r.setDigestAlgorithm(DigestAlgorithm.forName("digestAlgo", DigestAlgorithm.SHA256));
+				}
+
 			} else {
 				r = gson.fromJson(payload, SignatureRequest.class);
 			}
-			
+
 			Execution<?> respObj = api.sign(r);
-			
+
 			PrintWriter writer = resp.getWriter();
-			writer.write(gson.toJson(respObj));;
+			writer.write(gson.toJson(respObj));
 			writer.close();
 
 		} else if ("/certificates".equals(target)) {
 
 			logger.info("API call certificates");
 			GetCertificateRequest payloadObj = null;
-			if(StringUtils.isEmpty(payload)) {
+			if (StringUtils.isEmpty(payload)) {
 				payloadObj = new GetCertificateRequest();
 			} else {
 				payloadObj = gson.fromJson(payload, GetCertificateRequest.class);
 			}
-			
+
 			logger.info("Call API");
 			Execution<?> respObj = api.getCertificate(payloadObj);
 			PrintWriter writer = resp.getWriter();
-			writer.write(gson.toJson(respObj));;
+			writer.write(gson.toJson(respObj));
 			writer.close();
 
 		}
