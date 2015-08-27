@@ -22,7 +22,7 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<encoding>UTF-8</encoding>
 	</properties>
-	
+
 	<licenses>
 		<license>
 			<name>European Union Public Licence (EUPL) v1.1</name>
@@ -32,9 +32,9 @@
 
 	<repositories>
 		<repository>
-			<id>forge.nowina.lu</id>
-			<name>Internal repository</name>
-			<url>http://forge.nowina.local/nexus/content/groups/nowina/</url>
+			<id>joinup</id>
+			<name>Joinup</name>
+			<url>https://joinup.ec.europa.eu/nexus/content/repositories/releases/</url>
 		</repository>
 	</repositories>
 
