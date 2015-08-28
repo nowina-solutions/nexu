@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.DatatypeConverter;
 
 import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.GetCertificateRequest;
@@ -71,14 +72,14 @@ public class RestHttpPlugin implements HttpPlugin {
 				if (data != null) {
 					logger.info("Data to sign " + data);
 					ToBeSigned tbs = new ToBeSigned();
-					tbs.setBytes(data.getBytes());
+					tbs.setBytes(DatatypeConverter.parseBase64Binary(data));
 					r.setToBeSigned(tbs);
 				}
 
 				String digestAlgo = req.getParameter("digestAlgo");
 				if (digestAlgo != null) {
 					logger.info("digestAlgo " + digestAlgo);
-					r.setDigestAlgorithm(DigestAlgorithm.forName("digestAlgo", DigestAlgorithm.SHA256));
+					r.setDigestAlgorithm(DigestAlgorithm.forName(digestAlgo, DigestAlgorithm.SHA256));
 				}
 
 			} else {
