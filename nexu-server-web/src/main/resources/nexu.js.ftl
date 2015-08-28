@@ -18,8 +18,15 @@ function nexu_get_certificates(success_callback, error_callback) {
 	callUrl("${nexuUrl}/rest/certificates", "GET", {}, success_callback, error_callback);
 }
 
-function nexu_sign(tokenId, keyId, dataToSign, digestAlgo, success_callback, error_callback) {
+/* function to use if we already know a certificate and its tokenId/keyId */
+function nexu_sign_with_token_infos(tokenId, keyId, dataToSign, digestAlgo, success_callback, error_callback) {
 	var data = { tokenId:tokenId, keyId:keyId, dataToSign:dataToSign, digestAlgo:digestAlgo };
+	callUrl("${nexuUrl}/rest/sign", "GET", data, success_callback, error_callback);
+}
+
+/* function to use without tokenId/keyId */
+function nexu_sign(dataToSign, digestAlgo, success_callback, error_callback) {
+	var data = { dataToSign:dataToSign, digestAlgo:digestAlgo };
 	callUrl("${nexuUrl}/rest/sign", "GET", data, success_callback, error_callback);
 }
 
@@ -30,10 +37,11 @@ function callUrl(url, type, data, success_callback, error_callback) {
 		  data: data,
 		  dataType: "json",
 		  success: function (result) {
-			  console.log(url + " : ok");
+			  console.log(url + " : OK");
 			  success_callback.call(this, result);
 		  }
 		}).fail(function (error) {
+			console.log(url + " : KO");
 			eval(error);
 			error_callback.call(this, error);
 		});
@@ -44,6 +52,11 @@ $.get("${nexuUrl}/nexu-info", function(data) {
 	if(data == nexuVersion) {
 		// valid version
 		$(".nexu-sign-button").html("Sign");
+		// add hidden input to be able to check on server side
+    	if ($('#nexu').length){
+   	    	var hiddenInput = $('<input/>',{type:'hidden',name:'nexuDetected',value:'true'});
+   	    	hiddenInput.appendTo($('#nexu'));
+   	    }
 	} else {
 		// need update
 		$(".nexu-sign-button").html("Update NexU");
