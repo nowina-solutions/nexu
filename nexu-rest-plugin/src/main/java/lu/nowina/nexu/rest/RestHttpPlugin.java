@@ -25,6 +25,7 @@ import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
+import lu.nowina.nexu.api.signature.smartcard.TokenId;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -68,7 +69,7 @@ public class RestHttpPlugin implements HttpPlugin {
 			if (StringUtils.isEmpty(payload)) {
 				r = new SignatureRequest();
 
-				String data = req.getParameter("data");
+				String data = req.getParameter("dataToSign");
 				if (data != null) {
 					logger.info("Data to sign " + data);
 					ToBeSigned tbs = new ToBeSigned();
@@ -81,6 +82,11 @@ public class RestHttpPlugin implements HttpPlugin {
 					logger.info("digestAlgo " + digestAlgo);
 					r.setDigestAlgorithm(DigestAlgorithm.forName(digestAlgo, DigestAlgorithm.SHA256));
 				}
+
+				TokenId tokenId = new TokenId(req.getParameter("tokenId"));
+				r.setTokenId(tokenId );
+
+				r.setKeyId(req.getParameter("keyId"));
 
 			} else {
 				r = gson.fromJson(payload, SignatureRequest.class);

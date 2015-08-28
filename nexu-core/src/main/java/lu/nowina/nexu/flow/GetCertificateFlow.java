@@ -70,15 +70,14 @@ public class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCert
 								if (back != null) {
 									((InternalAPI) api).store(back.getSelectedCard().getAtr(), back.getSelectedAPI(), back.getApiParameter());
 								}
-
 							} else {
 								displayAndWaitUIOperation("/fxml/provide-feedback.fxml", feedback);
 							}
-
 						}
 
 						GetCertificateResponse resp = new GetCertificateResponse();
 						resp.setCertificate(key.getCertificate().getBase64Encoded());
+						resp.setKeyId(key.getCertificate().getDSSIdAsString());
 
 						CertificateToken[] certificateChain = key.getCertificateChain();
 						if (certificateChain != null) {

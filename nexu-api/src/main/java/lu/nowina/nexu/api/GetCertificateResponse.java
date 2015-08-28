@@ -19,11 +19,29 @@ import lu.nowina.nexu.api.signature.smartcard.TokenId;
 
 public class GetCertificateResponse {
 
+	private TokenId tokenId;
+
+	private String keyId;
+
 	private String certificate;
 
 	private List<String> certificateChain;
 
-	private TokenId tokenId;
+	public TokenId getTokenId() {
+		return tokenId;
+	}
+
+	public void setTokenId(TokenId tokenId) {
+		this.tokenId = tokenId;
+	}
+
+	public String getKeyId() {
+		return keyId;
+	}
+
+	public void setKeyId(String keyId) {
+		this.keyId = keyId;
+	}
 
 	public String getCertificate() {
 		return certificate;
@@ -39,14 +57,6 @@ public class GetCertificateResponse {
 
 	public void setCertificateChain(List<String> certificateChain) {
 		this.certificateChain = certificateChain;
-	}
-
-	public TokenId getTokenId() {
-		return tokenId;
-	}
-
-	public void setTokenId(TokenId tokenId) {
-		this.tokenId = tokenId;
 	}
 
 }

@@ -18,8 +18,8 @@ function nexu_get_certificates(success_callback, error_callback) {
 	callUrl("${nexuUrl}/rest/certificates", "GET", {}, success_callback, error_callback);
 }
 
-function nexu_sign(dataToSign, digestAlgo, success_callback, error_callback) {
-	var data = { data : dataToSign, digestAlgo : digestAlgo };
+function nexu_sign(tokenId, keyId, dataToSign, digestAlgo, success_callback, error_callback) {
+	var data = { tokenId:tokenId, keyId:keyId, dataToSign:dataToSign, digestAlgo:digestAlgo };
 	callUrl("${nexuUrl}/rest/sign", "GET", data, success_callback, error_callback);
 }
 
