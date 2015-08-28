@@ -34,7 +34,7 @@
 		<repository>
 			<id>joinup</id>
 			<name>Joinup</name>
-			<url>https://joinup.ec.europa.eu/nexus/content/repositories/releases/</url>
+			<url>https://joinup.ec.europa.eu/nexus/content/groups/public/</url>
 		</repository>
 	</repositories>
 
