@@ -16,6 +16,7 @@ package lu.nowina.nexu.api;
 import java.util.List;
 
 import lu.nowina.nexu.api.signature.smartcard.TokenId;
+import eu.europa.esig.dss.EncryptionAlgorithm;
 
 public class GetCertificateResponse {
 
@@ -26,6 +27,8 @@ public class GetCertificateResponse {
 	private String certificate;
 
 	private List<String> certificateChain;
+
+	private EncryptionAlgorithm encryptionAlgorithm;
 
 	public TokenId getTokenId() {
 		return tokenId;
@@ -57,6 +60,14 @@ public class GetCertificateResponse {
 
 	public void setCertificateChain(List<String> certificateChain) {
 		this.certificateChain = certificateChain;
+	}
+
+	public EncryptionAlgorithm getEncryptionAlgorithm() {
+		return encryptionAlgorithm;
+	}
+
+	public void setEncryptionAlgorithm(EncryptionAlgorithm encryptionAlgorithm) {
+		this.encryptionAlgorithm = encryptionAlgorithm;
 	}
 
 }

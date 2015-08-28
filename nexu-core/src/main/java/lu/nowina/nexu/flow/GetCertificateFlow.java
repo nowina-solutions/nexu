@@ -76,8 +76,12 @@ public class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCert
 						}
 
 						GetCertificateResponse resp = new GetCertificateResponse();
-						resp.setCertificate(key.getCertificate().getBase64Encoded());
-						resp.setKeyId(key.getCertificate().getDSSIdAsString());
+						resp.setTokenId(tokenId);
+
+						CertificateToken certificate = key.getCertificate();
+						resp.setCertificate(certificate.getBase64Encoded());
+						resp.setKeyId(certificate.getDSSIdAsString());
+						resp.setEncryptionAlgorithm(certificate.getEncryptionAlgorithm());
 
 						CertificateToken[] certificateChain = key.getCertificateChain();
 						if (certificateChain != null) {
@@ -87,7 +91,7 @@ public class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCert
 							}
 							resp.setCertificateChain(listCertificates);
 						}
-						resp.setTokenId(tokenId);
+
 						return resp;
 
 					}

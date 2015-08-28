@@ -15,25 +15,18 @@ package lu.nowina.nexu.api;
 
 import javax.xml.bind.DatatypeConverter;
 
-import eu.europa.esig.dss.EncryptionAlgorithm;
 import eu.europa.esig.dss.SignatureValue;
 
 public class SignatureResponse {
 
-	private EncryptionAlgorithm encryptionAlgorithm;
 	private String signatureValue;
 
 	public SignatureResponse(SignatureValue value) {
 		this.signatureValue = new String(DatatypeConverter.printBase64Binary(value.getValue()));
-		this.encryptionAlgorithm = value.getAlgorithm().getEncryptionAlgorithm();
 	}
 
 	public String getSignatureValue() {
 		return signatureValue;
-	}
-
-	public EncryptionAlgorithm getEncryptionAlgorithm() {
-		return encryptionAlgorithm;
 	}
 
 }
