@@ -34,6 +34,14 @@ public class DetectedCard {
      */
     private int terminalIndex;
 
+    public DetectedCard() {
+    }
+    
+    public DetectedCard(String atr, int terminalIndex) {
+        this.atr = atr;
+        this.terminalIndex = terminalIndex;
+    }
+    
     /**
      * Transform an ATR byte array into a string.
      *

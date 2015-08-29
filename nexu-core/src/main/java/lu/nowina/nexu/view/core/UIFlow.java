@@ -13,16 +13,12 @@
  */
 package lu.nowina.nexu.view.core;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
 import eu.europa.esig.dss.token.PasswordInputCallback;
-import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import lu.nowina.nexu.api.NexuAPI;
 
 /**
@@ -70,58 +66,12 @@ public abstract class UIFlow<I, O> {
 	 */
 	protected abstract O start(NexuAPI api, I input);
 
-	protected PasswordInputCallback getPasswordInputCallback() {
-		return new FlowPasswordCallback();
-	}
-
-	protected <T extends Object> T displayAndWaitUIOperation(String fxml) {
-		return displayAndWaitUIOperation(fxml, (Object[]) null);
-	}
-
 	protected <T extends Object> T displayAndWaitUIOperation(String fxml, Object... params) {
-
-		logger.info("Loading " + fxml + " view");
-		FXMLLoader loader = new FXMLLoader();
-		try {
-			loader.load(getClass().getResourceAsStream(fxml));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		Parent root = loader.getRoot();
-		UIOperation<T> controller = loader.getController();
-
-		display(root);
-		return waitForUser(controller, params);
+	    return display.displayAndWaitUIOperation(fxml, params);
 	}
-
-	private <T> T waitForUser(UIOperation<T> controller, Object... params) {
-		try {
-			logger.info("Wait on Thread " + Thread.currentThread().getName());
-			controller.init(params);
-			T r = controller.waitEnd();
-			display.displayWaitingPane();
-			return r;
-		} catch (InterruptedException e) {
-			throw new RuntimeException();
-		}
-	}
-
-	private void display(Parent root) {
-		logger.info("Display " + root + " in display " + display + " from Thread " + Thread.currentThread().getName());
-		Platform.runLater(() -> {
-			logger.info(
-					"Display " + root + " in display " + display + " from Thread " + Thread.currentThread().getName());
-			display.display(root);
-		});
-	}
-
-	private final class FlowPasswordCallback implements PasswordInputCallback {
-		@Override
-		public char[] getPassword() {
-			logger.info("Request password");
-			return displayAndWaitUIOperation("/fxml/password-input.fxml");
-		}
+	
+	protected PasswordInputCallback getPasswordInputCallback() {
+	    return display.getPasswordInputCallback();
 	}
 
 }

@@ -54,7 +54,7 @@ public class InternalAPI implements NexuAPI {
 
 	private UserPreferences prefs;
 
-	private CardDetector detector = new CardDetector();
+	private CardDetector detector;
 
 	private List<CardAdapter> adapters = new ArrayList<>();
 
@@ -66,10 +66,11 @@ public class InternalAPI implements NexuAPI {
 
 	private SCDatabase store;
 
-	public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store) {
+	public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store, CardDetector detector) {
 		this.display = display;
 		this.prefs = prefs;
 		this.store = store;
+		this.detector = detector;
 	}
 
 	@Override

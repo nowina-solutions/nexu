@@ -137,6 +137,7 @@ public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 
 			if (advanced) {
 
+			    logger.info("Advanced mode");
 				if(detectedCards.size() == 1) {
 					DetectedCard firstMatch = detectedCards.get(0);
 					this.selectedCard = firstMatch;

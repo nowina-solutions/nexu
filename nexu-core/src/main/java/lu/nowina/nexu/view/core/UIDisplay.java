@@ -13,6 +13,7 @@
  */
 package lu.nowina.nexu.view.core;
 
+import eu.europa.esig.dss.token.PasswordInputCallback;
 import javafx.scene.Parent;
 
 /**
@@ -22,10 +23,14 @@ import javafx.scene.Parent;
  */
 public interface UIDisplay {
 
-	void display(Parent panel);
+    void display(Parent panel);
 
-	void displayWaitingPane();
+    void displayWaitingPane();
 
-	void close();
+    void close();
+
+    <T extends Object> T displayAndWaitUIOperation(String fxml, Object... params);
+
+    PasswordInputCallback getPasswordInputCallback();
 
 }
