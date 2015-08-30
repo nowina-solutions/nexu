@@ -71,7 +71,7 @@ public class CardDetector {
 						new Object[] { terminalIndex, cardDetection.getAtr() });
 			} catch (CardException e) {
 				// Card not present or unreadable
-				logger.log(Level.INFO, "No card present in terminal {0}, or not readable.",
+				logger.log(Level.WARNING, "No card present in terminal {0}, or not readable.",
 						Integer.toString(terminalIndex));
 			}
 			terminalIndex++;

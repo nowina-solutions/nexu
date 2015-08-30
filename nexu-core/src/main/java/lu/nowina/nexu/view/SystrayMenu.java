@@ -23,6 +23,8 @@ import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -31,6 +33,8 @@ import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.ui.AboutController;
 
 public class SystrayMenu {
+    
+    private static final Logger logger = Logger.getLogger(SystrayMenu.class.getName());
 
 	private TrayIcon trayIcon;
 
@@ -86,6 +90,7 @@ public class SystrayMenu {
 			try {
 				tray.add(trayIcon);
 			} catch (AWTException e) {
+			    logger.log(Level.SEVERE, "Cannot add TrayIcon", e);
 				System.err.println("TrayIcon could not be added.");
 			}
 

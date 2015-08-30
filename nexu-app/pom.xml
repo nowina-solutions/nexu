@@ -8,10 +8,6 @@
 	</parent>
 	<artifactId>nexu-app</artifactId>
 
-	<properties>
-		<skip.package>false</skip.package>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
@@ -97,18 +93,17 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<artifactId>maven-install-plugin</artifactId>
+				<configuration>
+					<skip>${skip.package}</skip>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
 	<profiles>
 	
-		<profile>
-			<id>no_package</id>
-			<properties>
-				<skip.package>true</skip.package>
-			</properties>
-		</profile>
-
 		<profile>
 			<id>windows</id>
 			<activation>

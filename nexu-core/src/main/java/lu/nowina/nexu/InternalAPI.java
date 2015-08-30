@@ -41,6 +41,7 @@ import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCInfo;
 import lu.nowina.nexu.smartcard.dector.CardDetector;
 import lu.nowina.nexu.view.core.UIDisplay;
+import lu.nowina.nexu.view.core.UIFlow;
 
 /**
  * Implementation of the NexuAPI
@@ -124,59 +125,44 @@ public class InternalAPI implements NexuAPI {
 		return connections.get(tokenId);
 	}
 
+	private <I,O> Execution<O> executeRequest(UIFlow<I,O> flow, I request) {
+	    
+        Execution<O> resp = new Execution<>();
+        try {
+
+            O response = flow.execute(this, request);
+
+            if (response != null) {
+                resp.setSuccess(true);
+                resp.setResponse(response);
+            } else {
+                resp.setSuccess(false);
+                resp.setError("no_response");
+                resp.setErrorMessage("No response");
+            }
+
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Cannot execute get certificates", e);
+            resp.setSuccess(false);
+            resp.setError("exception");
+            resp.setErrorMessage("Exception during execution");
+        }
+
+        return resp;
+	}
+	
 	@Override
 	public Execution<GetCertificateResponse> getCertificate(GetCertificateRequest request) {
 
-		Execution<GetCertificateResponse> resp = new Execution<>();
-		try {
-
-			GetCertificateFlow flow = new GetCertificateFlow(display);
-			GetCertificateResponse response = flow.execute(this, request);
-
-			if (response != null) {
-				resp.setSuccess(true);
-				resp.setResponse(response);
-			} else {
-				resp.setSuccess(false);
-				resp.setError("no_response");
-				resp.setErrorMessage("No response");
-			}
-
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Cannot execute get certificates", e);
-			resp.setSuccess(false);
-			resp.setError("exception");
-			resp.setErrorMessage("Exception during execution");
-		}
-
-		return resp;
+        GetCertificateFlow flow = new GetCertificateFlow(display);
+		return executeRequest(flow, request);
 	}
 
 	@Override
 	public Execution<SignatureResponse> sign(SignatureRequest request) {
 
-		Execution<SignatureResponse> resp = new Execution<>();
-		try {
-
-			SignatureFlow flow = new SignatureFlow(display);
-			SignatureResponse response = flow.execute(this, request);
-
-			if (response != null) {
-				resp.setSuccess(true);
-				resp.setResponse(response);
-			} else {
-				resp.setSuccess(false);
-				resp.setError("no_response");
-				resp.setErrorMessage("No response");
-			}
-
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Cannot execute signature", e);
-			resp.setSuccess(false);
-			resp.setError("exception");
-			resp.setErrorMessage("Exception during execution");
-		}
-		return resp;
+        SignatureFlow flow = new SignatureFlow(display);
+        return executeRequest(flow, request);
 
 	}
 

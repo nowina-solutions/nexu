@@ -15,6 +15,7 @@ package lu.nowina.nexu.jetty;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -80,6 +81,7 @@ public class RequestProcessor extends AbstractHandler {
 				HttpPlugin httpPlugin = api.getPlugin("rest");
 				httpPlugin.process(api, new DelegatedHttpServerRequest(request, "/rest"), response);
 			} catch (Exception e) {
+			    logger.log(Level.SEVERE, "Cannot process request", e);
 				response.setContentType("text/plain;charset=utf-8");
 				e.printStackTrace(response.getWriter());
 				response.getWriter().close();
