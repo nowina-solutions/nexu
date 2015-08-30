@@ -102,7 +102,7 @@ public class InternalAPITest {
 
         CardAdapter adapter1 = Mockito.mock(CardAdapter.class);
         Mockito.when(adapter1.accept(card)).thenReturn(Boolean.TRUE);
-        Mockito.when(adapter1.connect(api, card, display.getPasswordInputCallback())).thenReturn(id);
+        Mockito.when(adapter1.connect(api, card, display.getPasswordInputCallback())).thenReturn(c);
 
         List<Match> matches = api.matchingCardAdapters(card);
 

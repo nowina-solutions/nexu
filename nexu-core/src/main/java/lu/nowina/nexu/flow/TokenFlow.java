@@ -210,7 +210,16 @@ public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 		this.selectedCard = firstMatch.getCard();
 		CardAdapter adapter = firstMatch.getAdapter();
 
-		TokenId tokenId = adapter.connect(api, card, getPasswordInputCallback());
+		SignatureTokenConnection connect = adapter.connect(api, card, getPasswordInputCallback());
+        if(connect == null) {
+            logger.severe("No connect returned");
+            throw new NullPointerException("Card adapter returned null");
+        }
+        TokenId tokenId = api.registerTokenConnection(connect);
+        if(tokenId == null) {
+            logger.severe("Received null TokenId after registration");
+            throw new NullPointerException("Null TokenId");
+        }
 		return tokenId;
 	}
 

@@ -14,6 +14,7 @@
 package lu.nowina.nexu.api.signature.smartcard;
 
 import eu.europa.esig.dss.token.PasswordInputCallback;
+import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.NexuAPI;
 
@@ -39,6 +40,6 @@ public interface CardAdapter {
 	 * @param callback
 	 * @return
 	 */
-	public TokenId connect(NexuAPI api, DetectedCard card, PasswordInputCallback callback);
+	public SignatureTokenConnection connect(NexuAPI api, DetectedCard card, PasswordInputCallback callback);
 
 }

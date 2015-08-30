@@ -16,11 +16,11 @@ package lu.nowina.nexu.generic;
 import eu.europa.esig.dss.token.MSCAPISignatureToken;
 import eu.europa.esig.dss.token.PasswordInputCallback;
 import eu.europa.esig.dss.token.Pkcs11SignatureToken;
+import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.signature.smartcard.CardAdapter;
-import lu.nowina.nexu.api.signature.smartcard.TokenId;
 
 public class GenericCardAdapter implements CardAdapter {
 
@@ -36,16 +36,16 @@ public class GenericCardAdapter implements CardAdapter {
 	}
 
 	@Override
-	public TokenId connect(NexuAPI api, DetectedCard card, PasswordInputCallback callback) {
+	public SignatureTokenConnection connect(NexuAPI api, DetectedCard card, PasswordInputCallback callback) {
 		ScAPI scApi = info.getSelectedApi();
 		switch (scApi) {
 		case MSCAPI:
-			return api.registerTokenConnection(new MSCAPISignatureToken());
+			return new MSCAPISignatureToken();
 		case PKCS_11:
 			String absolutePath = info.getApiParam();
-			return api.registerTokenConnection(new Pkcs11SignatureToken(absolutePath, callback));
+			return new Pkcs11SignatureToken(absolutePath, callback);
 		default:
-			return null;
+		    throw new RuntimeException("API not supported");
 		}
 	}
 

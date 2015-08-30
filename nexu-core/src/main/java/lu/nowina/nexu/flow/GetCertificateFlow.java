@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
+import eu.europa.esig.dss.token.SignatureTokenConnection;
+import eu.europa.esig.dss.x509.CertificateToken;
 import lu.nowina.nexu.InternalAPI;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackStatus;
@@ -29,9 +32,6 @@ import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.signature.smartcard.TokenId;
 import lu.nowina.nexu.view.core.UIDisplay;
-import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
-import eu.europa.esig.dss.token.SignatureTokenConnection;
-import eu.europa.esig.dss.x509.CertificateToken;
 
 public class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCertificateResponse> {
 

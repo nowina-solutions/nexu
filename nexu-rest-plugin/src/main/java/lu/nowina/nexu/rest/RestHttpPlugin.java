@@ -20,13 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.DatatypeConverter;
 
-import lu.nowina.nexu.api.Execution;
-import lu.nowina.nexu.api.GetCertificateRequest;
-import lu.nowina.nexu.api.NexuAPI;
-import lu.nowina.nexu.api.SignatureRequest;
-import lu.nowina.nexu.api.plugin.HttpPlugin;
-import lu.nowina.nexu.api.signature.smartcard.TokenId;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -34,6 +27,12 @@ import com.google.gson.Gson;
 
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.ToBeSigned;
+import lu.nowina.nexu.api.Execution;
+import lu.nowina.nexu.api.GetCertificateRequest;
+import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.SignatureRequest;
+import lu.nowina.nexu.api.plugin.HttpPlugin;
+import lu.nowina.nexu.api.signature.smartcard.TokenId;
 
 /**
  * Default implementation of HttpPlugin for NexU.

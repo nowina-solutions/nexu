@@ -13,10 +13,13 @@
  */
 package lu.nowina.nexu;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import eu.europa.esig.dss.DSSException;
 import eu.europa.esig.dss.DigestAlgorithm;
+import eu.europa.esig.dss.SignatureAlgorithm;
 import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.ToBeSigned;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
@@ -26,8 +29,12 @@ public class MockSignatureTokenConnection implements SignatureTokenConnection {
 
     private List<DSSPrivateKeyEntry> keys;
     
-    public MockSignatureTokenConnection(List<DSSPrivateKeyEntry> keys) {
-        this.keys = keys;
+    public MockSignatureTokenConnection(DSSPrivateKeyEntry... keys) {
+        if(keys == null || keys.length == 0) {
+            this.keys = Collections.emptyList();
+        } else {
+            this.keys = Arrays.asList(keys);
+        }
     }
     
     @Override
@@ -42,7 +49,7 @@ public class MockSignatureTokenConnection implements SignatureTokenConnection {
     @Override
     public SignatureValue sign(ToBeSigned toBeSigned, DigestAlgorithm digestAlgorithm, DSSPrivateKeyEntry keyEntry)
             throws DSSException {
-        return null;
+        return new SignatureValue(SignatureAlgorithm.RSA_SHA256, "value".getBytes());
     }
 
 }
