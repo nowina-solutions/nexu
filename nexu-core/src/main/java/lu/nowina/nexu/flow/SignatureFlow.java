@@ -18,9 +18,6 @@ import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import eu.europa.esig.dss.SignatureValue;
-import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
-import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.InternalAPI;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackStatus;
@@ -30,6 +27,9 @@ import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.signature.smartcard.TokenId;
 import lu.nowina.nexu.view.core.UIDisplay;
+import eu.europa.esig.dss.SignatureValue;
+import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
+import eu.europa.esig.dss.token.SignatureTokenConnection;
 
 public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse> {
 
@@ -45,17 +45,18 @@ public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse
 		if ((req.getToBeSigned() == null) || (req.getToBeSigned().getBytes() == null)) {
 			throw new IllegalArgumentException("ToBeSigned is null");
 		}
-		
+
 		if((req.getDigestAlgorithm() == null)) {
-		    throw new IllegalArgumentException("Digest algorithm expected");
+			throw new IllegalArgumentException("Digest algorithm expected");
 		}
 
+		SignatureTokenConnection token = null;
 		try {
 
 			TokenId tokenId = getTokenId(api, req.getTokenId());
 			if (tokenId != null) {
 
-				SignatureTokenConnection token = api.getTokenConnection(tokenId);
+				token = api.getTokenConnection(tokenId);
 				logger.info("Token " + token);
 
 				if (token != null) {
@@ -127,6 +128,10 @@ public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse
 			displayAndWaitUIOperation("/fxml/provide-feedback.fxml", feedback);
 
 			displayAndWaitUIOperation("/fxml/message.fxml");
+		} finally {
+			if (token !=null){
+				token.close();
+			}
 		}
 
 		return null;
