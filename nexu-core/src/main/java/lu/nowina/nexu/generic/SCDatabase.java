@@ -24,43 +24,61 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import lu.nowina.nexu.api.ScAPI;
-
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class SCDatabase {
 
 	private static final Logger logger = Logger.getLogger(SCDatabase.class.getName());
-	
+
 	private File file;
-	
+
+	@XmlElement(name = "smartcard")
 	private List<SCInfo> smartcards;
-	
-	public void add(String detectedAtr, ScAPI selectedApi, String apiParam) {
-		SCInfo info = new SCInfo();
-		info.setApiParam(apiParam);
-		info.setDetectedAtr(detectedAtr);
-		info.setSelectedApi(selectedApi);
-		smartcards.add(info);
-		try {
-			save();
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Cannot save", e);
+
+	/**
+	 * Add a new ConnectionInfo to the database, associated with the ATR
+	 * 
+	 * @param detectedAtr
+	 * @param cInfo
+	 */
+	public void add(String detectedAtr, ConnectionInfo cInfo) {
+		SCInfo info = getInfo(detectedAtr);
+		if (info == null) {
+			info = new SCInfo();
+			info.setAtr(detectedAtr);
+			getSmartcards().add(info);
+		}
+		info.getInfos().add(cInfo);
+		if (file != null) {
+			try {
+				save();
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, "Cannot save", e);
+			}
 		}
 	}
-	
-	public SCInfo getInfo(String detectedAtr) {
-		for(SCInfo i : getSmartcards()) {
-			if(i.getDetectedAtr().equals(detectedAtr)) {
+
+	/**
+	 * Get SCInfo matching the provided ATR
+	 * @param atr
+	 * @return
+	 */
+	public SCInfo getInfo(String atr) {
+		for (SCInfo i : getSmartcards()) {
+			if (i.getAtr().equals(atr)) {
 				return i;
 			}
 		}
 		return null;
 	}
-	
+
 	public static SCDatabase load(File f) throws Exception {
-		if(f.exists()) {
+		if (f.exists()) {
 			JAXBContext ctx = JAXBContext.newInstance(SCDatabase.class);
 			Unmarshaller u = ctx.createUnmarshaller();
 			try (FileInputStream in = new FileInputStream(f)) {
@@ -74,7 +92,7 @@ public class SCDatabase {
 			return db;
 		}
 	}
-	
+
 	public void save() throws Exception {
 		JAXBContext ctx = JAXBContext.newInstance(SCDatabase.class);
 		Marshaller m = ctx.createMarshaller();
@@ -84,13 +102,14 @@ public class SCDatabase {
 	}
 
 	public List<SCInfo> getSmartcards() {
-		if(smartcards == null) {
+		if (smartcards == null) {
 			this.smartcards = new ArrayList<>();
 		}
 		return smartcards;
 	}
-	
+
 	public void setSmartcards(List<SCInfo> smartcards) {
 		this.smartcards = smartcards;
 	}
+
 }

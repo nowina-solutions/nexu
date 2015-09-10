@@ -32,17 +32,18 @@ public class GenericCardAdapter implements CardAdapter {
 
 	@Override
 	public boolean accept(DetectedCard card) {
-		return info.getDetectedAtr().equals(card.getAtr());
+		return info.getAtr().equals(card.getAtr());
 	}
 
 	@Override
 	public SignatureTokenConnection connect(NexuAPI api, DetectedCard card, PasswordInputCallback callback) {
-		ScAPI scApi = info.getSelectedApi();
+		ConnectionInfo cInfo = info.getConnectionInfo(api.getEnvironmentInfo());
+		ScAPI scApi = cInfo.getSelectedApi();
 		switch (scApi) {
 		case MSCAPI:
 			return new MSCAPISignatureToken();
 		case PKCS_11:
-			String absolutePath = info.getApiParam();
+			String absolutePath = cInfo.getApiParam();
 			return new Pkcs11SignatureToken(absolutePath, callback);
 		default:
 		    throw new RuntimeException("API not supported");

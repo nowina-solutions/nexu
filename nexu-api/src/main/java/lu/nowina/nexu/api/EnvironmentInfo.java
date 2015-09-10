@@ -13,6 +13,8 @@
  */
 package lu.nowina.nexu.api;
 
+import java.util.Properties;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -36,6 +38,14 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class EnvironmentInfo {
 
+	private static final String OS_VERSION = "os.version";
+
+	private static final String OS_NAME = "os.name";
+
+	private static final String JAVA_VENDOR = "java.vendor";
+
+	private static final String OS_ARCH = "os.arch";
+
 	private JREVendor jreVendor;
 	
 	private String osName;
@@ -51,25 +61,42 @@ public class EnvironmentInfo {
 	public EnvironmentInfo() {
     }
 	
-	public static EnvironmentInfo get() {
+	public static EnvironmentInfo buildFromSystemProperties(Properties systemProperties) {
 	    EnvironmentInfo info = new EnvironmentInfo();
 
-	    String osArch = System.getProperty("os.arch");
+	    String osArch = systemProperties.getProperty(OS_ARCH);
         info.setOsArch(osArch);
         info.setArch(Arch.forOSArch(osArch));
 	    
-        info.setJreVendor(JREVendor.forJREVendor(System.getProperty("java.vendor")));
+        info.setJreVendor(JREVendor.forJREVendor(System.getProperty(JAVA_VENDOR)));
 	    
-        String osName = System.getProperty("os.name");
+        String osName = systemProperties.getProperty(OS_NAME);
         info.setOsName(osName);
         info.setOs(OS.forOSName(osName));
 
-        String osVersion = System.getProperty("os.version");
+        String osVersion = systemProperties.getProperty(OS_VERSION);
         info.setOsVersion(osVersion);
         
 	    return info;
 	}
 	
+	/**
+	 * Compare the filter value with the EnvironmentInfo to see if there is a
+	 * match.
+	 * 
+	 * @param env
+	 * @return true if the EnvironmentInfo matches the filter
+	 */
+	public boolean matches(EnvironmentInfo env) {
+		if (os != null && os != env.getOs()) {
+			return false;
+		}
+		if (arch != null && arch != env.getArch()) {
+			return false;
+		}
+		return true;
+	}
+
 	public JREVendor getJreVendor() {
 		return jreVendor;
 	}

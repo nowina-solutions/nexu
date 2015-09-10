@@ -36,6 +36,7 @@ import lu.nowina.nexu.api.signature.smartcard.CardAdapter;
 import lu.nowina.nexu.api.signature.smartcard.TokenId;
 import lu.nowina.nexu.flow.GetCertificateFlow;
 import lu.nowina.nexu.flow.SignatureFlow;
+import lu.nowina.nexu.generic.ConnectionInfo;
 import lu.nowina.nexu.generic.GenericCardAdapter;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCInfo;
@@ -109,7 +110,7 @@ public class InternalAPI implements NexuAPI {
 	@Override
 	public EnvironmentInfo getEnvironmentInfo() {
 
-		EnvironmentInfo info = EnvironmentInfo.get();
+		EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
 		return info;
 	}
 
@@ -176,7 +177,14 @@ public class InternalAPI implements NexuAPI {
 
 	public void store(String detectedAtr, ScAPI selectedApi, String apiParam) {
 		if (store != null) {
-			store.add(detectedAtr, selectedApi, apiParam);
+			
+			EnvironmentInfo env = getEnvironmentInfo();
+			ConnectionInfo cInfo = new ConnectionInfo();
+			cInfo.setSelectedApi(selectedApi);
+			cInfo.setEnv(env);
+			cInfo.setApiParam(apiParam);
+			
+			store.add(detectedAtr, cInfo);
 		}
 	}
 
