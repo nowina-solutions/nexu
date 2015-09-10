@@ -19,6 +19,7 @@ import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
 import eu.europa.esig.dss.token.PasswordInputCallback;
+import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.NexuAPI;
 
 /**
@@ -47,7 +48,7 @@ public abstract class UIFlow<I, O> {
 		try {
 
 			Future<O> task = executor.submit(() -> {
-				O out = start(api, input);
+				O out = process(api, input);
 				display.close();
 				return out;
 			});
@@ -64,7 +65,7 @@ public abstract class UIFlow<I, O> {
 	 * Méthode déclenchée pour démarrer le process. Les variables environement
 	 * et dialogDisplays sont déjà initialisée.
 	 */
-	protected abstract O start(NexuAPI api, I input);
+	protected abstract O process(NexuAPI api, I input) throws NexuException;
 
 	protected <T extends Object> T displayAndWaitUIOperation(String fxml, Object... params) {
 	    return display.displayAndWaitUIOperation(fxml, params);

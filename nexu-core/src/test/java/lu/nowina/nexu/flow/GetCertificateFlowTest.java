@@ -52,7 +52,7 @@ public class GetCertificateFlowTest {
         GetCertificateRequest req = new GetCertificateRequest();
 
         GetCertificateFlow flow = new GetCertificateFlow(display);
-        GetCertificateResponse resp = flow.start(api, req);
+        GetCertificateResponse resp = flow.process(api, req);
         Assert.assertNull(resp);
 
         verify(display, atLeastOnce()).displayAndWaitUIOperation(eq("/fxml/provide-feedback.fxml"),
@@ -71,7 +71,7 @@ public class GetCertificateFlowTest {
         GetCertificateRequest req = new GetCertificateRequest();
 
         GetCertificateFlow flow = new GetCertificateFlow(display);
-        GetCertificateResponse resp = flow.start(api, req);
+        GetCertificateResponse resp = flow.process(api, req);
         Assert.assertNull(resp);
 
         verify(display, atLeastOnce()).displayAndWaitUIOperation(eq("/fxml/provide-feedback.fxml"),
@@ -99,7 +99,7 @@ public class GetCertificateFlowTest {
         GetCertificateRequest req = new GetCertificateRequest();
 
         GetCertificateFlow flow = new GetCertificateFlow(display);
-        GetCertificateResponse resp = flow.start(api, req);
+        GetCertificateResponse resp = flow.process(api, req);
         Assert.assertNotNull(resp);
         Assert.assertNotNull(resp.getEncryptionAlgorithm());
         Assert.assertNotNull(resp.getTokenId());

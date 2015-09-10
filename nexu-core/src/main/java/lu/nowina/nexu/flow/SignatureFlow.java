@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import lu.nowina.nexu.InternalAPI;
+import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackStatus;
 import lu.nowina.nexu.api.NexuAPI;
@@ -40,14 +41,14 @@ public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse
 	}
 
 	@Override
-	protected SignatureResponse start(NexuAPI api, SignatureRequest req) {
+	protected SignatureResponse process(NexuAPI api, SignatureRequest req) throws NexuException {
 
 		if ((req.getToBeSigned() == null) || (req.getToBeSigned().getBytes() == null)) {
-			throw new IllegalArgumentException("ToBeSigned is null");
+			throw new NexuException("ToBeSigned is null");
 		}
 
 		if((req.getDigestAlgorithm() == null)) {
-			throw new IllegalArgumentException("Digest algorithm expected");
+			throw new NexuException("Digest algorithm expected");
 		}
 
 		SignatureTokenConnection token = null;

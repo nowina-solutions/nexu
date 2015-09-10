@@ -28,6 +28,7 @@ import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.ToBeSigned;
 import eu.europa.esig.dss.token.JKSSignatureToken;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
+import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
@@ -40,7 +41,7 @@ import lu.nowina.nexu.view.core.UIDisplay;
 public class SignatureFlowTest {
 
     @Test
-    public void testCardRecognized() {
+    public void testCardRecognized() throws Exception {
 
         UIDisplay display = mock(UIDisplay.class);
 
@@ -62,14 +63,14 @@ public class SignatureFlowTest {
         req.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
         SignatureFlow flow = new SignatureFlow(display);
-        SignatureResponse resp = flow.start(api, req);
+        SignatureResponse resp = flow.process(api, req);
         Assert.assertNotNull(resp);
         Assert.assertNotNull(resp.getSignatureValue());
 
     }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void testInputValidation1() {
+    @Test(expected=NexuException.class)
+    public void testInputValidation1() throws Exception {
 
         UIDisplay display = mock(UIDisplay.class);
 
@@ -79,12 +80,12 @@ public class SignatureFlowTest {
         req.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
         SignatureFlow flow = new SignatureFlow(display);
-        flow.start(api, req);
+        flow.process(api, req);
 
     }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void testInputValidation2() {
+    @Test(expected=NexuException.class)
+    public void testInputValidation2() throws Exception {
 
         UIDisplay display = mock(UIDisplay.class);
 
@@ -94,12 +95,12 @@ public class SignatureFlowTest {
         req.setToBeSigned(new ToBeSigned());
 
         SignatureFlow flow = new SignatureFlow(display);
-        flow.start(api, req);
+        flow.process(api, req);
 
     }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void testInputValidation3() {
+    @Test(expected=NexuException.class)
+    public void testInputValidation3() throws Exception {
 
         UIDisplay display = mock(UIDisplay.class);
 
@@ -109,7 +110,7 @@ public class SignatureFlowTest {
         req.setToBeSigned(new ToBeSigned("hello".getBytes()));
 
         SignatureFlow flow = new SignatureFlow(display);
-        flow.start(api, req);
+        flow.process(api, req);
 
     }
 

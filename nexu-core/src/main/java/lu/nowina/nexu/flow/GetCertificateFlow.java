@@ -42,7 +42,7 @@ public class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCert
 	}
 
 	@Override
-	protected GetCertificateResponse start(NexuAPI api, GetCertificateRequest req) {
+	protected GetCertificateResponse process(NexuAPI api, GetCertificateRequest req) {
 
 		try {
 
