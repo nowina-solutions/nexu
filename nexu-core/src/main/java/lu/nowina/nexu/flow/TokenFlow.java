@@ -36,6 +36,14 @@ import lu.nowina.nexu.model.Pkcs11Params;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIFlow;
 
+/**
+ * Most of the Flow executed by NexU use SignatureTokenConnection.  
+ *  
+ * @author david.naramski
+ *
+ * @param <I> The object for the request
+ * @param <O> The response for the request
+ */
 public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 
 	private static final Logger logger = Logger.getLogger(TokenFlow.class.getName());

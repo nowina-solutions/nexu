@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import eu.europa.esig.dss.DigestAlgorithm;
 import lu.nowina.nexu.api.EnvironmentInfo;
 
 /**
@@ -46,7 +47,18 @@ public class SCInfo {
 	private String downloadUrl;
 	
 	private String infoUrl;
+	
+	@XmlElementWrapper(name="supportedDigestAlgo")
+	@XmlElement(name="digestAlgo")
+	private List<DigestAlgorithm> supportedDigestAlgorithm;
 
+	public List<DigestAlgorithm> getSupportedDigestAlgorithm() {
+		if(supportedDigestAlgorithm == null) {
+			supportedDigestAlgorithm = new ArrayList<>();
+		}
+		return supportedDigestAlgorithm;
+	}
+	
 	public ConnectionInfo getConnectionInfo(EnvironmentInfo env) {
 		for(ConnectionInfo info : getInfos()) {
 			if(info.getEnv().matches(env)) {
@@ -99,4 +111,8 @@ public class SCInfo {
 		this.infoUrl = infoUrl;
 	}
 
+	public void setSupportedDigestAlgorithm(List<DigestAlgorithm> supportedDigtestAlgorithm) {
+		this.supportedDigestAlgorithm = supportedDigtestAlgorithm;
+	}
+	
 }

@@ -5,6 +5,7 @@ import javax.xml.bind.JAXBContext;
 import org.junit.Assert;
 import org.junit.Test;
 
+import eu.europa.esig.dss.DigestAlgorithm;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.ScAPI;
 
@@ -20,6 +21,9 @@ public class SCDatabaseTest {
 		cInfo.setSelectedApi(ScAPI.MSCAPI);
 		cInfo.setEnv(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
 		db.add("ADSF123FSDFS", cInfo);
+		
+		db.getInfo("ADSF123FSDFS").getSupportedDigestAlgorithm().add(DigestAlgorithm.SHA1);
+		db.getInfo("ADSF123FSDFS").getSupportedDigestAlgorithm().add(DigestAlgorithm.MD5);
 		
 		JAXBContext ctx = JAXBContext.newInstance(SCDatabase.class);
 		ctx.createMarshaller().marshal(db, System.out);

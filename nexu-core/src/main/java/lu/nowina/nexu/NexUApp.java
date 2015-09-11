@@ -30,6 +30,7 @@ import javafx.stage.Stage;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
 import lu.nowina.nexu.api.plugin.SignaturePlugin;
 import lu.nowina.nexu.generic.SCDatabase;
+import lu.nowina.nexu.generic.SCDatabaseLoader;
 import lu.nowina.nexu.jetty.JettyServer;
 import lu.nowina.nexu.smartcard.dector.CardDetector;
 import lu.nowina.nexu.view.SystrayMenu;
@@ -58,7 +59,7 @@ public class NexUApp extends Application implements UIDisplay {
 
             SCDatabase db = null;
             File store = new File("./store.xml");
-            db = SCDatabase.load(store);
+            db = SCDatabaseLoader.load(store);
 
             UserPreferences prefs = new UserPreferences();
             AppConfig config = new AppConfig();
