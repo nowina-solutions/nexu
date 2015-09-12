@@ -37,6 +37,7 @@ import lu.nowina.nexu.api.signature.smartcard.TokenId;
 import lu.nowina.nexu.flow.GetCertificateFlow;
 import lu.nowina.nexu.flow.SignatureFlow;
 import lu.nowina.nexu.generic.ConnectionInfo;
+import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.generic.GenericCardAdapter;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCInfo;
@@ -52,82 +53,96 @@ import lu.nowina.nexu.view.core.UIFlow;
  */
 public class InternalAPI implements NexuAPI {
 
-	private Logger logger = Logger.getLogger(InternalAPI.class.getName());
+    private Logger logger = Logger.getLogger(InternalAPI.class.getName());
 
-	private UserPreferences prefs;
+    private UserPreferences prefs;
 
-	private CardDetector detector;
+    private CardDetector detector;
 
-	private List<CardAdapter> adapters = new ArrayList<>();
+    private List<CardAdapter> adapters = new ArrayList<>();
 
-	private Map<TokenId, SignatureTokenConnection> connections = new HashMap<>();
+    private Map<TokenId, SignatureTokenConnection> connections = new HashMap<>();
 
-	private Map<String, HttpPlugin> httpPlugins = new HashMap<>();
+    private Map<String, HttpPlugin> httpPlugins = new HashMap<>();
 
-	private UIDisplay display;
+    private UIDisplay display;
 
-	private SCDatabase store;
+    private SCDatabase myDatabase;
 
-	public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store, CardDetector detector) {
-		this.display = display;
-		this.prefs = prefs;
-		this.store = store;
-		this.detector = detector;
-	}
+    private DatabaseWebLoader webDatabase;
 
-	@Override
-	public List<DetectedCard> detectCards() {
-		return detector.detectCard();
-	}
+    public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store, CardDetector detector,
+            DatabaseWebLoader webLoader) {
+        this.display = display;
+        this.prefs = prefs;
+        this.myDatabase = store;
+        this.detector = detector;
+        this.webDatabase = webLoader;
+    }
 
-	@Override
-	public List<Match> matchingCardAdapters(DetectedCard d) {
-		List<Match> cards = new ArrayList<>();
-		for (CardAdapter card : adapters) {
-			if (card.accept(d)) {
-				logger.info("Card is instance of " + card.getClass().getSimpleName());
-				cards.add(new Match(card, d));
-			}
-		}
-		if (cards.isEmpty()) {
-			if (store != null) {
-				SCInfo info = store.getInfo(d.getAtr());
-				if (info == null) {
-					logger.warning("Card " + d.getAtr() + " is not supported by the software");
-				} else {
-					cards.add(new Match(new GenericCardAdapter(info), d));
-				}
-			}
-		}
-		return cards;
-	}
+    @Override
+    public List<DetectedCard> detectCards() {
+        return detector.detectCard();
+    }
 
-	@Override
-	public void registerCardAdapter(CardAdapter adapter) {
-		adapters.add(adapter);
-	}
+    @Override
+    public List<Match> matchingCardAdapters(DetectedCard d) {
+        List<Match> cards = new ArrayList<>();
+        for (CardAdapter card : adapters) {
+            if (card.accept(d)) {
+                logger.info("Card is instance of " + card.getClass().getSimpleName());
+                cards.add(new Match(card, d));
+            }
+        }
+        if (cards.isEmpty()) {
+            SCInfo info = null;
+            if (webDatabase.getDatabase() != null) {
+                info = myDatabase.getInfo(d.getAtr());
+                if (info == null) {
+                    logger.warning("Card " + d.getAtr() + " is not in the web database");
+                } else {
+                    cards.add(new Match(new GenericCardAdapter(info), d));
+                }
 
-	@Override
-	public EnvironmentInfo getEnvironmentInfo() {
+            }
+            if (info == null && myDatabase != null) {
+                info = myDatabase.getInfo(d.getAtr());
+                if (info == null) {
+                    logger.warning("Card " + d.getAtr() + " is not in the personal database");
+                } else {
+                    cards.add(new Match(new GenericCardAdapter(info), d));
+                }
+            }
+        }
+        return cards;
+    }
 
-		EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
-		return info;
-	}
+    @Override
+    public void registerCardAdapter(CardAdapter adapter) {
+        adapters.add(adapter);
+    }
 
-	@Override
-	public TokenId registerTokenConnection(SignatureTokenConnection connection) {
-		TokenId id = new TokenId();
-		connections.put(id, connection);
-		return id;
-	}
+    @Override
+    public EnvironmentInfo getEnvironmentInfo() {
 
-	@Override
-	public SignatureTokenConnection getTokenConnection(TokenId tokenId) {
-		return connections.get(tokenId);
-	}
+        EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
+        return info;
+    }
 
-	private <I,O> Execution<O> executeRequest(UIFlow<I,O> flow, I request) {
-	    
+    @Override
+    public TokenId registerTokenConnection(SignatureTokenConnection connection) {
+        TokenId id = new TokenId();
+        connections.put(id, connection);
+        return id;
+    }
+
+    @Override
+    public SignatureTokenConnection getTokenConnection(TokenId tokenId) {
+        return connections.get(tokenId);
+    }
+
+    private <I, O> Execution<O> executeRequest(UIFlow<I, O> flow, I request) {
+
         Execution<O> resp = new Execution<>();
         try {
 
@@ -150,42 +165,42 @@ public class InternalAPI implements NexuAPI {
         }
 
         return resp;
-	}
-	
-	@Override
-	public Execution<GetCertificateResponse> getCertificate(GetCertificateRequest request) {
+    }
+
+    @Override
+    public Execution<GetCertificateResponse> getCertificate(GetCertificateRequest request) {
 
         GetCertificateFlow flow = new GetCertificateFlow(display);
-		return executeRequest(flow, request);
-	}
+        return executeRequest(flow, request);
+    }
 
-	@Override
-	public Execution<SignatureResponse> sign(SignatureRequest request) {
+    @Override
+    public Execution<SignatureResponse> sign(SignatureRequest request) {
 
         SignatureFlow flow = new SignatureFlow(display);
         return executeRequest(flow, request);
 
-	}
+    }
 
-	public HttpPlugin getPlugin(String context) {
-		return httpPlugins.get(context);
-	}
+    public HttpPlugin getPlugin(String context) {
+        return httpPlugins.get(context);
+    }
 
-	public void registerHttpContext(String context, HttpPlugin plugin) {
-		httpPlugins.put(context, plugin);
-	}
+    public void registerHttpContext(String context, HttpPlugin plugin) {
+        httpPlugins.put(context, plugin);
+    }
 
-	public void store(String detectedAtr, ScAPI selectedApi, String apiParam) {
-		if (store != null) {
-			
-			EnvironmentInfo env = getEnvironmentInfo();
-			ConnectionInfo cInfo = new ConnectionInfo();
-			cInfo.setSelectedApi(selectedApi);
-			cInfo.setEnv(env);
-			cInfo.setApiParam(apiParam);
-			
-			store.add(detectedAtr, cInfo);
-		}
-	}
+    public void store(String detectedAtr, ScAPI selectedApi, String apiParam) {
+        if (myDatabase != null) {
+
+            EnvironmentInfo env = getEnvironmentInfo();
+            ConnectionInfo cInfo = new ConnectionInfo();
+            cInfo.setSelectedApi(selectedApi);
+            cInfo.setEnv(env);
+            cInfo.setApiParam(apiParam);
+
+            myDatabase.add(detectedAtr, cInfo);
+        }
+    }
 
 }

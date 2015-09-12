@@ -29,6 +29,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
 import lu.nowina.nexu.api.plugin.SignaturePlugin;
+import lu.nowina.nexu.generic.DatabaseWebLoader;
+import lu.nowina.nexu.generic.HttpDataLoader;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCDatabaseLoader;
 import lu.nowina.nexu.jetty.JettyServer;
@@ -64,7 +66,11 @@ public class NexUApp extends Application implements UIDisplay {
             UserPreferences prefs = new UserPreferences();
             AppConfig config = new AppConfig();
             CardDetector detector = new CardDetector();
-            InternalAPI api = new InternalAPI(this, prefs, db, detector);
+            DatabaseWebLoader loader = new DatabaseWebLoader("http://lab.nowina.solutions", new HttpDataLoader());
+            
+            loader.start();
+            
+            InternalAPI api = new InternalAPI(this, prefs, db, detector, loader);
 
             InputStream configFile = NexUApp.class.getClassLoader().getResourceAsStream("nexu-config.properties");
             Properties props = new Properties();

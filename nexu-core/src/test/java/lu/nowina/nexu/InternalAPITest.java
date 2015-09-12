@@ -34,7 +34,7 @@ public class InternalAPITest {
     @Test
     public void testEnvironment() throws Exception {
 
-        InternalAPI api = new InternalAPI(null, null, null, null);
+        InternalAPI api = new InternalAPI(null, null, null, null, null);
 
         EnvironmentInfo info = api.getEnvironmentInfo();
         Assert.assertNotNull(info.getOs());
@@ -57,7 +57,7 @@ public class InternalAPITest {
 
         UIDisplay display = Mockito.mock(UIDisplay.class);
 
-        InternalAPI api = new InternalAPI(display, null, null, detector);
+        InternalAPI api = new InternalAPI(display, null, null, detector, null);
         Assert.assertEquals(0, api.detectCards().size());
 
     }
@@ -70,7 +70,7 @@ public class InternalAPITest {
 
         UIDisplay display = Mockito.mock(UIDisplay.class);
 
-        InternalAPI api = new InternalAPI(display, null, null, detector);
+        InternalAPI api = new InternalAPI(display, null, null, detector, null);
         Assert.assertEquals(1, api.detectCards().size());
 
     }
@@ -84,7 +84,7 @@ public class InternalAPITest {
 
         UIDisplay display = Mockito.mock(UIDisplay.class);
 
-        InternalAPI api = new InternalAPI(display, null, null, detector);
+        InternalAPI api = new InternalAPI(display, null, null, detector, null);
         Assert.assertEquals(2, api.detectCards().size());
 
     }
@@ -95,7 +95,7 @@ public class InternalAPITest {
         DetectedCard card = new DetectedCard("ATR", 0);
 
         UIDisplay display = Mockito.mock(UIDisplay.class);
-        InternalAPI api = new InternalAPI(display, null, null, null);
+        InternalAPI api = new InternalAPI(display, null, null, null, null);
 
         SignatureTokenConnection c = new MockSignatureTokenConnection(null);
         TokenId id = api.registerTokenConnection(c);
