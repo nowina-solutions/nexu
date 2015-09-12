@@ -24,6 +24,8 @@ public class AppConfig {
 	private String bindingIP;
 
 	private int bindingPort;
+	
+	private String serverUrl;
 
 	public String getBindingIP() {
 		return bindingIP;
@@ -40,5 +42,13 @@ public class AppConfig {
 	public void setBindingPort(int bindingPort) {
 		this.bindingPort = bindingPort;
 	}
+
+    public String getServerUrl() {
+        return serverUrl;
+    }
+
+    public void setServerUrl(String serverUrl) {
+        this.serverUrl = serverUrl;
+    }
 
 }

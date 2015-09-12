@@ -16,6 +16,9 @@ package lu.nowina.nexu;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -64,23 +67,16 @@ public class NexUApp extends Application implements UIDisplay {
             db = SCDatabaseLoader.load(store);
 
             UserPreferences prefs = new UserPreferences();
-            AppConfig config = new AppConfig();
             CardDetector detector = new CardDetector();
-            DatabaseWebLoader loader = new DatabaseWebLoader("http://lab.nowina.solutions", new HttpDataLoader());
             
+            Properties props = loadPropertiesFile();
+            AppConfig config = loadAppConfig(props);
+
+            DatabaseWebLoader loader = new DatabaseWebLoader(config, new HttpDataLoader());
             loader.start();
             
             InternalAPI api = new InternalAPI(this, prefs, db, detector, loader);
-
-            InputStream configFile = NexUApp.class.getClassLoader().getResourceAsStream("nexu-config.properties");
-            Properties props = new Properties();
-            if (configFile != null) {
-                props.load(configFile);
-            }
-
-            config.setBindingPort(Integer.parseInt(props.getProperty("binding_port", "9876")));
-            config.setBindingIP(props.getProperty("binding_ip", "127.0.0.1"));
-
+            
             for (String key : props.stringPropertyNames()) {
                 if (key.startsWith("plugin_")) {
 
@@ -124,6 +120,28 @@ public class NexUApp extends Application implements UIDisplay {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Cannot start", e);
         }
+    }
+
+    public Properties loadPropertiesFile() throws IOException {
+        
+        InputStream configFile = NexUApp.class.getClassLoader().getResourceAsStream("nexu-config.properties");
+        Properties props = new Properties();
+        if (configFile != null) {
+            props.load(configFile);
+        }
+        
+        return props;
+
+    }
+    
+    public AppConfig loadAppConfig(Properties props) {
+        AppConfig config = new AppConfig();
+
+        config.setBindingPort(Integer.parseInt(props.getProperty("binding_port", "9876")));
+        config.setBindingIP(props.getProperty("binding_ip", "127.0.0.1"));
+        config.setServerUrl(props.getProperty("server_url", "http://lab.nowina.solutions/nexu"));
+
+        return config;
     }
 
     @Override

@@ -33,6 +33,8 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 
+import lu.nowina.nexu.AppConfig;
+
 public class DatabaseWebLoader {
 
     private static final Logger logger = Logger.getLogger(DatabaseWebLoader.class.getName());
@@ -55,8 +57,8 @@ public class DatabaseWebLoader {
 
     private HttpDataLoader dataLoader;
 
-    public DatabaseWebLoader(String serverUrl, HttpDataLoader dataLoader) throws IOException {
-        this.serverUrl = serverUrl;
+    public DatabaseWebLoader(AppConfig config, HttpDataLoader dataLoader) throws IOException {
+        this.serverUrl = config.getServerUrl();
         this.dataLoader = dataLoader;
 
         try {
@@ -124,14 +126,24 @@ public class DatabaseWebLoader {
         } else {
             JAXBContext ctx = JAXBContext.newInstance(NexuInfo.class);
             Unmarshaller u = ctx.createUnmarshaller();
-            NexuInfo version = (NexuInfo) u.unmarshal(new ByteArrayInputStream(info));
-            return version;
+            try {
+                NexuInfo version = (NexuInfo) u.unmarshal(new ByteArrayInputStream(info));
+                return version;
+            } catch (Exception e) {
+                logger.log(Level.FINE, "Cannot parse /info", e);
+                logger.warning("Cannot parse /info");
+                return null;
+            }
         }
 
     }
 
     public void start() {
-        scheduleTimer();
+        if(database == null) {
+            scheduleUpdate();
+        } else {
+            scheduleTimer();
+        }
     }
 
     public void stop() {
