@@ -93,13 +93,17 @@ public class DatabaseWebLoader {
         return (SCDatabase) u.unmarshal(new ByteArrayInputStream(databaseData));
     }
 
-    private String digestDatabase() {
+    public String digestDatabase() {
 
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            return new String(Hex.encodeHex(md.digest(databaseData)));
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+        if (digestDatabase() == null) {
+            return null;
+        } else {
+            try {
+                MessageDigest md = MessageDigest.getInstance("MD5");
+                return new String(Hex.encodeHex(md.digest(databaseData)));
+            } catch (NoSuchAlgorithmException e) {
+                throw new RuntimeException(e);
+            }
         }
 
     }
@@ -139,7 +143,7 @@ public class DatabaseWebLoader {
     }
 
     public void start() {
-        if(database == null) {
+        if (database == null) {
             scheduleUpdate();
         } else {
             scheduleTimer();

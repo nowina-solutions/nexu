@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.ui.AboutController;
 
@@ -42,7 +43,7 @@ public class SystrayMenu {
 
 	private MenuItem aboutItem;
 	
-	public SystrayMenu(UIDisplay display) {
+	public SystrayMenu(UIDisplay display, DatabaseWebLoader webLoader) {
 
 		if (SystemTray.isSupported()) {
 
@@ -63,6 +64,7 @@ public class SystrayMenu {
 	                        Parent root = loader.getRoot();
 	                        AboutController controller = loader.getController();
 	                        controller.setDisplay(display);
+	                        controller.setLoader(webLoader);
 	                        
 	                        Platform.runLater(() -> {
 	                            display.display(root);

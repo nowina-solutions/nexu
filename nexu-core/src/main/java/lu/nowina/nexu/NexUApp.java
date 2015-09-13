@@ -101,7 +101,7 @@ public class NexUApp extends Application implements UIDisplay {
                 }
             }
 
-            new SystrayMenu(this);
+            new SystrayMenu(this, loader);
 
             logger.info("Start Jetty");
 

@@ -29,6 +29,8 @@
 		<VBox BorderPane.alignment="CENTER">
 			<children>
 				<Label styleClass="message" text="About" wrapText="true" />
+				<Label text="Database version" />
+				<Label fx:id="dbVersion" text="" />
 			</children>
 		</VBox>
 	</top>

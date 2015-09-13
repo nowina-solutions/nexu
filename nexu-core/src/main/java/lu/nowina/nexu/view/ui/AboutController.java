@@ -19,6 +19,8 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 public class AboutController implements Initializable {
@@ -26,7 +28,16 @@ public class AboutController implements Initializable {
 	@FXML
 	private Button ok;
 	
+	@FXML
+	private Label dbVersion;
+	
 	private UIDisplay display;
+	
+	private DatabaseWebLoader loader;
+
+	public void setLoader(DatabaseWebLoader loader) {
+        this.loader = loader;
+    }
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -35,6 +46,13 @@ public class AboutController implements Initializable {
 		});
 	}
 
+	public void setDataLoader(DatabaseWebLoader loader) {
+	    this.loader = loader;
+
+	    String digest = loader.digestDatabase();
+        dbVersion.setText(digest != null ? digest : "no_database");
+	}
+	
 	public void setDisplay(UIDisplay display) {
         this.display = display;
     }
