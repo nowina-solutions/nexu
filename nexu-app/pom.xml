@@ -88,6 +88,9 @@
 								<argument>NexU</argument>
 								<argument>-native</argument>
 								<argument>${installer.format}</argument>
+								<argument>-vendor</argument>
+								<argument>"Nowina Solutions"</argument>
+								<argument>-BsystemWide=true</argument>
 							</arguments>
 						</configuration>
 					</execution>
@@ -103,7 +106,7 @@
 	</build>
 
 	<profiles>
-	
+
 		<profile>
 			<id>windows</id>
 			<activation>

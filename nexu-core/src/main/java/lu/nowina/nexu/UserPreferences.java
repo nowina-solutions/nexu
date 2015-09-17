@@ -17,6 +17,10 @@ import java.util.prefs.Preferences;
 
 public class UserPreferences {
 
+	private static final String PROXY_SERVER = "nowina.nexu.proxyServer";
+
+	private static final String PROXY_PORT = "nowina.nexu.proxyPort";
+
 	private Preferences prefs;
 
 	private String proxyServer;
@@ -25,8 +29,8 @@ public class UserPreferences {
 
 	public UserPreferences() {
 		prefs = Preferences.userRoot().node(this.getClass().getName());
-		proxyServer = prefs.get("nowina.standup.proxyServer", null);
-		proxyPort = prefs.get("nowina.standup.proxyPort", null);
+		proxyServer = prefs.get(PROXY_SERVER, null);
+		proxyPort = prefs.get(PROXY_PORT, null);
 	};
 
 	public String getProxyServer() {
@@ -34,7 +38,7 @@ public class UserPreferences {
 	}
 
 	public void setProxyServer(String proxyServer) {
-		prefs.put("nowina.standup.proxyServer", proxyServer);
+		prefs.put(PROXY_SERVER, proxyServer);
 		this.proxyServer = proxyServer;
 	}
 
@@ -43,7 +47,7 @@ public class UserPreferences {
 	}
 
 	public void setProxyPort(String proxyPort) {
-		prefs.put("nowina.standup.proxyPort", proxyPort);
+		prefs.put(PROXY_PORT, proxyPort);
 		this.proxyPort = proxyPort;
 	}
 

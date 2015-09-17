@@ -85,7 +85,7 @@ public class SystrayMenu {
 			exitItem.addActionListener(actionListener);
 			popup.add(exitItem);
 
-			trayIcon = new TrayIcon(image, "Standup", popup);
+			trayIcon = new TrayIcon(image, "NexU", popup);
 
 			trayIcon.setImageAutoSize(true);
 
