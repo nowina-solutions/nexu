@@ -21,6 +21,10 @@ public class SCDatabaseManager {
 
 	public byte[] getData() {
 
+		if (!nexuDatabaseFile.exists()) {
+			return new byte[0];
+		}
+
 		if (data == null) {
 			try (FileInputStream in = new FileInputStream(nexuDatabaseFile)) {
 				data = IOUtils.toByteArray(in);
@@ -33,8 +37,8 @@ public class SCDatabaseManager {
 	}
 
 	public String getDatabaseDigest() {
-		
-		if(databaseDigest == null) {
+
+		if (databaseDigest == null) {
 			try {
 				MessageDigest digest = MessageDigest.getInstance("MD5");
 				databaseDigest = Hex.encodeHexString(digest.digest(getData()));
@@ -42,7 +46,7 @@ public class SCDatabaseManager {
 				throw new RuntimeException(e);
 			}
 		}
-		
+
 		return databaseDigest;
 	}
 

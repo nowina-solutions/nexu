@@ -31,13 +31,12 @@ public class AboutController implements Initializable {
 	@FXML
 	private Label dbVersion;
 	
+	@FXML
+	private Label dbFile;
+	
 	private UIDisplay display;
 	
 	private DatabaseWebLoader loader;
-
-	public void setLoader(DatabaseWebLoader loader) {
-        this.loader = loader;
-    }
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -51,6 +50,7 @@ public class AboutController implements Initializable {
 
 	    String digest = loader.digestDatabase();
         dbVersion.setText(digest != null ? digest : "no_database");
+        dbFile.setText(loader.getDatabaseFile().getAbsolutePath());
 	}
 	
 	public void setDisplay(UIDisplay display) {

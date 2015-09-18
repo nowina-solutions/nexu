@@ -16,12 +16,15 @@ package lu.nowina.nexu;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.apache.commons.io.IOUtils;
 
 import eu.europa.esig.dss.token.PasswordInputCallback;
 import javafx.application.Application;
@@ -46,10 +49,29 @@ public class NexUApp extends Application implements UIDisplay {
 
     private static final Logger logger = Logger.getLogger(NexUApp.class.getName());
 
+    private static Properties props;
+    
+    private static AppConfig config;
+    
     private Stage stage;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+    	
+        logger.config("Read configuration");
+        props = loadPropertiesFile();
+        config = loadAppConfig(props);
+
+        URL url = new URL("http://" + config.getBindingIP() + ":" + config.getBindingPort() + "/info");
+        try(InputStream in = url.openStream()) {
+        	String info = IOUtils.toString(in);
+        	logger.severe("NexU already started. Version '" + info + "'");
+        } catch(Exception e) {
+        	logger.info("no " + url.toString() + " detected, " + e.getMessage());
+        	// If we cannot connect, most likely NexU is not started yet
+        }
+
         launch(NexUApp.class, args);
+        
     }
 
     @Override
@@ -58,20 +80,15 @@ public class NexUApp extends Application implements UIDisplay {
 
         this.stage = new Stage();
 
-        logger.config("Read configuration");
 
         try {
 
-            SCDatabase db = null;
             File store = new File("./store.xml");
-            db = SCDatabaseLoader.load(store);
+            SCDatabase db = SCDatabaseLoader.load(store);
 
             UserPreferences prefs = new UserPreferences();
             CardDetector detector = new CardDetector();
             
-            Properties props = loadPropertiesFile();
-            AppConfig config = loadAppConfig(props);
-
             DatabaseWebLoader loader = new DatabaseWebLoader(config, new HttpDataLoader());
             loader.start();
             
@@ -122,7 +139,7 @@ public class NexUApp extends Application implements UIDisplay {
         }
     }
 
-    public Properties loadPropertiesFile() throws IOException {
+    public static Properties loadPropertiesFile() throws IOException {
         
         InputStream configFile = NexUApp.class.getClassLoader().getResourceAsStream("nexu-config.properties");
         Properties props = new Properties();
@@ -134,7 +151,7 @@ public class NexUApp extends Application implements UIDisplay {
 
     }
     
-    public AppConfig loadAppConfig(Properties props) {
+    public static AppConfig loadAppConfig(Properties props) {
         AppConfig config = new AppConfig();
 
         config.setBindingPort(Integer.parseInt(props.getProperty("binding_port", "9876")));

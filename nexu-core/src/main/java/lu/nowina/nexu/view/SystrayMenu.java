@@ -64,7 +64,7 @@ public class SystrayMenu {
 	                        Parent root = loader.getRoot();
 	                        AboutController controller = loader.getController();
 	                        controller.setDisplay(display);
-	                        controller.setLoader(webLoader);
+	                        controller.setDataLoader(webLoader);
 	                        
 	                        Platform.runLater(() -> {
 	                            display.display(root);

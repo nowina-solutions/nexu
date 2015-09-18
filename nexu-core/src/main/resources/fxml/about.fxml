@@ -31,6 +31,8 @@
 				<Label styleClass="message" text="About" wrapText="true" />
 				<Label text="Database version" />
 				<Label fx:id="dbVersion" text="" />
+				<Label text="Database file" />
+				<Label fx:id="dbFile" text="" />
 			</children>
 		</VBox>
 	</top>

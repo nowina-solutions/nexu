@@ -16,9 +16,11 @@ package lu.nowina.nexu.generic;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -56,6 +58,8 @@ public class DatabaseWebLoader {
     private final int UPDATE_RATE = 10;
 
     private HttpDataLoader dataLoader;
+    
+    private Date lastUpdate;
 
     public DatabaseWebLoader(AppConfig config, HttpDataLoader dataLoader) throws IOException {
         this.serverUrl = config.getServerUrl();
@@ -77,7 +81,7 @@ public class DatabaseWebLoader {
 
     public void loadDatabaseFromCache() throws IOException, JAXBException {
 
-        File databaseWeb = new File("./database-web.xml");
+        File databaseWeb = getDatabaseFile();
         if (databaseWeb.exists()) {
             try (FileInputStream in = new FileInputStream(databaseWeb)) {
                 databaseData = IOUtils.toByteArray(in);
@@ -87,6 +91,15 @@ public class DatabaseWebLoader {
 
     }
 
+	public File getDatabaseFile() {
+		File databaseWeb = new File("./database-web.xml");
+		return databaseWeb;
+	}
+
+	public Date getLastUpdate() {
+		return lastUpdate;
+	}
+	
     private SCDatabase parseDatabase() throws JAXBException {
         JAXBContext ctx = JAXBContext.newInstance(SCDatabase.class);
         Unmarshaller u = ctx.createUnmarshaller();
@@ -95,7 +108,7 @@ public class DatabaseWebLoader {
 
     public String digestDatabase() {
 
-        if (digestDatabase() == null) {
+        if (databaseData == null) {
             return null;
         } else {
             try {
@@ -118,6 +131,9 @@ public class DatabaseWebLoader {
     public void fetchDatabase() throws IOException {
 
         databaseData = dataLoader.fetchDatabase(serverUrl + "/database.xml");
+        try (FileOutputStream out = new FileOutputStream(getDatabaseFile())) {
+        	out.write(databaseData);
+        }
 
     }
 
