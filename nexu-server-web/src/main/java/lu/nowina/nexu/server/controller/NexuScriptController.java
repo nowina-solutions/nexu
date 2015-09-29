@@ -45,7 +45,7 @@ public class NexuScriptController {
 		try {
 			Configuration cfg = new Configuration();
 			cfg.setClassForTemplateLoading(getClass(), "/");
-			this.template = cfg.getTemplate("nexu.js.ftl", "UTF-8");
+			this.template = cfg.getTemplate("nexu.ftl.js", "UTF-8");
 		} catch (IOException e) {
 			throw new RuntimeException();
 		}

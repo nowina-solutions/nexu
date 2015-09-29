@@ -24,7 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.mortbay.jetty.handler.AbstractHandler;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import lu.nowina.nexu.InternalAPI;
 import lu.nowina.nexu.UserPreferences;
@@ -44,7 +45,7 @@ public class RequestProcessor extends AbstractHandler {
 	}
 
 	@Override
-	public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch)
+	public void handle(String target, Request arg1, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 
 		if (!"0:0:0:0:0:0:0:1".equals(request.getRemoteHost()) && !"127.0.0.1".equals(request.getRemoteHost())) {
@@ -81,7 +82,7 @@ public class RequestProcessor extends AbstractHandler {
 				HttpPlugin httpPlugin = api.getPlugin("rest");
 				httpPlugin.process(api, new DelegatedHttpServerRequest(request, "/rest"), response);
 			} catch (Exception e) {
-			    logger.log(Level.SEVERE, "Cannot process request", e);
+				logger.log(Level.SEVERE, "Cannot process request", e);
 				response.setContentType("text/plain;charset=utf-8");
 				e.printStackTrace(response.getWriter());
 				response.getWriter().close();

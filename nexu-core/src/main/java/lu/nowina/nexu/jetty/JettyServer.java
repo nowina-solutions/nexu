@@ -15,7 +15,9 @@ package lu.nowina.nexu.jetty;
 
 import java.util.logging.Logger;
 
-import org.mortbay.jetty.Server;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 import lu.nowina.nexu.AppConfig;
 import lu.nowina.nexu.InternalAPI;
@@ -41,6 +43,7 @@ public class JettyServer {
 
 	public void start() throws Exception {
 		logger.info("Start HTTP server, binding on " + conf.getBindingPort());
+
 		Server server = new Server(conf.getBindingPort());
 
 		RequestProcessor handler = new RequestProcessor();

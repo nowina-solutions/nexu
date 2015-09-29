@@ -102,8 +102,7 @@
 		<profile>
 			<id>rebel</id>
 			<properties>
-				<run.jvmArguments>-javaagent:${jrebel.home}/jrebel.jar -Xms256m
-					-Xmx1024m</run.jvmArguments>
+				<run.jvmArguments>-javaagent:${jrebel.home}/jrebel.jar -Xms256m -Xmx1024m</run.jvmArguments>
 			</properties>
 		</profile>
 

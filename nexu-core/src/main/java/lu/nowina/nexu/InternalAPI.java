@@ -96,7 +96,7 @@ public class InternalAPI implements NexuAPI {
         }
         if (cards.isEmpty()) {
             SCInfo info = null;
-            if (webDatabase.getDatabase() != null) {
+            if (webDatabase != null && webDatabase.getDatabase() != null) {
                 info = myDatabase.getInfo(d.getAtr());
                 if (info == null) {
                     logger.warning("Card " + d.getAtr() + " is not in the web database");
