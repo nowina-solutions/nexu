@@ -16,6 +16,8 @@ public class SCDatabaseLoaderTest {
 		JAXBContext ctx = JAXBContext.newInstance(SCDatabase.class);
 		ctx.createMarshaller().marshal(db, System.out);
 		
+		SCDatabaseLoader.saveAs(db, new File("target/db.xml"));
+		
 	}
 	
 }

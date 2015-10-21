@@ -29,6 +29,7 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 import lu.nowina.nexu.InternalAPI;
+import lu.nowina.nexu.TechnicalException;
 import lu.nowina.nexu.UserPreferences;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
 import lu.nowina.nexu.api.plugin.HttpResponse;
@@ -67,38 +68,55 @@ public class RequestProcessor extends AbstractHandler {
 		logger.info("Request " + target);
 
 		if ("/favicon.ico".equals(target)) {
-			response.setContentType("image/png");
-			InputStream in = this.getClass().getResourceAsStream("/tray-icon.png");
-			ServletOutputStream out = response.getOutputStream();
-			IOUtils.copy(in, out);
-			in.close();
-			out.close();
+			favIcon(response);
 		} else if ("/".equals(target) || "/nexu-info".equals(target)) {
-			response.setContentType("text/plain");
-			ServletOutputStream out = response.getOutputStream();
-			out.write("1.0".getBytes());
-			out.close();
+			nexuInfo(response);
 		} else {
-
-			logger.info("Process request " + target);
-			try {
-				HttpPlugin httpPlugin = api.getPlugin("rest");
-				
-				HttpResponse resp = httpPlugin.process(api, new DelegatedHttpServerRequest(request, "/rest"));
-				
-				writer.write(resp.getContent());
-				writer.close();
-				
-			} catch (Exception e) {
-				logger.log(Level.SEVERE, "Cannot process request", e);
-				response.setContentType("text/plain;charset=utf-8");
-				e.printStackTrace(writer);
-				writer.close();
-				response.setStatus(500);
-			}
-
+			httpPlugin(target, request, response, writer);
 		}
 
+	}
+
+	private void httpPlugin(String target, HttpServletRequest request, HttpServletResponse response,
+			PrintWriter writer) {
+		int index = target.indexOf("/", 1);
+		String pluginId = target.substring(target.charAt(0) == '/' ? 1 : 0, index);
+		
+		logger.info("Process request " + target + " pluginId: " + pluginId);
+		try {
+			HttpPlugin httpPlugin = api.getPlugin(pluginId);
+			
+			HttpResponse resp = httpPlugin.process(api, new DelegatedHttpServerRequest(request, "/rest"));
+			if(resp == null || resp.getContent() == null) {
+				throw new TechnicalException("Plugin responded null");
+			} else {
+				writer.write(resp.getContent());
+				writer.close();
+			}
+			
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Cannot process request", e);
+			response.setContentType("text/plain;charset=utf-8");
+			e.printStackTrace(writer);
+			writer.close();
+			response.setStatus(500);
+		}
+	}
+
+	private void nexuInfo(HttpServletResponse response) throws IOException {
+		response.setContentType("text/plain");
+		ServletOutputStream out = response.getOutputStream();
+		out.write("1.0".getBytes());
+		out.close();
+	}
+
+	private void favIcon(HttpServletResponse response) throws IOException {
+		response.setContentType("image/png");
+		InputStream in = this.getClass().getResourceAsStream("/tray-icon.png");
+		ServletOutputStream out = response.getOutputStream();
+		IOUtils.copy(in, out);
+		in.close();
+		out.close();
 	}
 
 }

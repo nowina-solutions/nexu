@@ -16,42 +16,59 @@ package lu.nowina.nexu.generic;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
+import lu.nowina.nexu.TechnicalException;
 
 public class SCDatabaseLoader {
 
 	private static final Logger logger = Logger.getLogger(SCDatabaseLoader.class.getName());
 
-	public static SCDatabase load(File f) throws Exception {
+	public static SCDatabase load(File f) {
 		SCDatabase db = null;
-		if (f.exists()) {
-			JAXBContext ctx = JAXBContext.newInstance(SCDatabase.class);
-			Unmarshaller u = ctx.createUnmarshaller();
-			try (FileInputStream in = new FileInputStream(f)) {
-				db = (SCDatabase) u.unmarshal(new FileInputStream(f));
-			}
-		} else {
+		if (!f.exists()) {
 			db = new SCDatabase();
+		} else {
+			try (FileInputStream in = new FileInputStream(f)) {
+				JAXBContext ctx = createJaxbContext();
+				Unmarshaller u = ctx.createUnmarshaller();
+				db = (SCDatabase) u.unmarshal(new FileInputStream(f));
+			} catch (Exception e) {
+				throw new TechnicalException("Cannot load database");
+			}
 		}
 		db.setOnAddAction((data) -> {
-			saveAs(data,f);
+			saveAs(data, f);
 		});
 		return db;
 	}
 
-	private static void saveAs(SCDatabase db, File file) {
+	private static JAXBContext createJaxbContext() {
 		try {
-			JAXBContext ctx = JAXBContext.newInstance(SCDatabaseLoader.class);
+			JAXBContext ctx = JAXBContext.newInstance(SCDatabase.class);
+			return ctx;
+		} catch(JAXBException e) {
+			logger.log(Level.SEVERE, "Cannot instanciate JAXBContext", e);
+			throw new TechnicalException("Cannot instanciate JAXBContext");
+		}
+	}
+
+	static void saveAs(SCDatabase db, File file) {
+		try {
+			JAXBContext ctx = createJaxbContext();
 			Marshaller m = ctx.createMarshaller();
 			try (FileOutputStream out = new FileOutputStream(file)) {
 				m.marshal(db, out);
 			}
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			logger.log(Level.SEVERE, "Cannot save database", e);
+			throw new TechnicalException("Cannot save database");
 		}
 	}
 

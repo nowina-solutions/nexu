@@ -18,6 +18,7 @@ public class HttpResponse {
 	private String content;
 	
 	public HttpResponse(String content) {
+		this.content = content;
 	}
 
 	public String getContent() {

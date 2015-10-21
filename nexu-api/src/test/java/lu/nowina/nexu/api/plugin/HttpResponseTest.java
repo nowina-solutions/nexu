@@ -11,25 +11,19 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.demo;
+package lu.nowina.nexu.api.plugin;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.web.SpringBootServletInitializer;
-import org.springframework.context.annotation.ComponentScan;
+import org.junit.Assert;
+import org.junit.Test;
 
-/**
- * Starter for NexU demonstration
- * @author David Naramski
- *
- */
-@SpringBootApplication
-@ComponentScan
-public class NexuDemoApp extends SpringBootServletInitializer {
+public class HttpResponseTest {
 
-	public static void main(String[] args) {
-		SpringApplication app = new SpringApplication(NexuDemoApp.class);
-		app.run();
+	@Test
+	public void test1() {
+		
+		HttpResponse resp = new HttpResponse("test");
+		Assert.assertEquals("test", resp.getContent());
+		
 	}
-
+	
 }

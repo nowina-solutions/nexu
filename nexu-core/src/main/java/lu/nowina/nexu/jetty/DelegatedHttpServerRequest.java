@@ -40,7 +40,7 @@ public class DelegatedHttpServerRequest implements HttpRequest {
 
 	@Override
 	public String getTarget() {
-		return context;
+		return wrapped.getPathInfo().substring(context.length());
 	}
 	
 	@Override

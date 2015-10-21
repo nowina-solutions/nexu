@@ -13,7 +13,6 @@
 		<module>nexu-api</module>
 		<module>nexu-server-web</module>
 		<module>nexu-ws-client</module>
-		<module>nexu-demo</module>
 		<module>nexu-app</module>
 		<module>nexu-model</module>
 	</modules>
