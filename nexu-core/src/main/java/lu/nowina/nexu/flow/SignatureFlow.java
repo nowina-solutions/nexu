@@ -27,7 +27,7 @@ import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
-import lu.nowina.nexu.api.signature.smartcard.TokenId;
+import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse> {

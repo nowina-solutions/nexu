@@ -16,8 +16,6 @@ package lu.nowina.nexu.api;
 import java.util.List;
 
 import eu.europa.esig.dss.token.SignatureTokenConnection;
-import lu.nowina.nexu.api.signature.smartcard.CardAdapter;
-import lu.nowina.nexu.api.signature.smartcard.TokenId;
 
 /**
  * The API exposes the functionalities to the developer of Plugin. 

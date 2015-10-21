@@ -13,8 +13,6 @@
  */
 package lu.nowina.nexu.api;
 
-import lu.nowina.nexu.api.signature.smartcard.CardAdapter;
-
 public class Match {
 
 	private CardAdapter adapter;

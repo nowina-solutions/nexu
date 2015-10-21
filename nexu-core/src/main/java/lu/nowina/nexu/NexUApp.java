@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,207 +45,228 @@ import lu.nowina.nexu.view.core.UIOperation;
 
 public class NexUApp extends Application implements UIDisplay {
 
-    private static final Logger logger = Logger.getLogger(NexUApp.class.getName());
+	private static final Logger logger = Logger.getLogger(NexUApp.class.getName());
 
-    private static Properties props;
-    
-    private static AppConfig config;
-    
-    private Stage stage;
+	private static Properties props;
 
-    public static void main(String[] args) throws Exception {
-    	
-        logger.config("Read configuration");
-        props = loadPropertiesFile();
-        config = loadAppConfig(props);
+	private static AppConfig config;
 
-        URL url = new URL("http://" + config.getBindingIP() + ":" + config.getBindingPort() + "/info");
-        try(InputStream in = url.openStream()) {
-        	String info = IOUtils.toString(in);
-        	logger.severe("NexU already started. Version '" + info + "'");
-        } catch(Exception e) {
-        	logger.info("no " + url.toString() + " detected, " + e.getMessage());
-        	// If we cannot connect, most likely NexU is not started yet
-        }
+	private Stage stage;
 
-        launch(NexUApp.class, args);
-        
-    }
+	public static void main(String[] args) throws Exception {
 
-    @Override
-    public void start(Stage primaryStage) {
-        Platform.setImplicitExit(false);
+		logger.config("Read configuration");
+		props = loadPropertiesFile();
+		config = loadAppConfig(props);
 
-        this.stage = new Stage();
+		URL url = new URL("http://" + config.getBindingIP() + ":" + config.getBindingPort() + "/info");
+		try (InputStream in = url.openStream()) {
+			String info = IOUtils.toString(in);
+			logger.severe("NexU already started. Version '" + info + "'");
+		} catch (Exception e) {
+			logger.info("no " + url.toString() + " detected, " + e.getMessage());
+			// If we cannot connect, most likely NexU is not started yet
+		}
 
+		launch(NexUApp.class, args);
 
-        try {
+	}
 
-            File store = new File("./store.xml");
-            SCDatabase db = SCDatabaseLoader.load(store);
+	@Override
+	public void start(Stage primaryStage) {
+		Platform.setImplicitExit(false);
 
-            UserPreferences prefs = new UserPreferences();
-            CardDetector detector = new CardDetector();
-            
-            DatabaseWebLoader loader = new DatabaseWebLoader(config, new HttpDataLoader());
-            loader.start();
-            
-            InternalAPI api = new InternalAPI(this, prefs, db, detector, loader);
-            
-            for (String key : props.stringPropertyNames()) {
-                if (key.startsWith("plugin_")) {
+		this.stage = new Stage();
 
-                    String pluginClassName = props.getProperty(key);
-                    String pluginId = key.substring("plugin_".length());
-                    logger.config(" + Plugin " + pluginClassName);
+		try {
 
-                    Class<?> clazz = Class.forName(pluginClassName);
-                    for (Class<?> i : clazz.getInterfaces()) {
-                        Object plugin = clazz.newInstance();
-                        if (SignaturePlugin.class.equals(i)) {
-                            SignaturePlugin p = (SignaturePlugin) plugin;
-                            p.init(pluginId, api);
-                        }
-                        if (HttpPlugin.class.equals(i)) {
-                            HttpPlugin p = (HttpPlugin) plugin;
-                            p.init(pluginId, api);
-                            api.registerHttpContext(pluginId, p);
-                        }
-                    }
+			File store = new File("./store.xml");
+			SCDatabase db = SCDatabaseLoader.load(store);
 
-                }
-            }
+			UserPreferences prefs = new UserPreferences();
+			CardDetector detector = new CardDetector();
 
-            new SystrayMenu(this, loader);
+			DatabaseWebLoader loader = new DatabaseWebLoader(config, new HttpDataLoader());
+			loader.start();
 
-            logger.info("Start Jetty");
+			InternalAPI api = new InternalAPI(this, prefs, db, detector, loader);
 
-            new Thread(() -> {
-                JettyServer server = new JettyServer();
-                server.setConfig(api, prefs, config);
-                try {
-                    server.start();
-                } catch (Exception e) {
-                    logger.log(Level.SEVERE, "Cannot Jetty", e);
-                }
-            }).start();
+			for (String key : props.stringPropertyNames()) {
+				if (key.startsWith("plugin_")) {
 
-            logger.info("Start finished");
+					String pluginClassName = props.getProperty(key);
+					String pluginId = key.substring("plugin_".length());
 
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Cannot start", e);
-        }
-    }
+					logger.config(" + Plugin " + pluginClassName);
+					instanciateAndRegisterPlugin(api, pluginClassName, pluginId, false);
 
-    public static Properties loadPropertiesFile() throws IOException {
-        
-        InputStream configFile = NexUApp.class.getClassLoader().getResourceAsStream("nexu-config.properties");
-        Properties props = new Properties();
-        if (configFile != null) {
-            props.load(configFile);
-        }
-        
-        return props;
+				}
+			}
 
-    }
-    
-    public static AppConfig loadAppConfig(Properties props) {
-        AppConfig config = new AppConfig();
+			new SystrayMenu(this, loader);
 
-        config.setBindingPort(Integer.parseInt(props.getProperty("binding_port", "9876")));
-        config.setBindingIP(props.getProperty("binding_ip", "127.0.0.1"));
-        config.setServerUrl(props.getProperty("server_url", "http://lab.nowina.solutions/nexu"));
+			logger.info("Start Jetty");
 
-        return config;
-    }
+			startJetty(prefs, api);
 
-    @Override
-    public void display(Parent panel) {
-        logger.info("Display " + panel + " in display " + this + " from Thread " + Thread.currentThread().getName());
-        Platform.runLater(() -> {
-            logger.info(
-                    "Display " + panel + " in display " + this + " from Thread " + Thread.currentThread().getName());
-            if (!stage.isShowing()) {
-                stage = createStage();
-                logger.info("Loading ui " + panel + " is a new Stage " + stage);
-            } else {
-                logger.info("Stage still showing, display " + panel);
-            }
-            stage.setScene(new Scene(panel, 300, 250));
-            stage.show();
-        });
-    }
+			logger.info("Start finished");
 
-    private Stage createStage() {
-        Stage newStage = new Stage();
-        newStage.setAlwaysOnTop(true);
-        newStage.setOnCloseRequest((e) -> {
-            logger.info("Closing stage " + stage + " from " + Thread.currentThread().getName());
-            stage.hide();
-            e.consume();
-        });
-        return newStage;
-    }
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Cannot start", e);
+		}
+	}
 
-    @Override
-    public void displayWaitingPane() {
-    }
+	private void startJetty(UserPreferences prefs, InternalAPI api) {
+		new Thread(() -> {
+			JettyServer server = new JettyServer();
+			server.setConfig(api, prefs, config);
+			try {
+				server.start();
+			} catch (Exception e) {
+				logger.log(Level.SEVERE, "Cannot Jetty", e);
+			}
+		}).start();
+	}
 
-    @Override
-    public void close() {
+	private void instanciateAndRegisterPlugin(InternalAPI api, String pluginClassName, String pluginId, boolean exceptionOnFailure) {
 
-        Platform.runLater(() -> {
-            Stage oldStage = stage;
-            logger.info("Hide stage " + stage + " and create new stage");
-            stage = createStage();
-            oldStage.hide();
-        });
-    }
+		try {
+			Class<?> clazz = Class.forName(pluginClassName);
+			for (Class<?> i : clazz.getInterfaces()) {
+				Object plugin = clazz.newInstance();
+				registerPlugin(api, pluginId, i, plugin);
+			}
+		} catch (Exception e) {
+			logger.log(Level.SEVERE,
+					MessageFormat.format("Cannot register plugin {0} (id: {1})", pluginClassName, pluginId), e);
+			if(exceptionOnFailure) {
+				throw new RuntimeException(e);
+			}
+		}
 
-    @Override
-    public void stop() throws Exception {
-        logger.warning("Can only happen with explicite user request");
-    }
+	}
 
-    public <T extends Object> T displayAndWaitUIOperation(String fxml, Object... params) {
+	private void registerPlugin(InternalAPI api, String pluginId, Class<?> i, Object plugin) {
+		if (SignaturePlugin.class.equals(i)) {
+			SignaturePlugin p = (SignaturePlugin) plugin;
+			p.init(pluginId, api);
+		}
+		if (HttpPlugin.class.equals(i)) {
+			HttpPlugin p = (HttpPlugin) plugin;
+			p.init(pluginId, api);
+			api.registerHttpContext(pluginId, p);
+		}
+	}
 
-        logger.info("Loading " + fxml + " view");
-        FXMLLoader loader = new FXMLLoader();
-        try {
-            loader.load(getClass().getResourceAsStream(fxml));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+	public static Properties loadPropertiesFile() throws IOException {
 
-        Parent root = loader.getRoot();
-        UIOperation<T> controller = loader.getController();
+		InputStream configFile = NexUApp.class.getClassLoader().getResourceAsStream("nexu-config.properties");
+		Properties props = new Properties();
+		if (configFile != null) {
+			props.load(configFile);
+		}
 
-        display(root);
-        return waitForUser(controller, params);
-    }
+		return props;
 
-    private <T> T waitForUser(UIOperation<T> controller, Object... params) {
-        try {
-            logger.info("Wait on Thread " + Thread.currentThread().getName());
-            controller.init(params);
-            T r = controller.waitEnd();
-            displayWaitingPane();
-            return r;
-        } catch (InterruptedException e) {
-            throw new RuntimeException();
-        }
-    }
+	}
 
-    private final class FlowPasswordCallback implements PasswordInputCallback {
-        @Override
-        public char[] getPassword() {
-            logger.info("Request password");
-            return displayAndWaitUIOperation("/fxml/password-input.fxml");
-        }
-    }
+	public static AppConfig loadAppConfig(Properties props) {
+		AppConfig config = new AppConfig();
 
-    public PasswordInputCallback getPasswordInputCallback() {
-        return new FlowPasswordCallback();
-    }
+		config.setBindingPort(Integer.parseInt(props.getProperty("binding_port", "9876")));
+		config.setBindingIP(props.getProperty("binding_ip", "127.0.0.1"));
+		config.setServerUrl(props.getProperty("server_url", "http://lab.nowina.solutions/nexu"));
+
+		return config;
+	}
+
+	@Override
+	public void display(Parent panel) {
+		logger.info("Display " + panel + " in display " + this + " from Thread " + Thread.currentThread().getName());
+		Platform.runLater(() -> {
+			logger.info(
+					"Display " + panel + " in display " + this + " from Thread " + Thread.currentThread().getName());
+			if (!stage.isShowing()) {
+				stage = createStage();
+				logger.info("Loading ui " + panel + " is a new Stage " + stage);
+			} else {
+				logger.info("Stage still showing, display " + panel);
+			}
+			stage.setScene(new Scene(panel, 300, 250));
+			stage.show();
+		});
+	}
+
+	private Stage createStage() {
+		Stage newStage = new Stage();
+		newStage.setAlwaysOnTop(true);
+		newStage.setOnCloseRequest((e) -> {
+			logger.info("Closing stage " + stage + " from " + Thread.currentThread().getName());
+			stage.hide();
+			e.consume();
+		});
+		return newStage;
+	}
+
+	@Override
+	public void displayWaitingPane() {
+	}
+
+	@Override
+	public void close() {
+
+		Platform.runLater(() -> {
+			Stage oldStage = stage;
+			logger.info("Hide stage " + stage + " and create new stage");
+			stage = createStage();
+			oldStage.hide();
+		});
+	}
+
+	@Override
+	public void stop() throws Exception {
+		logger.warning("Can only happen with explicite user request");
+	}
+
+	public <T extends Object> T displayAndWaitUIOperation(String fxml, Object... params) {
+
+		logger.info("Loading " + fxml + " view");
+		FXMLLoader loader = new FXMLLoader();
+		try {
+			loader.load(getClass().getResourceAsStream(fxml));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		Parent root = loader.getRoot();
+		UIOperation<T> controller = loader.getController();
+
+		display(root);
+		return waitForUser(controller, params);
+	}
+
+	private <T> T waitForUser(UIOperation<T> controller, Object... params) {
+		try {
+			logger.info("Wait on Thread " + Thread.currentThread().getName());
+			controller.init(params);
+			T r = controller.waitEnd();
+			displayWaitingPane();
+			return r;
+		} catch (InterruptedException e) {
+			throw new RuntimeException();
+		}
+	}
+
+	private final class FlowPasswordCallback implements PasswordInputCallback {
+		@Override
+		public char[] getPassword() {
+			logger.info("Request password");
+			return displayAndWaitUIOperation("/fxml/password-input.fxml");
+		}
+	}
+
+	public PasswordInputCallback getPasswordInputCallback() {
+		return new FlowPasswordCallback();
+	}
 
 }

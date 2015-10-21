@@ -27,9 +27,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import lu.nowina.nexu.ConfigurationException;
+import lu.nowina.nexu.TechnicalException;
 import lu.nowina.nexu.generic.NexuInfo;
-import lu.nowina.nexu.server.ConfigurationException;
-import lu.nowina.nexu.server.TechnicalException;
 import lu.nowina.nexu.server.manager.SCDatabaseManager;
 
 @Controller

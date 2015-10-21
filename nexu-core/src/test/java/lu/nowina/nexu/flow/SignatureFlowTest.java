@@ -29,13 +29,13 @@ import eu.europa.esig.dss.ToBeSigned;
 import eu.europa.esig.dss.token.JKSSignatureToken;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.NexuException;
+import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
-import lu.nowina.nexu.api.signature.smartcard.CardAdapter;
-import lu.nowina.nexu.api.signature.smartcard.TokenId;
+import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 public class SignatureFlowTest {

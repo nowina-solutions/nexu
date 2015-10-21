@@ -26,7 +26,7 @@ public class AppConfig {
 	private int bindingPort;
 	
 	private String serverUrl;
-
+	
 	public String getBindingIP() {
 		return bindingIP;
 	}

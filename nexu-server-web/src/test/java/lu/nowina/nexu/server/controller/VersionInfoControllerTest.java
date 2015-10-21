@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
-import lu.nowina.nexu.server.ConfigurationException;
+import lu.nowina.nexu.ConfigurationException;
 
 public class VersionInfoControllerTest {
 

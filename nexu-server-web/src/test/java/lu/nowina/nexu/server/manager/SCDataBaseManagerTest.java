@@ -17,7 +17,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.core.io.FileSystemResource;
 
-import lu.nowina.nexu.server.ConfigurationException;
+import lu.nowina.nexu.ConfigurationException;
 
 public class SCDataBaseManagerTest {
 

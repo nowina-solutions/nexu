@@ -28,7 +28,7 @@ import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.ScAPI;
-import lu.nowina.nexu.api.signature.smartcard.TokenId;
+import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 public class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCertificateResponse> {

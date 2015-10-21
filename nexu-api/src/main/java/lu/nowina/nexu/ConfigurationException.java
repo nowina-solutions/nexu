@@ -11,23 +11,23 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.server;
+package lu.nowina.nexu;
 
 /**
- * Exception that _should_ never happen on the server and are not likely to occur in the normal operation
- * (algorithm not found, IO error, ...). 
+ * Specific type of TechnicalException when the platform is not configured
+ * correctly.
  * 
  * @author david.naramski
  *
  */
-public class TechnicalException extends NexuException {
+public class ConfigurationException extends TechnicalException {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public TechnicalException(String message) {
+	public ConfigurationException(String message) {
 		super(message);
 	}
 

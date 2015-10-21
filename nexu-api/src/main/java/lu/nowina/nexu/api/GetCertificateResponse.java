@@ -16,7 +16,6 @@ package lu.nowina.nexu.api;
 import java.util.List;
 
 import eu.europa.esig.dss.EncryptionAlgorithm;
-import lu.nowina.nexu.api.signature.smartcard.TokenId;
 
 public class GetCertificateResponse {
 

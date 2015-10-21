@@ -28,9 +28,9 @@ import javax.xml.bind.JAXBContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import lu.nowina.nexu.ConfigurationException;
+import lu.nowina.nexu.TechnicalException;
 import lu.nowina.nexu.api.Feedback;
-import lu.nowina.nexu.server.ConfigurationException;
-import lu.nowina.nexu.server.TechnicalException;
 
 /**
  * WebService exposed to NexU install base. 

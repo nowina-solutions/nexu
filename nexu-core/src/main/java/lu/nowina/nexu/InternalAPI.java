@@ -21,6 +21,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import eu.europa.esig.dss.token.SignatureTokenConnection;
+import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Execution;
@@ -31,9 +32,8 @@ import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
+import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
-import lu.nowina.nexu.api.signature.smartcard.CardAdapter;
-import lu.nowina.nexu.api.signature.smartcard.TokenId;
 import lu.nowina.nexu.flow.GetCertificateFlow;
 import lu.nowina.nexu.flow.SignatureFlow;
 import lu.nowina.nexu.generic.ConnectionInfo;

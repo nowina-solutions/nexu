@@ -27,8 +27,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
-import lu.nowina.nexu.server.ConfigurationException;
-import lu.nowina.nexu.server.TechnicalException;
+import lu.nowina.nexu.ConfigurationException;
+import lu.nowina.nexu.TechnicalException;
 
 @Service
 public class SCDatabaseManager {

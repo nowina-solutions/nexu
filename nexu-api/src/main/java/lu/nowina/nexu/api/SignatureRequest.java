@@ -15,7 +15,6 @@ package lu.nowina.nexu.api;
 
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.ToBeSigned;
-import lu.nowina.nexu.api.signature.smartcard.TokenId;
 
 public class SignatureRequest extends NexuRequest {
 

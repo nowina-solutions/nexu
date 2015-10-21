@@ -29,14 +29,14 @@ import org.junit.Test;
 
 import eu.europa.esig.dss.token.JKSSignatureToken;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
+import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
-import lu.nowina.nexu.api.signature.smartcard.CardAdapter;
-import lu.nowina.nexu.api.signature.smartcard.TokenId;
+import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 public class GetCertificateFlowTest {

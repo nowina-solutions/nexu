@@ -31,8 +31,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import lu.nowina.nexu.server.ConfigurationException;
-import lu.nowina.nexu.server.TechnicalException;
+import lu.nowina.nexu.ConfigurationException;
+import lu.nowina.nexu.TechnicalException;
 
 @Controller
 public class NexuScriptController {

@@ -11,12 +11,10 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.api.signature.smartcard;
+package lu.nowina.nexu.api;
 
 import eu.europa.esig.dss.token.PasswordInputCallback;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
-import lu.nowina.nexu.api.DetectedCard;
-import lu.nowina.nexu.api.NexuAPI;
 
 /**
  * A CardAdapter can open connection for specific smartcard. 

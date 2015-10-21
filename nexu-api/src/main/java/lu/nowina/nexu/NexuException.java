@@ -13,9 +13,12 @@
  */
 package lu.nowina.nexu;
 
-public class NexuException extends Exception {
+public class NexuException extends RuntimeException {
 
-	private static final long serialVersionUID = -7792800887967589016L;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	public NexuException(String message) {
 		super(message);

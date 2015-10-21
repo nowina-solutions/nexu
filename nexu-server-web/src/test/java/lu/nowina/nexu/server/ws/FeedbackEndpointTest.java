@@ -15,7 +15,7 @@ package lu.nowina.nexu.server.ws;
 
 import org.junit.Test;
 
-import lu.nowina.nexu.server.ConfigurationException;
+import lu.nowina.nexu.ConfigurationException;
 import lu.nowina.nexu.server.api.ws.FeedbackEndpoint;
 
 public class FeedbackEndpointTest {
