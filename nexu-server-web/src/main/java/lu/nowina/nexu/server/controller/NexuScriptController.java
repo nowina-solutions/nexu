@@ -14,16 +14,16 @@
 package lu.nowina.nexu.server.controller;
 
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.Charset;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -33,37 +33,57 @@ import freemarker.template.Template;
 @Controller
 public class NexuScriptController {
 
+	private static final String UTF8 = "UTF-8";
+
+	private static final String TEXT_JAVASCRIPT = "text/javascript";
+
+	private static final String NEXUJS_TEMPLATE = "nexu.ftl.js";
+
+	private static final Logger logger = Logger.getLogger(NexuScriptController.class.getName());
+
 	@Value("${baseUrl}")
-	private String baseUrl;
+	String baseUrl;
 
 	@Value("${nexuUrl}")
-	private String nexuUrl = "http://localhost:9876/";
+	String nexuUrl = "http://localhost:9876/";
 
 	private Template template;
 
 	public NexuScriptController() {
 		try {
-			Configuration cfg = new Configuration();
+			Configuration cfg = new Configuration(Configuration.VERSION_2_3_22);
 			cfg.setClassForTemplateLoading(getClass(), "/");
-			this.template = cfg.getTemplate("nexu.ftl.js", "UTF-8");
+			this.template = cfg.getTemplate(NEXUJS_TEMPLATE, UTF8);
 		} catch (IOException e) {
-			throw new RuntimeException();
+			logger.log(Level.SEVERE, "Cannot find template for nexu", e);
+			throw new RuntimeException(e);
 		}
 	}
 
-	@RequestMapping("/nexu.js")
-	public void loadScript(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+	@RequestMapping(value = "/nexu.js")
+	public ResponseEntity<String> loadScript() {
 
-		resp.setContentType("text/javascript");
-		resp.setCharacterEncoding("UTF-8");
-		Writer outWriter = new OutputStreamWriter(resp.getOutputStream(), Charset.forName("UTF-8"));
+		StringWriter writer = new StringWriter();
 
 		Map<String, String> model = new HashMap<>();
 
 		model.put("baseUrl", baseUrl);
 		model.put("nexuUrl", nexuUrl);
 
-		template.process(model, outWriter);
+		try {
+			template.process(model, writer);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Cannot process template", e);
+			throw new RuntimeException(e);
+		}
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.CONTENT_TYPE, TEXT_JAVASCRIPT);
+		headers.add(HttpHeaders.CONTENT_ENCODING, UTF8);
+
+		ResponseEntity<String> entity = new ResponseEntity<>(writer.toString(), headers, HttpStatus.OK);
+		return entity;
+
 	}
 
 }
