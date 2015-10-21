@@ -13,8 +13,6 @@
  */
 package lu.nowina.nexu.flow;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -105,15 +103,7 @@ public class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCert
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Flow error", e);
 
-			Feedback feedback = new Feedback();
-			feedback.setFeedbackStatus(FeedbackStatus.EXCEPTION);
-
-			StringWriter buffer = new StringWriter();
-			PrintWriter writer = new PrintWriter(buffer);
-			e.printStackTrace(writer);
-			writer.close();
-
-			feedback.setStacktrace(buffer.toString());
+			Feedback feedback = new Feedback(e);
 
 			displayAndWaitUIOperation("/fxml/provide-feedback.fxml", feedback);
 

@@ -13,6 +13,8 @@
  */
 package lu.nowina.nexu.api;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +48,20 @@ public class Feedback {
     protected String userComment;
     protected EnvironmentInfo info;
 
+    public Feedback() {
+	}
+    
+    public Feedback(Exception e) {
+    	
+		StringWriter buffer = new StringWriter();
+		PrintWriter writer = new PrintWriter(buffer);
+		e.printStackTrace(writer);
+		writer.close();
+
+		setStacktrace(buffer.toString());
+		setFeedbackStatus(FeedbackStatus.EXCEPTION);
+	}
+    
     /**
      * Gets the value of the apiParameter property.
      * 
