@@ -13,17 +13,14 @@
  */
 package lu.nowina.nexu.api.plugin;
 
-import lu.nowina.nexu.api.NexuAPI;
+import java.io.InputStream;
 
-/**
- * NexU exposes an HTTP API to the external application. This external API can
- * be extended through the usage of HTTP Plugin
- * 
- * @author David Naramski
- *
- */
-public interface HttpPlugin extends NexuPlugin {
+public interface HttpRequest {
 
-	HttpResponse process(NexuAPI api, HttpRequest req) throws Exception;
-
+	String getParameter(String name);
+	
+	String getTarget();
+	
+	InputStream getInputStream();
+	
 }

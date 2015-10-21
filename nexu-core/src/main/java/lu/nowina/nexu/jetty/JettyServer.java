@@ -15,9 +15,7 @@ package lu.nowina.nexu.jetty;
 
 import java.util.logging.Logger;
 
-import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 import lu.nowina.nexu.AppConfig;
 import lu.nowina.nexu.InternalAPI;

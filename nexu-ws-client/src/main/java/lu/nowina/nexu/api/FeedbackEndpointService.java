@@ -17,7 +17,7 @@ import javax.xml.ws.WebServiceFeature;
  * Generated source version: 2.2
  * 
  */
-@WebServiceClient(name = "FeedbackEndpointService", targetNamespace = "http://api.nexu.nowina.lu/", wsdlLocation = "file:/C:/Users/david.naramski/git/nexu/nexu-server/nexu-ws-client/src/wsdl/feedback.wsdl")
+@WebServiceClient(name = "FeedbackEndpointService", targetNamespace = "http://api.nexu.nowina.lu/", wsdlLocation = "file:/C:/Users/david.naramski/git/nexu/nexu-ws-client/src/wsdl/feedback.wsdl")
 public class FeedbackEndpointService
     extends Service
 {
@@ -30,7 +30,7 @@ public class FeedbackEndpointService
         URL url = null;
         WebServiceException e = null;
         try {
-            url = new URL("file:/C:/Users/david.naramski/git/nexu/nexu-server/nexu-ws-client/src/wsdl/feedback.wsdl");
+            url = new URL("file:/C:/Users/david.naramski/git/nexu/nexu-ws-client/src/wsdl/feedback.wsdl");
         } catch (MalformedURLException ex) {
             e = new WebServiceException(ex);
         }

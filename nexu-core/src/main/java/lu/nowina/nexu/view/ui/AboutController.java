@@ -36,8 +36,6 @@ public class AboutController implements Initializable {
 	
 	private UIDisplay display;
 	
-	private DatabaseWebLoader loader;
-
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		ok.setOnAction((e) -> {
@@ -46,8 +44,6 @@ public class AboutController implements Initializable {
 	}
 
 	public void setDataLoader(DatabaseWebLoader loader) {
-	    this.loader = loader;
-
 	    String digest = loader.digestDatabase();
         dbVersion.setText(digest != null ? digest : "no_database");
         dbFile.setText(loader.getDatabaseFile().getAbsolutePath());

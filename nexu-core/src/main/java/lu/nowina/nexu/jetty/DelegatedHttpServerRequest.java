@@ -13,31 +13,14 @@
  */
 package lu.nowina.nexu.jetty;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.Principal;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Locale;
-import java.util.Map;
+import java.io.InputStream;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.DispatcherType;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpUpgradeHandler;
-import javax.servlet.http.Part;
 
-public class DelegatedHttpServerRequest implements HttpServletRequest {
+import lu.nowina.nexu.api.plugin.HttpRequest;
+
+public class DelegatedHttpServerRequest implements HttpRequest {
 
 	private HttpServletRequest wrapped;
 
@@ -55,310 +38,23 @@ public class DelegatedHttpServerRequest implements HttpServletRequest {
 		this.context = ctx;
 	}
 
-	public Object getAttribute(String arg0) {
-		return wrapped.getAttribute(arg0);
-	}
-
-	public Enumeration getAttributeNames() {
-		return wrapped.getAttributeNames();
-	}
-
-	public String getAuthType() {
-		return wrapped.getAuthType();
-	}
-
-	public String getCharacterEncoding() {
-		return wrapped.getCharacterEncoding();
-	}
-
-	public int getContentLength() {
-		return wrapped.getContentLength();
-	}
-
-	public String getContentType() {
-		return wrapped.getContentType();
-	}
-
-	public String getContextPath() {
+	@Override
+	public String getTarget() {
 		return context;
 	}
-
-	public Cookie[] getCookies() {
-		return wrapped.getCookies();
-	}
-
-	public long getDateHeader(String arg0) {
-		return wrapped.getDateHeader(arg0);
-	}
-
-	public String getHeader(String arg0) {
-		return wrapped.getHeader(arg0);
-	}
-
-	public Enumeration getHeaderNames() {
-		return wrapped.getHeaderNames();
-	}
-
-	public Enumeration getHeaders(String arg0) {
-		return wrapped.getHeaders(arg0);
-	}
-
-	public ServletInputStream getInputStream() throws IOException {
-		return wrapped.getInputStream();
-	}
-
-	public int getIntHeader(String arg0) {
-		return wrapped.getIntHeader(arg0);
-	}
-
-	public String getLocalAddr() {
-		return wrapped.getLocalAddr();
-	}
-
-	public String getLocalName() {
-		return wrapped.getLocalName();
-	}
-
-	public int getLocalPort() {
-		return wrapped.getLocalPort();
-	}
-
-	public Locale getLocale() {
-		return wrapped.getLocale();
-	}
-
-	public Enumeration getLocales() {
-		return wrapped.getLocales();
-	}
-
-	public String getMethod() {
-		return wrapped.getMethod();
-	}
-
-	public String getParameter(String arg0) {
-		return wrapped.getParameter(arg0);
-	}
-
-	public Map getParameterMap() {
-		return wrapped.getParameterMap();
-	}
-
-	public Enumeration getParameterNames() {
-		return wrapped.getParameterNames();
-	}
-
-	public String[] getParameterValues(String arg0) {
-		return wrapped.getParameterValues(arg0);
-	}
-
-	public String getPathInfo() {
-		return wrapped.getPathInfo().substring(getContextPath().length());
-	}
-
-	public String getPathTranslated() {
-		return wrapped.getPathTranslated();
-	}
-
-	public String getProtocol() {
-		return wrapped.getProtocol();
-	}
-
-	public String getQueryString() {
-		return wrapped.getQueryString();
-	}
-
-	public BufferedReader getReader() throws IOException {
-		return wrapped.getReader();
-	}
-
-	public String getRealPath(String arg0) {
-		return wrapped.getRealPath(arg0);
-	}
-
-	public String getRemoteAddr() {
-		return wrapped.getRemoteAddr();
-	}
-
-	public String getRemoteHost() {
-		return wrapped.getRemoteHost();
-	}
-
-	public int getRemotePort() {
-		return wrapped.getRemotePort();
-	}
-
-	public String getRemoteUser() {
-		return wrapped.getRemoteUser();
-	}
-
-	public RequestDispatcher getRequestDispatcher(String arg0) {
-		return wrapped.getRequestDispatcher(arg0);
-	}
-
-	public String getRequestURI() {
-		return wrapped.getRequestURI();
-	}
-
-	public StringBuffer getRequestURL() {
-		return wrapped.getRequestURL();
-	}
-
-	public String getRequestedSessionId() {
-		return wrapped.getRequestedSessionId();
-	}
-
-	public String getScheme() {
-		return wrapped.getScheme();
-	}
-
-	public String getServerName() {
-		return wrapped.getServerName();
-	}
-
-	public int getServerPort() {
-		return wrapped.getServerPort();
-	}
-
-	public String getServletPath() {
-		return wrapped.getServletPath();
-	}
-
-	public HttpSession getSession() {
-		return wrapped.getSession();
-	}
-
-	public HttpSession getSession(boolean arg0) {
-		return wrapped.getSession(arg0);
-	}
-
-	public Principal getUserPrincipal() {
-		return wrapped.getUserPrincipal();
-	}
-
-	public boolean isRequestedSessionIdFromCookie() {
-		return wrapped.isRequestedSessionIdFromCookie();
-	}
-
-	public boolean isRequestedSessionIdFromURL() {
-		return wrapped.isRequestedSessionIdFromURL();
-	}
-
-	public boolean isRequestedSessionIdFromUrl() {
-		return wrapped.isRequestedSessionIdFromUrl();
-	}
-
-	public boolean isRequestedSessionIdValid() {
-		return wrapped.isRequestedSessionIdValid();
-	}
-
-	public boolean isSecure() {
-		return wrapped.isSecure();
-	}
-
-	public boolean isUserInRole(String arg0) {
-		return wrapped.isUserInRole(arg0);
-	}
-
-	public void removeAttribute(String arg0) {
-		wrapped.removeAttribute(arg0);
-	}
-
-	public void setAttribute(String arg0, Object arg1) {
-		wrapped.setAttribute(arg0, arg1);
-	}
-
-	public void setCharacterEncoding(String arg0) throws UnsupportedEncodingException {
-		wrapped.setCharacterEncoding(arg0);
-	}
-
+	
 	@Override
-	public AsyncContext getAsyncContext() {
-		// TODO Auto-generated method stub
-		return null;
+	public InputStream getInputStream() {
+		try {
+			return wrapped.getInputStream();
+		} catch(IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
-
+	
 	@Override
-	public long getContentLengthLong() {
-		// TODO Auto-generated method stub
-		return 0;
+	public String getParameter(String name) {
+		return wrapped.getParameter(name);
 	}
-
-	@Override
-	public DispatcherType getDispatcherType() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ServletContext getServletContext() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isAsyncStarted() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean isAsyncSupported() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public AsyncContext startAsync() throws IllegalStateException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public AsyncContext startAsync(ServletRequest arg0, ServletResponse arg1) throws IllegalStateException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean authenticate(HttpServletResponse arg0) throws IOException, ServletException {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public String changeSessionId() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Part getPart(String arg0) throws IOException, ServletException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Collection<Part> getParts() throws IOException, ServletException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void login(String arg0, String arg1) throws ServletException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void logout() throws ServletException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public <T extends HttpUpgradeHandler> T upgrade(Class<T> arg0) throws IOException, ServletException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 }

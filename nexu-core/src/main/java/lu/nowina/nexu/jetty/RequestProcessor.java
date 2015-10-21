@@ -15,6 +15,7 @@ package lu.nowina.nexu.jetty;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,6 +31,7 @@ import org.eclipse.jetty.server.handler.AbstractHandler;
 import lu.nowina.nexu.InternalAPI;
 import lu.nowina.nexu.UserPreferences;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
+import lu.nowina.nexu.api.plugin.HttpResponse;
 
 public class RequestProcessor extends AbstractHandler {
 
@@ -48,11 +50,12 @@ public class RequestProcessor extends AbstractHandler {
 	public void handle(String target, Request arg1, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 
+		PrintWriter writer = response.getWriter();
 		if (!"0:0:0:0:0:0:0:1".equals(request.getRemoteHost()) && !"127.0.0.1".equals(request.getRemoteHost())) {
 			logger.warning("Cannot accept request from " + request.getRemoteHost());
 			response.setContentType("text/html;charset=utf-8");
-			response.getWriter().write("Please connect from localhost");
-			response.getWriter().close();
+			writer.write("Please connect from localhost");
+			writer.close();
 			return;
 		}
 
@@ -80,12 +83,17 @@ public class RequestProcessor extends AbstractHandler {
 			logger.info("Process request " + target);
 			try {
 				HttpPlugin httpPlugin = api.getPlugin("rest");
-				httpPlugin.process(api, new DelegatedHttpServerRequest(request, "/rest"), response);
+				
+				HttpResponse resp = httpPlugin.process(api, new DelegatedHttpServerRequest(request, "/rest"));
+				
+				writer.write(resp.getContent());
+				writer.close();
+				
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, "Cannot process request", e);
 				response.setContentType("text/plain;charset=utf-8");
-				e.printStackTrace(response.getWriter());
-				response.getWriter().close();
+				e.printStackTrace(writer);
+				writer.close();
 				response.setStatus(500);
 			}
 

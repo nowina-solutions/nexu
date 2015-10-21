@@ -13,11 +13,8 @@
  */
 package lu.nowina.nexu.rest;
 
-import java.io.PrintWriter;
 import java.util.logging.Logger;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.io.IOUtils;
@@ -32,6 +29,8 @@ import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
+import lu.nowina.nexu.api.plugin.HttpRequest;
+import lu.nowina.nexu.api.plugin.HttpResponse;
 import lu.nowina.nexu.api.signature.smartcard.TokenId;
 
 /**
@@ -50,12 +49,9 @@ public class RestHttpPlugin implements HttpPlugin {
 	}
 
 	@Override
-	public void process(NexuAPI api, HttpServletRequest req, HttpServletResponse resp) throws Exception {
+	public HttpResponse process(NexuAPI api, HttpRequest req) throws Exception {
 
-		String uri = req.getRequestURI();
-		logger.info("URI " + uri);
-
-		String target = req.getPathInfo();
+		String target = req.getTarget();
 		logger.info("PathInfo " + target);
 
 		String payload = IOUtils.toString(req.getInputStream());
@@ -93,9 +89,7 @@ public class RestHttpPlugin implements HttpPlugin {
 
 			Execution<?> respObj = api.sign(r);
 
-			PrintWriter writer = resp.getWriter();
-			writer.write(gson.toJson(respObj));
-			writer.close();
+			return new HttpResponse(gson.toJson(respObj));
 
 		} else if ("/certificates".equals(target)) {
 
@@ -109,10 +103,12 @@ public class RestHttpPlugin implements HttpPlugin {
 
 			logger.info("Call API");
 			Execution<?> respObj = api.getCertificate(payloadObj);
-			PrintWriter writer = resp.getWriter();
-			writer.write(gson.toJson(respObj));
-			writer.close();
+			return new HttpResponse(gson.toJson(respObj));
 
+		} else {
+
+			throw new RuntimeException("Target not recognized " + target);
+			
 		}
 
 	}
