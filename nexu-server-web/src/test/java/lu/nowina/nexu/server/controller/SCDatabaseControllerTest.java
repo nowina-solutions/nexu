@@ -11,34 +11,32 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.server.manager;
+package lu.nowina.nexu.server.controller;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
-import lu.nowina.nexu.server.ConfigurationException;
+import lu.nowina.nexu.server.manager.SCDatabaseManager;
 
-public class SCDataBaseManagerTest {
+public class SCDatabaseControllerTest {
 
 	@Test
-	public void test1() {
+	public void test1() throws Exception {
+		
+		SCDatabaseController controller = new SCDatabaseController();
 		SCDatabaseManager manager = new SCDatabaseManager();
-		manager.nexuDatabaseFile = new FileSystemResource("target/non-existing.xml");
-		Assert.assertEquals("d41d8cd98f00b204e9800998ecf8427e", manager.getDatabaseDigest());
-	}
-	
-	@Test
-	public void test2() {
-		SCDatabaseManager manager = new SCDatabaseManager();
-		manager.nexuDatabaseFile = new FileSystemResource("src/test/resources/db.xml");
-		Assert.assertEquals("98259f589138d7509e90cb3668f47be8", manager.getDatabaseDigest());
-	}
+		manager.setNexuDatabaseFile(new FileSystemResource("src/test/resources/db.xml"));
+		controller.databaseManager = manager;
+		
 
-	@Test(expected=ConfigurationException.class)
-	public void test3() {
-		SCDatabaseManager manager = new SCDatabaseManager();
-		manager.postConstruct();
+		ResponseEntity<byte[]> resp = controller.getDatabase();
+		
+		Assert.assertEquals(MediaType.parseMediaType("application/xml"), resp.getHeaders().getContentType());
+		Assert.assertTrue(resp.getBody() != null);
+		System.out.println(new String(resp.getBody()));
 	}
 	
 }

@@ -19,15 +19,22 @@ import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
+import lu.nowina.nexu.server.ConfigurationException;
+import lu.nowina.nexu.server.TechnicalException;
+
 @Service
 public class SCDatabaseManager {
 	
+	private static final String DIGEST = "MD5";
+
 	private static final Logger logger = Logger.getLogger(SCDatabaseManager.class.getName());
 
 	@Value("${nexuDatabase}")
@@ -37,6 +44,13 @@ public class SCDatabaseManager {
 
 	private String databaseDigest;
 
+	@PostConstruct
+	public void postConstruct() {
+		if(nexuDatabaseFile == null) {
+			throw new ConfigurationException("Configuration must define 'nexuDatabaseFile'");
+		}
+	}
+	
 	public byte[] getData() {
 
 		if (!nexuDatabaseFile.exists()) {
@@ -48,7 +62,7 @@ public class SCDatabaseManager {
 				data = IOUtils.toByteArray(in);
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, "Cannot read file " + nexuDatabaseFile, e);
-				throw new RuntimeException(e);
+				throw new TechnicalException("Cannot read file " + nexuDatabaseFile);
 			}
 		}
 
@@ -59,14 +73,19 @@ public class SCDatabaseManager {
 
 		if (databaseDigest == null) {
 			try {
-				MessageDigest digest = MessageDigest.getInstance("MD5");
+				MessageDigest digest = MessageDigest.getInstance(DIGEST);
 				databaseDigest = Hex.encodeHexString(digest.digest(getData()));
 			} catch (NoSuchAlgorithmException e) {
-				throw new RuntimeException(e);
+				logger.log(Level.SEVERE, "Algorithm " + DIGEST  + " not found", e);
+				throw new TechnicalException("Algorithm " + DIGEST  + " not found");
 			}
 		}
 
 		return databaseDigest;
 	}
 
+	public void setNexuDatabaseFile(Resource nexuDatabaseFile) {
+		this.nexuDatabaseFile = nexuDatabaseFile;
+	}
+	
 }

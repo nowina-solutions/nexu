@@ -13,10 +13,11 @@
  */
 package lu.nowina.nexu.server.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -25,14 +26,20 @@ import lu.nowina.nexu.server.manager.SCDatabaseManager;
 @Controller
 public class SCDatabaseController {
 
+	private static final String UTF8 = "UTF-8";
+
 	@Autowired
-	private SCDatabaseManager databaseManager;
+	SCDatabaseManager databaseManager;
 	
 	@RequestMapping("/database.xml")
-	public void info(HttpServletRequest req, HttpServletResponse resp) throws Exception {
+	public ResponseEntity<byte[]> getDatabase() throws Exception {
 
-		resp.setContentType("application/xml");
-		resp.getOutputStream().write(databaseManager.getData());
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE);
+		headers.add(HttpHeaders.CONTENT_ENCODING, UTF8);
+
+		ResponseEntity<byte[]> entity = new ResponseEntity<>(databaseManager.getData(), headers, HttpStatus.OK);
+		return entity;
 
 	}
 

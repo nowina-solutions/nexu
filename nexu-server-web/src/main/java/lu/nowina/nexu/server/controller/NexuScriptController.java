@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -29,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import lu.nowina.nexu.server.ConfigurationException;
+import lu.nowina.nexu.server.TechnicalException;
 
 @Controller
 public class NexuScriptController {
@@ -56,10 +60,20 @@ public class NexuScriptController {
 			this.template = cfg.getTemplate(NEXUJS_TEMPLATE, UTF8);
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "Cannot find template for nexu", e);
-			throw new RuntimeException(e);
+			throw new ConfigurationException("Cannot find template for nexu");
 		}
 	}
 
+	@PostConstruct
+	public void postConstruct() {
+		if(baseUrl == null) {
+			throw new ConfigurationException("Configuration must define 'baseUrl'");
+		}
+		if(nexuUrl == null) {
+			throw new ConfigurationException("Configuration must define 'nexuUrl'");
+		}
+	}
+	
 	@RequestMapping(value = "/nexu.js")
 	public ResponseEntity<String> loadScript() {
 
@@ -74,7 +88,7 @@ public class NexuScriptController {
 			template.process(model, writer);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Cannot process template", e);
-			throw new RuntimeException(e);
+			throw new TechnicalException("Cannot process template");
 		}
 
 		HttpHeaders headers = new HttpHeaders();

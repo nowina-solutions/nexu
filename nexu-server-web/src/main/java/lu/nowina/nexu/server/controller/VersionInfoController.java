@@ -13,28 +13,30 @@
  */
 package lu.nowina.nexu.server.controller;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.security.MessageDigest;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import lu.nowina.nexu.generic.NexuInfo;
+import lu.nowina.nexu.server.ConfigurationException;
+import lu.nowina.nexu.server.TechnicalException;
 import lu.nowina.nexu.server.manager.SCDatabaseManager;
 
 @Controller
 public class VersionInfoController {
 
+	private static final Logger logger = Logger.getLogger(VersionInfoController.class.getName());
+	
 	@Value("${nexuVersion}")
 	private String nexuVersion;
 
@@ -50,7 +52,15 @@ public class VersionInfoController {
 			ctx = JAXBContext.newInstance(NexuInfo.class);
 			marshaller = ctx.createMarshaller();
 		} catch (Exception e) {
-			throw new RuntimeException();
+			logger.log(Level.SEVERE, "Cannot build JAXBContext or Marshaller", e);
+			throw new TechnicalException("Cannot build JAXBContext or Marshaller");
+		}
+	}
+	
+	@PostConstruct
+	public void postConstruct() {
+		if(nexuVersion == null) {
+			throw new ConfigurationException("Configuration must define 'nexuVersion'");
 		}
 	}
 	

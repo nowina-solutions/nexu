@@ -19,22 +19,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import lu.nowina.nexu.server.ConfigurationException;
-import lu.nowina.nexu.server.TechnicalException;
 
-public class NexuScriptControllerTest {
+public class VersionInfoControllerTest {
 
-	@Test(expected=TechnicalException.class)
+	@Test(expected=ConfigurationException.class)
 	public void test1() throws Exception {
 		
-		NexuScriptController controller = new NexuScriptController();
-		controller.loadScript();
-		
-	}
-	
-	@Test(expected=ConfigurationException.class)
-	public void test3() throws Exception {
-		
-		NexuScriptController controller = new NexuScriptController();
+		VersionInfoController controller = new VersionInfoController();
 		controller.postConstruct();
 		
 	}
