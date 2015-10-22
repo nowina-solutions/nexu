@@ -21,8 +21,9 @@ public class HttpResponseTest {
 	@Test
 	public void test1() {
 		
-		HttpResponse resp = new HttpResponse("test");
+		HttpResponse resp = new HttpResponse("test", "application/json");
 		Assert.assertEquals("test", resp.getContent());
+		Assert.assertEquals("application/json", resp.getContentType());
 		
 	}
 	

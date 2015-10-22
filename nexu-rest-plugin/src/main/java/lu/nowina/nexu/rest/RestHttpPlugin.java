@@ -110,7 +110,7 @@ public class RestHttpPlugin implements HttpPlugin {
 
 		Execution<?> respObj = api.sign(r);
 
-		return new HttpResponse(gson.toJson(respObj));
+		return new HttpResponse(gson.toJson(respObj), "application/json");
 	}
 
 	private HttpResponse getCertificates(NexuAPI api, String payload) {
@@ -124,7 +124,7 @@ public class RestHttpPlugin implements HttpPlugin {
 
 		logger.info("Call API");
 		Execution<?> respObj = api.getCertificate(payloadObj);
-		return new HttpResponse(gson.toJson(respObj));
+		return new HttpResponse(gson.toJson(respObj), "application/json");
 	}
 
 }

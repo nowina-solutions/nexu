@@ -37,7 +37,7 @@ function callUrl(url, type, data, success_callback, error_callback) {
 		  data: data,
 		  crossDomain: true, 
 		  contentType: "application/json; charset=utf-8",
-		  dataType: "jsonp",
+		  dataType: "json",
 		  success: function (result) {
 			  console.log(url + " : OK");
 			  success_callback.call(this, result);

@@ -39,9 +39,13 @@ public class MessageController extends UIOperation<Void>implements Initializable
 
 	@Override
 	public void init(Object... params) {
-		String value = (String) params[0];
-		if (value != null) {
-			message.setText(value);
+		if(params.length > 0) {
+			String value = (String) params[0];
+			if (value != null) {
+				message.setText(value);
+			}
+		} else {
+			message.setText("Error");
 		}
 	}
 

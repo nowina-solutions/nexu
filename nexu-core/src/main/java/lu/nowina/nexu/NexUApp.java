@@ -96,7 +96,7 @@ public class NexUApp extends Application implements UIDisplay {
 					String pluginClassName = props.getProperty(key);
 					String pluginId = key.substring("plugin_".length());
 
-					logger.config(" + Plugin " + pluginClassName);
+					logger.info(" + Plugin " + pluginClassName);
 					instanciateAndRegisterPlugin(api, pluginClassName, pluginId, false);
 
 				}

@@ -17,12 +17,19 @@ public class HttpResponse {
 
 	private String content;
 	
-	public HttpResponse(String content) {
+	private String contentType;
+	
+	public HttpResponse(String content, String contentType) {
 		this.content = content;
+		this.contentType = contentType;
 	}
 
 	public String getContent() {
 		return content;
+	}
+	
+	public String getContentType() {
+		return contentType;
 	}
 	
 }

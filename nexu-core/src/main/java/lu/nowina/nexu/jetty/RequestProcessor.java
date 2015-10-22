@@ -51,20 +51,26 @@ public class RequestProcessor extends AbstractHandler {
 	public void handle(String target, Request arg1, HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 
-		PrintWriter writer = response.getWriter();
 		if (!"0:0:0:0:0:0:0:1".equals(request.getRemoteHost()) && !"127.0.0.1".equals(request.getRemoteHost())) {
 			logger.warning("Cannot accept request from " + request.getRemoteHost());
 			response.setContentType("text/html;charset=utf-8");
+			PrintWriter writer = response.getWriter();
 			writer.write("Please connect from localhost");
 			writer.close();
 			return;
 		}
 
 		response.setHeader("Access-Control-Allow-Origin", "*");
-		response.setHeader("Access-Control-Allow-Methods", "GET");
+		response.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT, DELETE");
 		response.setHeader("Access-Control-Max-Age", "3600");
-		response.setHeader("Access-Control-Allow-Headers", "x-requested-with");
+		response.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
+		if("OPTIONS".equals(request.getMethod())) {
+			response.setStatus(200);
+			response.getWriter().close();
+			return;
+		}
+		
 		logger.info("Request " + target);
 
 		if ("/favicon.ico".equals(target)) {
@@ -72,34 +78,40 @@ public class RequestProcessor extends AbstractHandler {
 		} else if ("/".equals(target) || "/nexu-info".equals(target)) {
 			nexuInfo(response);
 		} else {
-			httpPlugin(target, request, response, writer);
+			httpPlugin(target, request, response);
 		}
 
 	}
 
-	private void httpPlugin(String target, HttpServletRequest request, HttpServletResponse response,
-			PrintWriter writer) {
+	private void httpPlugin(String target, HttpServletRequest request, HttpServletResponse response) {
 		int index = target.indexOf("/", 1);
 		String pluginId = target.substring(target.charAt(0) == '/' ? 1 : 0, index);
 		
 		logger.info("Process request " + target + " pluginId: " + pluginId);
 		try {
+			PrintWriter writer = response.getWriter();
 			HttpPlugin httpPlugin = api.getPlugin(pluginId);
 			
 			HttpResponse resp = httpPlugin.process(api, new DelegatedHttpServerRequest(request, "/rest"));
 			if(resp == null || resp.getContent() == null) {
 				throw new TechnicalException("Plugin responded null");
 			} else {
+				response.setContentType(resp.getContentType());
 				writer.write(resp.getContent());
 				writer.close();
 			}
 			
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Cannot process request", e);
-			response.setContentType("text/plain;charset=utf-8");
-			e.printStackTrace(writer);
-			writer.close();
-			response.setStatus(500);
+			try {
+				response.sendError(500);
+				response.setContentType("text/plain;charset=utf-8");
+				PrintWriter writer = response.getWriter();
+				e.printStackTrace(writer);
+				writer.close();
+			} catch(IOException e2) {
+				logger.log(Level.SEVERE, "Cannot write error !?", e2);
+			}
 		}
 	}
 
