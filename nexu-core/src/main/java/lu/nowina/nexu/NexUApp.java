@@ -176,6 +176,8 @@ public class NexUApp extends Application implements UIDisplay {
 		config.setBindingPort(Integer.parseInt(props.getProperty("binding_port", "9876")));
 		config.setBindingIP(props.getProperty("binding_ip", "127.0.0.1"));
 		config.setServerUrl(props.getProperty("server_url", "http://lab.nowina.solutions/nexu"));
+		config.setInstallUrl(props.getProperty("install_url", "http://nowina.lu/nexu/"));
+		config.setNexuUrl(props.getProperty("nexu_url", "http://localhost:9876"));
 
 		return config;
 	}

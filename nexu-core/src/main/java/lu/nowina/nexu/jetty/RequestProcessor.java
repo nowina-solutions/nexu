@@ -16,6 +16,9 @@ package lu.nowina.nexu.jetty;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,6 +31,9 @@ import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import lu.nowina.nexu.ConfigurationException;
 import lu.nowina.nexu.InternalAPI;
 import lu.nowina.nexu.TechnicalException;
 import lu.nowina.nexu.UserPreferences;
@@ -38,9 +44,34 @@ public class RequestProcessor extends AbstractHandler {
 
 	private static final Logger logger = Logger.getLogger(RequestProcessor.class.getName());
 
+	private static final String UTF8 = "UTF-8";
+
+	private static final String TEXT_JAVASCRIPT = "text/javascript";
+
+	private static final String NEXUJS_TEMPLATE = "nexu.ftl.js";
+
 	private UserPreferences config;
 
 	private InternalAPI api;
+
+	String baseUrl;
+
+	String nexuUrl = "http://localhost:9876/";
+
+	private Template template;
+
+	public RequestProcessor(String baseUrl, String nexuUrl) {
+		this.baseUrl = baseUrl;
+		this.nexuUrl = nexuUrl;
+		try {
+			Configuration cfg = new Configuration(Configuration.VERSION_2_3_22);
+			cfg.setClassForTemplateLoading(getClass(), "/");
+			this.template = cfg.getTemplate(NEXUJS_TEMPLATE, UTF8);
+		} catch (IOException e) {
+			logger.log(Level.SEVERE, "Cannot find template for nexu", e);
+			throw new ConfigurationException("Cannot find template for nexu");
+		}
+	}
 
 	public void setConfig(InternalAPI api, UserPreferences config) {
 		this.api = api;
@@ -74,6 +105,8 @@ public class RequestProcessor extends AbstractHandler {
 
 		if ("/favicon.ico".equals(target)) {
 			favIcon(response);
+		} else if ("/nexu.js".equals(target)) {
+			nexuJs(response);
 		} else if ("/".equals(target) || "/nexu-info".equals(target)) {
 			nexuInfo(response);
 		} else {
@@ -128,6 +161,29 @@ public class RequestProcessor extends AbstractHandler {
 		IOUtils.copy(in, out);
 		in.close();
 		out.close();
+	}
+
+	private void nexuJs(HttpServletResponse response) throws IOException {
+	
+		StringWriter writer = new StringWriter();
+
+		Map<String, String> model = new HashMap<>();
+
+		model.put("baseUrl", baseUrl);
+		model.put("nexuUrl", nexuUrl);
+
+		try {
+			template.process(model, writer);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Cannot process template", e);
+			throw new TechnicalException("Cannot process template");
+		}
+
+		response.setContentType(TEXT_JAVASCRIPT);
+		PrintWriter out = response.getWriter();
+		out.println(writer.toString());
+		out.close();
+
 	}
 
 }

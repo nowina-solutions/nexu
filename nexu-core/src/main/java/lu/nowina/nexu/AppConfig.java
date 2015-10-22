@@ -27,6 +27,10 @@ public class AppConfig {
 	
 	private String serverUrl;
 	
+	private String installUrl; 
+	
+	private String nexuUrl;
+	
 	public String getBindingIP() {
 		return bindingIP;
 	}
@@ -50,5 +54,21 @@ public class AppConfig {
     public void setServerUrl(String serverUrl) {
         this.serverUrl = serverUrl;
     }
+
+	public String getInstallUrl() {
+		return installUrl;
+	}
+
+	public void setInstallUrl(String installUrl) {
+		this.installUrl = installUrl;
+	}
+
+	public String getNexuUrl() {
+		return nexuUrl;
+	}
+
+	public void setNexuUrl(String nexuUrl) {
+		this.nexuUrl = nexuUrl;
+	}
 
 }

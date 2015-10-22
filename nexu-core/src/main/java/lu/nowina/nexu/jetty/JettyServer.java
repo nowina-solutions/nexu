@@ -44,7 +44,7 @@ public class JettyServer {
 
 		Server server = new Server(conf.getBindingPort());
 
-		RequestProcessor handler = new RequestProcessor();
+		RequestProcessor handler = new RequestProcessor(conf.getInstallUrl(), conf.getNexuUrl());
 		handler.setConfig(api, prefs);
 
 		server.setHandler(handler);

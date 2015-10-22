@@ -30,17 +30,4 @@ public class VersionInfoControllerTest {
 		
 	}
 	
-	@Test
-	public void test2() throws Exception {
-		
-		NexuScriptController controller = new NexuScriptController();
-		controller.baseUrl = "http://localhost:8070/";
-		controller.nexuUrl = "http://localhost:9876/";
-		ResponseEntity<String> resp = controller.loadScript();
-		
-		Assert.assertEquals(MediaType.parseMediaType("text/javascript"), resp.getHeaders().getContentType());
-		Assert.assertTrue(resp.getBody() != null && !resp.getBody().isEmpty());
-		
-	}
-	
 }
