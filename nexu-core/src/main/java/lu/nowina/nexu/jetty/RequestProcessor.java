@@ -61,8 +61,7 @@ public class RequestProcessor extends AbstractHandler {
 		}
 
 		response.setHeader("Access-Control-Allow-Origin", "*");
-		response.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT, DELETE");
-		response.setHeader("Access-Control-Max-Age", "3600");
+		response.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
 		response.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
 		if("OPTIONS".equals(request.getMethod())) {
@@ -116,10 +115,10 @@ public class RequestProcessor extends AbstractHandler {
 	}
 
 	private void nexuInfo(HttpServletResponse response) throws IOException {
-		response.setContentType("text/plain");
-		ServletOutputStream out = response.getOutputStream();
-		out.write("1.0".getBytes());
-		out.close();
+		response.setContentType("application/json");
+		PrintWriter writer = response.getWriter();
+		writer.write("{ \"version\": \"1.0\"}");
+		writer.close();
 	}
 
 	private void favIcon(HttpServletResponse response) throws IOException {

@@ -49,9 +49,10 @@ function callUrl(url, type, data, success_callback, error_callback) {
 		});
 } 
 
-$.get("${nexuUrl}/nexu-info", function(data) {
+callUrl("${nexuUrl}/nexu-info", "GET", {}, function(data) {
 	// something responded
-	if(data == nexuVersion) {
+	console.log("server: " + data.version + " - expected: " + nexuVersion);
+	if(data.version == nexuVersion) {
 		// valid version
 		$(".nexu-sign-button").html("Sign");
 		// add hidden input to be able to check on server side
@@ -68,7 +69,7 @@ $.get("${nexuUrl}/nexu-info", function(data) {
 		});
 		
 	}
-}).fail(function() {
+}, function(data) {
 	// no response, NexU not installed or not started
 	$(".nexu-sign-button").html("Install NexU");
 	$(".nexu-sign-button").on("click", function() {
@@ -76,5 +77,4 @@ $.get("${nexuUrl}/nexu-info", function(data) {
 		window.location = "${baseUrl}/";
 		return false;
 	});
-	
 });
