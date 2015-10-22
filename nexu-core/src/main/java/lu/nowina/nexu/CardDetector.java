@@ -11,7 +11,7 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.smartcard.dector;
+package lu.nowina.nexu;
 
 import java.util.ArrayList;
 import java.util.List;

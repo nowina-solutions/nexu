@@ -28,7 +28,10 @@ public enum ScAPI {
     PKCS_11("PKCS11"),
     
     @XmlEnumValue("PKCS12")
-    PKCS_12("PKCS12");
+    PKCS_12("PKCS12"),
+    
+    @XmlEnumValue("MOCCA")
+    MOCCA("MOCCA");
     
     private final String value;
 

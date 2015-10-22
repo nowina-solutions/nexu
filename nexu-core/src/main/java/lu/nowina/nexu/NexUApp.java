@@ -38,7 +38,6 @@ import lu.nowina.nexu.generic.HttpDataLoader;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCDatabaseLoader;
 import lu.nowina.nexu.jetty.JettyServer;
-import lu.nowina.nexu.smartcard.dector.CardDetector;
 import lu.nowina.nexu.view.SystrayMenu;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;

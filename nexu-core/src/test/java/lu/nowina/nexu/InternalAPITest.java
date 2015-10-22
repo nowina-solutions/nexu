@@ -26,7 +26,6 @@ import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.TokenId;
-import lu.nowina.nexu.smartcard.dector.CardDetector;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 public class InternalAPITest {
