@@ -31,6 +31,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
 import lu.nowina.nexu.api.plugin.SignaturePlugin;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
@@ -83,7 +84,7 @@ public class NexUApp extends Application implements UIDisplay {
 			SCDatabase db = SCDatabaseLoader.load(store);
 
 			UserPreferences prefs = new UserPreferences();
-			CardDetector detector = new CardDetector();
+			CardDetector detector = new CardDetector(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
 
 			DatabaseWebLoader loader = new DatabaseWebLoader(config, new HttpDataLoader());
 			loader.start();

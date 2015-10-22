@@ -13,6 +13,7 @@
  */
 package lu.nowina.nexu;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -25,6 +26,8 @@ import javax.smartcardio.CardTerminal;
 import javax.smartcardio.TerminalFactory;
 
 import lu.nowina.nexu.api.DetectedCard;
+import lu.nowina.nexu.api.EnvironmentInfo;
+import lu.nowina.nexu.api.OS;
 
 /**
  * Detects smartcard.
@@ -34,6 +37,21 @@ public class CardDetector {
 
 	private static final Logger logger = Logger.getLogger(CardDetector.class.getSimpleName());
 
+	public CardDetector(EnvironmentInfo info) {
+		try {
+			if(info.getOs() == OS.LINUX) {
+				logger.info("The OS is Linux, we check for Library");
+				File libFile = at.gv.egiz.smcc.util.LinuxLibraryFinder.getLibraryPath("pcsclite", "1");
+				if(libFile != null) {
+					logger.info("Library installed is " + libFile.getAbsolutePath());
+					System.setProperty("sun.security.smartcardio.library", libFile.getAbsolutePath());
+				}
+			}
+		} catch(Exception e) {
+			logger.log(Level.SEVERE, "Error while loading library for Linux", e);
+		}
+	}
+	
 	/**
 	 * Detect the smartcard connected to the computer.
 	 *
