@@ -204,31 +204,41 @@ public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 	private TokenId createTokenAuto(NexuAPI api, List<DetectedCard> detectedCards) {
 		DetectedCard card = null;
 
-		if (detectedCards.size() == 1) {
+		if(detectedCards.isEmpty()) {
+			logger.warning("No card detected");
+			return null;
+		} else if (detectedCards.size() == 1) {
 			card = detectedCards.get(0);
 			logger.info("One card detected " + card);
 
 		} else {
 			// size() > 1
-			logger.info("Select one card");
+			logger.warning("More than one card. Not supported yet");
+			// TODO Add support for multiple card
+			card = detectedCards.get(0);
 		}
 
 		List<Match> adapters = api.matchingCardAdapters(card);
-		Match firstMatch = adapters.get(0);
-		this.selectedCard = firstMatch.getCard();
-		CardAdapter adapter = firstMatch.getAdapter();
-
-		SignatureTokenConnection connect = adapter.connect(api, card, getPasswordInputCallback());
-        if(connect == null) {
-            logger.severe("No connect returned");
+		if(adapters.isEmpty()) {
+			logger.warning("No matching adapter for the card " + card);
             throw new NullPointerException("Card adapter returned null");
-        }
-        TokenId tokenId = api.registerTokenConnection(connect);
-        if(tokenId == null) {
-            logger.severe("Received null TokenId after registration");
-            throw new NullPointerException("Null TokenId");
-        }
-		return tokenId;
+		} else {
+			Match firstMatch = adapters.get(0);
+			this.selectedCard = firstMatch.getCard();
+			CardAdapter adapter = firstMatch.getAdapter();
+	
+			SignatureTokenConnection connect = adapter.connect(api, card, getPasswordInputCallback());
+	        if(connect == null) {
+	            logger.severe("No connect returned");
+	            throw new NullPointerException("Card adapter returned null");
+	        }
+	        TokenId tokenId = api.registerTokenConnection(connect);
+	        if(tokenId == null) {
+	            logger.severe("Received null TokenId after registration");
+	            throw new NullPointerException("Null TokenId");
+	        }
+			return tokenId;
+		}
 	}
 
 	/**

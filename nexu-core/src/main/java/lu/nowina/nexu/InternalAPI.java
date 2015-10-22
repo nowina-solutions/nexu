@@ -14,6 +14,7 @@
 package lu.nowina.nexu;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +87,10 @@ public class InternalAPI implements NexuAPI {
 
     @Override
     public List<Match> matchingCardAdapters(DetectedCard d) {
+    	if(d == null) {
+    		logger.warning("DetectedCard argument should not be null");
+    		return Collections.emptyList();
+    	}
         List<Match> cards = new ArrayList<>();
         for (CardAdapter card : adapters) {
             if (card.accept(d)) {
