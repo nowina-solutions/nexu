@@ -11,20 +11,25 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.server.controller;
+package lu.nowina.nexu.server.business;
 
-import org.junit.Test;
+import java.io.File;
+import java.util.Date;
 
-import lu.nowina.nexu.ConfigurationException;
+public class FeedbackFile {
 
-public class VersionInfoControllerTest {
-
-	@Test(expected=ConfigurationException.class)
-	public void test1() throws Exception {
-		
-		VersionInfoController controller = new VersionInfoController();
-		controller.postConstruct();
-		
+	private File file;
+	
+	public FeedbackFile(File file) {
+		this.file = file;
+	}
+	
+	public String getId() {
+		return file.getName();
+	}
+	
+	public Date getDate() {
+		return new Date(file.lastModified());
 	}
 	
 }

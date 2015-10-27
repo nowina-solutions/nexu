@@ -13,24 +13,14 @@
  */
 package lu.nowina.nexu.server.api.ws;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.annotation.PostConstruct;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
-import javax.xml.bind.JAXBContext;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import lu.nowina.nexu.ConfigurationException;
-import lu.nowina.nexu.TechnicalException;
 import lu.nowina.nexu.api.Feedback;
+import lu.nowina.nexu.server.business.FeedbackManager;
 
 /**
  * WebService exposed to NexU install base. 
@@ -42,49 +32,12 @@ import lu.nowina.nexu.api.Feedback;
 @WebService(targetNamespace="http://api.nexu.nowina.lu/")
 public class FeedbackEndpoint {
 
-	private static final Logger logger = Logger.getLogger(FeedbackEndpoint.class.getName());
-	
-	@Value("${repository}")
-	private String repository;
-	
-	private JAXBContext ctx; 
-	
-	private File repositoryDir;
-	
-	public FeedbackEndpoint() throws Exception {
-		
-		try {
-		ctx = JAXBContext.newInstance(Feedback.class);
-		} catch(Exception e) {
-			logger.log(Level.SEVERE, "Cannot instanciante JAXBContext", e);
-			throw new TechnicalException("Cannot instanciate JAXBContext for Feedback");
-		}
-	}
-
-	@PostConstruct
-	public void postConstruct() {
-		if(repository == null) {
-			throw new ConfigurationException("Configuration must defined 'repository'");
-		}
-
-		repositoryDir = new File(repository);
-		
-		if(!repositoryDir.exists() || !repositoryDir.isDirectory() || !repositoryDir.canWrite()) {
-			throw new ConfigurationException(repositoryDir.getAbsolutePath() + " cannot be used for repository");
-		}
-		
-	}
+	@Autowired
+	FeedbackManager feedbackService;
 	
 	@WebMethod
 	public void reportError(Feedback feedback) throws Exception {
-		File reportFile = new File(repositoryDir, UUID.randomUUID().toString());
-		BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(reportFile));
-		ctx.createMarshaller().marshal(feedback, out);
-		out.close();
+		feedbackService.reportError(feedback);
 	}
 
-	public void setRepository(String repository) {
-		this.repository = repository;
-	}
-	
 }
