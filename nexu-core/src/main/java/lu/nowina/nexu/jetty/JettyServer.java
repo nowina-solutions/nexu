@@ -18,10 +18,11 @@ import java.util.logging.Logger;
 import org.eclipse.jetty.server.Server;
 
 import lu.nowina.nexu.AppConfig;
+import lu.nowina.nexu.HttpServer;
 import lu.nowina.nexu.InternalAPI;
 import lu.nowina.nexu.UserPreferences;
 
-public class JettyServer {
+public class JettyServer implements HttpServer {
 
 	private static final Logger logger = Logger.getLogger(JettyServer.class.getName());
 
@@ -33,12 +34,20 @@ public class JettyServer {
 
 	private InternalAPI api;
 
+	/* (non-Javadoc)
+	 * @see lu.nowina.nexu.jetty.HttpServer#setConfig(lu.nowina.nexu.InternalAPI, lu.nowina.nexu.UserPreferences, lu.nowina.nexu.AppConfig)
+	 */
+	@Override
 	public void setConfig(InternalAPI api, UserPreferences prefs, AppConfig config) {
 		this.api = api;
 		this.prefs = prefs;
 		this.conf = config;
 	}
 
+	/* (non-Javadoc)
+	 * @see lu.nowina.nexu.jetty.HttpServer#start()
+	 */
+	@Override
 	public void start() throws Exception {
 		logger.info("Start HTTP server, binding on " + conf.getBindingPort());
 
@@ -52,6 +61,10 @@ public class JettyServer {
 		server.join();
 	}
 
+	/* (non-Javadoc)
+	 * @see lu.nowina.nexu.jetty.HttpServer#stop()
+	 */
+	@Override
 	public void stop() throws Exception {
 		server.stop();
 		server = null;

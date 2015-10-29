@@ -31,6 +31,8 @@ public class AppConfig {
 	
 	private String nexuUrl;
 	
+	private String httpServerClass;
+	
 	public String getBindingIP() {
 		return bindingIP;
 	}
@@ -69,6 +71,14 @@ public class AppConfig {
 
 	public void setNexuUrl(String nexuUrl) {
 		this.nexuUrl = nexuUrl;
+	}
+
+	public String getHttpServerClass() {
+		return httpServerClass;
+	}
+
+	public void setHttpServerClass(String httpServerClass) {
+		this.httpServerClass = httpServerClass;
 	}
 
 }

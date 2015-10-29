@@ -98,7 +98,7 @@ public class NexUApp extends Application implements UIDisplay {
 					String pluginId = key.substring("plugin_".length());
 
 					logger.info(" + Plugin " + pluginClassName);
-					instanciateAndRegisterPlugin(api, pluginClassName, pluginId, false);
+					buildAndRegisterPlugin(api, pluginClassName, pluginId, false);
 
 				}
 			}
@@ -107,7 +107,7 @@ public class NexUApp extends Application implements UIDisplay {
 
 			logger.info("Start Jetty");
 
-			startJetty(prefs, api);
+			startHttpServer(prefs, api);
 
 			logger.info("Start finished");
 
@@ -116,9 +116,9 @@ public class NexUApp extends Application implements UIDisplay {
 		}
 	}
 
-	private void startJetty(UserPreferences prefs, InternalAPI api) {
+	private void startHttpServer(UserPreferences prefs, InternalAPI api) {
 		new Thread(() -> {
-			JettyServer server = new JettyServer();
+			HttpServer server = buildHttpServer();
 			server.setConfig(api, prefs, config);
 			try {
 				server.start();
@@ -128,7 +128,24 @@ public class NexUApp extends Application implements UIDisplay {
 		}).start();
 	}
 
-	private void instanciateAndRegisterPlugin(InternalAPI api, String pluginClassName, String pluginId, boolean exceptionOnFailure) {
+	/**
+	 * Build the HTTP Server for the platform
+	 * @return
+	 */
+	private HttpServer buildHttpServer() {
+		String httpServerClass = config.getHttpServerClass();
+		try {
+			Class<HttpServer> cla = (Class<HttpServer>) Class.forName(httpServerClass);
+			logger.info("HttpServer is " + httpServerClass);
+			HttpServer server = cla.newInstance();
+			return server;
+		} catch(Exception e) {
+			logger.log(Level.SEVERE, "Cannot instanciate Http Server " + httpServerClass, e);
+			throw new RuntimeException("Cannot instanciate Http Server");
+		}
+	}
+
+	private void buildAndRegisterPlugin(InternalAPI api, String pluginClassName, String pluginId, boolean exceptionOnFailure) {
 
 		try {
 			Class<?> clazz = Class.forName(pluginClassName);
@@ -170,6 +187,12 @@ public class NexUApp extends Application implements UIDisplay {
 
 	}
 
+	/**
+	 * Load the properties from the properties file. 
+	 * 
+	 * @param props
+	 * @return
+	 */
 	public static AppConfig loadAppConfig(Properties props) {
 		AppConfig config = new AppConfig();
 
@@ -178,6 +201,7 @@ public class NexUApp extends Application implements UIDisplay {
 		config.setServerUrl(props.getProperty("server_url", "http://lab.nowina.solutions/nexu"));
 		config.setInstallUrl(props.getProperty("install_url", "http://nowina.lu/nexu/"));
 		config.setNexuUrl(props.getProperty("nexu_url", "http://localhost:9876"));
+		config.setHttpServerClass(props.getProperty("http_server_class", JettyServer.class.getName()));
 
 		return config;
 	}
