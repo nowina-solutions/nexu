@@ -13,29 +13,18 @@
  */
 package lu.nowina.nexu.api.plugin;
 
-import org.junit.Assert;
-import org.junit.Test;
+public enum HttpStatus {
 
-public class HttpResponseTest {
-
-	@Test
-	public void test1() {
-		
-		HttpResponse resp = new HttpResponse("test", "application/json", HttpStatus.OK);
-		Assert.assertEquals("test", resp.getContent());
-		Assert.assertEquals("application/json", resp.getContentType());
-		Assert.assertEquals(200, resp.getHttpStatus().getHttpCode());
-		
+	OK(200), ERROR(500);
+	
+	private int httpCode;
+	
+	private HttpStatus(int httpCode) {
+		this.httpCode = httpCode;
 	}
 	
-	@Test(expected=IllegalArgumentException.class)
-	public void test2() {
-		
-		HttpResponse resp = new HttpResponse("test", "application/json", null);
-		Assert.assertEquals("test", resp.getContent());
-		Assert.assertEquals("application/json", resp.getContentType());
-		Assert.assertEquals(200, resp.getHttpStatus().getHttpCode());
-		
+	public int getHttpCode() {
+		return httpCode;
 	}
 	
 }

@@ -19,9 +19,16 @@ public class HttpResponse {
 	
 	private String contentType;
 	
-	public HttpResponse(String content, String contentType) {
+	private HttpStatus httpStatus;
+	
+	public HttpResponse(String content, String contentType, HttpStatus status) {
 		this.content = content;
 		this.contentType = contentType;
+
+		if(status == null) {
+			throw new IllegalArgumentException();
+		}
+		this.httpStatus = status;
 	}
 
 	public String getContent() {
@@ -30,6 +37,10 @@ public class HttpResponse {
 	
 	public String getContentType() {
 		return contentType;
+	}
+
+	public HttpStatus getHttpStatus() {
+		return httpStatus;
 	}
 	
 }

@@ -133,14 +133,13 @@ public class NexUApp extends Application implements UIDisplay {
 	 * @return
 	 */
 	private HttpServer buildHttpServer() {
-		String httpServerClass = config.getHttpServerClass();
 		try {
-			Class<HttpServer> cla = (Class<HttpServer>) Class.forName(httpServerClass);
-			logger.info("HttpServer is " + httpServerClass);
+			Class<HttpServer> cla = (Class<HttpServer>) Class.forName(config.getHttpServerClass());
+			logger.info("HttpServer is " + config.getHttpServerClass());
 			HttpServer server = cla.newInstance();
 			return server;
 		} catch(Exception e) {
-			logger.log(Level.SEVERE, "Cannot instanciate Http Server " + httpServerClass, e);
+			logger.log(Level.SEVERE, "Cannot instanciate Http Server " + config.getHttpServerClass(), e);
 			throw new RuntimeException("Cannot instanciate Http Server");
 		}
 	}

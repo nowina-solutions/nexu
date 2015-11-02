@@ -32,6 +32,7 @@ import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
 import lu.nowina.nexu.api.plugin.HttpRequest;
 import lu.nowina.nexu.api.plugin.HttpResponse;
+import lu.nowina.nexu.api.plugin.HttpStatus;
 
 /**
  * Default implementation of HttpPlugin for NexU.
@@ -42,7 +43,7 @@ public class RestHttpPlugin implements HttpPlugin {
 
 	private static final Logger logger = Logger.getLogger(RestHttpPlugin.class.getName());
 
-	private static final Gson gson = new Gson();
+	private static final Gson gson = GsonHelper.customGson;
 
 	@Override
 	public void init(String pluginId, NexuAPI api) {
@@ -109,8 +110,12 @@ public class RestHttpPlugin implements HttpPlugin {
 		}
 
 		Execution<?> respObj = api.sign(r);
+		if(respObj.isSuccess()) {
+			return new HttpResponse(gson.toJson(respObj), "application/json", HttpStatus.OK);
+		} else {
+			return new HttpResponse(gson.toJson(respObj), "application/json", HttpStatus.ERROR);
+		}
 
-		return new HttpResponse(gson.toJson(respObj), "application/json");
 	}
 
 	private HttpResponse getCertificates(NexuAPI api, String payload) {
@@ -124,7 +129,12 @@ public class RestHttpPlugin implements HttpPlugin {
 
 		logger.info("Call API");
 		Execution<?> respObj = api.getCertificate(payloadObj);
-		return new HttpResponse(gson.toJson(respObj), "application/json");
+
+		if(respObj.isSuccess()) {
+			return new HttpResponse(gson.toJson(respObj), "application/json", HttpStatus.OK);
+		} else {
+			return new HttpResponse(gson.toJson(respObj), "application/json", HttpStatus.ERROR);
+		}
 	}
 
 }

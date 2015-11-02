@@ -39,6 +39,7 @@ import lu.nowina.nexu.TechnicalException;
 import lu.nowina.nexu.UserPreferences;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
 import lu.nowina.nexu.api.plugin.HttpResponse;
+import lu.nowina.nexu.api.plugin.HttpStatus;
 
 public class RequestProcessor extends AbstractHandler {
 
@@ -128,6 +129,9 @@ public class RequestProcessor extends AbstractHandler {
 			if(resp == null || resp.getContent() == null) {
 				throw new TechnicalException("Plugin responded null");
 			} else {
+				if(resp.getHttpStatus() != HttpStatus.OK) {
+					response.sendError(resp.getHttpStatus().getHttpCode());
+				}
 				response.setContentType(resp.getContentType());
 				writer.write(resp.getContent());
 				writer.close();
