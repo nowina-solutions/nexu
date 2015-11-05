@@ -27,7 +27,7 @@ public class SCDataBaseManagerTest {
 		manager.nexuDatabaseFile = new FileSystemResource("target/non-existing.xml");
 		Assert.assertEquals("d41d8cd98f00b204e9800998ecf8427e", manager.getDatabaseDigest());
 	}
-	
+
 	@Test
 	public void test2() {
 		SCDatabaseManager manager = new SCDatabaseManager();
@@ -35,10 +35,10 @@ public class SCDataBaseManagerTest {
 		Assert.assertEquals("98259f589138d7509e90cb3668f47be8", manager.getDatabaseDigest());
 	}
 
-	@Test(expected=ConfigurationException.class)
+	@Test(expected = ConfigurationException.class)
 	public void test3() {
 		SCDatabaseManager manager = new SCDatabaseManager();
 		manager.postConstruct();
 	}
-	
+
 }

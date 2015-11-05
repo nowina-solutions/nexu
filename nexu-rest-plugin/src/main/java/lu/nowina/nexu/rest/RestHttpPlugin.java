@@ -69,7 +69,7 @@ public class RestHttpPlugin implements HttpPlugin {
 		} else {
 
 			throw new RuntimeException("Target not recognized " + target);
-			
+
 		}
 
 	}
@@ -95,13 +95,13 @@ public class RestHttpPlugin implements HttpPlugin {
 			}
 
 			String tokenIdString = req.getParameter("tokenId");
-			if(tokenIdString != null) {
+			if (tokenIdString != null) {
 				TokenId tokenId = new TokenId(tokenIdString);
-				r.setTokenId(tokenId );
+				r.setTokenId(tokenId);
 			}
 
 			String keyId = req.getParameter("keyId");
-			if(keyId != null) {
+			if (keyId != null) {
 				r.setKeyId(keyId);
 			}
 
@@ -110,7 +110,7 @@ public class RestHttpPlugin implements HttpPlugin {
 		}
 
 		Execution<?> respObj = api.sign(r);
-		if(respObj.isSuccess()) {
+		if (respObj.isSuccess()) {
 			return new HttpResponse(gson.toJson(respObj), "application/json", HttpStatus.OK);
 		} else {
 			return new HttpResponse(gson.toJson(respObj), "application/json", HttpStatus.ERROR);
@@ -130,7 +130,7 @@ public class RestHttpPlugin implements HttpPlugin {
 		logger.info("Call API");
 		Execution<?> respObj = api.getCertificate(payloadObj);
 
-		if(respObj.isSuccess()) {
+		if (respObj.isSuccess()) {
 			return new HttpResponse(gson.toJson(respObj), "application/json", HttpStatus.OK);
 		} else {
 			return new HttpResponse(gson.toJson(respObj), "application/json", HttpStatus.ERROR);

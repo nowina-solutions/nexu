@@ -23,18 +23,18 @@ import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.server.business.FeedbackManager;
 
 /**
- * WebService exposed to NexU install base. 
+ * WebService exposed to NexU install base.
  * 
  * @author David Naramski
  *
  */
 @Service
-@WebService(targetNamespace="http://api.nexu.nowina.lu/")
+@WebService(targetNamespace = "http://api.nexu.nowina.lu/")
 public class FeedbackEndpoint {
 
 	@Autowired
 	FeedbackManager feedbackService;
-	
+
 	@WebMethod
 	public void reportError(Feedback feedback) throws Exception {
 		feedbackService.reportError(feedback);
