@@ -25,18 +25,17 @@ public class SCDatabaseControllerTest {
 
 	@Test
 	public void test1() throws Exception {
-		
+
 		SCDatabaseController controller = new SCDatabaseController();
 		SCDatabaseManager manager = new SCDatabaseManager();
 		manager.setNexuDatabaseFile(new FileSystemResource("src/test/resources/db.xml"));
 		controller.databaseManager = manager;
-		
 
 		ResponseEntity<byte[]> resp = controller.getDatabase();
-		
+
 		Assert.assertEquals(MediaType.parseMediaType("application/xml"), resp.getHeaders().getContentType());
 		Assert.assertTrue(resp.getBody() != null);
 		System.out.println(new String(resp.getBody()));
 	}
-	
+
 }

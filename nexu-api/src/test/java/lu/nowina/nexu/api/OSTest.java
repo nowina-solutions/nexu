@@ -18,13 +18,13 @@ import org.junit.Test;
 
 public class OSTest {
 
-    @Test
-    public void test1() {
-        
-        OS os = OS.forOSName(System.getProperty("os.name"));
-        Assert.assertNotNull(os);
-        Assert.assertNotEquals(OS.NOT_RECOGNIZED, os);
-        
-    }
-    
+	@Test
+	public void test1() {
+
+		OS os = OS.forOSName(System.getProperty("os.name"));
+		Assert.assertNotNull(os);
+		Assert.assertNotEquals(OS.NOT_RECOGNIZED, os);
+
+	}
+
 }

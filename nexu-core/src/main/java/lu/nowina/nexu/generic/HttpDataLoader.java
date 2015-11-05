@@ -25,36 +25,36 @@ import lu.nowina.nexu.api.EnvironmentInfo;
 
 public class HttpDataLoader {
 
-    private HttpClient client = new HttpClient();
+	private HttpClient client = new HttpClient();
 
-    public byte[] fetchDatabase(String databaseUrl) throws IOException {
+	public byte[] fetchDatabase(String databaseUrl) throws IOException {
 
-        GetMethod get = new GetMethod(databaseUrl);
+		GetMethod get = new GetMethod(databaseUrl);
 
-        EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
+		EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
 
-        get.setQueryString(new NameValuePair[] { new NameValuePair("os.name", info.getOsName()),
-                new NameValuePair("os.arch", info.getOsArch()), new NameValuePair("os.version", info.getOsVersion()) });
+		get.setQueryString(new NameValuePair[] { new NameValuePair("os.name", info.getOsName()), new NameValuePair("os.arch", info.getOsArch()),
+				new NameValuePair("os.version", info.getOsVersion()) });
 
-        client.executeMethod(get);
+		client.executeMethod(get);
 
-        return get.getResponseBody();
+		return get.getResponseBody();
 
-    }
+	}
 
-    public byte[] fetchNexuInfo(String infoUrl) throws IOException, JAXBException {
+	public byte[] fetchNexuInfo(String infoUrl) throws IOException, JAXBException {
 
-        GetMethod get = new GetMethod(infoUrl);
+		GetMethod get = new GetMethod(infoUrl);
 
-        EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
+		EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
 
-        get.setQueryString(new NameValuePair[] { new NameValuePair("os.name", info.getOsName()),
-                new NameValuePair("os.arch", info.getOsArch()), new NameValuePair("os.version", info.getOsVersion()) });
+		get.setQueryString(new NameValuePair[] { new NameValuePair("os.name", info.getOsName()), new NameValuePair("os.arch", info.getOsArch()),
+				new NameValuePair("os.version", info.getOsVersion()) });
 
-        client.executeMethod(get);
+		client.executeMethod(get);
 
-        return get.getResponseBody();
+		return get.getResponseBody();
 
-    }
+	}
 
 }

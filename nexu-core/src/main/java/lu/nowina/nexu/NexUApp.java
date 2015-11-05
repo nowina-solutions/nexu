@@ -15,14 +15,11 @@ package lu.nowina.nexu;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.europa.esig.dss.token.PasswordInputCallback;
 import javafx.application.Application;
@@ -38,38 +35,22 @@ import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.generic.HttpDataLoader;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCDatabaseLoader;
-import lu.nowina.nexu.jetty.JettyServer;
 import lu.nowina.nexu.view.SystrayMenu;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
 
 public class NexUApp extends Application implements UIDisplay {
 
-	private static final Logger logger = Logger.getLogger(NexUApp.class.getName());
-
-	private static Properties props;
-
-	private static AppConfig config;
+	private static final Logger logger = LoggerFactory.getLogger(NexUApp.class.getName());
 
 	private Stage stage;
 
-	public static void main(String[] args) throws Exception {
+	private AppConfig getConfig() {
+		return NexuLauncher.getConfig();
+	}
 
-		logger.config("Read configuration");
-		props = loadPropertiesFile();
-		config = loadAppConfig(props);
-
-		URL url = new URL("http://" + config.getBindingIP() + ":" + config.getBindingPort() + "/info");
-		try (InputStream in = url.openStream()) {
-			String info = IOUtils.toString(in);
-			logger.severe("NexU already started. Version '" + info + "'");
-		} catch (Exception e) {
-			logger.info("no " + url.toString() + " detected, " + e.getMessage());
-			// If we cannot connect, most likely NexU is not started yet
-		}
-
-		launch(NexUApp.class, args);
-
+	private Properties getProperties() {
+		return NexuLauncher.getProperties();
 	}
 
 	@Override
@@ -80,21 +61,28 @@ public class NexUApp extends Application implements UIDisplay {
 
 		try {
 
-			File store = new File("./store.xml");
-			SCDatabase db = SCDatabaseLoader.load(store);
+			File nexuHome = NexuLauncher.getNexuHome();
+			SCDatabase db = null;
+			if (nexuHome != null) {
+				File store = new File(nexuHome, "store.xml");
+				logger.info("Load database from " + store.getAbsolutePath());
+				db = SCDatabaseLoader.load(store);
+			} else {
+				db = new SCDatabase();
+			}
 
 			UserPreferences prefs = new UserPreferences();
 			CardDetector detector = new CardDetector(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
 
-			DatabaseWebLoader loader = new DatabaseWebLoader(config, new HttpDataLoader());
+			DatabaseWebLoader loader = new DatabaseWebLoader(getConfig(), new HttpDataLoader());
 			loader.start();
 
 			InternalAPI api = new InternalAPI(this, prefs, db, detector, loader);
 
-			for (String key : props.stringPropertyNames()) {
+			for (String key : getProperties().stringPropertyNames()) {
 				if (key.startsWith("plugin_")) {
 
-					String pluginClassName = props.getProperty(key);
+					String pluginClassName = getProperties().getProperty(key);
 					String pluginId = key.substring("plugin_".length());
 
 					logger.info(" + Plugin " + pluginClassName);
@@ -112,34 +100,35 @@ public class NexUApp extends Application implements UIDisplay {
 			logger.info("Start finished");
 
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Cannot start", e);
+			logger.error("Cannot start", e);
 		}
 	}
 
 	private void startHttpServer(UserPreferences prefs, InternalAPI api) {
 		new Thread(() -> {
 			HttpServer server = buildHttpServer();
-			server.setConfig(api, prefs, config);
+			server.setConfig(api, prefs, getConfig());
 			try {
 				server.start();
 			} catch (Exception e) {
-				logger.log(Level.SEVERE, "Cannot Jetty", e);
+				logger.error("Cannot Jetty", e);
 			}
 		}).start();
 	}
 
 	/**
 	 * Build the HTTP Server for the platform
+	 * 
 	 * @return
 	 */
 	private HttpServer buildHttpServer() {
 		try {
-			Class<HttpServer> cla = (Class<HttpServer>) Class.forName(config.getHttpServerClass());
-			logger.info("HttpServer is " + config.getHttpServerClass());
+			Class<HttpServer> cla = (Class<HttpServer>) Class.forName(getConfig().getHttpServerClass());
+			logger.info("HttpServer is " + getConfig().getHttpServerClass());
 			HttpServer server = cla.newInstance();
 			return server;
-		} catch(Exception e) {
-			logger.log(Level.SEVERE, "Cannot instanciate Http Server " + config.getHttpServerClass(), e);
+		} catch (Exception e) {
+			logger.error("Cannot instanciate Http Server " + getConfig().getHttpServerClass(), e);
 			throw new RuntimeException("Cannot instanciate Http Server");
 		}
 	}
@@ -148,14 +137,13 @@ public class NexUApp extends Application implements UIDisplay {
 
 		try {
 			Class<?> clazz = Class.forName(pluginClassName);
+			Object plugin = clazz.newInstance();
 			for (Class<?> i : clazz.getInterfaces()) {
-				Object plugin = clazz.newInstance();
 				registerPlugin(api, pluginId, i, plugin);
 			}
 		} catch (Exception e) {
-			logger.log(Level.SEVERE,
-					MessageFormat.format("Cannot register plugin {0} (id: {1})", pluginClassName, pluginId), e);
-			if(exceptionOnFailure) {
+			logger.error(MessageFormat.format("Cannot register plugin {0} (id: {1})", pluginClassName, pluginId), e);
+			if (exceptionOnFailure) {
 				throw new RuntimeException(e);
 			}
 		}
@@ -174,43 +162,11 @@ public class NexUApp extends Application implements UIDisplay {
 		}
 	}
 
-	public static Properties loadPropertiesFile() throws IOException {
-
-		InputStream configFile = NexUApp.class.getClassLoader().getResourceAsStream("nexu-config.properties");
-		Properties props = new Properties();
-		if (configFile != null) {
-			props.load(configFile);
-		}
-
-		return props;
-
-	}
-
-	/**
-	 * Load the properties from the properties file. 
-	 * 
-	 * @param props
-	 * @return
-	 */
-	public static AppConfig loadAppConfig(Properties props) {
-		AppConfig config = new AppConfig();
-
-		config.setBindingPort(Integer.parseInt(props.getProperty("binding_port", "9876")));
-		config.setBindingIP(props.getProperty("binding_ip", "127.0.0.1"));
-		config.setServerUrl(props.getProperty("server_url", "http://lab.nowina.solutions/nexu"));
-		config.setInstallUrl(props.getProperty("install_url", "http://nowina.lu/nexu/"));
-		config.setNexuUrl(props.getProperty("nexu_url", "http://localhost:9876"));
-		config.setHttpServerClass(props.getProperty("http_server_class", JettyServer.class.getName()));
-
-		return config;
-	}
-
 	@Override
 	public void display(Parent panel) {
 		logger.info("Display " + panel + " in display " + this + " from Thread " + Thread.currentThread().getName());
 		Platform.runLater(() -> {
-			logger.info(
-					"Display " + panel + " in display " + this + " from Thread " + Thread.currentThread().getName());
+			logger.info("Display " + panel + " in display " + this + " from Thread " + Thread.currentThread().getName());
 			if (!stage.isShowing()) {
 				stage = createStage();
 				logger.info("Loading ui " + panel + " is a new Stage " + stage);
@@ -250,7 +206,7 @@ public class NexUApp extends Application implements UIDisplay {
 
 	@Override
 	public void stop() throws Exception {
-		logger.warning("Can only happen with explicite user request");
+		logger.warn("Can only happen with explicite user request");
 	}
 
 	public <T extends Object> T displayAndWaitUIOperation(String fxml, Object... params) {

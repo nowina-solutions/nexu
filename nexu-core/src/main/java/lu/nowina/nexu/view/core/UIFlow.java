@@ -16,7 +16,9 @@ package lu.nowina.nexu.view.core;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.europa.esig.dss.token.PasswordInputCallback;
 import lu.nowina.nexu.NexuException;
@@ -30,7 +32,7 @@ import lu.nowina.nexu.api.NexuAPI;
  */
 public abstract class UIFlow<I, O> {
 
-	private static final Logger logger = Logger.getLogger(UIFlow.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(UIFlow.class.getName());
 
 	private UIDisplay display;
 
@@ -62,17 +64,16 @@ public abstract class UIFlow<I, O> {
 	}
 
 	/**
-	 * Méthode déclenchée pour démarrer le process. Les variables environement
-	 * et dialogDisplays sont déjà initialisée.
+	 * Méthode déclenchée pour démarrer le process. Les variables environement et dialogDisplays sont déjà initialisée.
 	 */
 	protected abstract O process(NexuAPI api, I input) throws NexuException;
 
 	protected <T extends Object> T displayAndWaitUIOperation(String fxml, Object... params) {
-	    return display.displayAndWaitUIOperation(fxml, params);
+		return display.displayAndWaitUIOperation(fxml, params);
 	}
-	
+
 	protected PasswordInputCallback getPasswordInputCallback() {
-	    return display.getPasswordInputCallback();
+		return display.getPasswordInputCallback();
 	}
 
 }

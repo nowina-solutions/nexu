@@ -24,46 +24,46 @@ import lu.nowina.nexu.rest.GsonHelper;
 
 public class SignatureRequestTest {
 
-    @Test
-    public void test1() {
-        
-    	SignatureRequest obj = new SignatureRequest();
-        obj.setDigestAlgorithm(DigestAlgorithm.SHA1);
-        obj.setKeyId("key");
+	@Test
+	public void test1() {
 
-    	Gson gson = new Gson();
-    	String text = gson.toJson(obj);
-    	
-    	Assert.assertEquals("{\"digestAlgorithm\":\"SHA1\",\"keyId\":\"key\"}", text);
-    	
-    	SignatureRequest obj2 = gson.fromJson(text, SignatureRequest.class);
-    	
-    	Assert.assertEquals(obj.getKeyId(), obj2.getKeyId());
-    	Assert.assertEquals(obj.getDigestAlgorithm(), obj2.getDigestAlgorithm());
-    	
-    }
-    
-    @Test
-    public void test2() {
-        
-    	SignatureRequest obj = new SignatureRequest();
-        obj.setDigestAlgorithm(DigestAlgorithm.SHA1);
-        obj.setKeyId("key");
-        
-        ToBeSigned tbs = new ToBeSigned("HelloWorld".getBytes());
-        obj.setToBeSigned(tbs);
-        obj.setTokenId(new TokenId("tokenId"));
-        
-    	Gson gson = GsonHelper.customGson;
-    	String text = gson.toJson(obj);
-    	
-    	System.out.println(text);
-    	
-    	SignatureRequest obj2 = gson.fromJson(text, SignatureRequest.class);
-    	
-    	Assert.assertEquals(obj.getKeyId(), obj2.getKeyId());
-    	Assert.assertEquals(obj.getDigestAlgorithm(), obj2.getDigestAlgorithm());
-    	
-    }
-    
+		SignatureRequest obj = new SignatureRequest();
+		obj.setDigestAlgorithm(DigestAlgorithm.SHA1);
+		obj.setKeyId("key");
+
+		Gson gson = new Gson();
+		String text = gson.toJson(obj);
+
+		Assert.assertEquals("{\"digestAlgorithm\":\"SHA1\",\"keyId\":\"key\"}", text);
+
+		SignatureRequest obj2 = gson.fromJson(text, SignatureRequest.class);
+
+		Assert.assertEquals(obj.getKeyId(), obj2.getKeyId());
+		Assert.assertEquals(obj.getDigestAlgorithm(), obj2.getDigestAlgorithm());
+
+	}
+
+	@Test
+	public void test2() {
+
+		SignatureRequest obj = new SignatureRequest();
+		obj.setDigestAlgorithm(DigestAlgorithm.SHA1);
+		obj.setKeyId("key");
+
+		ToBeSigned tbs = new ToBeSigned("HelloWorld".getBytes());
+		obj.setToBeSigned(tbs);
+		obj.setTokenId(new TokenId("tokenId"));
+
+		Gson gson = GsonHelper.customGson;
+		String text = gson.toJson(obj);
+
+		System.out.println(text);
+
+		SignatureRequest obj2 = gson.fromJson(text, SignatureRequest.class);
+
+		Assert.assertEquals(obj.getKeyId(), obj2.getKeyId());
+		Assert.assertEquals(obj.getDigestAlgorithm(), obj2.getDigestAlgorithm());
+
+	}
+
 }

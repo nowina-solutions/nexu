@@ -16,7 +16,9 @@ package lu.nowina.nexu.flow;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.MSCAPISignatureToken;
@@ -37,25 +39,27 @@ import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIFlow;
 
 /**
- * Most of the Flow executed by NexU use SignatureTokenConnection.  
- *  
+ * Most of the Flow executed by NexU use SignatureTokenConnection.
+ * 
  * @author david.naramski
  *
- * @param <I> The object for the request
- * @param <O> The response for the request
+ * @param <I>
+ *            The object for the request
+ * @param <O>
+ *            The response for the request
  */
 public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 
-	private static final Logger logger = Logger.getLogger(TokenFlow.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(TokenFlow.class.getName());
 
 	private boolean advancedModeAvailable = true;
-	
+
 	private boolean advancedCreation = false;
-	
+
 	private ScAPI selectedApi;
-	
+
 	private String apiParams;
-	
+
 	private DetectedCard selectedCard;
 
 	public TokenFlow(UIDisplay display) {
@@ -63,34 +67,33 @@ public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 	}
 
 	protected DSSPrivateKeyEntry selectPrivateKey(NexuAPI api, SignatureTokenConnection token, String keyFilter) {
-		
+
 		return selectPrivateKey(token, keyFilter);
-		
+
 	}
-	
+
 	protected SignatureTokenConnection getTokenConnection(NexuAPI api, TokenId previousTokenId) {
 
-		
 		TokenId tokenId = getTokenId(api, previousTokenId);
-		if(tokenId != null) {
+		if (tokenId != null) {
 			return api.getTokenConnection(tokenId);
 		}
-		
+
 		return null;
-		
+
 	}
-	
+
 	protected TokenId getTokenId(NexuAPI api, TokenId previousTokenId) {
-		
-		if(previousTokenId != null) {
+
+		if (previousTokenId != null) {
 			return previousTokenId;
 		}
-		
+
 		TokenId tokenId = createToken(api);
 		return tokenId;
-		
+
 	}
-	
+
 	protected TokenId createToken(NexuAPI api) {
 
 		List<DetectedCard> detectedCards = api.detectCards();
@@ -108,10 +111,10 @@ public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 			return tokenId;
 
 		}
-		
+
 		return null;
 	}
-	
+
 	protected TokenId createToken(NexuAPI api, List<DetectedCard> detectedCards) {
 
 		List<DetectedCard> supportedCards = new ArrayList<>();
@@ -145,22 +148,22 @@ public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 
 			if (advanced) {
 
-			    logger.info("Advanced mode");
-				if(detectedCards.size() == 1) {
+				logger.info("Advanced mode");
+				if (detectedCards.size() == 1) {
 					DetectedCard firstMatch = detectedCards.get(0);
 					this.selectedCard = firstMatch;
 				}
-				
+
 				this.advancedCreation = true;
 				return createTokenAdvanced(api);
 
 			} else {
 
 				logger.info("Request support");
-				
+
 				Feedback feedback = new Feedback();
 				feedback.setFeedbackStatus(FeedbackStatus.PRODUCT_NOT_SUPPORTED);
-				
+
 				displayAndWaitUIOperation("/fxml/provide-feedback.fxml", feedback);
 
 			}
@@ -185,12 +188,10 @@ public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 			Pkcs11Params pkcs11Params = displayAndWaitUIOperation("/fxml/pkcs11-params.fxml");
 			String absolutePath = pkcs11Params.getPkcs11Lib().getAbsolutePath();
 			this.apiParams = absolutePath;
-			return api.registerTokenConnection(new Pkcs11SignatureToken(absolutePath,
-					getPasswordInputCallback()));
+			return api.registerTokenConnection(new Pkcs11SignatureToken(absolutePath, getPasswordInputCallback()));
 		case PKCS_12:
 			KeystoreParams pkcs12Params = displayAndWaitUIOperation("/fxml/keystore-params.fxml");
-			return api.registerTokenConnection(
-					new Pkcs12SignatureToken(pkcs12Params.getPassword(), pkcs12Params.getPkcs12File()));
+			return api.registerTokenConnection(new Pkcs12SignatureToken(pkcs12Params.getPassword(), pkcs12Params.getPkcs12File()));
 		}
 		return null;
 	}
@@ -204,8 +205,8 @@ public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 	private TokenId createTokenAuto(NexuAPI api, List<DetectedCard> detectedCards) {
 		DetectedCard card = null;
 
-		if(detectedCards.isEmpty()) {
-			logger.warning("No card detected");
+		if (detectedCards.isEmpty()) {
+			logger.warn("No card detected");
 			return null;
 		} else if (detectedCards.size() == 1) {
 			card = detectedCards.get(0);
@@ -213,37 +214,36 @@ public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 
 		} else {
 			// size() > 1
-			logger.warning("More than one card. Not supported yet");
+			logger.warn("More than one card. Not supported yet");
 			// TODO Add support for multiple card
 			card = detectedCards.get(0);
 		}
 
 		List<Match> adapters = api.matchingCardAdapters(card);
-		if(adapters.isEmpty()) {
-			logger.warning("No matching adapter for the card " + card);
-            throw new NullPointerException("Card adapter returned null");
+		if (adapters.isEmpty()) {
+			logger.warn("No matching adapter for the card " + card);
+			throw new NullPointerException("Card adapter returned null");
 		} else {
 			Match firstMatch = adapters.get(0);
 			this.selectedCard = firstMatch.getCard();
 			CardAdapter adapter = firstMatch.getAdapter();
-	
+
 			SignatureTokenConnection connect = adapter.connect(api, card, getPasswordInputCallback());
-	        if(connect == null) {
-	            logger.severe("No connect returned");
-	            throw new NullPointerException("Card adapter returned null");
-	        }
-	        TokenId tokenId = api.registerTokenConnection(connect);
-	        if(tokenId == null) {
-	            logger.severe("Received null TokenId after registration");
-	            throw new NullPointerException("Null TokenId");
-	        }
+			if (connect == null) {
+				logger.error("No connect returned");
+				throw new NullPointerException("Card adapter returned null");
+			}
+			TokenId tokenId = api.registerTokenConnection(connect);
+			if (tokenId == null) {
+				logger.error("Received null TokenId after registration");
+				throw new NullPointerException("Null TokenId");
+			}
 			return tokenId;
 		}
 	}
 
 	/**
-	 * Return a private key of the provided token. The key is selected depending
-	 * on the optional filter and user choice.
+	 * Return a private key of the provided token. The key is selected depending on the optional filter and user choice.
 	 * 
 	 * @param token
 	 * @param keyFilter
@@ -254,14 +254,14 @@ public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 		DSSPrivateKeyEntry key = null;
 
 		Iterator<DSSPrivateKeyEntry> it = keys.iterator();
-		while(it.hasNext()) {
+		while (it.hasNext()) {
 			DSSPrivateKeyEntry e = it.next();
-			if("CN=Token Signing Public Key".equals(e.getCertificate().getIssuerDN().getName())) {
+			if ("CN=Token Signing Public Key".equals(e.getCertificate().getIssuerDN().getName())) {
 				it.remove();
 			}
 		}
-		
-		if(keys.isEmpty()) {
+
+		if (keys.isEmpty()) {
 			return null;
 		} else if (keys.size() == 1) {
 			key = keys.get(0);
@@ -286,7 +286,7 @@ public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 	private boolean isAdvancedModeAvailable() {
 		return advancedModeAvailable;
 	}
-	
+
 	public boolean isAdvancedCreation() {
 		return advancedCreation;
 	}
@@ -294,13 +294,13 @@ public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 	protected String getApiParams() {
 		return apiParams;
 	}
-	
+
 	protected ScAPI getSelectedApi() {
 		return selectedApi;
 	}
-	
+
 	protected DetectedCard getSelectedCard() {
 		return selectedCard;
 	}
-	
+
 }

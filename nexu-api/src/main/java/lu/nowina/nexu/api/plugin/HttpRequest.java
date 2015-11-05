@@ -18,9 +18,9 @@ import java.io.InputStream;
 public interface HttpRequest {
 
 	String getParameter(String name);
-	
+
 	String getTarget();
-	
+
 	InputStream getInputStream();
-	
+
 }

@@ -20,51 +20,51 @@ public class EnvironmentInfoTest {
 
 	@Test
 	public void test1() throws Exception {
-		
+
 		EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
 
 		EnvironmentInfo info2 = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
-		
+
 		Assert.assertTrue(info.matches(info2));
 		Assert.assertTrue(info2.matches(info));
-		
+
 	}
-	
+
 	@Test
 	public void test2() throws Exception {
-		
+
 		EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
 
 		EnvironmentInfo infoNull = new EnvironmentInfo();
-		
+
 		Assert.assertTrue(infoNull.matches(info));
-		
+
 	}
-	
+
 	@Test
 	public void test3() throws Exception {
-		
+
 		EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
 
 		EnvironmentInfo info2 = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
 		info2.setArch(null);
-		
+
 		Assert.assertFalse(info.matches(info2));
 		Assert.assertTrue(info2.matches(info));
-		
+
 	}
-	
+
 	@Test
 	public void test4() throws Exception {
-		
+
 		EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
 
 		EnvironmentInfo info2 = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
 		info2.setOs(null);
-		
+
 		Assert.assertFalse(info.matches(info2));
 		Assert.assertTrue(info2.matches(info));
-		
+
 	}
-	
+
 }

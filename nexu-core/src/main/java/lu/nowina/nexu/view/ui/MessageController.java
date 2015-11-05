@@ -22,7 +22,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import lu.nowina.nexu.view.core.UIOperation;
 
-public class MessageController extends UIOperation<Void>implements Initializable {
+public class MessageController extends UIOperation<Void> implements Initializable {
 
 	@FXML
 	private Label message;
@@ -39,7 +39,7 @@ public class MessageController extends UIOperation<Void>implements Initializable
 
 	@Override
 	public void init(Object... params) {
-		if(params.length > 0) {
+		if (params.length > 0) {
 			String value = (String) params[0];
 			if (value != null) {
 				message.setText(value);

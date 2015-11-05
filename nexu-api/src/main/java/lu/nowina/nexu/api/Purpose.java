@@ -11,25 +11,10 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.view.core;
+package lu.nowina.nexu.api;
 
-import eu.europa.esig.dss.token.PasswordInputCallback;
-import javafx.scene.Parent;
+public enum Purpose {
 
-/**
- * Représente une interface graphique visible par l'utilisateur. On peut demander l'affichage d'un panel spécifique ou montrer des panels pré-définis.
- * 
- */
-public interface UIDisplay {
-
-	void display(Parent panel);
-
-	void displayWaitingPane();
-
-	void close();
-
-	<T extends Object> T displayAndWaitUIOperation(String fxml, Object... params);
-
-	PasswordInputCallback getPasswordInputCallback();
+	SIGNATURE, AUTHENTIFICATION
 
 }

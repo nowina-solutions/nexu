@@ -13,9 +13,9 @@
  */
 package lu.nowina.nexu.jetty;
 
-import java.util.logging.Logger;
-
 import org.eclipse.jetty.server.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import lu.nowina.nexu.AppConfig;
 import lu.nowina.nexu.HttpServer;
@@ -24,7 +24,7 @@ import lu.nowina.nexu.UserPreferences;
 
 public class JettyServer implements HttpServer {
 
-	private static final Logger logger = Logger.getLogger(JettyServer.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(JettyServer.class.getName());
 
 	private UserPreferences prefs;
 
@@ -34,7 +34,9 @@ public class JettyServer implements HttpServer {
 
 	private InternalAPI api;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see lu.nowina.nexu.jetty.HttpServer#setConfig(lu.nowina.nexu.InternalAPI, lu.nowina.nexu.UserPreferences, lu.nowina.nexu.AppConfig)
 	 */
 	@Override
@@ -44,7 +46,9 @@ public class JettyServer implements HttpServer {
 		this.conf = config;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see lu.nowina.nexu.jetty.HttpServer#start()
 	 */
 	@Override
@@ -61,7 +65,9 @@ public class JettyServer implements HttpServer {
 		server.join();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see lu.nowina.nexu.jetty.HttpServer#stop()
 	 */
 	@Override

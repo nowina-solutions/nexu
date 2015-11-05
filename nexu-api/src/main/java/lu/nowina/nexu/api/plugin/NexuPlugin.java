@@ -16,7 +16,7 @@ package lu.nowina.nexu.api.plugin;
 import lu.nowina.nexu.api.NexuAPI;
 
 /**
- * Interface for a plugin 
+ * Interface for a plugin
  * 
  * @author David Naramski
  *
@@ -24,7 +24,7 @@ import lu.nowina.nexu.api.NexuAPI;
 public interface NexuPlugin {
 
 	/**
-	 * This method is called by NexU directly after the instantiation. 
+	 * This method is called by NexU directly after the instantiation.
 	 * 
 	 * @param pluginId
 	 * @param api

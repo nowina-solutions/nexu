@@ -14,8 +14,7 @@
 package lu.nowina.nexu;
 
 /**
- * Specific type of TechnicalException when the platform is not configured
- * correctly.
+ * Specific type of TechnicalException when the platform is not configured correctly.
  * 
  * @author david.naramski
  *

@@ -35,8 +35,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import lu.nowina.nexu.server.api.ws.FeedbackEndpoint;
 
 /**
- * Launcher for NexU Server. The Server is not involved in normal signature operation but can collect feedback from
- * NexU install base. 
+ * Launcher for NexU Server. The Server is not involved in normal signature operation but can collect feedback from NexU install base.
  * 
  * @author David Naramski
  *
@@ -45,9 +44,7 @@ import lu.nowina.nexu.server.api.ws.FeedbackEndpoint;
 @ComponentScan
 @EnableTransactionManagement
 @EnableScheduling
-@ImportResource({
-    "classpath:META-INF/cxf/cxf.xml"
-})
+@ImportResource({ "classpath:META-INF/cxf/cxf.xml" })
 public class NexuServerApp extends SpringBootServletInitializer {
 
 	private static final Logger logger = Logger.getLogger(NexuServerApp.class.getName());
@@ -56,24 +53,24 @@ public class NexuServerApp extends SpringBootServletInitializer {
 	private ApplicationContext applicationContext;
 
 	public static void main(String[] args) {
-        SpringApplication app = new SpringApplication(NexuServerApp.class);
-        app.run();
+		SpringApplication app = new SpringApplication(NexuServerApp.class);
+		app.run();
 	}
 
 	@Bean
-    public ServletRegistrationBean servletRegistrationBean(final ApplicationContext context) {
-        return new ServletRegistrationBean(new CXFServlet(), "/api/v1/*");
-    }
+	public ServletRegistrationBean servletRegistrationBean(final ApplicationContext context) {
+		return new ServletRegistrationBean(new CXFServlet(), "/api/v1/*");
+	}
 
-    @Bean
-    public EndpointImpl endpoint1() {
-        final Bus bus = (Bus) this.applicationContext.getBean(Bus.DEFAULT_BUS_ID);
-        final Object implementor = this.applicationContext.getBean(FeedbackEndpoint.class);
-        final EndpointImpl endpoint = new EndpointImpl(bus, implementor);
-        endpoint.publish("/feedback");
-        endpoint.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-        endpoint.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
-        return endpoint;
-    }
+	@Bean
+	public EndpointImpl endpoint1() {
+		final Bus bus = (Bus) this.applicationContext.getBean(Bus.DEFAULT_BUS_ID);
+		final Object implementor = this.applicationContext.getBean(FeedbackEndpoint.class);
+		final EndpointImpl endpoint = new EndpointImpl(bus, implementor);
+		endpoint.publish("/feedback");
+		endpoint.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
+		endpoint.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
+		return endpoint;
+	}
 
 }

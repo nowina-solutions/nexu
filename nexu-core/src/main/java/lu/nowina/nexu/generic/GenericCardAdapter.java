@@ -50,7 +50,7 @@ public class GenericCardAdapter implements CardAdapter {
 			MOCCASignatureTokenConnection mocca = new MOCCASignatureTokenConnection(callback);
 			return mocca;
 		default:
-		    throw new RuntimeException("API not supported");
+			throw new RuntimeException("API not supported");
 		}
 	}
 

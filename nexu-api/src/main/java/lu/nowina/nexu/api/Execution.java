@@ -22,12 +22,14 @@ package lu.nowina.nexu.api;
 public class Execution<T> {
 
 	private boolean success;
-	
+
 	private T response;
-	
+
 	private String error;
-	
+
 	private String errorMessage;
+
+	private String feedback;
 
 	public T getResponse() {
 		return response;
@@ -60,5 +62,13 @@ public class Execution<T> {
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
 	}
-	
+
+	public String getFeedback() {
+		return feedback;
+	}
+
+	public void setFeedback(String feedback) {
+		this.feedback = feedback;
+	}
+
 }

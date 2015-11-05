@@ -25,8 +25,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -34,187 +32,191 @@ import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import lu.nowina.nexu.AppConfig;
+import lu.nowina.nexu.NexuLauncher;
 
 public class DatabaseWebLoader {
 
-    private static final Logger logger = Logger.getLogger(DatabaseWebLoader.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DatabaseWebLoader.class.getName());
 
-    private byte[] databaseData;
+	private byte[] databaseData;
 
-    private SCDatabase database;
+	private SCDatabase database;
 
-    private String serverUrl;
+	private String serverUrl;
 
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-    private ScheduledFuture<?> timerHandle;
+	private ScheduledFuture<?> timerHandle;
 
-    private ScheduledFuture<?> updateHandle;
+	private ScheduledFuture<?> updateHandle;
 
-    private final int TIMER_RATE = 1;
+	private final int TIMER_RATE = 1;
 
-    private final int UPDATE_RATE = 10;
+	private final int UPDATE_RATE = 10;
 
-    private HttpDataLoader dataLoader;
-    
-    private Date lastUpdate;
+	private HttpDataLoader dataLoader;
 
-    public DatabaseWebLoader(AppConfig config, HttpDataLoader dataLoader) throws IOException {
-        this.serverUrl = config.getServerUrl();
-        this.dataLoader = dataLoader;
+	private Date lastUpdate;
 
-        try {
-            loadDatabaseFromCache();
-        } catch (IOException | JAXBException e) {
-            logger.log(Level.SEVERE, "Cannot load database from cache", e);
-        }
+	public DatabaseWebLoader(AppConfig config, HttpDataLoader dataLoader) throws IOException {
+		this.serverUrl = config.getServerUrl();
+		this.dataLoader = dataLoader;
 
-        try {
-            updateDatabase();
-        } catch (IOException | JAXBException e) {
-            logger.log(Level.SEVERE, "Cannot update database", e);
-        }
+		try {
+			loadDatabaseFromCache();
+		} catch (IOException | JAXBException e) {
+			logger.error("Cannot load database from cache", e);
+		}
 
-    }
+		try {
+			updateDatabase();
+		} catch (IOException | JAXBException e) {
+			logger.error("Cannot update database", e);
+		}
 
-    public void loadDatabaseFromCache() throws IOException, JAXBException {
+	}
 
-        File databaseWeb = getDatabaseFile();
-        if (databaseWeb.exists()) {
-            try (FileInputStream in = new FileInputStream(databaseWeb)) {
-                databaseData = IOUtils.toByteArray(in);
-                parseDatabase();
-            }
-        }
+	public void loadDatabaseFromCache() throws IOException, JAXBException {
 
-    }
+		File databaseWeb = getDatabaseFile();
+		if (databaseWeb.exists() && databaseWeb.length() > 0) {
+			try (FileInputStream in = new FileInputStream(databaseWeb)) {
+				databaseData = IOUtils.toByteArray(in);
+				parseDatabase();
+			}
+		}
+
+	}
 
 	public File getDatabaseFile() {
-		File databaseWeb = new File("./database-web.xml");
+		File nexuHome = NexuLauncher.getNexuHome();
+		File databaseWeb = new File(nexuHome, "database-web.xml");
 		return databaseWeb;
 	}
 
 	public Date getLastUpdate() {
 		return lastUpdate;
 	}
-	
-    private SCDatabase parseDatabase() throws JAXBException {
-        JAXBContext ctx = JAXBContext.newInstance(SCDatabase.class);
-        Unmarshaller u = ctx.createUnmarshaller();
-        return (SCDatabase) u.unmarshal(new ByteArrayInputStream(databaseData));
-    }
 
-    public String digestDatabase() {
+	private SCDatabase parseDatabase() throws JAXBException {
+		JAXBContext ctx = JAXBContext.newInstance(SCDatabase.class);
+		Unmarshaller u = ctx.createUnmarshaller();
+		return (SCDatabase) u.unmarshal(new ByteArrayInputStream(databaseData));
+	}
 
-        if (databaseData == null) {
-            return null;
-        } else {
-            try {
-                MessageDigest md = MessageDigest.getInstance("MD5");
-                return new String(Hex.encodeHex(md.digest(databaseData)));
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            }
-        }
+	public String digestDatabase() {
 
-    }
+		if (databaseData == null) {
+			return null;
+		} else {
+			try {
+				MessageDigest md = MessageDigest.getInstance("MD5");
+				return new String(Hex.encodeHex(md.digest(databaseData)));
+			} catch (NoSuchAlgorithmException e) {
+				throw new RuntimeException(e);
+			}
+		}
 
-    private void updateDatabase() throws JAXBException, IOException {
-        NexuInfo info = fetchNexuInfo();
-        if (info != null && !info.getDatabaseVersion().equals(digestDatabase())) {
-            fetchDatabase();
-        }
-    }
+	}
 
-    public void fetchDatabase() throws IOException {
+	private void updateDatabase() throws JAXBException, IOException {
+		NexuInfo info = fetchNexuInfo();
+		if (info != null && !info.getDatabaseVersion().equals(digestDatabase())) {
+			fetchDatabase();
+		}
+	}
 
-        databaseData = dataLoader.fetchDatabase(serverUrl + "/database.xml");
-        try (FileOutputStream out = new FileOutputStream(getDatabaseFile())) {
-        	out.write(databaseData);
-        }
+	public void fetchDatabase() throws IOException {
 
-    }
+		databaseData = dataLoader.fetchDatabase(serverUrl + "/database.xml");
+		try (FileOutputStream out = new FileOutputStream(getDatabaseFile())) {
+			out.write(databaseData);
+		}
 
-    public NexuInfo fetchNexuInfo() throws IOException, JAXBException {
+	}
 
-        byte[] info = dataLoader.fetchNexuInfo(serverUrl + "/info");
+	public NexuInfo fetchNexuInfo() throws IOException, JAXBException {
 
-        if (info == null) {
-            return null;
-        } else {
-            JAXBContext ctx = JAXBContext.newInstance(NexuInfo.class);
-            Unmarshaller u = ctx.createUnmarshaller();
-            try {
-                NexuInfo version = (NexuInfo) u.unmarshal(new ByteArrayInputStream(info));
-                return version;
-            } catch (Exception e) {
-                logger.log(Level.FINE, "Cannot parse /info", e);
-                logger.warning("Cannot parse /info");
-                return null;
-            }
-        }
+		byte[] info = dataLoader.fetchNexuInfo(serverUrl + "/info");
 
-    }
+		if (info == null) {
+			return null;
+		} else {
+			JAXBContext ctx = JAXBContext.newInstance(NexuInfo.class);
+			Unmarshaller u = ctx.createUnmarshaller();
+			try {
+				NexuInfo version = (NexuInfo) u.unmarshal(new ByteArrayInputStream(info));
+				return version;
+			} catch (Exception e) {
+				logger.debug("Cannot parse /info", e);
+				logger.warn("Cannot parse /info");
+				return null;
+			}
+		}
 
-    public void start() {
-        if (database == null) {
-            scheduleUpdate();
-        } else {
-            scheduleTimer();
-        }
-    }
+	}
 
-    public void stop() {
-        if (updateHandle != null) {
-            updateHandle.cancel(true);
-        }
-        if (timerHandle != null) {
-            timerHandle.cancel(true);
-        }
-    }
+	public void start() {
+		if (database == null) {
+			scheduleUpdate();
+		} else {
+			scheduleTimer();
+		}
+	}
 
-    private void scheduleTimer() {
-        timerHandle = scheduler.scheduleAtFixedRate(timerTask, 1, TIMER_RATE, TimeUnit.DAYS);
-    }
+	public void stop() {
+		if (updateHandle != null) {
+			updateHandle.cancel(true);
+		}
+		if (timerHandle != null) {
+			timerHandle.cancel(true);
+		}
+	}
 
-    private void scheduleUpdate() {
-        updateHandle = scheduler.scheduleAtFixedRate(updateTask, 1, UPDATE_RATE, TimeUnit.MINUTES);
-    }
+	private void scheduleTimer() {
+		timerHandle = scheduler.scheduleAtFixedRate(timerTask, 1, TIMER_RATE, TimeUnit.DAYS);
+	}
 
-    public SCDatabase getDatabase() {
-        if (database == null) {
-            database = new SCDatabase();
-        }
-        return database;
-    }
+	private void scheduleUpdate() {
+		updateHandle = scheduler.scheduleAtFixedRate(updateTask, 1, UPDATE_RATE, TimeUnit.MINUTES);
+	}
 
-    final Runnable timerTask = new Runnable() {
-        public void run() {
-            if (updateHandle != null) {
-                logger.info("Update still running");
-            } else {
-                logger.info("Schedule update");
-                scheduleUpdate();
-            }
-        }
+	public SCDatabase getDatabase() {
+		if (database == null) {
+			database = new SCDatabase();
+		}
+		return database;
+	}
 
-    };
+	final Runnable timerTask = new Runnable() {
+		public void run() {
+			if (updateHandle != null) {
+				logger.info("Update still running");
+			} else {
+				logger.info("Schedule update");
+				scheduleUpdate();
+			}
+		}
 
-    final Runnable updateTask = new Runnable() {
-        public void run() {
-            logger.info("Attempt update");
-            try {
-                updateDatabase();
-                scheduleTimer();
-                updateHandle.cancel(false);
-                updateHandle = null;
-            } catch (IOException | JAXBException e) {
-                logger.log(Level.SEVERE, "Cannot update database", e);
-            }
-        }
+	};
 
-    };
+	final Runnable updateTask = new Runnable() {
+		public void run() {
+			logger.info("Attempt update");
+			try {
+				updateDatabase();
+				scheduleTimer();
+				updateHandle.cancel(false);
+				updateHandle = null;
+			} catch (IOException | JAXBException e) {
+				logger.error("Cannot update database", e);
+			}
+		}
+
+	};
 
 }

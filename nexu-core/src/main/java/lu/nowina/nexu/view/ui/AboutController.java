@@ -27,30 +27,30 @@ public class AboutController implements Initializable {
 
 	@FXML
 	private Button ok;
-	
+
 	@FXML
 	private Label dbVersion;
-	
+
 	@FXML
 	private Label dbFile;
-	
+
 	private UIDisplay display;
-	
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		ok.setOnAction((e) -> {
-		    display.close();
+			display.close();
 		});
 	}
 
 	public void setDataLoader(DatabaseWebLoader loader) {
-	    String digest = loader.digestDatabase();
-        dbVersion.setText(digest != null ? digest : "no_database");
-        dbFile.setText(loader.getDatabaseFile().getAbsolutePath());
+		String digest = loader.digestDatabase();
+		dbVersion.setText(digest != null ? digest : "no_database");
+		dbFile.setText(loader.getDatabaseFile().getAbsolutePath());
 	}
-	
+
 	public void setDisplay(UIDisplay display) {
-        this.display = display;
-    }
-	
+		this.display = display;
+	}
+
 }

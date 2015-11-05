@@ -20,8 +20,7 @@ import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.ScAPI;
 
 /**
- * The ConnectionInfo contains the information needed to configure the
- * connection to a SmartCard with the generic API.
+ * The ConnectionInfo contains the information needed to configure the connection to a SmartCard with the generic API.
  * 
  * @author david.naramski
  *
@@ -30,7 +29,7 @@ import lu.nowina.nexu.api.ScAPI;
 public class ConnectionInfo {
 
 	private EnvironmentInfo env;
-	
+
 	private ScAPI selectedApi;
 
 	private String apiParam;

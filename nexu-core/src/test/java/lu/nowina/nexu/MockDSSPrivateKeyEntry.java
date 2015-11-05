@@ -20,22 +20,22 @@ import eu.europa.esig.dss.x509.CertificateToken;
 
 public class MockDSSPrivateKeyEntry implements DSSPrivateKeyEntry {
 
-    @Override
-    public CertificateToken getCertificate() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	@Override
+	public CertificateToken getCertificate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-    @Override
-    public CertificateToken[] getCertificateChain() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	@Override
+	public CertificateToken[] getCertificateChain() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-    @Override
-    public EncryptionAlgorithm getEncryptionAlgorithm() throws DSSException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	@Override
+	public EncryptionAlgorithm getEncryptionAlgorithm() throws DSSException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

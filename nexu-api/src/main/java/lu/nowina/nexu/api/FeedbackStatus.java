@@ -20,18 +20,14 @@ import javax.xml.bind.annotation.XmlType;
 @XmlEnum
 public enum FeedbackStatus {
 
-    NO_PRODUCT_FOUND,
-    PRODUCT_NOT_SUPPORTED,
-    NO_KEYS,
-    EXCEPTION,
-    SUCCESS;
+	NO_PRODUCT_FOUND, PRODUCT_NOT_SUPPORTED, NO_KEYS, EXCEPTION, SUCCESS;
 
-    public String value() {
-        return name();
-    }
+	public String value() {
+		return name();
+	}
 
-    public static FeedbackStatus fromValue(String v) {
-        return valueOf(v);
-    }
+	public static FeedbackStatus fromValue(String v) {
+		return valueOf(v);
+	}
 
 }

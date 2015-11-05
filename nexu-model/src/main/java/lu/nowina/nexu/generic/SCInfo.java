@@ -26,8 +26,7 @@ import eu.europa.esig.dss.DigestAlgorithm;
 import lu.nowina.nexu.api.EnvironmentInfo;
 
 /**
- * SCInfo contains information about a SmartCard, such as known ATR, 
- * label, downloadUrl for drivers, infoUrl for information, ...
+ * SCInfo contains information about a SmartCard, such as known ATR, label, downloadUrl for drivers, infoUrl for information, ...
  * 
  * @author david.naramski
  *
@@ -38,38 +37,38 @@ public class SCInfo {
 
 	private String atr;
 
-	@XmlElementWrapper(name="connectionInfos")
-	@XmlElement(name="connectionInfo")
+	@XmlElementWrapper(name = "connectionInfos")
+	@XmlElement(name = "connectionInfo")
 	private List<ConnectionInfo> infos;
 
 	private String label;
 
 	private String downloadUrl;
-	
+
 	private String infoUrl;
-	
-	@XmlElementWrapper(name="supportedDigestAlgo")
-	@XmlElement(name="digestAlgo")
+
+	@XmlElementWrapper(name = "supportedDigestAlgo")
+	@XmlElement(name = "digestAlgo")
 	private List<DigestAlgorithm> supportedDigestAlgorithm;
 
 	public List<DigestAlgorithm> getSupportedDigestAlgorithm() {
-		if(supportedDigestAlgorithm == null) {
+		if (supportedDigestAlgorithm == null) {
 			supportedDigestAlgorithm = new ArrayList<>();
 		}
 		return supportedDigestAlgorithm;
 	}
-	
+
 	public ConnectionInfo getConnectionInfo(EnvironmentInfo env) {
-		for(ConnectionInfo info : getInfos()) {
-			if(info.getEnv().matches(env)) {
+		for (ConnectionInfo info : getInfos()) {
+			if (info.getEnv().matches(env)) {
 				return info;
 			}
 		}
 		return null;
 	}
-	
+
 	public List<ConnectionInfo> getInfos() {
-		if(infos == null) {
+		if (infos == null) {
 			infos = new ArrayList<>();
 		}
 		return infos;
@@ -114,5 +113,5 @@ public class SCInfo {
 	public void setSupportedDigestAlgorithm(List<DigestAlgorithm> supportedDigtestAlgorithm) {
 		this.supportedDigestAlgorithm = supportedDigtestAlgorithm;
 	}
-	
+
 }

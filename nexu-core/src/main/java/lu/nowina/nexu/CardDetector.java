@@ -16,14 +16,15 @@ package lu.nowina.nexu;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.smartcardio.ATR;
 import javax.smartcardio.Card;
 import javax.smartcardio.CardException;
 import javax.smartcardio.CardTerminal;
 import javax.smartcardio.TerminalFactory;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.EnvironmentInfo;
@@ -35,23 +36,23 @@ import lu.nowina.nexu.api.OS;
  */
 public class CardDetector {
 
-	private static final Logger logger = Logger.getLogger(CardDetector.class.getSimpleName());
+	private static final Logger logger = LoggerFactory.getLogger(CardDetector.class.getSimpleName());
 
 	public CardDetector(EnvironmentInfo info) {
 		try {
-			if(info.getOs() == OS.LINUX) {
+			if (info.getOs() == OS.LINUX) {
 				logger.info("The OS is Linux, we check for Library");
 				File libFile = at.gv.egiz.smcc.util.LinuxLibraryFinder.getLibraryPath("pcsclite", "1");
-				if(libFile != null) {
+				if (libFile != null) {
 					logger.info("Library installed is " + libFile.getAbsolutePath());
 					System.setProperty("sun.security.smartcardio.library", libFile.getAbsolutePath());
 				}
 			}
-		} catch(Exception e) {
-			logger.log(Level.SEVERE, "Error while loading library for Linux", e);
+		} catch (Exception e) {
+			logger.error("Error while loading library for Linux", e);
 		}
 	}
-	
+
 	/**
 	 * Detect the smartcard connected to the computer.
 	 *
@@ -70,8 +71,8 @@ public class CardDetector {
 			// terminals connected
 			// but it is OK to continue with the intitalisation - user can
 			// connect + refresh
-			logger.log(Level.FINE, "Error listing the terminals", e);
-			logger.log(Level.INFO, "No terminals found.");
+			logger.debug("Error listing the terminals", e);
+			logger.info("No terminals found.");
 			return listCardDetect;
 		}
 		int terminalIndex = 0;
@@ -85,12 +86,10 @@ public class CardDetector {
 				cardDetection.setAtr(DetectedCard.atrToString(atr.getBytes()));
 				cardDetection.setTerminalIndex(terminalIndex);
 				listCardDetect.add(cardDetection);
-				logger.log(Level.INFO, "Found card in terminal {0} with ATR {1}.",
-						new Object[] { terminalIndex, cardDetection.getAtr() });
+				logger.info("Found card in terminal {0} with ATR {1}.", new Object[] { terminalIndex, cardDetection.getAtr() });
 			} catch (CardException e) {
 				// Card not present or unreadable
-				logger.log(Level.WARNING, "No card present in terminal {0}, or not readable.",
-						Integer.toString(terminalIndex));
+				logger.warn("No card present in terminal {0}, or not readable.", Integer.toString(terminalIndex));
 			}
 			terminalIndex++;
 		}

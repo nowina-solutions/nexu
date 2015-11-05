@@ -19,7 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class NexuInfo {
 
 	private String nexuVersion;
-	
+
 	private String databaseVersion;
 
 	public String getNexuVersion() {
@@ -37,5 +37,5 @@ public class NexuInfo {
 	public void setDatabaseVersion(String databaseVersion) {
 		this.databaseVersion = databaseVersion;
 	}
-	
+
 }

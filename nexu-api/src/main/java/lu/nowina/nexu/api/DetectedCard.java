@@ -18,85 +18,85 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "detectedCard", propOrder = {
-    "atr",
-    "terminalIndex"
-})
+@XmlType(name = "detectedCard", propOrder = { "atr", "terminalIndex" })
 public class DetectedCard {
 
-    /**
-     * The atr.
-     */
-    private String atr;
-    
-    /**
-     * The terminal index.
-     */
-    private int terminalIndex;
+	/**
+	 * The atr.
+	 */
+	private String atr;
 
-    public DetectedCard() {
-    }
-    
-    public DetectedCard(String atr, int terminalIndex) {
-        this.atr = atr;
-        this.terminalIndex = terminalIndex;
-    }
-    
-    /**
-     * Transform an ATR byte array into a string.
-     *
-     * @param b the ATR byte array
-     * @return the string (empty if the ATR byte array is empty or null)
-     */
-    public static String atrToString(byte[] b) {
-        final StringBuilder sb = new StringBuilder();
-        if (b != null && b.length > 0) {
-            sb.append(Integer.toHexString((b[0] & 240) >> 4));
-            sb.append(Integer.toHexString(b[0] & 15));
+	/**
+	 * The terminal index.
+	 */
+	private int terminalIndex;
 
-            for (int i = 1; i < b.length; i++) {
-                // sb.append(' ');
-                sb.append(Integer.toHexString((b[i] & 240) >> 4));
-                sb.append(Integer.toHexString(b[i] & 15));
-            }
-        }
-        return sb.toString().toUpperCase();
-    }
+	public DetectedCard() {
+	}
 
-    /**
-     * Gets the atr.
-     *
-     * @return the atr
-     */
-    public String getAtr() {
-        return atr;
-    }
+	public DetectedCard(String atr, int terminalIndex) {
+		this.atr = atr;
+		this.terminalIndex = terminalIndex;
+	}
 
-    /**
-     * Sets the atr.
-     *
-     * @param atr the atr to set
-     */
-    public void setAtr(String atr) {
-        this.atr = atr;
-    }
+	/**
+	 * Transform an ATR byte array into a string.
+	 *
+	 * @param b
+	 *            the ATR byte array
+	 * @return the string (empty if the ATR byte array is empty or null)
+	 */
+	public static String atrToString(byte[] b) {
+		final StringBuilder sb = new StringBuilder();
+		if (b != null && b.length > 0) {
+			sb.append(Integer.toHexString((b[0] & 240) >> 4));
+			sb.append(Integer.toHexString(b[0] & 15));
 
-    /**
-     * Get the index of the terminal from which the card info was read.
-     *
-     * @return the terminalIndex
-     */
-    public int getTerminalIndex() {
-        return terminalIndex;
-    }
+			for (int i = 1; i < b.length; i++) {
+				// sb.append(' ');
+				sb.append(Integer.toHexString((b[i] & 240) >> 4));
+				sb.append(Integer.toHexString(b[i] & 15));
+			}
+		}
+		return sb.toString().toUpperCase();
+	}
 
-    /**
-     * Set the index of the terminal from which the card info was read.
-     *
-     * @param terminalIndex the terminalIndex to set
-     */
-    public void setTerminalIndex(int terminalIndex) {
-        this.terminalIndex = terminalIndex;
-    }
+	/**
+	 * Gets the atr.
+	 *
+	 * @return the atr
+	 */
+	public String getAtr() {
+		return atr;
+	}
+
+	/**
+	 * Sets the atr.
+	 *
+	 * @param atr
+	 *            the atr to set
+	 */
+	public void setAtr(String atr) {
+		this.atr = atr;
+	}
+
+	/**
+	 * Get the index of the terminal from which the card info was read.
+	 *
+	 * @return the terminalIndex
+	 */
+	public int getTerminalIndex() {
+		return terminalIndex;
+	}
+
+	/**
+	 * Set the index of the terminal from which the card info was read.
+	 *
+	 * @param terminalIndex
+	 *            the terminalIndex to set
+	 */
+	public void setTerminalIndex(int terminalIndex) {
+		this.terminalIndex = terminalIndex;
+	}
 
 }

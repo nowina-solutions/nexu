@@ -23,5 +23,5 @@ public class NexuException extends RuntimeException {
 	public NexuException(String message) {
 		super(message);
 	}
-	
+
 }

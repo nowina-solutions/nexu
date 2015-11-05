@@ -15,6 +15,7 @@ package lu.nowina.nexu.api;
 
 import java.util.List;
 
+import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.EncryptionAlgorithm;
 
 public class GetCertificateResponse {
@@ -28,6 +29,8 @@ public class GetCertificateResponse {
 	private List<String> certificateChain;
 
 	private EncryptionAlgorithm encryptionAlgorithm;
+
+	private List<DigestAlgorithm> supportedDigests;
 
 	public TokenId getTokenId() {
 		return tokenId;
@@ -67,6 +70,14 @@ public class GetCertificateResponse {
 
 	public void setEncryptionAlgorithm(EncryptionAlgorithm encryptionAlgorithm) {
 		this.encryptionAlgorithm = encryptionAlgorithm;
+	}
+
+	public List<DigestAlgorithm> getSupportedDigests() {
+		return supportedDigests;
+	}
+
+	public void setSupportedDigests(List<DigestAlgorithm> supportedDigests) {
+		this.supportedDigests = supportedDigests;
 	}
 
 }

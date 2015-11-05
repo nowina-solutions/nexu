@@ -13,8 +13,8 @@
  */
 package lu.nowina.nexu.flow;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
@@ -32,7 +32,7 @@ import lu.nowina.nexu.view.core.UIDisplay;
 
 public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse> {
 
-	private static final Logger logger = Logger.getLogger(SignatureFlow.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(SignatureFlow.class.getName());
 
 	public SignatureFlow(UIDisplay display) {
 		super(display);
@@ -45,7 +45,7 @@ public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse
 			throw new NexuException("ToBeSigned is null");
 		}
 
-		if((req.getDigestAlgorithm() == null)) {
+		if ((req.getDigestAlgorithm() == null)) {
 			throw new NexuException("Digest algorithm expected");
 		}
 
@@ -63,8 +63,7 @@ public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse
 
 					if (key != null) {
 
-						logger.info("Key " + key + " " + key.getCertificate().getSubjectDN() + " from "
-								+ key.getCertificate().getIssuerDN());
+						logger.info("Key " + key + " " + key.getCertificate().getSubjectDN() + " from " + key.getCertificate().getIssuerDN());
 						SignatureValue value = token.sign(req.getToBeSigned(), req.getDigestAlgorithm(), key);
 						logger.info("Signature performed " + value);
 
@@ -77,13 +76,11 @@ public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse
 							feedback.setSelectedCard(getSelectedCard());
 
 							if ((feedback.getSelectedCard() != null) && (feedback.getSelectedAPI() != null)
-									&& ((feedback.getSelectedAPI() == ScAPI.MSCAPI)
-											|| (feedback.getApiParameter() != null))) {
+									&& ((feedback.getSelectedAPI() == ScAPI.MSCAPI) || (feedback.getApiParameter() != null))) {
 
 								Feedback back = displayAndWaitUIOperation("/fxml/store-result.fxml", feedback);
 								if (back != null) {
-									((InternalAPI) api).store(back.getSelectedCard().getAtr(), back.getSelectedAPI(),
-											back.getApiParameter());
+									((InternalAPI) api).store(back.getSelectedCard().getAtr(), back.getSelectedAPI(), back.getApiParameter());
 								}
 
 							} else {
@@ -112,7 +109,7 @@ public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse
 			}
 
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Flow error", e);
+			logger.error("Flow error", e);
 
 			Feedback feedback = new Feedback(e);
 
@@ -120,7 +117,7 @@ public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse
 
 			displayAndWaitUIOperation("/fxml/message.fxml");
 		} finally {
-			if (token !=null){
+			if (token != null) {
 				token.close();
 			}
 		}

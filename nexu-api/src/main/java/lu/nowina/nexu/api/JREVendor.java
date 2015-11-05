@@ -13,10 +13,11 @@
  */
 package lu.nowina.nexu.api;
 
-import java.util.logging.Logger;
-
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlType;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Enumerate JRE Vendors detected by NexU
@@ -29,16 +30,16 @@ import javax.xml.bind.annotation.XmlType;
 public enum JREVendor {
 
 	ORACLE, NOT_RECOGNIZED;
-	
-    private static Logger logger = Logger.getLogger(JREVendor.class.getName());
-    
+
+	private static Logger logger = LoggerFactory.getLogger(JREVendor.class);
+
 	public static JREVendor forJREVendor(String jreVendor) {
-	    if(jreVendor.toLowerCase().contains("oracle")) {
-	        return ORACLE;
-	    } else {
-	        logger.warning("JRE not recognized " + jreVendor);
-	        return NOT_RECOGNIZED;
-	    }
+		if (jreVendor.toLowerCase().contains("oracle")) {
+			return ORACLE;
+		} else {
+			logger.warn("JRE not recognized " + jreVendor);
+			return NOT_RECOGNIZED;
+		}
 	}
-	
+
 }

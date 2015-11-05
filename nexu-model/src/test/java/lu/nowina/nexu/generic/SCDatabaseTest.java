@@ -13,28 +13,28 @@ public class SCDatabaseTest {
 
 	@Test
 	public void test1() throws Exception {
-		
+
 		SCDatabase db = new SCDatabase();
-		
+
 		ConnectionInfo cInfo = new ConnectionInfo();
 		cInfo.setApiParam("param");
 		cInfo.setSelectedApi(ScAPI.MSCAPI);
 		cInfo.setEnv(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
 		db.add("ADSF123FSDFS", cInfo);
-		
+
 		db.getInfo("ADSF123FSDFS").getSupportedDigestAlgorithm().add(DigestAlgorithm.SHA1);
 		db.getInfo("ADSF123FSDFS").getSupportedDigestAlgorithm().add(DigestAlgorithm.MD5);
-		
+
 		JAXBContext ctx = JAXBContext.newInstance(SCDatabase.class);
 		ctx.createMarshaller().marshal(db, System.out);
-		
+
 	}
-	
+
 	@Test
 	public void test2() throws Exception {
-		
+
 		SCDatabase db = new SCDatabase();
-		
+
 		ConnectionInfo cInfo = new ConnectionInfo();
 		cInfo.setApiParam("param");
 		cInfo.setSelectedApi(ScAPI.MSCAPI);
@@ -43,7 +43,7 @@ public class SCDatabaseTest {
 
 		Assert.assertEquals(1, db.getSmartcards().size());
 		Assert.assertEquals(1, db.getSmartcards().get(0).getInfos().size());
-		
+
 		ConnectionInfo cInfo2 = new ConnectionInfo();
 		cInfo2.setApiParam("param");
 		cInfo2.setSelectedApi(ScAPI.MSCAPI);
@@ -52,7 +52,7 @@ public class SCDatabaseTest {
 
 		Assert.assertEquals(1, db.getSmartcards().size());
 		Assert.assertEquals(2, db.getSmartcards().get(0).getInfos().size());
-		
+
 		ConnectionInfo cInfo3 = new ConnectionInfo();
 		cInfo3.setApiParam("param");
 		cInfo3.setSelectedApi(ScAPI.MSCAPI);
@@ -64,7 +64,7 @@ public class SCDatabaseTest {
 		Assert.assertEquals(1, db.getSmartcards().get(1).getInfos().size());
 		Assert.assertTrue(db.getInfo("ATR1") == db.getSmartcards().get(0));
 		Assert.assertTrue(db.getInfo("ATR2") == db.getSmartcards().get(1));
-		
+
 	}
-	
+
 }

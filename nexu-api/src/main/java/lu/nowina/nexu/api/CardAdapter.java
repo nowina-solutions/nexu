@@ -17,7 +17,8 @@ import eu.europa.esig.dss.token.PasswordInputCallback;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 
 /**
- * A CardAdapter can open connection for specific smartcard. 
+ * A CardAdapter can open connection for specific smartcard.
+ * 
  * @author David Naramski
  *
  */
@@ -33,6 +34,7 @@ public interface CardAdapter {
 
 	/**
 	 * Open a connection the the SmartCard
+	 * 
 	 * @param api
 	 * @param card
 	 * @param callback

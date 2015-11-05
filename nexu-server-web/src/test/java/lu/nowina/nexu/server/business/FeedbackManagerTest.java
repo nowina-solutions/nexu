@@ -20,21 +20,19 @@ import org.junit.Test;
 
 import lu.nowina.nexu.ConfigurationException;
 import lu.nowina.nexu.api.Feedback;
-import lu.nowina.nexu.server.business.FeedbackFile;
-import lu.nowina.nexu.server.business.FeedbackManager;
 
 public class FeedbackManagerTest {
 
-	@Test(expected=ConfigurationException.class)
+	@Test(expected = ConfigurationException.class)
 	public void test1() throws Exception {
-		
+
 		FeedbackManager endpoint = new FeedbackManager();
 		endpoint.postConstruct();
 	}
 
-	@Test(expected=ConfigurationException.class)
+	@Test(expected = ConfigurationException.class)
 	public void test2() throws Exception {
-		
+
 		FeedbackManager endpoint = new FeedbackManager();
 		endpoint.setRepository("non-existing");
 		endpoint.postConstruct();
@@ -42,7 +40,7 @@ public class FeedbackManagerTest {
 
 	@Test
 	public void test3() throws Exception {
-		
+
 		FeedbackManager endpoint = new FeedbackManager();
 		endpoint.setRepository("target");
 		endpoint.postConstruct();
@@ -50,33 +48,33 @@ public class FeedbackManagerTest {
 
 	@Test
 	public void test4() throws Exception {
-		
+
 		FeedbackManager endpoint = new FeedbackManager();
 		endpoint.setRepository("target");
 		endpoint.postConstruct();
 		List<FeedbackFile> list = endpoint.feedbackList();
 		int size = list.size();
-		
+
 		Feedback f = new Feedback();
 		endpoint.reportError(f);
-		
+
 		list = endpoint.feedbackList();
-		Assert.assertEquals(size+1, list.size());
+		Assert.assertEquals(size + 1, list.size());
 	}
 
 	@Test
 	public void test5() throws Exception {
-		
+
 		FeedbackManager endpoint = new FeedbackManager();
 		endpoint.setRepository("target");
 		endpoint.postConstruct();
 		List<FeedbackFile> list = endpoint.feedbackList();
 
-		for(FeedbackFile f : list) {
+		for (FeedbackFile f : list) {
 			Assert.assertNotNull(f.getId());
 			Assert.assertNotNull(f.getDate());
 		}
-		
+
 	}
 
 }

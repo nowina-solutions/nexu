@@ -14,7 +14,7 @@
 package lu.nowina.nexu;
 
 /**
- * Interface for the local HTTP Server. 
+ * Interface for the local HTTP Server.
  * 
  * @author david.naramski
  *

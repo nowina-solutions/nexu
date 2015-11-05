@@ -15,7 +15,6 @@ package lu.nowina.nexu.generic;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -23,18 +22,21 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-@XmlRootElement(name="database")
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@XmlRootElement(name = "database")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class SCDatabase {
 
-	private static final Logger logger = Logger.getLogger(SCDatabase.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(SCDatabase.class.getName());
 
 	@XmlElement(name = "smartcard")
 	private List<SCInfo> smartcards;
 
 	@XmlTransient
 	private DatabaseEventHandler onAddAction;
-	
+
 	/**
 	 * Add a new ConnectionInfo to the database, associated with the ATR
 	 * 
@@ -50,13 +52,14 @@ public class SCDatabase {
 		}
 		info.getInfos().add(cInfo);
 	}
-	
+
 	protected void onAdd() {
-		
+
 	}
 
 	/**
 	 * Get SCInfo matching the provided ATR
+	 * 
 	 * @param atr
 	 * @return
 	 */

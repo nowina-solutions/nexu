@@ -24,15 +24,15 @@ public class AppConfig {
 	private String bindingIP;
 
 	private int bindingPort;
-	
+
 	private String serverUrl;
-	
-	private String installUrl; 
-	
+
+	private String installUrl;
+
 	private String nexuUrl;
-	
+
 	private String httpServerClass;
-	
+
 	public String getBindingIP() {
 		return bindingIP;
 	}
@@ -49,13 +49,13 @@ public class AppConfig {
 		this.bindingPort = bindingPort;
 	}
 
-    public String getServerUrl() {
-        return serverUrl;
-    }
+	public String getServerUrl() {
+		return serverUrl;
+	}
 
-    public void setServerUrl(String serverUrl) {
-        this.serverUrl = serverUrl;
-    }
+	public void setServerUrl(String serverUrl) {
+		this.serverUrl = serverUrl;
+	}
 
 	public String getInstallUrl() {
 		return installUrl;

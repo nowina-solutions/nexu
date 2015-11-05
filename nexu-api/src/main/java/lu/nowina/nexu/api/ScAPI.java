@@ -21,35 +21,31 @@ import javax.xml.bind.annotation.XmlType;
 @XmlEnum
 public enum ScAPI {
 
-    @XmlEnumValue("MSCAPI")
-    MSCAPI("MSCAPI"),
-    
-    @XmlEnumValue("PKCS11")
-    PKCS_11("PKCS11"),
-    
-    @XmlEnumValue("PKCS12")
-    PKCS_12("PKCS12"),
-    
-    @XmlEnumValue("MOCCA")
-    MOCCA("MOCCA");
-    
-    private final String value;
+	@XmlEnumValue("MSCAPI") MSCAPI("MSCAPI"),
 
-    ScAPI(String v) {
-        value = v;
-    }
+	@XmlEnumValue("PKCS11") PKCS_11("PKCS11"),
 
-    public String value() {
-        return value;
-    }
+	@XmlEnumValue("PKCS12") PKCS_12("PKCS12"),
 
-    public static ScAPI fromValue(String v) {
-        for (ScAPI c: ScAPI.values()) {
-            if (c.value.equals(v)) {
-                return c;
-            }
-        }
-        throw new IllegalArgumentException(v);
-    }
+	@XmlEnumValue("MOCCA") MOCCA("MOCCA");
+
+	private final String value;
+
+	ScAPI(String v) {
+		value = v;
+	}
+
+	public String value() {
+		return value;
+	}
+
+	public static ScAPI fromValue(String v) {
+		for (ScAPI c : ScAPI.values()) {
+			if (c.value.equals(v)) {
+				return c;
+			}
+		}
+		throw new IllegalArgumentException(v);
+	}
 
 }

@@ -13,13 +13,15 @@
  */
 package lu.nowina.nexu.api;
 
-import java.util.logging.Logger;
-
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Enumerates OS detected by NexU
+ * 
  * @author David Naramski
  *
  */
@@ -28,20 +30,20 @@ import javax.xml.bind.annotation.XmlType;
 public enum OS {
 
 	MACOSX, LINUX, WINDOWS, NOT_RECOGNIZED;
-	
-    private static final Logger logger = Logger.getLogger(OS.class.getName());
-    
+
+	private static final Logger logger = LoggerFactory.getLogger(OS.class);
+
 	public static OS forOSName(String osName) {
-        if (osName.startsWith("Mac")) {
-            return MACOSX;
-        } else if (osName.toLowerCase().contains("windows")) {
-            return WINDOWS;
-        } else if (osName.toLowerCase().contains("linux")) {
-            return LINUX;
-        } else {
-            logger.warning("OS name not recognized " + osName);
-            return NOT_RECOGNIZED;
-        }
+		if (osName.startsWith("Mac")) {
+			return MACOSX;
+		} else if (osName.toLowerCase().contains("windows")) {
+			return WINDOWS;
+		} else if (osName.toLowerCase().contains("linux")) {
+			return LINUX;
+		} else {
+			logger.warn("OS name not recognized " + osName);
+			return NOT_RECOGNIZED;
+		}
 	}
-	
+
 }

@@ -13,13 +13,12 @@
  */
 package lu.nowina.nexu.view.core;
 
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * A UIOperation control the user interaction with the UIFlow. The UIFlow
- * trigger the UIOperation and call the method "waitEnd()". When the user
- * finished the operation, the UIOperation notify the UIFlow through the method
- * "signalEnd()".
+ * A UIOperation control the user interaction with the UIFlow. The UIFlow trigger the UIOperation and call the method "waitEnd()". When the user finished the
+ * operation, the UIOperation notify the UIFlow through the method "signalEnd()".
  * 
  * @author david.naramski
  *
@@ -27,19 +26,18 @@ import java.util.logging.Logger;
  */
 public abstract class UIOperation<R> {
 
-	private static final Logger logger = Logger.getLogger(UIOperation.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(UIOperation.class.getName());
 
 	private Object lock = new Object();
 
 	private volatile R result = null;
-	
-    /**
-     * Once the UIOperation has been instanciated and initialized, the UIFlow
-     * will call the "waitEnd()" method.
-     * 
-     * @return
-     * @throws InterruptedException
-     */
+
+	/**
+	 * Once the UIOperation has been instanciated and initialized, the UIFlow will call the "waitEnd()" method.
+	 * 
+	 * @return
+	 * @throws InterruptedException
+	 */
 	public final R waitEnd() throws InterruptedException {
 		String name = getOperationName();
 
@@ -51,12 +49,11 @@ public abstract class UIOperation<R> {
 		return result;
 	}
 
-    /**
-     * When the user has finished performing the operation, the UIOperation must
-     * call the "signalEnd()" method to resume the UIFlow.
-     * 
-     * @param result
-     */
+	/**
+	 * When the user has finished performing the operation, the UIOperation must call the "signalEnd()" method to resume the UIFlow.
+	 * 
+	 * @param result
+	 */
 	protected final void signalEnd(R result) {
 		String name = getOperationName();
 

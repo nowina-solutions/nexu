@@ -42,19 +42,19 @@ public class DelegatedHttpServerRequest implements HttpRequest {
 	public String getTarget() {
 		return wrapped.getPathInfo().substring(context.length());
 	}
-	
+
 	@Override
 	public InputStream getInputStream() {
 		try {
 			return wrapped.getInputStream();
-		} catch(IOException e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	@Override
 	public String getParameter(String name) {
 		return wrapped.getParameter(name);
 	}
-	
+
 }

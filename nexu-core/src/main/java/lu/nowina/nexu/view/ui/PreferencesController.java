@@ -13,21 +13,20 @@
  */
 package lu.nowina.nexu.view.ui;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
-import lu.nowina.nexu.model.KeystoreParams;
-import lu.nowina.nexu.view.core.UIOperation;
+import javafx.scene.control.TextField;
+import lu.nowina.nexu.UserPreferences;
+import lu.nowina.nexu.view.core.UIDisplay;
 
-public class KeystoreParamsController extends UIOperation<KeystoreParams> implements Initializable {
+public class PreferencesController implements Initializable {
 
 	@FXML
 	private Button ok;
@@ -36,34 +35,51 @@ public class KeystoreParamsController extends UIOperation<KeystoreParams> implem
 	private Button cancel;
 
 	@FXML
-	private Button selectFile;
+	private TextField proxyHost;
 
 	@FXML
-	private PasswordField password;
+	private TextField proxyPort;
 
 	@FXML
-	private Label filename;
+	private CheckBox authenticationRequired;
 
-	private File keyStoreFile;
+	@FXML
+	private TextField proxyUsername;
+
+	@FXML
+	private PasswordField proxyPassword;
+
+	@FXML
+	private Label dbFile;
+
+	private UIDisplay display;
+
+	private UserPreferences preferences;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		ok.setOnAction((event) -> {
-			KeystoreParams result = new KeystoreParams();
-			if (password.getText() != null)
-				result.setPassword(password.getText().toCharArray());
-			result.setPkcs12File(keyStoreFile);
-			signalEnd(result);
+		ok.setOnAction((e) -> {
+			display.close();
 		});
-		cancel.setOnAction((e) -> {
-			signalEnd(null);
-		});
-		selectFile.setOnAction((e) -> {
-			FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle("Open Resource File");
-			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("DLL", "*.dll"));
-			keyStoreFile = fileChooser.showOpenDialog(null);
-		});
+	}
+
+	public void setDisplay(UIDisplay display) {
+		this.display = display;
+	}
+
+	public void setPreferences(UserPreferences preferences) {
+
+		if (preferences == null) {
+			throw new NullPointerException("preferences cannot be null");
+		}
+
+		this.preferences = preferences;
+
+		this.authenticationRequired.setSelected(preferences.getProxyAuthentification());
+		this.proxyUsername.setText(preferences.getProxyUsername());
+		this.proxyPassword.setText(preferences.getProxyPassword());
+		this.proxyPort.setText(preferences.getProxyPort());
+		this.proxyHost.setText(preferences.getProxyServer());
 	}
 
 }

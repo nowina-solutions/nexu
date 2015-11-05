@@ -28,14 +28,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "environment", propOrder = {
-    "jreVendor",
-    "osName",
-    "osArch",
-    "osVersion",
-    "arch",
-    "os"
-})
+@XmlType(name = "environment", propOrder = { "jreVendor", "osName", "osArch", "osVersion", "arch", "os" })
 public class EnvironmentInfo {
 
 	private static final String OS_VERSION = "os.version";
@@ -47,9 +40,9 @@ public class EnvironmentInfo {
 	private static final String OS_ARCH = "os.arch";
 
 	private JREVendor jreVendor;
-	
+
 	private String osName;
-	
+
 	private String osArch;
 
 	private String osVersion;
@@ -59,30 +52,29 @@ public class EnvironmentInfo {
 	private OS os;
 
 	public EnvironmentInfo() {
-    }
-	
-	public static EnvironmentInfo buildFromSystemProperties(Properties systemProperties) {
-	    EnvironmentInfo info = new EnvironmentInfo();
-
-	    String osArch = systemProperties.getProperty(OS_ARCH);
-        info.setOsArch(osArch);
-        info.setArch(Arch.forOSArch(osArch));
-	    
-        info.setJreVendor(JREVendor.forJREVendor(System.getProperty(JAVA_VENDOR)));
-	    
-        String osName = systemProperties.getProperty(OS_NAME);
-        info.setOsName(osName);
-        info.setOs(OS.forOSName(osName));
-
-        String osVersion = systemProperties.getProperty(OS_VERSION);
-        info.setOsVersion(osVersion);
-        
-	    return info;
 	}
-	
+
+	public static EnvironmentInfo buildFromSystemProperties(Properties systemProperties) {
+		EnvironmentInfo info = new EnvironmentInfo();
+
+		String osArch = systemProperties.getProperty(OS_ARCH);
+		info.setOsArch(osArch);
+		info.setArch(Arch.forOSArch(osArch));
+
+		info.setJreVendor(JREVendor.forJREVendor(System.getProperty(JAVA_VENDOR)));
+
+		String osName = systemProperties.getProperty(OS_NAME);
+		info.setOsName(osName);
+		info.setOs(OS.forOSName(osName));
+
+		String osVersion = systemProperties.getProperty(OS_VERSION);
+		info.setOsVersion(osVersion);
+
+		return info;
+	}
+
 	/**
-	 * Compare the filter value with the EnvironmentInfo to see if there is a
-	 * match.
+	 * Compare the filter value with the EnvironmentInfo to see if there is a match.
 	 * 
 	 * @param env
 	 * @return true if the EnvironmentInfo matches the filter
@@ -129,20 +121,20 @@ public class EnvironmentInfo {
 		this.os = os;
 	}
 
-    public String getOsName() {
-        return osName;
-    }
+	public String getOsName() {
+		return osName;
+	}
 
-    public void setOsName(String osName) {
-        this.osName = osName;
-    }
+	public void setOsName(String osName) {
+		this.osName = osName;
+	}
 
-    public String getOsArch() {
-        return osArch;
-    }
+	public String getOsArch() {
+		return osArch;
+	}
 
-    public void setOsArch(String osArch) {
-        this.osArch = osArch;
-    }
+	public void setOsArch(String osArch) {
+		this.osArch = osArch;
+	}
 
 }

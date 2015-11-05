@@ -41,71 +41,69 @@ import lu.nowina.nexu.view.core.UIDisplay;
 
 public class GetCertificateFlowTest {
 
-    @Test
-    public void testNoProduct() {
+	@Test
+	public void testNoProduct() {
 
-        UIDisplay display = mock(UIDisplay.class);
+		UIDisplay display = mock(UIDisplay.class);
 
-        NexuAPI api = mock(NexuAPI.class);
-        when(api.detectCards()).thenReturn(Collections.emptyList());
+		NexuAPI api = mock(NexuAPI.class);
+		when(api.detectCards()).thenReturn(Collections.emptyList());
 
-        GetCertificateRequest req = new GetCertificateRequest();
+		GetCertificateRequest req = new GetCertificateRequest();
 
-        GetCertificateFlow flow = new GetCertificateFlow(display);
-        GetCertificateResponse resp = flow.process(api, req);
-        Assert.assertNull(resp);
+		GetCertificateFlow flow = new GetCertificateFlow(display);
+		GetCertificateResponse resp = flow.process(api, req);
+		Assert.assertNull(resp);
 
-        verify(display, atLeastOnce()).displayAndWaitUIOperation(eq("/fxml/provide-feedback.fxml"),
-                any(Feedback.class));
-    }
+		verify(display, atLeastOnce()).displayAndWaitUIOperation(eq("/fxml/provide-feedback.fxml"), any(Feedback.class));
+	}
 
-    @Test
-    public void testNotRecognizedRequestSupport() {
+	@Test
+	public void testNotRecognizedRequestSupport() {
 
-        UIDisplay display = mock(UIDisplay.class);
-        when(display.displayAndWaitUIOperation(eq("/fxml/unsupported-product.fxml"))).thenReturn(false);
+		UIDisplay display = mock(UIDisplay.class);
+		when(display.displayAndWaitUIOperation(eq("/fxml/unsupported-product.fxml"))).thenReturn(false);
 
-        NexuAPI api = mock(NexuAPI.class);
-        when(api.detectCards()).thenReturn(Arrays.asList(new DetectedCard("atr", 0)));
+		NexuAPI api = mock(NexuAPI.class);
+		when(api.detectCards()).thenReturn(Arrays.asList(new DetectedCard("atr", 0)));
 
-        GetCertificateRequest req = new GetCertificateRequest();
+		GetCertificateRequest req = new GetCertificateRequest();
 
-        GetCertificateFlow flow = new GetCertificateFlow(display);
-        GetCertificateResponse resp = flow.process(api, req);
-        Assert.assertNull(resp);
+		GetCertificateFlow flow = new GetCertificateFlow(display);
+		GetCertificateResponse resp = flow.process(api, req);
+		Assert.assertNull(resp);
 
-        verify(display, atLeastOnce()).displayAndWaitUIOperation(eq("/fxml/provide-feedback.fxml"),
-                any(Feedback.class));
-    }
+		verify(display, atLeastOnce()).displayAndWaitUIOperation(eq("/fxml/provide-feedback.fxml"), any(Feedback.class));
+	}
 
-    @Test
-    public void testCardRecognized() {
+	@Test
+	public void testCardRecognized() {
 
-        UIDisplay display = mock(UIDisplay.class);
+		UIDisplay display = mock(UIDisplay.class);
 
-        CardAdapter adapter = mock(CardAdapter.class, withSettings().verboseLogging());
+		CardAdapter adapter = mock(CardAdapter.class, withSettings().verboseLogging());
 
-        SignatureTokenConnection token = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password");
+		SignatureTokenConnection token = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password");
 
-        NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
-        DetectedCard detectedCard = new DetectedCard("atr", 0);
-        when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
-        when(api.matchingCardAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
-        when(api.registerTokenConnection(token)).thenReturn(new TokenId("id"));
-        when(api.getTokenConnection(new TokenId("id"))).thenReturn(token);
-        
-        when(adapter.connect(eq(api), eq(detectedCard), any())).thenReturn(token);
+		NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
+		DetectedCard detectedCard = new DetectedCard("atr", 0);
+		when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
+		when(api.matchingCardAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
+		when(api.registerTokenConnection(token)).thenReturn(new TokenId("id"));
+		when(api.getTokenConnection(new TokenId("id"))).thenReturn(token);
 
-        GetCertificateRequest req = new GetCertificateRequest();
+		when(adapter.connect(eq(api), eq(detectedCard), any())).thenReturn(token);
 
-        GetCertificateFlow flow = new GetCertificateFlow(display);
-        GetCertificateResponse resp = flow.process(api, req);
-        Assert.assertNotNull(resp);
-        Assert.assertNotNull(resp.getEncryptionAlgorithm());
-        Assert.assertNotNull(resp.getTokenId());
-        Assert.assertEquals(new TokenId("id"), resp.getTokenId());
-        Assert.assertNotNull(resp.getKeyId());
+		GetCertificateRequest req = new GetCertificateRequest();
 
-    }
+		GetCertificateFlow flow = new GetCertificateFlow(display);
+		GetCertificateResponse resp = flow.process(api, req);
+		Assert.assertNotNull(resp);
+		Assert.assertNotNull(resp.getEncryptionAlgorithm());
+		Assert.assertNotNull(resp.getTokenId());
+		Assert.assertEquals(new TokenId("id"), resp.getTokenId());
+		Assert.assertNotNull(resp.getKeyId());
+
+	}
 
 }

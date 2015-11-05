@@ -16,16 +16,16 @@ package lu.nowina.nexu.api.plugin;
 public class HttpResponse {
 
 	private String content;
-	
+
 	private String contentType;
-	
+
 	private HttpStatus httpStatus;
-	
+
 	public HttpResponse(String content, String contentType, HttpStatus status) {
 		this.content = content;
 		this.contentType = contentType;
 
-		if(status == null) {
+		if (status == null) {
 			throw new IllegalArgumentException();
 		}
 		this.httpStatus = status;
@@ -34,7 +34,7 @@ public class HttpResponse {
 	public String getContent() {
 		return content;
 	}
-	
+
 	public String getContentType() {
 		return contentType;
 	}
@@ -42,5 +42,5 @@ public class HttpResponse {
 	public HttpStatus getHttpStatus() {
 		return httpStatus;
 	}
-	
+
 }

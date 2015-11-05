@@ -15,8 +15,9 @@ package lu.nowina.nexu.flow;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
@@ -33,7 +34,7 @@ import lu.nowina.nexu.view.core.UIDisplay;
 
 public class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCertificateResponse> {
 
-	static final Logger logger = Logger.getLogger(GetCertificateFlow.class.getName());
+	static final Logger logger = LoggerFactory.getLogger(GetCertificateFlow.class);
 
 	public GetCertificateFlow(UIDisplay display) {
 		super(display);
@@ -101,7 +102,7 @@ public class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCert
 			displayAndWaitUIOperation("/fxml/message.fxml", "Finished");
 
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Flow error", e);
+			logger.error("Flow error", e);
 
 			Feedback feedback = new Feedback(e);
 

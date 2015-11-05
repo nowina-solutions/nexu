@@ -40,78 +40,78 @@ import lu.nowina.nexu.view.core.UIDisplay;
 
 public class SignatureFlowTest {
 
-    @Test
-    public void testCardRecognized() throws Exception {
+	@Test
+	public void testCardRecognized() throws Exception {
 
-        UIDisplay display = mock(UIDisplay.class);
+		UIDisplay display = mock(UIDisplay.class);
 
-        CardAdapter adapter = mock(CardAdapter.class, withSettings().verboseLogging());
+		CardAdapter adapter = mock(CardAdapter.class, withSettings().verboseLogging());
 
-        SignatureTokenConnection token = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password");
+		SignatureTokenConnection token = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password");
 
-        NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
-        DetectedCard detectedCard = new DetectedCard("atr", 0);
-        when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
-        when(api.matchingCardAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
-        when(api.registerTokenConnection(token)).thenReturn(new TokenId("id"));
-        when(api.getTokenConnection(new TokenId("id"))).thenReturn(token);
-        
-        when(adapter.connect(eq(api), eq(detectedCard), any())).thenReturn(token);
+		NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
+		DetectedCard detectedCard = new DetectedCard("atr", 0);
+		when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
+		when(api.matchingCardAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
+		when(api.registerTokenConnection(token)).thenReturn(new TokenId("id"));
+		when(api.getTokenConnection(new TokenId("id"))).thenReturn(token);
 
-        SignatureRequest req = new SignatureRequest();
-        req.setToBeSigned(new ToBeSigned("hello".getBytes()));
-        req.setDigestAlgorithm(DigestAlgorithm.SHA256);
+		when(adapter.connect(eq(api), eq(detectedCard), any())).thenReturn(token);
 
-        SignatureFlow flow = new SignatureFlow(display);
-        SignatureResponse resp = flow.process(api, req);
-        Assert.assertNotNull(resp);
-        Assert.assertNotNull(resp.getSignatureValue());
+		SignatureRequest req = new SignatureRequest();
+		req.setToBeSigned(new ToBeSigned("hello".getBytes()));
+		req.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
-    }
+		SignatureFlow flow = new SignatureFlow(display);
+		SignatureResponse resp = flow.process(api, req);
+		Assert.assertNotNull(resp);
+		Assert.assertNotNull(resp.getSignatureValue());
 
-    @Test(expected=NexuException.class)
-    public void testInputValidation1() throws Exception {
+	}
 
-        UIDisplay display = mock(UIDisplay.class);
+	@Test(expected = NexuException.class)
+	public void testInputValidation1() throws Exception {
 
-        NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
+		UIDisplay display = mock(UIDisplay.class);
 
-        SignatureRequest req = new SignatureRequest();
-        req.setDigestAlgorithm(DigestAlgorithm.SHA256);
+		NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
 
-        SignatureFlow flow = new SignatureFlow(display);
-        flow.process(api, req);
+		SignatureRequest req = new SignatureRequest();
+		req.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
-    }
+		SignatureFlow flow = new SignatureFlow(display);
+		flow.process(api, req);
 
-    @Test(expected=NexuException.class)
-    public void testInputValidation2() throws Exception {
+	}
 
-        UIDisplay display = mock(UIDisplay.class);
+	@Test(expected = NexuException.class)
+	public void testInputValidation2() throws Exception {
 
-        NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
+		UIDisplay display = mock(UIDisplay.class);
 
-        SignatureRequest req = new SignatureRequest();
-        req.setToBeSigned(new ToBeSigned());
+		NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
 
-        SignatureFlow flow = new SignatureFlow(display);
-        flow.process(api, req);
+		SignatureRequest req = new SignatureRequest();
+		req.setToBeSigned(new ToBeSigned());
 
-    }
+		SignatureFlow flow = new SignatureFlow(display);
+		flow.process(api, req);
 
-    @Test(expected=NexuException.class)
-    public void testInputValidation3() throws Exception {
+	}
 
-        UIDisplay display = mock(UIDisplay.class);
+	@Test(expected = NexuException.class)
+	public void testInputValidation3() throws Exception {
 
-        NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
+		UIDisplay display = mock(UIDisplay.class);
 
-        SignatureRequest req = new SignatureRequest();
-        req.setToBeSigned(new ToBeSigned("hello".getBytes()));
+		NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
 
-        SignatureFlow flow = new SignatureFlow(display);
-        flow.process(api, req);
+		SignatureRequest req = new SignatureRequest();
+		req.setToBeSigned(new ToBeSigned("hello".getBytes()));
 
-    }
+		SignatureFlow flow = new SignatureFlow(display);
+		flow.process(api, req);
+
+	}
 
 }

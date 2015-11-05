@@ -16,8 +16,9 @@ package lu.nowina.nexu.view.ui;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -29,9 +30,9 @@ import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackClient;
 import lu.nowina.nexu.view.core.UIOperation;
 
-public class StoreResultController extends UIOperation<Feedback>implements Initializable {
+public class StoreResultController extends UIOperation<Feedback> implements Initializable {
 
-	private static final Logger logger = Logger.getLogger(StoreResultController.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(StoreResultController.class.getName());
 
 	@FXML
 	private Button store;
@@ -50,8 +51,7 @@ public class StoreResultController extends UIOperation<Feedback>implements Initi
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		store.setOnAction((e) -> {
-			logger.info("Store for " + feedback.getSelectedCard().getAtr() + " parameters: " + feedback.getSelectedAPI()
-					+ " - " + feedback.getApiParameter());
+			logger.info("Store for " + feedback.getSelectedCard().getAtr() + " parameters: " + feedback.getSelectedAPI() + " - " + feedback.getApiParameter());
 			logger.info(new File(".").getAbsolutePath());
 			if (publish.isSelected()) {
 				try {
@@ -59,7 +59,7 @@ public class StoreResultController extends UIOperation<Feedback>implements Initi
 					client.reportError(feedback);
 					signalEnd(feedback);
 				} catch (Exception ex) {
-					logger.log(Level.SEVERE, "Cannot send feedback", ex);
+					logger.error("Cannot send feedback", ex);
 					signalEnd(feedback);
 				}
 			}
@@ -83,8 +83,7 @@ public class StoreResultController extends UIOperation<Feedback>implements Initi
 		}
 
 		if (feedback.getSelectedCard() == null || feedback.getSelectedAPI() == null) {
-			throw new IllegalArgumentException(
-					"Invalid Feedback (card:" + feedback.getSelectedCard() + ",api:" + feedback.getSelectedAPI() + ")");
+			throw new IllegalArgumentException("Invalid Feedback (card:" + feedback.getSelectedCard() + ",api:" + feedback.getSelectedAPI() + ")");
 		}
 
 		this.feedback = feedback;

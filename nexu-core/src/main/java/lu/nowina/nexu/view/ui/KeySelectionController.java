@@ -16,7 +16,9 @@ package lu.nowina.nexu.view.ui;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import javafx.collections.FXCollections;
@@ -29,9 +31,9 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import lu.nowina.nexu.view.core.UIOperation;
 
-public class KeySelectionController extends UIOperation<DSSPrivateKeyEntry>implements Initializable {
+public class KeySelectionController extends UIOperation<DSSPrivateKeyEntry> implements Initializable {
 
-	private static final Logger logger = Logger.getLogger(KeySelectionController.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(KeySelectionController.class.getName());
 
 	@FXML
 	private Button select;

@@ -23,8 +23,9 @@ import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -32,17 +33,20 @@ import javafx.scene.Parent;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.ui.AboutController;
+import lu.nowina.nexu.view.ui.PreferencesController;
 
 public class SystrayMenu {
-    
-    private static final Logger logger = Logger.getLogger(SystrayMenu.class.getName());
+
+	private static final Logger logger = LoggerFactory.getLogger(SystrayMenu.class.getName());
 
 	private TrayIcon trayIcon;
 
 	private MenuItem exitItem;
 
 	private MenuItem aboutItem;
-	
+
+	private MenuItem preferencesItem;
+
 	public SystrayMenu(UIDisplay display, DatabaseWebLoader webLoader) {
 
 		if (SystemTray.isSupported()) {
@@ -57,22 +61,39 @@ public class SystrayMenu {
 						System.exit(0);
 					} else if (e.getSource() == aboutItem) {
 
-				        FXMLLoader loader = new FXMLLoader();
-				        try {
-				            loader.load(getClass().getResourceAsStream("/fxml/about.fxml"));
+						FXMLLoader loader = new FXMLLoader();
+						try {
+							loader.load(getClass().getResourceAsStream("/fxml/about.fxml"));
 
-	                        Parent root = loader.getRoot();
-	                        AboutController controller = loader.getController();
-	                        controller.setDisplay(display);
-	                        controller.setDataLoader(webLoader);
-	                        
-	                        Platform.runLater(() -> {
-	                            display.display(root);
-	                        });
-	                        
-				        } catch (IOException ex) {
-				            throw new RuntimeException(ex);
-				        }
+							Parent root = loader.getRoot();
+							AboutController controller = loader.getController();
+							controller.setDisplay(display);
+							controller.setDataLoader(webLoader);
+
+							Platform.runLater(() -> {
+								display.display(root);
+							});
+
+						} catch (IOException ex) {
+							throw new RuntimeException(ex);
+						}
+					} else if (e.getSource() == preferencesItem) {
+
+						FXMLLoader loader = new FXMLLoader();
+						try {
+							loader.load(getClass().getResourceAsStream("/fxml/preferences.fxml"));
+
+							Parent root = loader.getRoot();
+							PreferencesController controller = loader.getController();
+							controller.setDisplay(display);
+
+							Platform.runLater(() -> {
+								display.display(root);
+							});
+
+						} catch (IOException ex) {
+							throw new RuntimeException(ex);
+						}
 					}
 				}
 			};
@@ -81,6 +102,9 @@ public class SystrayMenu {
 			aboutItem = new MenuItem("About");
 			aboutItem.addActionListener(actionListener);
 			popup.add(aboutItem);
+			preferencesItem = new MenuItem("Preferences");
+			preferencesItem.addActionListener(actionListener);
+			popup.add(preferencesItem);
 			exitItem = new MenuItem("Exit");
 			exitItem.addActionListener(actionListener);
 			popup.add(exitItem);
@@ -92,7 +116,7 @@ public class SystrayMenu {
 			try {
 				tray.add(trayIcon);
 			} catch (AWTException e) {
-			    logger.log(Level.SEVERE, "Cannot add TrayIcon", e);
+				logger.error("Cannot add TrayIcon", e);
 				System.err.println("TrayIcon could not be added.");
 			}
 

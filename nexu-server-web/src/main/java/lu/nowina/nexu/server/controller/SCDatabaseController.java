@@ -30,7 +30,7 @@ public class SCDatabaseController {
 
 	@Autowired
 	SCDatabaseManager databaseManager;
-	
+
 	@RequestMapping("/database.xml")
 	public ResponseEntity<byte[]> getDatabase() throws Exception {
 

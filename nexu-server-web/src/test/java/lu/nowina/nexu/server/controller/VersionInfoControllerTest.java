@@ -19,12 +19,12 @@ import lu.nowina.nexu.ConfigurationException;
 
 public class VersionInfoControllerTest {
 
-	@Test(expected=ConfigurationException.class)
+	@Test(expected = ConfigurationException.class)
 	public void test1() throws Exception {
-		
+
 		VersionInfoController controller = new VersionInfoController();
 		controller.postConstruct();
-		
+
 	}
-	
+
 }

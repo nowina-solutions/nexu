@@ -20,20 +20,18 @@ import lu.nowina.nexu.AppConfig;
 
 public class DatabaseWebLoaderTest {
 
-    
-    @Test
-    public void test1() throws Exception {
+	@Test
+	public void test1() throws Exception {
 
-        HttpDataLoader httpLoader = Mockito.mock(HttpDataLoader.class);
-        
-        AppConfig config = new AppConfig();
+		HttpDataLoader httpLoader = Mockito.mock(HttpDataLoader.class);
 
-        DatabaseWebLoader loader = new DatabaseWebLoader(config, httpLoader);
-        loader.start();
-        Thread.sleep(3000);
-        loader.stop();
-        
-        
-    }
-    
+		AppConfig config = new AppConfig();
+
+		DatabaseWebLoader loader = new DatabaseWebLoader(config, httpLoader);
+		loader.start();
+		Thread.sleep(3000);
+		loader.stop();
+
+	}
+
 }

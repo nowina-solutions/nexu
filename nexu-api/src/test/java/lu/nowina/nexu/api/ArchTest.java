@@ -18,13 +18,13 @@ import org.junit.Test;
 
 public class ArchTest {
 
-    @Test
-    public void test1() {
-        
-        Arch arch = Arch.forOSArch(System.getProperty("os.arch"));
-        Assert.assertNotNull(arch);
-        Assert.assertNotEquals(Arch.NOT_RECOGNIZED, arch);
-        
-    }
+	@Test
+	public void test1() {
+
+		Arch arch = Arch.forOSArch(System.getProperty("os.arch"));
+		Assert.assertNotNull(arch);
+		Assert.assertNotEquals(Arch.NOT_RECOGNIZED, arch);
+
+	}
 
 }

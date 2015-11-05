@@ -20,22 +20,22 @@ public class HttpResponseTest {
 
 	@Test
 	public void test1() {
-		
+
 		HttpResponse resp = new HttpResponse("test", "application/json", HttpStatus.OK);
 		Assert.assertEquals("test", resp.getContent());
 		Assert.assertEquals("application/json", resp.getContentType());
 		Assert.assertEquals(200, resp.getHttpStatus().getHttpCode());
-		
+
 	}
-	
-	@Test(expected=IllegalArgumentException.class)
+
+	@Test(expected = IllegalArgumentException.class)
 	public void test2() {
-		
+
 		HttpResponse resp = new HttpResponse("test", "application/json", null);
 		Assert.assertEquals("test", resp.getContent());
 		Assert.assertEquals("application/json", resp.getContentType());
 		Assert.assertEquals(200, resp.getHttpStatus().getHttpCode());
-		
+
 	}
-	
+
 }

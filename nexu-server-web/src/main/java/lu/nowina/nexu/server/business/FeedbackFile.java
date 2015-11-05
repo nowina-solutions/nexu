@@ -19,17 +19,17 @@ import java.util.Date;
 public class FeedbackFile {
 
 	private File file;
-	
+
 	public FeedbackFile(File file) {
 		this.file = file;
 	}
-	
+
 	public String getId() {
 		return file.getName();
 	}
-	
+
 	public Date getDate() {
 		return new Date(file.lastModified());
 	}
-	
+
 }

@@ -14,8 +14,7 @@
 package lu.nowina.nexu;
 
 /**
- * Exception that _should_ never happen on the server and are not likely to occur in the normal operation
- * (algorithm not found, IO error, ...). 
+ * Exception that _should_ never happen on the server and are not likely to occur in the normal operation (algorithm not found, IO error, ...).
  * 
  * @author david.naramski
  *

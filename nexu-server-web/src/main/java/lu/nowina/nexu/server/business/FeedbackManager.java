@@ -22,14 +22,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -39,40 +39,40 @@ import lu.nowina.nexu.api.Feedback;
 
 @Service
 public class FeedbackManager {
-	
-	private static final Logger logger = Logger.getLogger(FeedbackManager.class.getName());
+
+	private static final Logger logger = LoggerFactory.getLogger(FeedbackManager.class.getName());
 
 	@Value("${repository}")
 	private String repository;
-	
-	private JAXBContext ctx; 
-	
+
+	private JAXBContext ctx;
+
 	private File repositoryDir;
-	
+
 	public FeedbackManager() throws Exception {
-		
+
 		try {
-		ctx = JAXBContext.newInstance(Feedback.class);
-		} catch(Exception e) {
-			logger.log(Level.SEVERE, "Cannot instanciante JAXBContext", e);
+			ctx = JAXBContext.newInstance(Feedback.class);
+		} catch (Exception e) {
+			logger.error("Cannot instanciante JAXBContext", e);
 			throw new TechnicalException("Cannot instanciate JAXBContext for Feedback");
 		}
 	}
 
 	@PostConstruct
 	public void postConstruct() {
-		if(repository == null) {
+		if (repository == null) {
 			throw new ConfigurationException("Configuration must defined 'repository'");
 		}
 
 		repositoryDir = new File(repository);
-		
-		if(!repositoryDir.exists() || !repositoryDir.isDirectory() || !repositoryDir.canWrite()) {
+
+		if (!repositoryDir.exists() || !repositoryDir.isDirectory() || !repositoryDir.canWrite()) {
 			throw new ConfigurationException(repositoryDir.getAbsolutePath() + " cannot be used for repository");
 		}
-		
+
 	}
-	
+
 	public void reportError(Feedback feedback) throws Exception {
 		String id = UUID.randomUUID().toString();
 		File reportFile = getFile(id);
@@ -85,31 +85,31 @@ public class FeedbackManager {
 		File reportFile = new File(repositoryDir, id);
 		return reportFile;
 	}
-	
+
 	public List<FeedbackFile> feedbackList() throws Exception {
-		
+
 		Pattern pattern = Pattern.compile("........-....-....-....-............");
-		
+
 		File[] listFiles = repositoryDir.listFiles(new FilenameFilter() {
-			
+
 			@Override
 			public boolean accept(File dir, String name) {
 				return pattern.matcher(name).matches();
 			}
 		});
-		
+
 		List<FeedbackFile> files = new ArrayList<>();
-		for(File f : listFiles) {
+		for (File f : listFiles) {
 			files.add(new FeedbackFile(f));
 		}
 		return files;
 	}
-	
+
 	public String feedback(String id) {
 		File file = getFile(id);
-		try(FileReader r = new FileReader(file)) {
+		try (FileReader r = new FileReader(file)) {
 			return IOUtils.toString(r);
-		} catch(IOException e) {
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -117,5 +117,5 @@ public class FeedbackManager {
 	public void setRepository(String repository) {
 		this.repository = repository;
 	}
-		
+
 }

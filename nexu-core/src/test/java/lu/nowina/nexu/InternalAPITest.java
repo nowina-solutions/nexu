@@ -30,89 +30,88 @@ import lu.nowina.nexu.view.core.UIDisplay;
 
 public class InternalAPITest {
 
-    @Test
-    public void testEnvironment() throws Exception {
+	@Test
+	public void testEnvironment() throws Exception {
 
-        InternalAPI api = new InternalAPI(null, null, null, null, null);
+		InternalAPI api = new InternalAPI(null, null, null, null, null);
 
-        EnvironmentInfo info = api.getEnvironmentInfo();
-        Assert.assertNotNull(info.getOs());
-        Assert.assertNotNull(info.getArch());
-        Assert.assertNotNull(info.getOsName());
-        Assert.assertNotNull(info.getOsVersion());
-        Assert.assertNotNull(info.getJreVendor());
+		EnvironmentInfo info = api.getEnvironmentInfo();
+		Assert.assertNotNull(info.getOs());
+		Assert.assertNotNull(info.getArch());
+		Assert.assertNotNull(info.getOsName());
+		Assert.assertNotNull(info.getOsVersion());
+		Assert.assertNotNull(info.getJreVendor());
 
-    }
+	}
 
-    /**
-     * No card are detected
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testDetectCards1() throws Exception {
+	/**
+	 * No card are detected
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testDetectCards1() throws Exception {
 
-        CardDetector detector = Mockito.mock(CardDetector.class);
+		CardDetector detector = Mockito.mock(CardDetector.class);
 
-        UIDisplay display = Mockito.mock(UIDisplay.class);
+		UIDisplay display = Mockito.mock(UIDisplay.class);
 
-        InternalAPI api = new InternalAPI(display, null, null, detector, null);
-        Assert.assertEquals(0, api.detectCards().size());
+		InternalAPI api = new InternalAPI(display, null, null, detector, null);
+		Assert.assertEquals(0, api.detectCards().size());
 
-    }
+	}
 
-    @Test
-    public void testDetectCards2() throws Exception {
+	@Test
+	public void testDetectCards2() throws Exception {
 
-        CardDetector detector = Mockito.mock(CardDetector.class);
-        Mockito.when(detector.detectCard()).thenReturn(Arrays.asList(new DetectedCard("ATR", 0)));
+		CardDetector detector = Mockito.mock(CardDetector.class);
+		Mockito.when(detector.detectCard()).thenReturn(Arrays.asList(new DetectedCard("ATR", 0)));
 
-        UIDisplay display = Mockito.mock(UIDisplay.class);
+		UIDisplay display = Mockito.mock(UIDisplay.class);
 
-        InternalAPI api = new InternalAPI(display, null, null, detector, null);
-        Assert.assertEquals(1, api.detectCards().size());
+		InternalAPI api = new InternalAPI(display, null, null, detector, null);
+		Assert.assertEquals(1, api.detectCards().size());
 
-    }
+	}
 
-    @Test
-    public void testDetectCards3() throws Exception {
+	@Test
+	public void testDetectCards3() throws Exception {
 
-        CardDetector detector = Mockito.mock(CardDetector.class);
-        Mockito.when(detector.detectCard())
-                .thenReturn(Arrays.asList(new DetectedCard("ATR1", 0), new DetectedCard("ATR2", 0)));
+		CardDetector detector = Mockito.mock(CardDetector.class);
+		Mockito.when(detector.detectCard()).thenReturn(Arrays.asList(new DetectedCard("ATR1", 0), new DetectedCard("ATR2", 0)));
 
-        UIDisplay display = Mockito.mock(UIDisplay.class);
+		UIDisplay display = Mockito.mock(UIDisplay.class);
 
-        InternalAPI api = new InternalAPI(display, null, null, detector, null);
-        Assert.assertEquals(2, api.detectCards().size());
+		InternalAPI api = new InternalAPI(display, null, null, detector, null);
+		Assert.assertEquals(2, api.detectCards().size());
 
-    }
+	}
 
-    @Test
-    public void testMatchingCardAdapter1() throws Exception {
+	@Test
+	public void testMatchingCardAdapter1() throws Exception {
 
-        DetectedCard card = new DetectedCard("ATR", 0);
+		DetectedCard card = new DetectedCard("ATR", 0);
 
-        UIDisplay display = Mockito.mock(UIDisplay.class);
-        InternalAPI api = new InternalAPI(display, null, null, null, null);
+		UIDisplay display = Mockito.mock(UIDisplay.class);
+		InternalAPI api = new InternalAPI(display, null, null, null, null);
 
-        SignatureTokenConnection c = new MockSignatureTokenConnection(null);
-        TokenId id = api.registerTokenConnection(c);
+		SignatureTokenConnection c = new MockSignatureTokenConnection(null);
+		TokenId id = api.registerTokenConnection(c);
 
-        CardAdapter adapter1 = Mockito.mock(CardAdapter.class);
-        Mockito.when(adapter1.accept(card)).thenReturn(Boolean.TRUE);
-        Mockito.when(adapter1.connect(api, card, display.getPasswordInputCallback())).thenReturn(c);
+		CardAdapter adapter1 = Mockito.mock(CardAdapter.class);
+		Mockito.when(adapter1.accept(card)).thenReturn(Boolean.TRUE);
+		Mockito.when(adapter1.connect(api, card, display.getPasswordInputCallback())).thenReturn(c);
 
-        List<Match> matches = api.matchingCardAdapters(card);
+		List<Match> matches = api.matchingCardAdapters(card);
 
-        Assert.assertEquals(0, matches.size());
+		Assert.assertEquals(0, matches.size());
 
-        api.registerCardAdapter(adapter1);
+		api.registerCardAdapter(adapter1);
 
-        matches = api.matchingCardAdapters(card);
+		matches = api.matchingCardAdapters(card);
 
-        Assert.assertEquals(1, matches.size());
+		Assert.assertEquals(1, matches.size());
 
-    }
+	}
 
 }

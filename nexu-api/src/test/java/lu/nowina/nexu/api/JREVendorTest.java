@@ -18,13 +18,13 @@ import org.junit.Test;
 
 public class JREVendorTest {
 
-    @Test
-    public void test1() {
-        
-        JREVendor jre = JREVendor.forJREVendor(System.getProperty("java.vendor"));
-        Assert.assertNotNull(jre);
-        Assert.assertNotEquals(JREVendor.NOT_RECOGNIZED, jre);
-        
-    }
+	@Test
+	public void test1() {
+
+		JREVendor jre = JREVendor.forJREVendor(System.getProperty("java.vendor"));
+		Assert.assertNotNull(jre);
+		Assert.assertNotEquals(JREVendor.NOT_RECOGNIZED, jre);
+
+	}
 
 }

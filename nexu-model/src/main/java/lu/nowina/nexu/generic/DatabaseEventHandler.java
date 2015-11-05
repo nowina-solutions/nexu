@@ -16,5 +16,5 @@ package lu.nowina.nexu.generic;
 public interface DatabaseEventHandler {
 
 	void execute(SCDatabase db);
-	
+
 }

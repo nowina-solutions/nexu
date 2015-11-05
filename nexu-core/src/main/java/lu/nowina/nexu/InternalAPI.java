@@ -18,8 +18,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.api.CardAdapter;
@@ -53,158 +54,157 @@ import lu.nowina.nexu.view.core.UIFlow;
  */
 public class InternalAPI implements NexuAPI {
 
-    private Logger logger = Logger.getLogger(InternalAPI.class.getName());
+	private Logger logger = LoggerFactory.getLogger(InternalAPI.class.getName());
 
-    private UserPreferences prefs;
+	private UserPreferences prefs;
 
-    private CardDetector detector;
+	private CardDetector detector;
 
-    private List<CardAdapter> adapters = new ArrayList<>();
+	private List<CardAdapter> adapters = new ArrayList<>();
 
-    private Map<TokenId, SignatureTokenConnection> connections = new HashMap<>();
+	private Map<TokenId, SignatureTokenConnection> connections = new HashMap<>();
 
-    private Map<String, HttpPlugin> httpPlugins = new HashMap<>();
+	private Map<String, HttpPlugin> httpPlugins = new HashMap<>();
 
-    private UIDisplay display;
+	private UIDisplay display;
 
-    private SCDatabase myDatabase;
+	private SCDatabase myDatabase;
 
-    private DatabaseWebLoader webDatabase;
+	private DatabaseWebLoader webDatabase;
 
-    public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store, CardDetector detector,
-            DatabaseWebLoader webLoader) {
-        this.display = display;
-        this.prefs = prefs;
-        this.myDatabase = store;
-        this.detector = detector;
-        this.webDatabase = webLoader;
-    }
+	public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store, CardDetector detector, DatabaseWebLoader webLoader) {
+		this.display = display;
+		this.prefs = prefs;
+		this.myDatabase = store;
+		this.detector = detector;
+		this.webDatabase = webLoader;
+	}
 
-    @Override
-    public List<DetectedCard> detectCards() {
-        return detector.detectCard();
-    }
+	@Override
+	public List<DetectedCard> detectCards() {
+		return detector.detectCard();
+	}
 
-    @Override
-    public List<Match> matchingCardAdapters(DetectedCard d) {
-    	if(d == null) {
-    		logger.warning("DetectedCard argument should not be null");
-    		return Collections.emptyList();
-    	}
-        List<Match> cards = new ArrayList<>();
-        for (CardAdapter card : adapters) {
-            if (card.accept(d)) {
-                logger.info("Card is instance of " + card.getClass().getSimpleName());
-                cards.add(new Match(card, d));
-            }
-        }
-        if (cards.isEmpty()) {
-            SCInfo info = null;
-            if (webDatabase != null && webDatabase.getDatabase() != null) {
-                info = myDatabase.getInfo(d.getAtr());
-                if (info == null) {
-                    logger.warning("Card " + d.getAtr() + " is not in the web database");
-                } else {
-                    cards.add(new Match(new GenericCardAdapter(info), d));
-                }
+	@Override
+	public List<Match> matchingCardAdapters(DetectedCard d) {
+		if (d == null) {
+			logger.warn("DetectedCard argument should not be null");
+			return Collections.emptyList();
+		}
+		List<Match> cards = new ArrayList<>();
+		for (CardAdapter card : adapters) {
+			if (card.accept(d)) {
+				logger.info("Card is instance of " + card.getClass().getSimpleName());
+				cards.add(new Match(card, d));
+			}
+		}
+		if (cards.isEmpty()) {
+			SCInfo info = null;
+			if (webDatabase != null && webDatabase.getDatabase() != null) {
+				info = myDatabase.getInfo(d.getAtr());
+				if (info == null) {
+					logger.warn("Card " + d.getAtr() + " is not in the web database");
+				} else {
+					cards.add(new Match(new GenericCardAdapter(info), d));
+				}
 
-            }
-            if (info == null && myDatabase != null) {
-                info = myDatabase.getInfo(d.getAtr());
-                if (info == null) {
-                    logger.warning("Card " + d.getAtr() + " is not in the personal database");
-                } else {
-                    cards.add(new Match(new GenericCardAdapter(info), d));
-                }
-            }
-        }
-        return cards;
-    }
+			}
+			if (info == null && myDatabase != null) {
+				info = myDatabase.getInfo(d.getAtr());
+				if (info == null) {
+					logger.warn("Card " + d.getAtr() + " is not in the personal database");
+				} else {
+					cards.add(new Match(new GenericCardAdapter(info), d));
+				}
+			}
+		}
+		return cards;
+	}
 
-    @Override
-    public void registerCardAdapter(CardAdapter adapter) {
-        adapters.add(adapter);
-    }
+	@Override
+	public void registerCardAdapter(CardAdapter adapter) {
+		adapters.add(adapter);
+	}
 
-    @Override
-    public EnvironmentInfo getEnvironmentInfo() {
+	@Override
+	public EnvironmentInfo getEnvironmentInfo() {
 
-        EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
-        return info;
-    }
+		EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
+		return info;
+	}
 
-    @Override
-    public TokenId registerTokenConnection(SignatureTokenConnection connection) {
-        TokenId id = new TokenId();
-        connections.put(id, connection);
-        return id;
-    }
+	@Override
+	public TokenId registerTokenConnection(SignatureTokenConnection connection) {
+		TokenId id = new TokenId();
+		connections.put(id, connection);
+		return id;
+	}
 
-    @Override
-    public SignatureTokenConnection getTokenConnection(TokenId tokenId) {
-        return connections.get(tokenId);
-    }
+	@Override
+	public SignatureTokenConnection getTokenConnection(TokenId tokenId) {
+		return connections.get(tokenId);
+	}
 
-    private <I, O> Execution<O> executeRequest(UIFlow<I, O> flow, I request) {
+	private <I, O> Execution<O> executeRequest(UIFlow<I, O> flow, I request) {
 
-        Execution<O> resp = new Execution<>();
-        try {
+		Execution<O> resp = new Execution<>();
+		try {
 
-            O response = flow.execute(this, request);
+			O response = flow.execute(this, request);
 
-            if (response != null) {
-                resp.setSuccess(true);
-                resp.setResponse(response);
-            } else {
-                resp.setSuccess(false);
-                resp.setError("no_response");
-                resp.setErrorMessage("No response");
-            }
+			if (response != null) {
+				resp.setSuccess(true);
+				resp.setResponse(response);
+			} else {
+				resp.setSuccess(false);
+				resp.setError("no_response");
+				resp.setErrorMessage("No response");
+			}
 
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Cannot execute get certificates", e);
-            resp.setSuccess(false);
-            resp.setError("exception");
-            resp.setErrorMessage("Exception during execution");
-        }
+		} catch (Exception e) {
+			logger.error("Cannot execute get certificates", e);
+			resp.setSuccess(false);
+			resp.setError("exception");
+			resp.setErrorMessage("Exception during execution");
+		}
 
-        return resp;
-    }
+		return resp;
+	}
 
-    @Override
-    public Execution<GetCertificateResponse> getCertificate(GetCertificateRequest request) {
+	@Override
+	public Execution<GetCertificateResponse> getCertificate(GetCertificateRequest request) {
 
-        GetCertificateFlow flow = new GetCertificateFlow(display);
-        return executeRequest(flow, request);
-    }
+		GetCertificateFlow flow = new GetCertificateFlow(display);
+		return executeRequest(flow, request);
+	}
 
-    @Override
-    public Execution<SignatureResponse> sign(SignatureRequest request) {
+	@Override
+	public Execution<SignatureResponse> sign(SignatureRequest request) {
 
-        SignatureFlow flow = new SignatureFlow(display);
-        return executeRequest(flow, request);
+		SignatureFlow flow = new SignatureFlow(display);
+		return executeRequest(flow, request);
 
-    }
+	}
 
-    public HttpPlugin getPlugin(String context) {
-        return httpPlugins.get(context);
-    }
+	public HttpPlugin getPlugin(String context) {
+		return httpPlugins.get(context);
+	}
 
-    public void registerHttpContext(String context, HttpPlugin plugin) {
-        httpPlugins.put(context, plugin);
-    }
+	public void registerHttpContext(String context, HttpPlugin plugin) {
+		httpPlugins.put(context, plugin);
+	}
 
-    public void store(String detectedAtr, ScAPI selectedApi, String apiParam) {
-        if (myDatabase != null) {
+	public void store(String detectedAtr, ScAPI selectedApi, String apiParam) {
+		if (myDatabase != null) {
 
-            EnvironmentInfo env = getEnvironmentInfo();
-            ConnectionInfo cInfo = new ConnectionInfo();
-            cInfo.setSelectedApi(selectedApi);
-            cInfo.setEnv(env);
-            cInfo.setApiParam(apiParam);
+			EnvironmentInfo env = getEnvironmentInfo();
+			ConnectionInfo cInfo = new ConnectionInfo();
+			cInfo.setSelectedApi(selectedApi);
+			cInfo.setEnv(env);
+			cInfo.setApiParam(apiParam);
 
-            myDatabase.add(detectedAtr, cInfo);
-        }
-    }
+			myDatabase.add(detectedAtr, cInfo);
+		}
+	}
 
 }

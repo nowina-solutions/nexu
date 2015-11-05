@@ -27,7 +27,7 @@ import lu.nowina.nexu.view.core.UIOperation;
  * @author David Naramski
  *
  */
-public class UnsupportedProductController extends UIOperation<Boolean>implements Initializable {
+public class UnsupportedProductController extends UIOperation<Boolean> implements Initializable {
 
 	@FXML
 	Button requestSupport;

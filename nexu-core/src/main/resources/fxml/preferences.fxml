@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ © Nowina Solutions, 2015-2015
+
+ Concédée sous licence EUPL, version 1.1 ou – dès leur approbation par la Commission européenne - versions ultérieures de l’EUPL (la «Licence»).
+ Vous ne pouvez utiliser la présente œuvre que conformément à la Licence.
+ Vous pouvez obtenir une copie de la Licence à l’adresse suivante:
+
+ http://ec.europa.eu/idabc/eupl5
+
+ Sauf obligation légale ou contractuelle écrite, le logiciel distribué sous la Licence est distribué «en l’état»,
+ SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
+ Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
+-->
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.PreferencesController">
+
+	<stylesheets>
+		<URL value="@/styles/nexu.css" />
+	</stylesheets>
+
+	<top>
+		<VBox BorderPane.alignment="CENTER">
+			<children>
+				<Label styleClass="message" text="Preferences" wrapText="true" />
+				<Label text="Proxy Host" />
+				<TextField fx:id="proxyHost" />
+				<Label text="Proxy Port" />
+				<TextField fx:id="proxyPort" />
+				<Label text="Authentication required" />
+				<CheckBox id="authenticationRequired" fx:id="authenticationRequired" />
+				<Label text="Proxy Username" />
+				<TextField fx:id="proxyUsername" disable="${!authenticationRequired.selected}"/>
+				<Label text="Proxy Password" />
+				<PasswordField fx:id="proxyPassword" disable="${!authenticationRequired.selected}" />
+			</children>
+		</VBox>
+	</top>
+
+	<bottom>
+		<HBox styleClass="btn-container" BorderPane.alignment="CENTER">
+			<children>
+				<Button fx:id="ok" mnemonicParsing="false" styleClass="btn-primary" text="Ok" />
+			</children>
+		</HBox>
+	</bottom>
+	<center>
+		<VBox styleClass="form-container" BorderPane.alignment="CENTER" />
+	</center>
+</BorderPane>

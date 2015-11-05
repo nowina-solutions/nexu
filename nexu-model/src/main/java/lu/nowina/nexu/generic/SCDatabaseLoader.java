@@ -13,22 +13,25 @@
  */
 package lu.nowina.nexu.generic;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import lu.nowina.nexu.TechnicalException;
 
 public class SCDatabaseLoader {
 
-	private static final Logger logger = Logger.getLogger(SCDatabaseLoader.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(SCDatabaseLoader.class.getName());
 
 	public static SCDatabase load(File f) {
 		SCDatabase db = null;
@@ -36,9 +39,10 @@ public class SCDatabaseLoader {
 			db = new SCDatabase();
 		} else {
 			try (FileInputStream in = new FileInputStream(f)) {
+				byte[] data = IOUtils.toByteArray(in);
 				JAXBContext ctx = createJaxbContext();
 				Unmarshaller u = ctx.createUnmarshaller();
-				db = (SCDatabase) u.unmarshal(new FileInputStream(f));
+				db = (SCDatabase) u.unmarshal(new ByteArrayInputStream(data));
 			} catch (Exception e) {
 				throw new TechnicalException("Cannot load database");
 			}
@@ -53,8 +57,8 @@ public class SCDatabaseLoader {
 		try {
 			JAXBContext ctx = JAXBContext.newInstance(SCDatabase.class);
 			return ctx;
-		} catch(JAXBException e) {
-			logger.log(Level.SEVERE, "Cannot instanciate JAXBContext", e);
+		} catch (JAXBException e) {
+			logger.error("Cannot instanciate JAXBContext", e);
 			throw new TechnicalException("Cannot instanciate JAXBContext");
 		}
 	}
@@ -67,7 +71,7 @@ public class SCDatabaseLoader {
 				m.marshal(db, out);
 			}
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Cannot save database", e);
+			logger.error("Cannot save database", e);
 			throw new TechnicalException("Cannot save database");
 		}
 	}

@@ -27,29 +27,28 @@ import eu.europa.esig.dss.token.SignatureTokenConnection;
 
 public class MockSignatureTokenConnection implements SignatureTokenConnection {
 
-    private List<DSSPrivateKeyEntry> keys;
-    
-    public MockSignatureTokenConnection(DSSPrivateKeyEntry... keys) {
-        if(keys == null || keys.length == 0) {
-            this.keys = Collections.emptyList();
-        } else {
-            this.keys = Arrays.asList(keys);
-        }
-    }
-    
-    @Override
-    public void close() {
-    }
+	private List<DSSPrivateKeyEntry> keys;
 
-    @Override
-    public List<DSSPrivateKeyEntry> getKeys() throws DSSException {
-        return keys;
-    }
+	public MockSignatureTokenConnection(DSSPrivateKeyEntry... keys) {
+		if (keys == null || keys.length == 0) {
+			this.keys = Collections.emptyList();
+		} else {
+			this.keys = Arrays.asList(keys);
+		}
+	}
 
-    @Override
-    public SignatureValue sign(ToBeSigned toBeSigned, DigestAlgorithm digestAlgorithm, DSSPrivateKeyEntry keyEntry)
-            throws DSSException {
-        return new SignatureValue(SignatureAlgorithm.RSA_SHA256, "value".getBytes());
-    }
+	@Override
+	public void close() {
+	}
+
+	@Override
+	public List<DSSPrivateKeyEntry> getKeys() throws DSSException {
+		return keys;
+	}
+
+	@Override
+	public SignatureValue sign(ToBeSigned toBeSigned, DigestAlgorithm digestAlgorithm, DSSPrivateKeyEntry keyEntry) throws DSSException {
+		return new SignatureValue(SignatureAlgorithm.RSA_SHA256, "value".getBytes());
+	}
 
 }

@@ -26,7 +26,7 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import lu.nowina.nexu.model.Pkcs11Params;
 import lu.nowina.nexu.view.core.UIOperation;
 
-public class Pkcs11ParamsController extends UIOperation<Pkcs11Params>implements Initializable {
+public class Pkcs11ParamsController extends UIOperation<Pkcs11Params> implements Initializable {
 
 	@FXML
 	private Button ok;

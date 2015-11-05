@@ -16,8 +16,7 @@ package lu.nowina.nexu.api.plugin;
 import lu.nowina.nexu.api.NexuAPI;
 
 /**
- * NexU exposes an HTTP API to the external application. This external API can
- * be extended through the usage of HTTP Plugin
+ * NexU exposes an HTTP API to the external application. This external API can be extended through the usage of HTTP Plugin
  * 
  * @author David Naramski
  *

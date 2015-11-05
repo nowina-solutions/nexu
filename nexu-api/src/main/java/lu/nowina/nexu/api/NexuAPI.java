@@ -18,7 +18,7 @@ import java.util.List;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 
 /**
- * The API exposes the functionalities to the developer of Plugin. 
+ * The API exposes the functionalities to the developer of Plugin.
  * 
  * @author David Naramski
  */
@@ -33,11 +33,11 @@ public interface NexuAPI {
 	void registerCardAdapter(CardAdapter adapter);
 
 	TokenId registerTokenConnection(SignatureTokenConnection connection);
-	
+
 	SignatureTokenConnection getTokenConnection(TokenId tokenId);
-	
+
 	Execution<GetCertificateResponse> getCertificate(GetCertificateRequest request);
-	
+
 	Execution<SignatureResponse> sign(SignatureRequest request);
-	
+
 }

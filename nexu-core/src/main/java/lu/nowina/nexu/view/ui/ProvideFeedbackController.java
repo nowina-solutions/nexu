@@ -15,8 +15,9 @@ package lu.nowina.nexu.view.ui;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -29,10 +30,10 @@ import lu.nowina.nexu.api.FeedbackClient;
 import lu.nowina.nexu.api.FeedbackStatus;
 import lu.nowina.nexu.view.core.UIOperation;
 
-public class ProvideFeedbackController extends UIOperation<Feedback>implements Initializable {
+public class ProvideFeedbackController extends UIOperation<Feedback> implements Initializable {
 
-	private static final Logger logger = Logger.getLogger(ProvideFeedbackController.class.getName());
-	
+	private static final Logger logger = LoggerFactory.getLogger(ProvideFeedbackController.class.getName());
+
 	@FXML
 	private Button ok;
 
@@ -60,7 +61,7 @@ public class ProvideFeedbackController extends UIOperation<Feedback>implements I
 					client.reportError(feedback);
 					signalEnd(feedback);
 				} catch (Exception ex) {
-					logger.log(Level.SEVERE, "Cannot send feedback", ex);
+					logger.error("Cannot send feedback", ex);
 					signalEnd(null);
 				}
 			}
@@ -68,7 +69,7 @@ public class ProvideFeedbackController extends UIOperation<Feedback>implements I
 		cancel.setOnAction((e) -> {
 			signalEnd(null);
 		});
-		if(feedback != null && feedback.getFeedbackStatus() == FeedbackStatus.SUCCESS) {
+		if (feedback != null && feedback.getFeedbackStatus() == FeedbackStatus.SUCCESS) {
 			cancel.setVisible(false);
 			userComment.setVisible(false);
 			what.setVisible(false);

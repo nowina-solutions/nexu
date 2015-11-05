@@ -13,20 +13,19 @@
  */
 package lu.nowina.nexu.api;
 
-import java.util.logging.Logger;
-
 import javax.xml.bind.annotation.XmlEnum;
 import javax.xml.bind.annotation.XmlType;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @XmlType(name = "osArch")
 @XmlEnum
 public enum Arch {
 
-	X86,
-	AMD64,
-	NOT_RECOGNIZED;
+	X86, AMD64, NOT_RECOGNIZED;
 
-	private static final Logger logger = Logger.getLogger(Arch.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(Arch.class);
 
 	public static Arch forOSArch(String osArch) {
 		if ("amd64".equals(osArch) || "x86_64".equals(osArch)) {
@@ -34,7 +33,7 @@ public enum Arch {
 		} else if ("x86".equals(osArch)) {
 			return X86;
 		} else {
-			logger.warning("Arch not recognized " + osArch);
+			logger.warn("Arch not recognized " + osArch);
 			return Arch.NOT_RECOGNIZED;
 		}
 	}
