@@ -34,33 +34,3 @@ function callUrl(url, type, data, success_callback, error_callback) {
 			error_callback.call(this, error);
 		});
 } 
-
-callUrl("${nexuUrl}/nexu-info", "GET", {}, function(data) {
-	// something responded
-	console.log("server: " + data.version + " - expected: " + nexuVersion);
-	if(data.version == nexuVersion) {
-		// valid version
-		$(".nexu-sign-button").html("Sign");
-		// add hidden input to be able to check on server side
-    	if ($('#nexu').length){
-   	    	var hiddenInput = $('<input/>',{type:'hidden',name:'nexuDetected',value:'true'});
-   	    	hiddenInput.appendTo($('#nexu'));
-   	    }
-	} else {
-		// need update
-		$(".nexu-sign-button").html("Update NexU");
-		$(".nexu-sign-button").on("click", function() {
-			console.log("Update NexU");
-			return false;
-		});
-		
-	}
-}, function(data) {
-	// no response, NexU not installed or not started
-	$(".nexu-sign-button").html("Install NexU");
-	$(".nexu-sign-button").on("click", function() {
-		console.log("Install NexU");
-		window.location = "${baseUrl}/";
-		return false;
-	});
-});
