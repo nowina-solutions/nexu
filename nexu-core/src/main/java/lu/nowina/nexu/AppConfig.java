@@ -32,6 +32,8 @@ public class AppConfig {
 	private String nexuUrl;
 
 	private String httpServerClass;
+	
+	private boolean debug;
 
 	public String getBindingIP() {
 		return bindingIP;
@@ -79,6 +81,14 @@ public class AppConfig {
 
 	public void setHttpServerClass(String httpServerClass) {
 		this.httpServerClass = httpServerClass;
+	}
+
+	public boolean isDebug() {
+		return debug;
+	}
+
+	public void setDebug(boolean debug) {
+		this.debug = debug;
 	}
 
 }

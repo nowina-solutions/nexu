@@ -32,6 +32,8 @@ import lu.nowina.nexu.jetty.JettyServer;
 
 public class NexuLauncher {
 
+	private static final String DEBUG = "debug";
+
 	private static final String HTTP_SERVER_CLASS = "http_server_class";
 
 	private static final String NEXU_URL = "nexu_url";
@@ -60,10 +62,21 @@ public class NexuLauncher {
 		props = loadProperties();
 		config = loadAppConfig(props);
 
+		configureLogger(config);
+
+		beforeLaunch();
+
+		boolean started = checkAlreadyStarted();
+		if (!started) {
+			NexUApp.launch(NexUApp.class, args);
+		}
+	}
+
+	private void configureLogger(AppConfig config) {
 		ConsoleAppender console = new ConsoleAppender(); // create appender
 		String PATTERN = "%d [%p|%c|%C{1}] %m%n";
 		console.setLayout(new PatternLayout(PATTERN));
-		console.setThreshold(Level.DEBUG);
+		console.setThreshold(config.isDebug() ? Level.DEBUG : Level.WARN);
 		console.activateOptions();
 		org.apache.log4j.Logger.getRootLogger().addAppender(console);
 
@@ -74,7 +87,7 @@ public class NexuLauncher {
 
 		fa.setFile(new File(nexuHome, "nexu.log").getAbsolutePath());
 		fa.setLayout(new PatternLayout("%d %-5p [%c{1}] %m%n"));
-		fa.setThreshold(Level.DEBUG);
+		fa.setThreshold(config.isDebug() ? Level.DEBUG : Level.WARN);
 		fa.setAppend(true);
 		fa.activateOptions();
 		org.apache.log4j.Logger.getRootLogger().addAppender(fa);
@@ -83,13 +96,6 @@ public class NexuLauncher {
 		org.apache.log4j.Logger.getLogger("httpclient").setLevel(Level.INFO);
 		org.apache.log4j.Logger.getLogger("freemarker").setLevel(Level.INFO);
 		org.apache.log4j.Logger.getLogger("lu.nowina").setLevel(Level.DEBUG);
-
-		beforeLaunch();
-
-		boolean started = checkAlreadyStarted();
-		if (!started) {
-			NexUApp.launch(NexUApp.class, args);
-		}
 	}
 
 	public void beforeLaunch() {
@@ -165,6 +171,7 @@ public class NexuLauncher {
 		config.setInstallUrl(props.getProperty(INSTALL_URL, "http://nowina.lu/nexu/"));
 		config.setNexuUrl(props.getProperty(NEXU_URL, "http://localhost:9876"));
 		config.setHttpServerClass(props.getProperty(HTTP_SERVER_CLASS, JettyServer.class.getName()));
+		config.setDebug(Boolean.parseBoolean(props.getProperty(DEBUG, "false")));
 
 		return config;
 	}
