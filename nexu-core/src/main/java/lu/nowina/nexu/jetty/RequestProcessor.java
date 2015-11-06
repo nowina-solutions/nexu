@@ -128,12 +128,12 @@ public class RequestProcessor extends AbstractHandler {
 			if (resp == null || resp.getContent() == null) {
 				throw new TechnicalException("Plugin responded null");
 			} else {
-				if (resp.getHttpStatus() != HttpStatus.OK) {
-					response.sendError(resp.getHttpStatus().getHttpCode());
-				}
 				response.setContentType(resp.getContentType());
 				writer.write(resp.getContent());
 				writer.close();
+				if (resp.getHttpStatus() != HttpStatus.OK) {
+					response.sendError(resp.getHttpStatus().getHttpCode());
+				}
 			}
 
 		} catch (Exception e) {

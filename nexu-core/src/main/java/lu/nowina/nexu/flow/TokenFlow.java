@@ -35,6 +35,7 @@ import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.model.KeystoreParams;
 import lu.nowina.nexu.model.Pkcs11Params;
+import lu.nowina.nexu.view.core.OperationResult;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIFlow;
 
@@ -142,7 +143,8 @@ public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 			if (isAdvancedModeAvailable()) {
 
 				logger.info("Advanced mode available");
-				advanced = displayAndWaitUIOperation("/fxml/unsupported-product.fxml");
+				OperationResult<Boolean> result = displayAndWaitUIOperation("/fxml/unsupported-product.fxml");
+				advanced = result.getResult();
 
 			}
 
@@ -179,19 +181,22 @@ public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 	 */
 	private TokenId createTokenAdvanced(NexuAPI api) {
 		logger.info("Advanced mode selected");
-		ScAPI scApi = displayAndWaitUIOperation("/fxml/api-selection.fxml");
+		OperationResult<ScAPI> result = displayAndWaitUIOperation("/fxml/api-selection.fxml");
+		ScAPI scApi = result.getResult();
 		this.selectedApi = scApi;
 		switch (scApi) {
 		case MSCAPI:
 			return api.registerTokenConnection(new MSCAPISignatureToken());
 		case PKCS_11:
-			Pkcs11Params pkcs11Params = displayAndWaitUIOperation("/fxml/pkcs11-params.fxml");
+			OperationResult<Pkcs11Params> op2 = displayAndWaitUIOperation("/fxml/pkcs11-params.fxml"); 
+			Pkcs11Params pkcs11Params = op2.getResult();
 			String absolutePath = pkcs11Params.getPkcs11Lib().getAbsolutePath();
 			this.apiParams = absolutePath;
 			return api.registerTokenConnection(new Pkcs11SignatureToken(absolutePath, getPasswordInputCallback()));
 		case PKCS_12:
-			KeystoreParams pkcs12Params = displayAndWaitUIOperation("/fxml/keystore-params.fxml");
-			return api.registerTokenConnection(new Pkcs12SignatureToken(pkcs12Params.getPassword(), pkcs12Params.getPkcs12File()));
+			OperationResult<KeystoreParams> op3 = displayAndWaitUIOperation("/fxml/pkcs11-params.fxml"); 
+			KeystoreParams keysToreParams = op3.getResult();
+			return api.registerTokenConnection(new Pkcs12SignatureToken(keysToreParams.getPassword(), keysToreParams.getPkcs12File()));
 		}
 		return null;
 	}
@@ -276,7 +281,8 @@ public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 			}
 
 			if (key == null) {
-				key = displayAndWaitUIOperation("/fxml/key-selection.fxml", keys);
+				OperationResult<DSSPrivateKeyEntry> op = displayAndWaitUIOperation("/fxml/key-selection.fxml", keys);
+				key = op.getResult();
 			}
 
 		}

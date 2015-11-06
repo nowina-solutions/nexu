@@ -28,6 +28,7 @@ import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.view.core.OperationResult;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse> {
@@ -78,7 +79,8 @@ public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse
 							if ((feedback.getSelectedCard() != null) && (feedback.getSelectedAPI() != null)
 									&& ((feedback.getSelectedAPI() == ScAPI.MSCAPI) || (feedback.getApiParameter() != null))) {
 
-								Feedback back = displayAndWaitUIOperation("/fxml/store-result.fxml", feedback);
+								OperationResult<Feedback> result = displayAndWaitUIOperation("/fxml/store-result.fxml", feedback);
+								Feedback back = result.getResult();
 								if (back != null) {
 									((InternalAPI) api).store(back.getSelectedCard().getAtr(), back.getSelectedAPI(), back.getApiParameter());
 								}

@@ -68,7 +68,7 @@ public abstract class UIFlow<I, O> {
 	 */
 	protected abstract O process(NexuAPI api, I input) throws NexuException;
 
-	protected <T extends Object> T displayAndWaitUIOperation(String fxml, Object... params) {
+	protected <T> OperationResult<T> displayAndWaitUIOperation(String fxml, Object... params) {
 		return display.displayAndWaitUIOperation(fxml, params);
 	}
 

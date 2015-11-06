@@ -13,23 +13,38 @@
  */
 package lu.nowina.nexu.view.core;
 
-import eu.europa.esig.dss.token.PasswordInputCallback;
-import javafx.scene.Parent;
+public class OperationResult<R> {
 
-/**
- * Représente une interface graphique visible par l'utilisateur. On peut demander l'affichage d'un panel spécifique ou montrer des panels pré-définis.
- * 
- */
-public interface UIDisplay {
+	private R result;
+	
+	private OperationStatus status;
+	
+	private Exception exception;
 
-	void display(Parent panel);
+	public OperationResult(R result) {
+		this.status = OperationStatus.SUCCESS;
+		this.result = result;
+	}
+	
+	public OperationResult(Exception ex) {
+		this.status = OperationStatus.EXCEPTION;
+		this.exception = ex;
+	}
 
-	void displayWaitingPane();
+	public OperationResult(OperationStatus status) {
+		this.status = status;
+	}
 
-	void close();
-
-	<T extends Object> OperationResult<T> displayAndWaitUIOperation(String fxml, Object... params);
-
-	PasswordInputCallback getPasswordInputCallback();
-
+	public Exception getException() {
+		return exception;
+	}
+	
+	public R getResult() {
+		return result;
+	}
+	
+	public OperationStatus getStatus() {
+		return status;
+	}
+	
 }

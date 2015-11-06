@@ -30,7 +30,7 @@ public abstract class UIOperation<R> {
 
 	private Object lock = new Object();
 
-	private volatile R result = null;
+	private volatile OperationResult<R> result = null;
 
 	/**
 	 * Once the UIOperation has been instanciated and initialized, the UIFlow will call the "waitEnd()" method.
@@ -38,7 +38,7 @@ public abstract class UIOperation<R> {
 	 * @return
 	 * @throws InterruptedException
 	 */
-	public final R waitEnd() throws InterruptedException {
+	public final OperationResult<R> waitEnd() throws InterruptedException {
 		String name = getOperationName();
 
 		logger.info("Thread " + Thread.currentThread().getName() + " wait on " + name);
@@ -56,12 +56,19 @@ public abstract class UIOperation<R> {
 	 */
 	protected final void signalEnd(R result) {
 		String name = getOperationName();
-
-		this.result = result;
 		logger.info("Notify from " + Thread.currentThread().getName() + " on " + name);
+		notifyResult(new OperationResult<>(result));
+	}
+
+	private void notifyResult(OperationResult<R> result) {
+		this.result = result;
 		synchronized (lock) {
 			lock.notify();
 		}
+	}
+	
+	public final void signalUserCancel() {
+		notifyResult(new OperationResult<>(OperationStatus.USER_CANCEL));
 	}
 
 	private String getOperationName() {

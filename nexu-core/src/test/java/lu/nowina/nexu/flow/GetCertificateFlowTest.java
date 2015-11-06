@@ -37,6 +37,7 @@ import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.view.core.OperationResult;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 public class GetCertificateFlowTest {
@@ -62,7 +63,7 @@ public class GetCertificateFlowTest {
 	public void testNotRecognizedRequestSupport() {
 
 		UIDisplay display = mock(UIDisplay.class);
-		when(display.displayAndWaitUIOperation(eq("/fxml/unsupported-product.fxml"))).thenReturn(false);
+		when(display.displayAndWaitUIOperation(eq("/fxml/unsupported-product.fxml"))).thenReturn(new OperationResult<>(false));
 
 		NexuAPI api = mock(NexuAPI.class);
 		when(api.detectCards()).thenReturn(Arrays.asList(new DetectedCard("atr", 0)));
