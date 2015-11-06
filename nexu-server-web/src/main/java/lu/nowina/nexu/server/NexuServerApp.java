@@ -13,13 +13,13 @@
  */
 package lu.nowina.nexu.server;
 
-import java.util.logging.Logger;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.transport.servlet.CXFServlet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -47,7 +47,7 @@ import lu.nowina.nexu.server.api.ws.FeedbackEndpoint;
 @ImportResource({ "classpath:META-INF/cxf/cxf.xml" })
 public class NexuServerApp extends SpringBootServletInitializer {
 
-	private static final Logger logger = Logger.getLogger(NexuServerApp.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(NexuServerApp.class.getName());
 
 	@Autowired
 	private ApplicationContext applicationContext;
