@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>lu.nowina.apps</groupId>
 		<artifactId>nexu</artifactId>
-		<version>1.1-SNAPSHOT</version>
+		<version>1.0.RC2</version>
 	</parent>
 	<artifactId>nexu-core</artifactId>
 
@@ -12,12 +12,12 @@
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
 			<artifactId>nexu-api</artifactId>
-			<version>1.1-SNAPSHOT</version>
+			<version>1.0.RC2</version>
 		</dependency>
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
 			<artifactId>nexu-ws-client</artifactId>
-			<version>1.1-SNAPSHOT</version>
+			<version>1.0.RC2</version>
 		</dependency>
 		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
 			<artifactId>nexu-model</artifactId>
-			<version>1.1-SNAPSHOT</version>
+			<version>1.0.RC2</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-httpclient</groupId>
