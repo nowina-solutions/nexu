@@ -76,7 +76,7 @@ public class RestHttpPlugin implements HttpPlugin {
 
 	private HttpResponse signRequest(NexuAPI api, HttpRequest req, String payload) {
 		logger.info("Signature");
-		SignatureRequest r = new SignatureRequest();
+		final SignatureRequest r;
 		if (StringUtils.isEmpty(payload)) {
 			r = new SignatureRequest();
 
