@@ -31,6 +31,7 @@ import javafx.stage.Stage;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
 import lu.nowina.nexu.api.plugin.SignaturePlugin;
+import lu.nowina.nexu.flow.BasicFlowRegistry;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.generic.HttpDataLoader;
 import lu.nowina.nexu.generic.SCDatabase;
@@ -80,7 +81,7 @@ public class NexUApp extends Application implements UIDisplay {
 			DatabaseWebLoader loader = new DatabaseWebLoader(getConfig(), new HttpDataLoader());
 			loader.start();
 
-			InternalAPI api = new InternalAPI(this, prefs, db, detector, loader);
+			InternalAPI api = new InternalAPI(this, prefs, db, detector, loader, new BasicFlowRegistry());
 
 			for (String key : getProperties().stringPropertyNames()) {
 				if (key.startsWith("plugin_")) {

@@ -31,7 +31,7 @@ import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.view.core.OperationResult;
 import lu.nowina.nexu.view.core.UIDisplay;
 
-public class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse> {
+class SignatureFlow extends TokenFlow<SignatureRequest, SignatureResponse> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SignatureFlow.class.getName());
 

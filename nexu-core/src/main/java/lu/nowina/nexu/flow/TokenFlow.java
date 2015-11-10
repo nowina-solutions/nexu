@@ -49,7 +49,7 @@ import lu.nowina.nexu.view.core.UIFlow;
  * @param <O>
  *            The response for the request
  */
-public abstract class TokenFlow<I, O> extends UIFlow<I, O> {
+abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 
 	private static final Logger logger = LoggerFactory.getLogger(TokenFlow.class.getName());
 

@@ -33,7 +33,7 @@ import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.view.core.OperationResult;
 import lu.nowina.nexu.view.core.UIDisplay;
 
-public class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCertificateResponse> {
+class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCertificateResponse> {
 
 	static final Logger logger = LoggerFactory.getLogger(GetCertificateFlow.class);
 

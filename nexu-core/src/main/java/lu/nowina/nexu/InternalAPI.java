@@ -36,8 +36,7 @@ import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
-import lu.nowina.nexu.flow.GetCertificateFlow;
-import lu.nowina.nexu.flow.SignatureFlow;
+import lu.nowina.nexu.flow.FlowRegistry;
 import lu.nowina.nexu.generic.ConnectionInfo;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.generic.GenericCardAdapter;
@@ -71,13 +70,16 @@ public class InternalAPI implements NexuAPI {
 	private SCDatabase myDatabase;
 
 	private DatabaseWebLoader webDatabase;
+	
+	private FlowRegistry flowRegistry;
 
-	public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store, CardDetector detector, DatabaseWebLoader webLoader) {
+	public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store, CardDetector detector, DatabaseWebLoader webLoader, FlowRegistry flowRegistry) {
 		this.display = display;
 		this.prefs = prefs;
 		this.myDatabase = store;
 		this.detector = detector;
 		this.webDatabase = webLoader;
+		this.flowRegistry = flowRegistry;
 	}
 
 	@Override
@@ -174,14 +176,14 @@ public class InternalAPI implements NexuAPI {
 	@Override
 	public Execution<GetCertificateResponse> getCertificate(GetCertificateRequest request) {
 
-		GetCertificateFlow flow = new GetCertificateFlow(display);
+		UIFlow<GetCertificateRequest, GetCertificateResponse> flow = flowRegistry.getFlow(FlowRegistry.CERTIFICATE_FLOW, display);
 		return executeRequest(flow, request);
 	}
 
 	@Override
 	public Execution<SignatureResponse> sign(SignatureRequest request) {
 
-		SignatureFlow flow = new SignatureFlow(display);
+		UIFlow<SignatureRequest, SignatureResponse> flow = flowRegistry.getFlow(FlowRegistry.CERTIFICATE_FLOW, display);
 		return executeRequest(flow, request);
 
 	}
