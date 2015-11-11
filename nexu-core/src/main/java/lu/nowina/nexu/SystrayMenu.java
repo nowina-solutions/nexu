@@ -11,7 +11,7 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.view;
+package lu.nowina.nexu;
 
 import java.awt.AWTException;
 import java.awt.Image;
@@ -31,7 +31,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
-import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.ui.AboutController;
 import lu.nowina.nexu.view.ui.PreferencesController;
 
@@ -47,7 +46,7 @@ public class SystrayMenu {
 
 	private MenuItem preferencesItem;
 
-	public SystrayMenu(UIDisplay display, DatabaseWebLoader webLoader) {
+	public SystrayMenu(NexUApp display, DatabaseWebLoader webLoader) {
 
 		if (SystemTray.isSupported()) {
 

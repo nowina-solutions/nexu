@@ -188,13 +188,13 @@ abstract class TokenFlow<I, O> extends UIFlow<I, O> {
 		case MSCAPI:
 			return api.registerTokenConnection(new MSCAPISignatureToken());
 		case PKCS_11:
-			OperationResult<Pkcs11Params> op2 = displayAndWaitUIOperation("/fxml/pkcs11-params.fxml"); 
+			OperationResult<Pkcs11Params> op2 = displayAndWaitUIOperation("/fxml/pkcs11-params.fxml");
 			Pkcs11Params pkcs11Params = op2.getResult();
 			String absolutePath = pkcs11Params.getPkcs11Lib().getAbsolutePath();
 			this.apiParams = absolutePath;
 			return api.registerTokenConnection(new Pkcs11SignatureToken(absolutePath, getPasswordInputCallback()));
 		case PKCS_12:
-			OperationResult<KeystoreParams> op3 = displayAndWaitUIOperation("/fxml/pkcs11-params.fxml"); 
+			OperationResult<KeystoreParams> op3 = displayAndWaitUIOperation("/fxml/pkcs11-params.fxml");
 			KeystoreParams keysToreParams = op3.getResult();
 			return api.registerTokenConnection(new Pkcs12SignatureToken(keysToreParams.getPassword(), keysToreParams.getPkcs12File()));
 		}

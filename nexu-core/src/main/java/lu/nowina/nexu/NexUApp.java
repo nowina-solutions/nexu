@@ -36,7 +36,6 @@ import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.generic.HttpDataLoader;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCDatabaseLoader;
-import lu.nowina.nexu.view.SystrayMenu;
 import lu.nowina.nexu.view.core.OperationResult;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
@@ -48,7 +47,7 @@ public class NexUApp extends Application implements UIDisplay {
 	private Stage stage;
 
 	private UIOperation<?> currentOperation;
-	
+
 	private AppConfig getConfig() {
 		return NexuLauncher.getConfig();
 	}
@@ -56,7 +55,7 @@ public class NexUApp extends Application implements UIDisplay {
 	private Properties getProperties() {
 		return NexuLauncher.getProperties();
 	}
-	
+
 	@Override
 	public void start(Stage primaryStage) {
 		Platform.setImplicitExit(false);
@@ -171,8 +170,7 @@ public class NexUApp extends Application implements UIDisplay {
 		}
 	}
 
-	@Override
-	public void display(Parent panel) {
+	void display(Parent panel) {
 		logger.info("Display " + panel + " in display " + this + " from Thread " + Thread.currentThread().getName());
 		Platform.runLater(() -> {
 			logger.info("Display " + panel + " in display " + this + " from Thread " + Thread.currentThread().getName());
@@ -195,15 +193,14 @@ public class NexUApp extends Application implements UIDisplay {
 			stage.hide();
 			e.consume();
 
-			if(currentOperation != null) {
+			if (currentOperation != null) {
 				currentOperation.signalUserCancel();
 			}
-			
+
 		});
 		return newStage;
 	}
 
-	@Override
 	public void displayWaitingPane() {
 	}
 
@@ -216,7 +213,7 @@ public class NexUApp extends Application implements UIDisplay {
 			stage = createStage();
 			oldStage.hide();
 		});
-		
+
 	}
 
 	@Override
@@ -245,7 +242,7 @@ public class NexUApp extends Application implements UIDisplay {
 		try {
 			logger.info("Wait on Thread " + Thread.currentThread().getName());
 			controller.init(params);
-			currentOperation = controller; 
+			currentOperation = controller;
 			OperationResult<T> result = controller.waitEnd();
 			currentOperation = null;
 			displayWaitingPane();

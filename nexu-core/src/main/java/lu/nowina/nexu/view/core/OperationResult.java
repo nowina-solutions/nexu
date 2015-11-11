@@ -16,16 +16,16 @@ package lu.nowina.nexu.view.core;
 public class OperationResult<R> {
 
 	private R result;
-	
+
 	private OperationStatus status;
-	
+
 	private Exception exception;
 
 	public OperationResult(R result) {
 		this.status = OperationStatus.SUCCESS;
 		this.result = result;
 	}
-	
+
 	public OperationResult(Exception ex) {
 		this.status = OperationStatus.EXCEPTION;
 		this.exception = ex;
@@ -38,13 +38,13 @@ public class OperationResult<R> {
 	public Exception getException() {
 		return exception;
 	}
-	
+
 	public R getResult() {
 		return result;
 	}
-	
+
 	public OperationStatus getStatus() {
 		return status;
 	}
-	
+
 }

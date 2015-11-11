@@ -32,7 +32,7 @@ public class AppConfig {
 	private String nexuUrl;
 
 	private String httpServerClass;
-	
+
 	private boolean debug;
 
 	public String getBindingIP() {

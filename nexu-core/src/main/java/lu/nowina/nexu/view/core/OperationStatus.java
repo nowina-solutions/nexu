@@ -15,6 +15,6 @@ package lu.nowina.nexu.view.core;
 
 public enum OperationStatus {
 
-	SUCCESS,EXCEPTION,USER_CANCEL
-	
+	SUCCESS, EXCEPTION, USER_CANCEL
+
 }

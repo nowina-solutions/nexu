@@ -70,10 +70,11 @@ public class InternalAPI implements NexuAPI {
 	private SCDatabase myDatabase;
 
 	private DatabaseWebLoader webDatabase;
-	
+
 	private FlowRegistry flowRegistry;
 
-	public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store, CardDetector detector, DatabaseWebLoader webLoader, FlowRegistry flowRegistry) {
+	public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store, CardDetector detector, DatabaseWebLoader webLoader,
+			FlowRegistry flowRegistry) {
 		this.display = display;
 		this.prefs = prefs;
 		this.myDatabase = store;
@@ -208,11 +209,11 @@ public class InternalAPI implements NexuAPI {
 			myDatabase.add(detectedAtr, cInfo);
 		}
 	}
-	
+
 	public DatabaseWebLoader getWebDatabase() {
 		return webDatabase;
 	}
-	
+
 	public UserPreferences getPrefs() {
 		return prefs;
 	}

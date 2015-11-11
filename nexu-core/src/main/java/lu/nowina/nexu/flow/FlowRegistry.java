@@ -19,9 +19,9 @@ import lu.nowina.nexu.view.core.UIFlow;
 public interface FlowRegistry {
 
 	static final String SIGNATURE_FLOW = "signature";
-	
+
 	static final String CERTIFICATE_FLOW = "certificate";
-	
-	<I,O> UIFlow<I,O> getFlow(String code, UIDisplay display);
-	
+
+	<I, O> UIFlow<I, O> getFlow(String code, UIDisplay display);
+
 }

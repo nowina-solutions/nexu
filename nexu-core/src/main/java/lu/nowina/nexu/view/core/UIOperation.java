@@ -66,7 +66,7 @@ public abstract class UIOperation<R> {
 			lock.notify();
 		}
 	}
-	
+
 	public final void signalUserCancel() {
 		notifyResult(new OperationResult<>(OperationStatus.USER_CANCEL));
 	}

@@ -69,11 +69,17 @@ public abstract class UIFlow<I, O> {
 	protected abstract O process(NexuAPI api, I input) throws NexuException;
 
 	protected <T> OperationResult<T> displayAndWaitUIOperation(String fxml, Object... params) {
-		return display.displayAndWaitUIOperation(fxml, params);
+		OperationResult<T> result = display.displayAndWaitUIOperation(fxml, params);
+		onUIFinish(result);
+		return result;
 	}
 
 	protected PasswordInputCallback getPasswordInputCallback() {
 		return display.getPasswordInputCallback();
+	}
+
+	protected <T> void onUIFinish(OperationResult<T> result) {
+
 	}
 
 }
