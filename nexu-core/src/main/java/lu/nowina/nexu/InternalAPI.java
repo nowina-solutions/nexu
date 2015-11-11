@@ -208,5 +208,13 @@ public class InternalAPI implements NexuAPI {
 			myDatabase.add(detectedAtr, cInfo);
 		}
 	}
+	
+	public DatabaseWebLoader getWebDatabase() {
+		return webDatabase;
+	}
+	
+	public UserPreferences getPrefs() {
+		return prefs;
+	}
 
 }

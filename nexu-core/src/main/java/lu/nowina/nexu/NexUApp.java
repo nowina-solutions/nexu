@@ -65,47 +65,52 @@ public class NexUApp extends Application implements UIDisplay {
 
 		try {
 
-			File nexuHome = NexuLauncher.getNexuHome();
-			SCDatabase db = null;
-			if (nexuHome != null) {
-				File store = new File(nexuHome, "store.xml");
-				logger.info("Load database from " + store.getAbsolutePath());
-				db = SCDatabaseLoader.load(store);
-			} else {
-				db = new SCDatabase();
-			}
+			InternalAPI api = buildAPI();
 
-			UserPreferences prefs = new UserPreferences();
-			CardDetector detector = new CardDetector(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
-
-			DatabaseWebLoader loader = new DatabaseWebLoader(getConfig(), new HttpDataLoader());
-			loader.start();
-
-			InternalAPI api = new InternalAPI(this, prefs, db, detector, loader, new BasicFlowRegistry());
-
-			for (String key : getProperties().stringPropertyNames()) {
-				if (key.startsWith("plugin_")) {
-
-					String pluginClassName = getProperties().getProperty(key);
-					String pluginId = key.substring("plugin_".length());
-
-					logger.info(" + Plugin " + pluginClassName);
-					buildAndRegisterPlugin(api, pluginClassName, pluginId, false);
-
-				}
-			}
-
-			new SystrayMenu(this, loader);
+			new SystrayMenu(this, api.getWebDatabase());
 
 			logger.info("Start Jetty");
 
-			startHttpServer(prefs, api);
+			startHttpServer(api.getPrefs(), api);
 
 			logger.info("Start finished");
 
 		} catch (Exception e) {
 			logger.error("Cannot start", e);
 		}
+	}
+
+	protected InternalAPI buildAPI() throws IOException {
+		File nexuHome = NexuLauncher.getNexuHome();
+		SCDatabase db = null;
+		if (nexuHome != null) {
+			File store = new File(nexuHome, "store.xml");
+			logger.info("Load database from " + store.getAbsolutePath());
+			db = SCDatabaseLoader.load(store);
+		} else {
+			db = new SCDatabase();
+		}
+
+		UserPreferences prefs = new UserPreferences();
+		CardDetector detector = new CardDetector(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
+
+		DatabaseWebLoader loader = new DatabaseWebLoader(getConfig(), new HttpDataLoader());
+		loader.start();
+
+		InternalAPI api = new InternalAPI(this, prefs, db, detector, loader, new BasicFlowRegistry());
+
+		for (String key : getProperties().stringPropertyNames()) {
+			if (key.startsWith("plugin_")) {
+
+				String pluginClassName = getProperties().getProperty(key);
+				String pluginId = key.substring("plugin_".length());
+
+				logger.info(" + Plugin " + pluginClassName);
+				buildAndRegisterPlugin(api, pluginClassName, pluginId, false);
+
+			}
+		}
+		return api;
 	}
 
 	private void startHttpServer(UserPreferences prefs, InternalAPI api) {
