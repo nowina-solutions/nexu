@@ -53,6 +53,67 @@ public class Feedback {
 		setFeedbackStatus(FeedbackStatus.EXCEPTION);
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((apiParameter == null) ? 0 : apiParameter.hashCode());
+		result = prime * result + ((detected == null) ? 0 : detected.hashCode());
+		result = prime * result + ((feedbackStatus == null) ? 0 : feedbackStatus.hashCode());
+		result = prime * result + ((info == null) ? 0 : info.hashCode());
+		result = prime * result + ((selectedAPI == null) ? 0 : selectedAPI.hashCode());
+		result = prime * result + ((selectedCard == null) ? 0 : selectedCard.hashCode());
+		result = prime * result + ((stacktrace == null) ? 0 : stacktrace.hashCode());
+		result = prime * result + ((userComment == null) ? 0 : userComment.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Feedback other = (Feedback) obj;
+		if (apiParameter == null) {
+			if (other.apiParameter != null)
+				return false;
+		} else if (!apiParameter.equals(other.apiParameter))
+			return false;
+		if (detected == null) {
+			if (other.detected != null)
+				return false;
+		} else if (!detected.equals(other.detected))
+			return false;
+		if (feedbackStatus != other.feedbackStatus)
+			return false;
+		if (info == null) {
+			if (other.info != null)
+				return false;
+		} else if (!info.equals(other.info))
+			return false;
+		if (selectedAPI != other.selectedAPI)
+			return false;
+		if (selectedCard == null) {
+			if (other.selectedCard != null)
+				return false;
+		} else if (!selectedCard.equals(other.selectedCard))
+			return false;
+		if (stacktrace == null) {
+			if (other.stacktrace != null)
+				return false;
+		} else if (!stacktrace.equals(other.stacktrace))
+			return false;
+		if (userComment == null) {
+			if (other.userComment != null)
+				return false;
+		} else if (!userComment.equals(other.userComment))
+			return false;
+		return true;
+	}
+
 	/**
 	 * Gets the value of the apiParameter property.
 	 * 

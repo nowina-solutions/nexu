@@ -13,18 +13,23 @@
  */
 package lu.nowina.nexu.view.core;
 
-import eu.europa.esig.dss.token.PasswordInputCallback;
-
 /**
- * Représente une interface graphique visible par l'utilisateur. On peut demander l'affichage d'un panel spécifique ou montrer des panels pré-définis.
+ * An <code>Operation</code> is an element of a {@link Flow}.
  * 
+ * <p>An <code>Operation</code> can be composed of several <code>Operation</code>s.
+ *
+ * @param <R> The return type of the operation.
+ *
+ * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public interface UIDisplay {
+public interface Operation<R> {
 
-	void close();
-
-	<T> void displayAndWaitUIOperation(UIOperation<T> operation);
-
-	PasswordInputCallback getPasswordInputCallback();
-
+	/**
+	 * Performs the operation and returns its result.
+	 * @return The result of the operation.
+	 * @throws InterruptedException If the thread was interrupted when performing
+	 * the operation.
+	 */
+	OperationResult<R> perform() throws InterruptedException;
+	
 }

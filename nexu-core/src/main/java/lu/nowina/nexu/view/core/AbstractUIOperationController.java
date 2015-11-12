@@ -13,18 +13,32 @@
  */
 package lu.nowina.nexu.view.core;
 
-import eu.europa.esig.dss.token.PasswordInputCallback;
-
 /**
- * Représente une interface graphique visible par l'utilisateur. On peut demander l'affichage d'un panel spécifique ou montrer des panels pré-définis.
- * 
+ * Convenient base class for {@link UIOperationController}.
+ *
+ * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public interface UIDisplay {
+public abstract class AbstractUIOperationController<R> implements UIOperationController<R> {
 
-	void close();
+	private UIOperation<R> uiOperation;
+	
+	public AbstractUIOperationController() {
+		super();
+	}
 
-	<T> void displayAndWaitUIOperation(UIOperation<T> operation);
-
-	PasswordInputCallback getPasswordInputCallback();
-
+	@Override
+	public final void setUIOperation(final UIOperation<R> uiOperation) {
+		this.uiOperation = uiOperation;
+	}
+	
+	protected final void signalEnd(R result) {
+		uiOperation.signalEnd(result);
+	}
+	
+	/**
+	 * This implementation does nothing.
+	 */
+	public void init(Object... params) {
+		// Do nothing by contract
+	}
 }

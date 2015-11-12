@@ -17,10 +17,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -29,9 +25,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
-import lu.nowina.nexu.view.core.UIOperation;
+import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
-public class KeySelectionController extends UIOperation<DSSPrivateKeyEntry> implements Initializable {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
+
+public class KeySelectionController extends AbstractUIOperationController<DSSPrivateKeyEntry> implements Initializable {
 
 	private static final Logger logger = LoggerFactory.getLogger(KeySelectionController.class.getName());
 
@@ -77,6 +78,7 @@ public class KeySelectionController extends UIOperation<DSSPrivateKeyEntry> impl
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void init(Object... params) {
 		List<DSSPrivateKeyEntry> keys = (List<DSSPrivateKeyEntry>) params[0];
 		ObservableList<DSSPrivateKeyEntry> items = FXCollections.observableArrayList(keys);

@@ -18,6 +18,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +46,7 @@ import lu.nowina.nexu.generic.GenericCardAdapter;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCInfo;
 import lu.nowina.nexu.view.core.UIDisplay;
-import lu.nowina.nexu.view.core.UIFlow;
+import lu.nowina.nexu.view.core.Flow;
 
 /**
  * Implementation of the NexuAPI
@@ -73,6 +76,10 @@ public class InternalAPI implements NexuAPI {
 
 	private FlowRegistry flowRegistry;
 
+	private ExecutorService executor;
+
+	private Future<?> currentTask;
+
 	public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store, CardDetector detector, DatabaseWebLoader webLoader,
 			FlowRegistry flowRegistry) {
 		this.display = display;
@@ -81,6 +88,8 @@ public class InternalAPI implements NexuAPI {
 		this.detector = detector;
 		this.webDatabase = webLoader;
 		this.flowRegistry = flowRegistry;
+		this.executor = Executors.newSingleThreadExecutor();
+		this.currentTask = null;
 	}
 
 	@Override
@@ -148,13 +157,24 @@ public class InternalAPI implements NexuAPI {
 		return connections.get(tokenId);
 	}
 
-	private <I, O> Execution<O> executeRequest(UIFlow<I, O> flow, I request) {
+	private <I, O> Execution<O> executeRequest(Flow<I, O> flow, I request) {
+		final Execution<O> resp = new Execution<>();
 
-		Execution<O> resp = new Execution<>();
 		try {
+			final Future<O> task;
+			// Prevent race condition on currentTask
+			synchronized (this) {
+				if((currentTask != null) && !currentTask.isDone()) {
+					currentTask.cancel(true);
+				}
 
-			O response = flow.execute(this, request);
-
+				task = executor.submit(() -> {
+					return flow.execute(this, request);
+				});
+				currentTask = task;
+			}
+			
+			final O response = task.get();
 			if (response != null) {
 				resp.setSuccess(true);
 				resp.setResponse(response);
@@ -163,28 +183,27 @@ public class InternalAPI implements NexuAPI {
 				resp.setError("no_response");
 				resp.setErrorMessage("No response");
 			}
-
-		} catch (Exception e) {
+			return resp;
+		}  catch (Exception e) {
 			logger.error("Cannot execute get certificates", e);
 			resp.setSuccess(false);
 			resp.setError("exception");
 			resp.setErrorMessage("Exception during execution");
+			return resp;
 		}
-
-		return resp;
 	}
 
 	@Override
 	public Execution<GetCertificateResponse> getCertificate(GetCertificateRequest request) {
 
-		UIFlow<GetCertificateRequest, GetCertificateResponse> flow = flowRegistry.getFlow(FlowRegistry.CERTIFICATE_FLOW, display);
+		Flow<GetCertificateRequest, GetCertificateResponse> flow = flowRegistry.getFlow(FlowRegistry.CERTIFICATE_FLOW, display);
 		return executeRequest(flow, request);
 	}
 
 	@Override
 	public Execution<SignatureResponse> sign(SignatureRequest request) {
 
-		UIFlow<SignatureRequest, SignatureResponse> flow = flowRegistry.getFlow(FlowRegistry.CERTIFICATE_FLOW, display);
+		Flow<SignatureRequest, SignatureResponse> flow = flowRegistry.getFlow(FlowRegistry.SIGNATURE_FLOW, display);
 		return executeRequest(flow, request);
 
 	}

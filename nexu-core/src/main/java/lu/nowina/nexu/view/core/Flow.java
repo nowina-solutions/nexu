@@ -13,32 +13,20 @@
  */
 package lu.nowina.nexu.view.core;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import eu.europa.esig.dss.token.PasswordInputCallback;
 import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.NexuAPI;
+import eu.europa.esig.dss.token.PasswordInputCallback;
 
 /**
- * Represent the flow of UI of a complete operation.
+ * A flow is a sequence of {@link Operation}.
  * 
  * @author David Naramski
- *
  */
-public abstract class UIFlow<I, O> {
-
-	private static final Logger logger = LoggerFactory.getLogger(UIFlow.class.getName());
+public abstract class Flow<I, O> {
 
 	private UIDisplay display;
 
-	private ExecutorService executor = Executors.newSingleThreadExecutor();
-
-	public UIFlow(UIDisplay display) {
+	public Flow(UIDisplay display) {
 		if (display == null) {
 			throw new IllegalArgumentException("display cannot be null");
 		}
@@ -46,30 +34,15 @@ public abstract class UIFlow<I, O> {
 	}
 
 	public final O execute(NexuAPI api, I input) {
-
-		try {
-
-			Future<O> task = executor.submit(() -> {
-				O out = process(api, input);
-				display.close();
-				return out;
-			});
-
-			return task.get();
-
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-
+		final O out = process(api, input);
+		display.close();
+		return out;
 	}
 
-	/**
-	 * Méthode déclenchée pour démarrer le process. Les variables environement et dialogDisplays sont déjà initialisée.
-	 */
 	protected abstract O process(NexuAPI api, I input) throws NexuException;
 
 	protected <T> OperationResult<T> displayAndWaitUIOperation(String fxml, Object... params) {
-		OperationResult<T> result = display.displayAndWaitUIOperation(fxml, params);
+		OperationResult<T> result = new UIOperation<T>(display, fxml, params).perform();
 		onUIFinish(result);
 		return result;
 	}

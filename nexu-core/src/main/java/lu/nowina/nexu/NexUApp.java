@@ -18,13 +18,8 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import eu.europa.esig.dss.token.PasswordInputCallback;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -39,6 +34,11 @@ import lu.nowina.nexu.generic.SCDatabaseLoader;
 import lu.nowina.nexu.view.core.OperationResult;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.europa.esig.dss.token.PasswordInputCallback;
 
 public class NexUApp extends Application implements UIDisplay {
 
@@ -129,6 +129,7 @@ public class NexUApp extends Application implements UIDisplay {
 	 * 
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	private HttpServer buildHttpServer() {
 		try {
 			Class<HttpServer> cla = (Class<HttpServer>) Class.forName(getConfig().getHttpServerClass());
@@ -221,32 +222,18 @@ public class NexUApp extends Application implements UIDisplay {
 		logger.warn("Can only happen with explicite user request");
 	}
 
-	public <T extends Object> OperationResult<T> displayAndWaitUIOperation(String fxml, Object... params) {
-
-		logger.info("Loading " + fxml + " view");
-		FXMLLoader loader = new FXMLLoader();
-		try {
-			loader.load(getClass().getResourceAsStream(fxml));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		Parent root = loader.getRoot();
-		UIOperation<T> controller = loader.getController();
-
-		display(root);
-		return waitForUser(controller, params);
+	public <T> void displayAndWaitUIOperation(final UIOperation<T> operation) {
+		display(operation.getRoot());
+		waitForUser(operation);
 	}
 
-	private <T> OperationResult<T> waitForUser(UIOperation<T> controller, Object... params) {
+	private <T> void waitForUser(UIOperation<T> operation) {
 		try {
 			logger.info("Wait on Thread " + Thread.currentThread().getName());
-			controller.init(params);
-			currentOperation = controller;
-			OperationResult<T> result = controller.waitEnd();
+			currentOperation = operation;
+			operation.waitEnd();
 			currentOperation = null;
 			displayWaitingPane();
-			return result;
 		} catch (InterruptedException e) {
 			throw new RuntimeException();
 		}
@@ -256,7 +243,8 @@ public class NexUApp extends Application implements UIDisplay {
 		@Override
 		public char[] getPassword() {
 			logger.info("Request password");
-			OperationResult<char[]> passwordResult = displayAndWaitUIOperation("/fxml/password-input.fxml");
+			OperationResult<char[]> passwordResult =
+					new UIOperation<char[]>(NexUApp.this, "/fxml/password-input.fxml").perform();
 			return passwordResult.getResult();
 		}
 	}

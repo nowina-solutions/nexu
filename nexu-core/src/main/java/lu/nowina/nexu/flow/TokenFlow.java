@@ -37,7 +37,7 @@ import lu.nowina.nexu.model.KeystoreParams;
 import lu.nowina.nexu.model.Pkcs11Params;
 import lu.nowina.nexu.view.core.OperationResult;
 import lu.nowina.nexu.view.core.UIDisplay;
-import lu.nowina.nexu.view.core.UIFlow;
+import lu.nowina.nexu.view.core.Flow;
 
 /**
  * Most of the Flow executed by NexU use SignatureTokenConnection.
@@ -49,7 +49,7 @@ import lu.nowina.nexu.view.core.UIFlow;
  * @param <O>
  *            The response for the request
  */
-abstract class TokenFlow<I, O> extends UIFlow<I, O> {
+abstract class TokenFlow<I, O> extends Flow<I, O> {
 
 	private static final Logger logger = LoggerFactory.getLogger(TokenFlow.class.getName());
 

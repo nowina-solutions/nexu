@@ -14,7 +14,7 @@
 package lu.nowina.nexu.flow;
 
 import lu.nowina.nexu.view.core.UIDisplay;
-import lu.nowina.nexu.view.core.UIFlow;
+import lu.nowina.nexu.view.core.Flow;
 
 public interface FlowRegistry {
 
@@ -22,6 +22,6 @@ public interface FlowRegistry {
 
 	static final String CERTIFICATE_FLOW = "certificate";
 
-	<I, O> UIFlow<I, O> getFlow(String code, UIDisplay display);
+	<I, O> Flow<I, O> getFlow(String code, UIDisplay display);
 
 }

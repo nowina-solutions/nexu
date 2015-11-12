@@ -15,66 +15,82 @@ package lu.nowina.nexu.flow;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import eu.europa.esig.dss.token.JKSSignatureToken;
-import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Feedback;
+import lu.nowina.nexu.api.FeedbackStatus;
 import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.view.core.OperationResult;
+import lu.nowina.nexu.view.core.OperationStatus;
 import lu.nowina.nexu.view.core.UIDisplay;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.powermock.api.mockito.PowerMockito;
+
+import eu.europa.esig.dss.token.JKSSignatureToken;
+import eu.europa.esig.dss.token.SignatureTokenConnection;
 
 public class GetCertificateFlowTest {
 
 	@Test
-	public void testNoProduct() {
+	public void testNoProduct() throws Exception {
 
-		UIDisplay display = mock(UIDisplay.class);
+		UIDisplay display = PowerMockito.mock(UIDisplay.class);
 
-		NexuAPI api = mock(NexuAPI.class);
-		when(api.detectCards()).thenReturn(Collections.emptyList());
+		NexuAPI api = PowerMockito.mock(NexuAPI.class);
+		PowerMockito.when(api.detectCards()).thenReturn(Collections.emptyList());
 
 		GetCertificateRequest req = new GetCertificateRequest();
 
-		GetCertificateFlow flow = new GetCertificateFlow(display);
+		GetCertificateFlow flow = PowerMockito.spy(new GetCertificateFlow(display));
+		
+		final Feedback feedback = new Feedback();
+		feedback.setFeedbackStatus(FeedbackStatus.NO_PRODUCT_FOUND);
+		PowerMockito.doReturn(new OperationResult<Void>(OperationStatus.SUCCESS)).when(
+				flow, "displayAndWaitUIOperation", "/fxml/provide-feedback.fxml", feedback);
+		
+		PowerMockito.doReturn(new OperationResult<Void>(OperationStatus.SUCCESS)).when(
+				flow, "displayAndWaitUIOperation", "/fxml/message.fxml", "Finished");
+
 		GetCertificateResponse resp = flow.process(api, req);
 		Assert.assertNull(resp);
-
-		verify(display, atLeastOnce()).displayAndWaitUIOperation(eq("/fxml/provide-feedback.fxml"), any(Feedback.class));
 	}
 
 	@Test
-	public void testNotRecognizedRequestSupport() {
+	public void testNotRecognizedRequestSupport() throws Exception {
 
-		UIDisplay display = mock(UIDisplay.class);
-		when(display.displayAndWaitUIOperation(eq("/fxml/unsupported-product.fxml"))).thenReturn(new OperationResult<>(false));
+		UIDisplay display = PowerMockito.mock(UIDisplay.class);
 
-		NexuAPI api = mock(NexuAPI.class);
-		when(api.detectCards()).thenReturn(Arrays.asList(new DetectedCard("atr", 0)));
+		NexuAPI api = PowerMockito.mock(NexuAPI.class);
+		PowerMockito.when(api.detectCards()).thenReturn(Arrays.asList(new DetectedCard("atr", 0)));
 
 		GetCertificateRequest req = new GetCertificateRequest();
 
-		GetCertificateFlow flow = new GetCertificateFlow(display);
+		GetCertificateFlow flow = PowerMockito.spy(new GetCertificateFlow(display));
+		PowerMockito.doReturn(new OperationResult<>(false)).when(flow, "displayAndWaitUIOperation", "/fxml/unsupported-product.fxml");
+
+		final Feedback feedback = new Feedback();
+		feedback.setFeedbackStatus(FeedbackStatus.PRODUCT_NOT_SUPPORTED);
+		PowerMockito.doReturn(new OperationResult<Void>(OperationStatus.SUCCESS)).when(
+				flow, "displayAndWaitUIOperation", "/fxml/provide-feedback.fxml", feedback);
+		
+		PowerMockito.doReturn(new OperationResult<Void>(OperationStatus.SUCCESS)).when(
+				flow, "displayAndWaitUIOperation", "/fxml/message.fxml", "Finished");
+		
 		GetCertificateResponse resp = flow.process(api, req);
 		Assert.assertNull(resp);
-
-		verify(display, atLeastOnce()).displayAndWaitUIOperation(eq("/fxml/provide-feedback.fxml"), any(Feedback.class));
 	}
 
 	@Test

@@ -17,14 +17,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import lu.nowina.nexu.view.core.UIDisplay;
-import lu.nowina.nexu.view.core.UIFlow;
+import lu.nowina.nexu.view.core.Flow;
 
 public class BasicFlowRegistry implements FlowRegistry {
 
 	private static Logger logger = LoggerFactory.getLogger(BasicFlowRegistry.class.getName());
 
 	@Override
-	public UIFlow<?, ?> getFlow(String code, UIDisplay display) {
+	@SuppressWarnings("unchecked")
+	public Flow<?, ?> getFlow(String code, UIDisplay display) {
 		switch (code) {
 		case CERTIFICATE_FLOW:
 			return new GetCertificateFlow(display);

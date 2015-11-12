@@ -25,9 +25,9 @@ import javafx.scene.control.PasswordField;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import lu.nowina.nexu.model.KeystoreParams;
-import lu.nowina.nexu.view.core.UIOperation;
+import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
-public class KeystoreParamsController extends UIOperation<KeystoreParams> implements Initializable {
+public class KeystoreParamsController extends AbstractUIOperationController<KeystoreParams> implements Initializable {
 
 	@FXML
 	private Button ok;

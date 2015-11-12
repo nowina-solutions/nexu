@@ -24,9 +24,9 @@ import javafx.scene.control.Label;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import lu.nowina.nexu.model.Pkcs11Params;
-import lu.nowina.nexu.view.core.UIOperation;
+import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
-public class Pkcs11ParamsController extends UIOperation<Pkcs11Params> implements Initializable {
+public class Pkcs11ParamsController extends AbstractUIOperationController<Pkcs11Params> implements Initializable {
 
 	@FXML
 	private Button ok;

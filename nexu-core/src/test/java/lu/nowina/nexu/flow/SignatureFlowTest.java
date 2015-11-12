@@ -23,6 +23,7 @@ import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.powermock.api.mockito.PowerMockito;
 
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.ToBeSigned;
@@ -36,6 +37,8 @@ import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.view.core.OperationResult;
+import lu.nowina.nexu.view.core.OperationStatus;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 public class SignatureFlowTest {
@@ -62,7 +65,10 @@ public class SignatureFlowTest {
 		req.setToBeSigned(new ToBeSigned("hello".getBytes()));
 		req.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
-		SignatureFlow flow = new SignatureFlow(display);
+		SignatureFlow flow = PowerMockito.spy(new SignatureFlow(display));
+		PowerMockito.doReturn(new OperationResult<Void>(OperationStatus.SUCCESS)).when(
+				flow, "displayAndWaitUIOperation", "/fxml/message.fxml", "Signature performed");
+
 		SignatureResponse resp = flow.process(api, req);
 		Assert.assertNotNull(resp);
 		Assert.assertNotNull(resp.getSignatureValue());

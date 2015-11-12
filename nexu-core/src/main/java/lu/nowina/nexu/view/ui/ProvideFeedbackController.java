@@ -16,9 +16,6 @@ package lu.nowina.nexu.view.ui;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -28,9 +25,12 @@ import javafx.scene.control.TextArea;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackClient;
 import lu.nowina.nexu.api.FeedbackStatus;
-import lu.nowina.nexu.view.core.UIOperation;
+import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
-public class ProvideFeedbackController extends UIOperation<Feedback> implements Initializable {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class ProvideFeedbackController extends AbstractUIOperationController<Feedback> implements Initializable {
 
 	private static final Logger logger = LoggerFactory.getLogger(ProvideFeedbackController.class.getName());
 
