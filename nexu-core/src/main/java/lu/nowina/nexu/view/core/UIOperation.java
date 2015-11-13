@@ -39,18 +39,26 @@ public class UIOperation<R> implements Operation<R> {
 	private transient Object lock = new Object();
 	private transient volatile OperationResult<R> result = null;
 
-	private final UIDisplay display;
-	private final String fxml;
-	private final Object[] params;
+	private UIDisplay display;
+	private String fxml;
+	private Object[] params;
 	
 	private transient Parent root;
 	private transient UIOperationController<R> controller;
 	
-	public UIOperation(final UIDisplay display, final String fxml, final Object... params) {
+	public UIOperation() {
 		super();
-		this.display = display;
-		this.fxml = fxml;
-		this.params = params;
+	}
+	
+	public void setParams(final Object... params) {
+		if(params.length < 2) {
+			throw new IllegalArgumentException("An UIOperation needs at least the display and the fxml.");
+		}
+		this.display = (UIDisplay) params[0];
+		this.fxml = (String) params[1];
+		if(params.length > 2) {
+			this.params = (Object[]) params[2];
+		}
 	}
 	
 	@Override

@@ -21,14 +21,7 @@ import static org.mockito.Mockito.withSettings;
 
 import java.util.Arrays;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.powermock.api.mockito.PowerMockito;
-
-import eu.europa.esig.dss.DigestAlgorithm;
-import eu.europa.esig.dss.ToBeSigned;
-import eu.europa.esig.dss.token.JKSSignatureToken;
-import eu.europa.esig.dss.token.SignatureTokenConnection;
+import lu.nowina.nexu.AbstractConfigureLoggerTest;
 import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
@@ -37,13 +30,25 @@ import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.view.core.Operation;
+import lu.nowina.nexu.view.core.OperationFactory;
 import lu.nowina.nexu.view.core.OperationResult;
 import lu.nowina.nexu.view.core.OperationStatus;
 import lu.nowina.nexu.view.core.UIDisplay;
+import lu.nowina.nexu.view.core.UIOperation;
 
-public class SignatureFlowTest {
+import org.junit.Assert;
+import org.junit.Test;
+
+import eu.europa.esig.dss.DigestAlgorithm;
+import eu.europa.esig.dss.ToBeSigned;
+import eu.europa.esig.dss.token.JKSSignatureToken;
+import eu.europa.esig.dss.token.SignatureTokenConnection;
+
+public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testCardRecognized() throws Exception {
 
 		UIDisplay display = mock(UIDisplay.class);
@@ -65,10 +70,15 @@ public class SignatureFlowTest {
 		req.setToBeSigned(new ToBeSigned("hello".getBytes()));
 		req.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
-		SignatureFlow flow = PowerMockito.spy(new SignatureFlow(display));
-		PowerMockito.doReturn(new OperationResult<Void>(OperationStatus.SUCCESS)).when(
-				flow, "displayAndWaitUIOperation", "/fxml/message.fxml", "Signature performed");
+		Operation<Void> successOperation = mock(Operation.class);
+		when(successOperation.perform()).thenReturn(new OperationResult<Void>(OperationStatus.SUCCESS));
+		
+		OperationFactory operationFactory = mock(OperationFactory.class);
+		when(operationFactory.getOperation(UIOperation.class, display,
+				"/fxml/message.fxml", new Object[]{"Signature performed"})).thenReturn(successOperation);
 
+		SignatureFlow flow = new SignatureFlow(display);
+		flow.setOperationFactory(operationFactory);
 		SignatureResponse resp = flow.process(api, req);
 		Assert.assertNotNull(resp);
 		Assert.assertNotNull(resp.getSignatureValue());

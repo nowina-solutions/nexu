@@ -22,10 +22,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.EnvironmentInfo;
@@ -45,8 +41,14 @@ import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.generic.GenericCardAdapter;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCInfo;
-import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.Flow;
+import lu.nowina.nexu.view.core.OperationFactory;
+import lu.nowina.nexu.view.core.UIDisplay;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.europa.esig.dss.token.SignatureTokenConnection;
 
 /**
  * Implementation of the NexuAPI
@@ -76,18 +78,21 @@ public class InternalAPI implements NexuAPI {
 
 	private FlowRegistry flowRegistry;
 
+	private OperationFactory operationFactory;
+	
 	private ExecutorService executor;
 
 	private Future<?> currentTask;
 
 	public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store, CardDetector detector, DatabaseWebLoader webLoader,
-			FlowRegistry flowRegistry) {
+			FlowRegistry flowRegistry, OperationFactory operationFactory) {
 		this.display = display;
 		this.prefs = prefs;
 		this.myDatabase = store;
 		this.detector = detector;
 		this.webDatabase = webLoader;
 		this.flowRegistry = flowRegistry;
+		this.operationFactory = operationFactory;
 		this.executor = Executors.newSingleThreadExecutor();
 		this.currentTask = null;
 	}
@@ -197,6 +202,7 @@ public class InternalAPI implements NexuAPI {
 	public Execution<GetCertificateResponse> getCertificate(GetCertificateRequest request) {
 
 		Flow<GetCertificateRequest, GetCertificateResponse> flow = flowRegistry.getFlow(FlowRegistry.CERTIFICATE_FLOW, display);
+		flow.setOperationFactory(operationFactory);
 		return executeRequest(flow, request);
 	}
 
@@ -204,6 +210,7 @@ public class InternalAPI implements NexuAPI {
 	public Execution<SignatureResponse> sign(SignatureRequest request) {
 
 		Flow<SignatureRequest, SignatureResponse> flow = flowRegistry.getFlow(FlowRegistry.SIGNATURE_FLOW, display);
+		flow.setOperationFactory(operationFactory);
 		return executeRequest(flow, request);
 
 	}

@@ -25,6 +25,8 @@ import eu.europa.esig.dss.token.PasswordInputCallback;
 public abstract class Flow<I, O> {
 
 	private UIDisplay display;
+	
+	private OperationFactory operationFactory;
 
 	public Flow(UIDisplay display) {
 		if (display == null) {
@@ -33,6 +35,14 @@ public abstract class Flow<I, O> {
 		this.display = display;
 	}
 
+	public final void setOperationFactory(final OperationFactory operationFactory) {
+		this.operationFactory = operationFactory;
+	}
+	
+	protected final OperationFactory getOperationFactory() {
+		return operationFactory;
+	}
+	
 	public final O execute(NexuAPI api, I input) {
 		final O out = process(api, input);
 		display.close();
@@ -42,9 +52,15 @@ public abstract class Flow<I, O> {
 	protected abstract O process(NexuAPI api, I input) throws NexuException;
 
 	protected <T> OperationResult<T> displayAndWaitUIOperation(String fxml, Object... params) {
-		OperationResult<T> result = new UIOperation<T>(display, fxml, params).perform();
-		onUIFinish(result);
-		return result;
+		try {
+			@SuppressWarnings("unchecked")
+			final OperationResult<T> result =
+				operationFactory.getOperation(UIOperation.class, display, fxml, params).perform();
+			onUIFinish(result);
+			return result;
+		} catch(final InterruptedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	protected PasswordInputCallback getPasswordInputCallback() {

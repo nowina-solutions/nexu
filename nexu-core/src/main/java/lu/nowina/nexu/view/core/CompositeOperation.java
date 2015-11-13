@@ -14,32 +14,19 @@
 package lu.nowina.nexu.view.core;
 
 /**
- * An <code>Operation</code> is an element of a {@link Flow}.
- * 
- * <p>Each sub-class is expected to provide a no-arg constructor (parameters will
- * be provided thanks to the {@link #setParams(Object...)} method).
- *
- * @param <R> The return type of the operation.
+ * A <code>CompositeOperation</code> is composed of several {@link Operation}s.
+ * Hence it has a {@link #setOperationFactory(OperationFactory)} method to get the
+ * {@link OperationFactory} to use to create other {@link Operation}s.
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
- * 
- * @see CompositeOperation
  */
-public interface Operation<R> {
+public interface CompositeOperation<R> extends Operation<R> {
 
 	/**
-	 * Sets the parameters of the operation.
-	 * @param params The parameters of the operation. It can be <code>null</null>
-	 * if the operation does not accept any parameter.
+	 * Sets the {@link OperationFactory} to use to create other {@link Operation}s.
+	 * @param operationFactory The {@link OperationFactory} to use to create other
+	 * {@link Operation}s.
 	 */
-	void setParams(Object... params);
-	
-	/**
-	 * Performs the operation and returns its result.
-	 * @return The result of the operation.
-	 * @throws InterruptedException If the thread was interrupted when performing
-	 * the operation.
-	 */
-	OperationResult<R> perform() throws InterruptedException;
+	void setOperationFactory(OperationFactory operationFactory);
 	
 }

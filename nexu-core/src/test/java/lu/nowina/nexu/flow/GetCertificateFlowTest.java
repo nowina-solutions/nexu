@@ -22,6 +22,7 @@ import static org.mockito.Mockito.withSettings;
 import java.util.Arrays;
 import java.util.Collections;
 
+import lu.nowina.nexu.AbstractConfigureLoggerTest;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Feedback;
@@ -31,65 +32,81 @@ import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.view.core.Operation;
+import lu.nowina.nexu.view.core.OperationFactory;
 import lu.nowina.nexu.view.core.OperationResult;
 import lu.nowina.nexu.view.core.OperationStatus;
 import lu.nowina.nexu.view.core.UIDisplay;
+import lu.nowina.nexu.view.core.UIOperation;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.powermock.api.mockito.PowerMockito;
 
 import eu.europa.esig.dss.token.JKSSignatureToken;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 
-public class GetCertificateFlowTest {
+public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testNoProduct() throws Exception {
 
-		UIDisplay display = PowerMockito.mock(UIDisplay.class);
+		final UIDisplay display = mock(UIDisplay.class);
 
-		NexuAPI api = PowerMockito.mock(NexuAPI.class);
-		PowerMockito.when(api.detectCards()).thenReturn(Collections.emptyList());
+		final NexuAPI api = mock(NexuAPI.class);
+		when(api.detectCards()).thenReturn(Collections.emptyList());
 
-		GetCertificateRequest req = new GetCertificateRequest();
+		final OperationFactory operationFactory = mock(OperationFactory.class);
 
-		GetCertificateFlow flow = PowerMockito.spy(new GetCertificateFlow(display));
+		final Operation<Void> successOperation = mock(Operation.class);
+		when(successOperation.perform()).thenReturn(new OperationResult<Void>(OperationStatus.SUCCESS));
 		
 		final Feedback feedback = new Feedback();
 		feedback.setFeedbackStatus(FeedbackStatus.NO_PRODUCT_FOUND);
-		PowerMockito.doReturn(new OperationResult<Void>(OperationStatus.SUCCESS)).when(
-				flow, "displayAndWaitUIOperation", "/fxml/provide-feedback.fxml", feedback);
-		
-		PowerMockito.doReturn(new OperationResult<Void>(OperationStatus.SUCCESS)).when(
-				flow, "displayAndWaitUIOperation", "/fxml/message.fxml", "Finished");
+		when(operationFactory.getOperation(
+				UIOperation.class, display, "/fxml/provide-feedback.fxml", new Object[]{feedback})).thenReturn(successOperation);
 
-		GetCertificateResponse resp = flow.process(api, req);
+		when(operationFactory.getOperation(
+				UIOperation.class, display, "/fxml/message.fxml", new Object[]{"Finished"})).thenReturn(successOperation);
+		
+		final GetCertificateFlow flow = new GetCertificateFlow(display);
+		flow.setOperationFactory(operationFactory);
+		
+		final GetCertificateRequest req = new GetCertificateRequest();
+		final GetCertificateResponse resp = flow.process(api, req);
 		Assert.assertNull(resp);
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testNotRecognizedRequestSupport() throws Exception {
 
-		UIDisplay display = PowerMockito.mock(UIDisplay.class);
+		final UIDisplay display = mock(UIDisplay.class);
 
-		NexuAPI api = PowerMockito.mock(NexuAPI.class);
-		PowerMockito.when(api.detectCards()).thenReturn(Arrays.asList(new DetectedCard("atr", 0)));
+		final NexuAPI api = mock(NexuAPI.class);
+		when(api.detectCards()).thenReturn(Arrays.asList(new DetectedCard("atr", 0)));
 
-		GetCertificateRequest req = new GetCertificateRequest();
+		final OperationFactory operationFactory = mock(OperationFactory.class);
 
-		GetCertificateFlow flow = PowerMockito.spy(new GetCertificateFlow(display));
-		PowerMockito.doReturn(new OperationResult<>(false)).when(flow, "displayAndWaitUIOperation", "/fxml/unsupported-product.fxml");
+		final Operation<Boolean> returnFalseOperation = mock(Operation.class);
+		when(returnFalseOperation.perform()).thenReturn(new OperationResult<Boolean>(false));
+		when(operationFactory.getOperation(
+				UIOperation.class, display, "/fxml/unsupported-product.fxml", new Object[0])).thenReturn(returnFalseOperation);
 
+		final Operation<Void> successOperation = mock(Operation.class);
+		when(successOperation.perform()).thenReturn(new OperationResult<Void>(OperationStatus.SUCCESS));
 		final Feedback feedback = new Feedback();
 		feedback.setFeedbackStatus(FeedbackStatus.PRODUCT_NOT_SUPPORTED);
-		PowerMockito.doReturn(new OperationResult<Void>(OperationStatus.SUCCESS)).when(
-				flow, "displayAndWaitUIOperation", "/fxml/provide-feedback.fxml", feedback);
+		when(operationFactory.getOperation(
+				UIOperation.class, display, "/fxml/provide-feedback.fxml", new Object[]{feedback})).thenReturn(successOperation);
+		when(operationFactory.getOperation(
+				UIOperation.class, display, "/fxml/message.fxml", new Object[]{"Finished"})).thenReturn(successOperation);
 		
-		PowerMockito.doReturn(new OperationResult<Void>(OperationStatus.SUCCESS)).when(
-				flow, "displayAndWaitUIOperation", "/fxml/message.fxml", "Finished");
+		final GetCertificateFlow flow = new GetCertificateFlow(display);
+		flow.setOperationFactory(operationFactory);
 		
-		GetCertificateResponse resp = flow.process(api, req);
+		final GetCertificateRequest req = new GetCertificateRequest();
+		final GetCertificateResponse resp = flow.process(api, req);
 		Assert.assertNull(resp);
 	}
 

@@ -31,6 +31,8 @@ import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.generic.HttpDataLoader;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCDatabaseLoader;
+import lu.nowina.nexu.view.core.BasicOperationFactory;
+import lu.nowina.nexu.view.core.OperationFactory;
 import lu.nowina.nexu.view.core.OperationResult;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
@@ -46,6 +48,8 @@ public class NexUApp extends Application implements UIDisplay {
 
 	private Stage stage;
 
+	private OperationFactory operationFactory;
+	
 	private UIOperation<?> currentOperation;
 
 	private AppConfig getConfig() {
@@ -96,7 +100,8 @@ public class NexUApp extends Application implements UIDisplay {
 		DatabaseWebLoader loader = new DatabaseWebLoader(getConfig(), new HttpDataLoader());
 		loader.start();
 
-		InternalAPI api = new InternalAPI(this, prefs, db, detector, loader, new BasicFlowRegistry());
+		this.operationFactory = new BasicOperationFactory();
+		InternalAPI api = new InternalAPI(this, prefs, db, detector, loader, new BasicFlowRegistry(), this.operationFactory);
 
 		for (String key : getProperties().stringPropertyNames()) {
 			if (key.startsWith("plugin_")) {
@@ -243,9 +248,14 @@ public class NexUApp extends Application implements UIDisplay {
 		@Override
 		public char[] getPassword() {
 			logger.info("Request password");
-			OperationResult<char[]> passwordResult =
-					new UIOperation<char[]>(NexUApp.this, "/fxml/password-input.fxml").perform();
-			return passwordResult.getResult();
+			try {
+				@SuppressWarnings("unchecked")
+				final OperationResult<char[]> passwordResult = NexUApp.this.operationFactory.getOperation(
+						UIOperation.class, NexUApp.this, "/fxml/password-input.fxml").perform();
+				return passwordResult.getResult();
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 
