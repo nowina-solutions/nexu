@@ -51,20 +51,13 @@ public abstract class Flow<I, O> {
 
 	protected abstract O process(NexuAPI api, I input) throws NexuException;
 
+	@SuppressWarnings("unchecked")
 	protected <T> OperationResult<T> displayAndWaitUIOperation(String fxml, Object... params) {
-		@SuppressWarnings("unchecked")
-		final OperationResult<T> result =
-			operationFactory.getOperation(UIOperation.class, display, fxml, params).perform();
-		onUIFinish(result);
-		return result;
+		return operationFactory.getOperation(UIOperation.class, display, fxml, params).perform();
 	}
 
 	protected PasswordInputCallback getPasswordInputCallback() {
 		return display.getPasswordInputCallback();
-	}
-
-	protected <T> void onUIFinish(OperationResult<T> result) {
-
 	}
 
 }
