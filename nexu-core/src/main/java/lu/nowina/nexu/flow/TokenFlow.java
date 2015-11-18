@@ -192,13 +192,14 @@ abstract class TokenFlow<I, O> extends Flow<I, O> {
 			Pkcs11Params pkcs11Params = op2.getResult();
 			String absolutePath = pkcs11Params.getPkcs11Lib().getAbsolutePath();
 			this.apiParams = absolutePath;
-			return api.registerTokenConnection(new Pkcs11SignatureToken(absolutePath, getPasswordInputCallback()));
+			return api.registerTokenConnection(new Pkcs11SignatureToken(absolutePath, getDisplay().getPasswordInputCallback()));
 		case PKCS_12:
 			OperationResult<KeystoreParams> op3 = displayAndWaitUIOperation("/fxml/pkcs11-params.fxml");
 			KeystoreParams keysToreParams = op3.getResult();
 			return api.registerTokenConnection(new Pkcs12SignatureToken(keysToreParams.getPassword(), keysToreParams.getPkcs12File()));
+		default:
+			return null;
 		}
-		return null;
 	}
 
 	/**
@@ -233,7 +234,7 @@ abstract class TokenFlow<I, O> extends Flow<I, O> {
 			this.selectedCard = firstMatch.getCard();
 			CardAdapter adapter = firstMatch.getAdapter();
 
-			SignatureTokenConnection connect = adapter.connect(api, card, getPasswordInputCallback());
+			SignatureTokenConnection connect = adapter.connect(api, card, getDisplay().getPasswordInputCallback());
 			if (connect == null) {
 				logger.error("No connect returned");
 				throw new NullPointerException("Card adapter returned null");

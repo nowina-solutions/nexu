@@ -20,6 +20,8 @@ package lu.nowina.nexu.view.core;
  */
 public class BasicOperationFactory implements OperationFactory {
 
+	private UIDisplay display;
+	
 	public BasicOperationFactory() {
 		super();
 	}
@@ -29,6 +31,11 @@ public class BasicOperationFactory implements OperationFactory {
 		try {
 			final T operation = clazz.newInstance();
 			operation.setParams(params);
+			if(operation instanceof CompositeOperation) {
+				final CompositeOperation<R> compositeOperation = (CompositeOperation<R>) operation;
+				compositeOperation.setOperationFactory(this);
+				compositeOperation.setDisplay(display);
+			}
 			return operation;
 		} catch (InstantiationException e) {
 			throw new IllegalArgumentException(e);
@@ -38,18 +45,7 @@ public class BasicOperationFactory implements OperationFactory {
 	}
 
 	@Override
-	public <R, T extends CompositeOperation<R>> CompositeOperation<R> getCompositeOperation(
-			Class<T> clazz, Object... params) {
-		try {
-			final T operation = clazz.newInstance();
-			operation.setParams(params);
-			operation.setOperationFactory(this);
-			return operation;
-		} catch (InstantiationException e) {
-			throw new IllegalArgumentException(e);
-		} catch (IllegalAccessException e) {
-			throw new IllegalArgumentException(e);
-		}
+	public void setDisplay(UIDisplay display) {
+		this.display = display;
 	}
-
 }

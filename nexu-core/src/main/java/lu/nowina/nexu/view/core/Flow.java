@@ -15,7 +15,6 @@ package lu.nowina.nexu.view.core;
 
 import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.NexuAPI;
-import eu.europa.esig.dss.token.PasswordInputCallback;
 
 /**
  * A flow is a sequence of {@link Operation}.
@@ -56,8 +55,7 @@ public abstract class Flow<I, O> {
 		return operationFactory.getOperation(UIOperation.class, display, fxml, params).perform();
 	}
 
-	protected PasswordInputCallback getPasswordInputCallback() {
-		return display.getPasswordInputCallback();
+	protected final UIDisplay getDisplay() {
+		return display;
 	}
-
 }

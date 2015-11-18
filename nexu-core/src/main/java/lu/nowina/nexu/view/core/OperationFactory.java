@@ -22,8 +22,8 @@ public interface OperationFactory {
 
 	/**
 	 * Returns an instance of {@link Operation} initialized with <code>params</code>.
-	 * <p>The type of the returned instance is guaranteed to implement {@link Operation} but
-	 * its concrete type could be different from <code>clazz</code>.
+	 * <p>The type of the returned instance is guaranteed to implement {@link Operation}
+	 * or {@link CompositeOperation} but its concrete type could be different from <code>clazz</code>.
 	 * @param clazz The target operation type.
 	 * @param params The parameters to use to initialize the operation.
 	 * @return An instance of {@link Operation} initialized with <code>params</code>.
@@ -31,12 +31,9 @@ public interface OperationFactory {
 	<R, T extends Operation<R>> Operation<R> getOperation(Class<T> clazz, Object... params);
 	
 	/**
-	 * Returns an instance of {@link CompositeOperation} initialized with <code>params</code>.
-	 * <p>The type of the returned instance is guaranteed to implement {@link CompositeOperation} but
-	 * its concrete type could be different from <code>clazz</code>.
-	 * @param clazz The target operation type.
-	 * @param params The parameters to use to initialize the operation.
-	 * @return An instance of {@link CompositeOperation} initialized with <code>params</code>.
+	 * Sets the {@link UIDisplay} for {@link UIOperation}.
+	 * @param display The {@link UIDisplay} for {@link UIOperation}.
 	 */
-	<R, T extends CompositeOperation<R>> CompositeOperation<R> getCompositeOperation(Class<T> clazz, Object... params);
+	void setDisplay(UIDisplay display);
+	
 }

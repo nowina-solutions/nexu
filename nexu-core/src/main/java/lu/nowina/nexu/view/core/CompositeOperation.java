@@ -29,4 +29,10 @@ public interface CompositeOperation<R> extends Operation<R> {
 	 */
 	void setOperationFactory(OperationFactory operationFactory);
 	
+	/**
+	 * Sets the {@link UIDisplay} for {@link UIOperation}.
+	 * @param display The {@link UIDisplay} for {@link UIOperation}.
+	 */
+	void setDisplay(UIDisplay display);
+	
 }
