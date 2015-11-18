@@ -240,7 +240,7 @@ public class NexUApp extends Application implements UIDisplay {
 			currentOperation = null;
 			displayWaitingPane();
 		} catch (InterruptedException e) {
-			throw new RuntimeException();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -248,14 +248,10 @@ public class NexUApp extends Application implements UIDisplay {
 		@Override
 		public char[] getPassword() {
 			logger.info("Request password");
-			try {
-				@SuppressWarnings("unchecked")
-				final OperationResult<char[]> passwordResult = NexUApp.this.operationFactory.getOperation(
-						UIOperation.class, NexUApp.this, "/fxml/password-input.fxml").perform();
-				return passwordResult.getResult();
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			}
+			@SuppressWarnings("unchecked")
+			final OperationResult<char[]> passwordResult = NexUApp.this.operationFactory.getOperation(
+					UIOperation.class, NexUApp.this, "/fxml/password-input.fxml").perform();
+			return passwordResult.getResult();
 		}
 	}
 

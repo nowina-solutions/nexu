@@ -37,9 +37,7 @@ public interface Operation<R> {
 	/**
 	 * Performs the operation and returns its result.
 	 * @return The result of the operation.
-	 * @throws InterruptedException If the thread was interrupted when performing
-	 * the operation.
 	 */
-	OperationResult<R> perform() throws InterruptedException;
+	OperationResult<R> perform();
 	
 }
