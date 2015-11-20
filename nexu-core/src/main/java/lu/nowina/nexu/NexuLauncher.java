@@ -32,6 +32,8 @@ import lu.nowina.nexu.jetty.JettyServer;
 
 public class NexuLauncher {
 
+	private static final String ADVANCED_MODE_AVAILABLE = "advanced_mode_available";
+	
 	private static final String DEBUG = "debug";
 
 	private static final String HTTP_SERVER_CLASS = "http_server_class";
@@ -172,6 +174,7 @@ public class NexuLauncher {
 		config.setNexuUrl(props.getProperty(NEXU_URL, "http://localhost:9876"));
 		config.setHttpServerClass(props.getProperty(HTTP_SERVER_CLASS, JettyServer.class.getName()));
 		config.setDebug(Boolean.parseBoolean(props.getProperty(DEBUG, "false")));
+		config.setAdvancedModeAvailable(Boolean.parseBoolean(props.getProperty(ADVANCED_MODE_AVAILABLE, "true")));
 
 		return config;
 	}

@@ -13,16 +13,38 @@
  */
 package lu.nowina.nexu.flow.operation;
 
+import lu.nowina.nexu.api.DetectedCard;
+import lu.nowina.nexu.api.ScAPI;
+import lu.nowina.nexu.api.TokenId;
+
 /**
- * This enum gathers all possible result statuses for an {@link Operation}.
+ * Possible keys in the map returned by {@link CreateTokenOperation} and {@link GetTokenOperation}.
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public enum OperationStatus {
-
-	SUCCESS,
-	EXCEPTION,
-	USER_CANCEL,
-	FAILED;
-
+public enum TokenOperationResultKey {
+	/**
+	 * {@link TokenId}
+	 */
+	TOKEN_ID,
+	
+	/**
+	 * {@link Boolean}
+	 */
+	ADVANCED_CREATION,
+	
+	/**
+	 * {@link DetectedCard}
+	 */
+	SELECTED_CARD,
+	
+	/**
+	 * {@link ScAPI}
+	 */
+	SELECTED_API,
+	
+	/**
+	 * {@link String}
+	 */
+	SELECTED_API_PARAMS;
 }

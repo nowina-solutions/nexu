@@ -17,9 +17,7 @@ import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.flow.operation.Operation;
 import lu.nowina.nexu.flow.operation.OperationFactory;
-import lu.nowina.nexu.flow.operation.OperationResult;
 import lu.nowina.nexu.view.core.UIDisplay;
-import lu.nowina.nexu.view.core.UIOperation;
 
 /**
  * A flow is a sequence of {@link Operation}.
@@ -54,11 +52,6 @@ public abstract class Flow<I, O> {
 	}
 
 	protected abstract O process(NexuAPI api, I input) throws NexuException;
-
-	@SuppressWarnings("unchecked")
-	protected <T> OperationResult<T> displayAndWaitUIOperation(String fxml, Object... params) {
-		return operationFactory.getOperation(UIOperation.class, display, fxml, params).perform();
-	}
 
 	protected final UIDisplay getDisplay() {
 		return display;

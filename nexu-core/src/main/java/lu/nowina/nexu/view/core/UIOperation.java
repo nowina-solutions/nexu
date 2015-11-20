@@ -32,8 +32,15 @@ import org.slf4j.LoggerFactory;
  * When the user finished the operation, the {@link UIOperationController} notifies the <code>UIOperation</code>
  * through the method {@link #signalEnd(Object)}.
  * 
+ * <p>Expected parameters:
+ * <ol>
+ * <li>{@link UIDisplay}</li>
+ * <li>FXML</li>
+ * <li>Controller parameters (optional): array of {@link Object}.</li>
+ * </ol>
+ * 
  * @author david.naramski
- *
+ * @author Jean Lepropre (jean.lepropre@nowina.lu)
  * @param <R> The return type of the operation.
  */
 public class UIOperation<R> implements Operation<R> {
@@ -58,10 +65,14 @@ public class UIOperation<R> implements Operation<R> {
 		if(params.length < 2) {
 			throw new IllegalArgumentException("An UIOperation needs at least the display and the fxml.");
 		}
-		this.display = (UIDisplay) params[0];
-		this.fxml = (String) params[1];
-		if(params.length > 2) {
-			this.params = (Object[]) params[2];
+		try {
+			this.display = (UIDisplay) params[0];
+			this.fxml = (String) params[1];
+			if(params.length > 2) {
+				this.params = (Object[]) params[2];
+			}
+		} catch(ClassCastException e) {
+			throw new IllegalArgumentException("Expected parameters: display, fxml, controller params.");
 		}
 	}
 	

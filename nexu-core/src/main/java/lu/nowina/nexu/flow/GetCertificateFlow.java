@@ -15,6 +15,22 @@ package lu.nowina.nexu.flow;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import lu.nowina.nexu.api.Feedback;
+import lu.nowina.nexu.api.GetCertificateRequest;
+import lu.nowina.nexu.api.GetCertificateResponse;
+import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.flow.operation.AdvancedCreationFeedbackOperation;
+import lu.nowina.nexu.flow.operation.CreateTokenOperation;
+import lu.nowina.nexu.flow.operation.GetTokenConnectionOperation;
+import lu.nowina.nexu.flow.operation.OperationResult;
+import lu.nowina.nexu.flow.operation.OperationStatus;
+import lu.nowina.nexu.flow.operation.SelectPrivateKeyOperation;
+import lu.nowina.nexu.flow.operation.TokenOperationResultKey;
+import lu.nowina.nexu.view.core.UIDisplay;
+import lu.nowina.nexu.view.core.UIOperation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,18 +38,8 @@ import org.slf4j.LoggerFactory;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 import eu.europa.esig.dss.x509.CertificateToken;
-import lu.nowina.nexu.InternalAPI;
-import lu.nowina.nexu.api.Feedback;
-import lu.nowina.nexu.api.FeedbackStatus;
-import lu.nowina.nexu.api.GetCertificateRequest;
-import lu.nowina.nexu.api.GetCertificateResponse;
-import lu.nowina.nexu.api.NexuAPI;
-import lu.nowina.nexu.api.ScAPI;
-import lu.nowina.nexu.api.TokenId;
-import lu.nowina.nexu.flow.operation.OperationResult;
-import lu.nowina.nexu.view.core.UIDisplay;
 
-class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCertificateResponse> {
+class GetCertificateFlow extends Flow<GetCertificateRequest, GetCertificateResponse> {
 
 	static final Logger logger = LoggerFactory.getLogger(GetCertificateFlow.class);
 
@@ -42,51 +48,42 @@ class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCertificate
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	protected GetCertificateResponse process(NexuAPI api, GetCertificateRequest req) {
-
+		SignatureTokenConnection token = null;
 		try {
+			final OperationResult<Map<TokenOperationResultKey, Object>> createTokenOperationResult =
+					getOperationFactory().getOperation(CreateTokenOperation.class, api).perform();
+			if (createTokenOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+				final Map<TokenOperationResultKey, Object> map = createTokenOperationResult.getResult();
+				final TokenId tokenId = (TokenId) map.get(TokenOperationResultKey.TOKEN_ID);
+				
+				final OperationResult<SignatureTokenConnection> getTokenConnectionOperationResult =
+						getOperationFactory().getOperation(GetTokenConnectionOperation.class, api, tokenId).perform();
+				if (getTokenConnectionOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+					token = getTokenConnectionOperationResult.getResult();
 
-			TokenId tokenId = getTokenId(api, null);
-			if (tokenId != null) {
+					final OperationResult<DSSPrivateKeyEntry> selectPrivateKeyOperationResult =
+							getOperationFactory().getOperation(SelectPrivateKeyOperation.class, token).perform();
+					if (selectPrivateKeyOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+						final DSSPrivateKeyEntry key = selectPrivateKeyOperationResult.getResult();
 
-				SignatureTokenConnection token = api.getTokenConnection(tokenId);
-				if (token != null) {
-
-					DSSPrivateKeyEntry key = selectPrivateKey(api, token, null);
-
-					if (key != null) {
-
-						if (isAdvancedCreation()) {
-							Feedback feedback = new Feedback();
-							feedback.setFeedbackStatus(FeedbackStatus.SUCCESS);
-							feedback.setApiParameter(getApiParams());
-							feedback.setSelectedAPI(getSelectedApi());
-							feedback.setSelectedCard(getSelectedCard());
-
-							if ((feedback.getSelectedCard() != null) && (feedback.getSelectedAPI() != null)
-									&& ((feedback.getSelectedAPI() == ScAPI.MSCAPI) || (feedback.getApiParameter() != null))) {
-
-								OperationResult<Feedback> result = displayAndWaitUIOperation("/fxml/store-result.fxml", feedback);
-								Feedback back = result.getResult();
-								if (back != null) {
-									((InternalAPI) api).store(back.getSelectedCard().getAtr(), back.getSelectedAPI(), back.getApiParameter());
-								}
-							} else {
-								displayAndWaitUIOperation("/fxml/provide-feedback.fxml", feedback);
-							}
+						if ((Boolean) map.get(TokenOperationResultKey.ADVANCED_CREATION)) {
+							getOperationFactory().getOperation(AdvancedCreationFeedbackOperation.class,
+									api, map).perform();
 						}
 
-						GetCertificateResponse resp = new GetCertificateResponse();
+						final GetCertificateResponse resp = new GetCertificateResponse();
 						resp.setTokenId(tokenId);
 
-						CertificateToken certificate = key.getCertificate();
+						final CertificateToken certificate = key.getCertificate();
 						resp.setCertificate(certificate.getBase64Encoded());
 						resp.setKeyId(certificate.getDSSIdAsString());
 						resp.setEncryptionAlgorithm(certificate.getEncryptionAlgorithm());
 
-						CertificateToken[] certificateChain = key.getCertificateChain();
+						final CertificateToken[] certificateChain = key.getCertificateChain();
 						if (certificateChain != null) {
-							List<String> listCertificates = new ArrayList<String>();
+							final List<String> listCertificates = new ArrayList<String>();
 							for (CertificateToken certificateToken : certificateChain) {
 								listCertificates.add(certificateToken.getBase64Encoded());
 							}
@@ -94,27 +91,27 @@ class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCertificate
 						}
 
 						return resp;
-
 					}
-
 				}
-
 			}
 
-			displayAndWaitUIOperation("/fxml/message.fxml", "Finished");
-
-		} catch (Exception e) {
+			getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+					new Object[]{"Finished"}).perform();
+		} catch (final Exception e) {
 			logger.error("Flow error", e);
-
-			Feedback feedback = new Feedback(e);
-
-			displayAndWaitUIOperation("/fxml/provide-feedback.fxml", feedback);
-
-			displayAndWaitUIOperation("/fxml/message.fxml", "Failure");
+			final Feedback feedback = new Feedback(e);
+			getOperationFactory().getOperation(
+					UIOperation.class, getDisplay(), "/fxml/provide-feedback.fxml",
+					new Object[]{feedback}).perform();
+			getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+					new Object[]{"Failure"}).perform();
+		} finally {
+			if(token != null) {
+				token.close();
+			}
 		}
 
 		return null;
-
 	}
 
 }

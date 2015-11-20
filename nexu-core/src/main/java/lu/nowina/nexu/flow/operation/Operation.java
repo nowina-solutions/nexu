@@ -33,6 +33,7 @@ public interface Operation<R> {
 	 * Sets the parameters of the operation.
 	 * @param params The parameters of the operation. It can be <code>null</null>
 	 * if the operation does not accept any parameter.
+	 * @throws IllegalArgumentException If <code>params</code> are not the expected parameters.
 	 */
 	void setParams(Object... params);
 	

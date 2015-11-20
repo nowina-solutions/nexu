@@ -13,16 +13,30 @@
  */
 package lu.nowina.nexu.flow.operation;
 
+import lu.nowina.nexu.view.core.UIDisplay;
+
 /**
- * This enum gathers all possible result statuses for an {@link Operation}.
+ * Convenient base class for {@link CompositeOperation}.
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public enum OperationStatus {
+public abstract class AbstractCompositeOperation<R> implements CompositeOperation<R> {
 
-	SUCCESS,
-	EXCEPTION,
-	USER_CANCEL,
-	FAILED;
+	protected UIDisplay display;
+	protected OperationFactory operationFactory;
+	
+	public AbstractCompositeOperation() {
+		super();
+	}
+
+	@Override
+	public final void setOperationFactory(OperationFactory operationFactory) {
+		this.operationFactory = operationFactory;
+	}
+
+	@Override
+	public final void setDisplay(UIDisplay display) {
+		this.display = display;
+	}
 
 }

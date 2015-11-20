@@ -61,7 +61,7 @@ public class KeystoreParamsController extends AbstractUIOperationController<Keys
 		selectFile.setOnAction((e) -> {
 			FileChooser fileChooser = new FileChooser();
 			fileChooser.setTitle("Open Resource File");
-			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("DLL", "*.dll"));
+			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PKCS12", "*.p12", "*.pfx"));
 			keyStoreFile = fileChooser.showOpenDialog(null);
 		});
 	}
