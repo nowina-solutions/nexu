@@ -18,6 +18,10 @@ import java.util.Arrays;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import lu.nowina.nexu.flow.Flow;
+import lu.nowina.nexu.flow.operation.Operation;
+import lu.nowina.nexu.flow.operation.OperationResult;
+import lu.nowina.nexu.flow.operation.OperationStatus;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

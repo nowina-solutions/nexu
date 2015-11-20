@@ -35,14 +35,14 @@ import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
+import lu.nowina.nexu.flow.Flow;
 import lu.nowina.nexu.flow.FlowRegistry;
+import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.generic.ConnectionInfo;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.generic.GenericCardAdapter;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCInfo;
-import lu.nowina.nexu.view.core.Flow;
-import lu.nowina.nexu.view.core.OperationFactory;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 import org.slf4j.Logger;

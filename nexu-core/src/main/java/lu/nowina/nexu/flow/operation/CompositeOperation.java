@@ -11,24 +11,26 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.view.core;
+package lu.nowina.nexu.flow.operation;
+
+import lu.nowina.nexu.view.core.UIDisplay;
+import lu.nowina.nexu.view.core.UIOperation;
 
 /**
- * Allows to get instances of {@link Operation}.
+ * A <code>CompositeOperation</code> is composed of several {@link Operation}s.
+ * Hence it has a {@link #setOperationFactory(OperationFactory)} method to get the
+ * {@link OperationFactory} to use to create other {@link Operation}s.
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public interface OperationFactory {
+public interface CompositeOperation<R> extends Operation<R> {
 
 	/**
-	 * Returns an instance of {@link Operation} initialized with <code>params</code>.
-	 * <p>The type of the returned instance is guaranteed to implement {@link Operation}
-	 * or {@link CompositeOperation} but its concrete type could be different from <code>clazz</code>.
-	 * @param clazz The target operation type.
-	 * @param params The parameters to use to initialize the operation.
-	 * @return An instance of {@link Operation} initialized with <code>params</code>.
+	 * Sets the {@link OperationFactory} to use to create other {@link Operation}s.
+	 * @param operationFactory The {@link OperationFactory} to use to create other
+	 * {@link Operation}s.
 	 */
-	<R, T extends Operation<R>> Operation<R> getOperation(Class<T> clazz, Object... params);
+	void setOperationFactory(OperationFactory operationFactory);
 	
 	/**
 	 * Sets the {@link UIDisplay} for {@link UIOperation}.

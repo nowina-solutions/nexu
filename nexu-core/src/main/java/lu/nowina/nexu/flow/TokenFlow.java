@@ -33,11 +33,10 @@ import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.flow.operation.OperationResult;
 import lu.nowina.nexu.model.KeystoreParams;
 import lu.nowina.nexu.model.Pkcs11Params;
-import lu.nowina.nexu.view.core.OperationResult;
 import lu.nowina.nexu.view.core.UIDisplay;
-import lu.nowina.nexu.view.core.Flow;
 
 /**
  * Most of the Flow executed by NexU use SignatureTokenConnection.

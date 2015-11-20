@@ -32,10 +32,10 @@ import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.TokenId;
-import lu.nowina.nexu.view.core.Operation;
-import lu.nowina.nexu.view.core.OperationFactory;
-import lu.nowina.nexu.view.core.OperationResult;
-import lu.nowina.nexu.view.core.OperationStatus;
+import lu.nowina.nexu.flow.operation.Operation;
+import lu.nowina.nexu.flow.operation.OperationFactory;
+import lu.nowina.nexu.flow.operation.OperationResult;
+import lu.nowina.nexu.flow.operation.OperationStatus;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
 

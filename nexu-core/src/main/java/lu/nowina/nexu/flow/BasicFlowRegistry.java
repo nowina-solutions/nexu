@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import lu.nowina.nexu.view.core.UIDisplay;
-import lu.nowina.nexu.view.core.Flow;
 
 public class BasicFlowRegistry implements FlowRegistry {
 

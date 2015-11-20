@@ -30,7 +30,7 @@ import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.TokenId;
-import lu.nowina.nexu.view.core.OperationResult;
+import lu.nowina.nexu.flow.operation.OperationResult;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 class GetCertificateFlow extends TokenFlow<GetCertificateRequest, GetCertificateResponse> {

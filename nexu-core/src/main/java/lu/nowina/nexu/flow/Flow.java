@@ -11,10 +11,15 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.view.core;
+package lu.nowina.nexu.flow;
 
 import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.flow.operation.Operation;
+import lu.nowina.nexu.flow.operation.OperationFactory;
+import lu.nowina.nexu.flow.operation.OperationResult;
+import lu.nowina.nexu.view.core.UIDisplay;
+import lu.nowina.nexu.view.core.UIOperation;
 
 /**
  * A flow is a sequence of {@link Operation}.

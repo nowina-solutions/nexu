@@ -14,7 +14,6 @@
 package lu.nowina.nexu.flow;
 
 import lu.nowina.nexu.view.core.UIDisplay;
-import lu.nowina.nexu.view.core.Flow;
 
 public interface FlowRegistry {
 

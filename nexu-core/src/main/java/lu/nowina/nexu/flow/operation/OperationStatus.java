@@ -11,40 +11,10 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.view.core;
+package lu.nowina.nexu.flow.operation;
 
-public class OperationResult<R> {
+public enum OperationStatus {
 
-	private R result;
-
-	private OperationStatus status;
-
-	private Exception exception;
-
-	public OperationResult(R result) {
-		this.status = OperationStatus.SUCCESS;
-		this.result = result;
-	}
-
-	public OperationResult(Exception ex) {
-		this.status = OperationStatus.EXCEPTION;
-		this.exception = ex;
-	}
-
-	public OperationResult(OperationStatus status) {
-		this.status = status;
-	}
-
-	public Exception getException() {
-		return exception;
-	}
-
-	public R getResult() {
-		return result;
-	}
-
-	public OperationStatus getStatus() {
-		return status;
-	}
+	SUCCESS, EXCEPTION, USER_CANCEL
 
 }
