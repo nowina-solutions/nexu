@@ -85,7 +85,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 
 	@SuppressWarnings("unchecked")
 	private OperationResult<Map<TokenOperationResultKey, Object>> createToken(List<DetectedCard> detectedCards) {
-		if(detectedCards.size() > 0) {
+		if(detectedCards.size() > 1) {
 			LOG.warn("More than one card. Not supported yet. We will take the first one having a matching adapter.");
 		}
 		

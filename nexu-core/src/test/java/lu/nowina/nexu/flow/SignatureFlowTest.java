@@ -17,7 +17,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 
 import java.util.Arrays;
 
@@ -52,11 +51,11 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 	public void testCardRecognized() throws Exception {
 		UIDisplay display = mock(UIDisplay.class);
 
-		CardAdapter adapter = mock(CardAdapter.class, withSettings().verboseLogging());
+		CardAdapter adapter = mock(CardAdapter.class);
 
 		SignatureTokenConnection token = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password");
 
-		NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
+		NexuAPI api = mock(NexuAPI.class);
 		DetectedCard detectedCard = new DetectedCard("atr", 0);
 		when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
 		when(api.matchingCardAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
@@ -85,7 +84,7 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 
 		UIDisplay display = mock(UIDisplay.class);
 
-		NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
+		NexuAPI api = mock(NexuAPI.class);
 
 		SignatureRequest req = new SignatureRequest();
 		req.setDigestAlgorithm(DigestAlgorithm.SHA256);
@@ -100,7 +99,7 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 
 		UIDisplay display = mock(UIDisplay.class);
 
-		NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
+		NexuAPI api = mock(NexuAPI.class);
 
 		SignatureRequest req = new SignatureRequest();
 		req.setToBeSigned(new ToBeSigned());
@@ -115,7 +114,7 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 
 		UIDisplay display = mock(UIDisplay.class);
 
-		NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
+		NexuAPI api = mock(NexuAPI.class);
 
 		SignatureRequest req = new SignatureRequest();
 		req.setToBeSigned(new ToBeSigned("hello".getBytes()));
