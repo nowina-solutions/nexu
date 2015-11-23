@@ -27,6 +27,8 @@ import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
 import lu.nowina.nexu.api.plugin.SignaturePlugin;
 import lu.nowina.nexu.flow.BasicFlowRegistry;
+import lu.nowina.nexu.flow.Flow;
+import lu.nowina.nexu.flow.FlowRegistry;
 import lu.nowina.nexu.flow.operation.BasicOperationFactory;
 import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.flow.operation.OperationResult;
@@ -102,7 +104,7 @@ public class NexUApp extends Application implements UIDisplay {
 
 		this.operationFactory = new BasicOperationFactory();
 		this.operationFactory.setDisplay(this);
-		InternalAPI api = new InternalAPI(this, prefs, db, detector, loader, new BasicFlowRegistry(), this.operationFactory);
+		InternalAPI api = new InternalAPI(this, prefs, db, detector, loader, getFlowRegistry(), this.operationFactory);
 
 		for (String key : getProperties().stringPropertyNames()) {
 			if (key.startsWith("plugin_")) {
@@ -118,6 +120,14 @@ public class NexUApp extends Application implements UIDisplay {
 		return api;
 	}
 
+	/**
+	 * Returns the {@link FlowRegistry} to use to resolve {@link Flow}s.
+	 * @return The {@link FlowRegistry} to use to resolve {@link Flow}s.
+	 */
+	protected FlowRegistry getFlowRegistry() {
+		return new BasicFlowRegistry();
+	}
+	
 	private void startHttpServer(UserPreferences prefs, InternalAPI api) {
 		new Thread(() -> {
 			HttpServer server = buildHttpServer();

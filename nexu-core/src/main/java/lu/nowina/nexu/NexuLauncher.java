@@ -20,6 +20,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
+import javafx.application.Application;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.FileAppender;
@@ -70,7 +72,7 @@ public class NexuLauncher {
 
 		boolean started = checkAlreadyStarted();
 		if (!started) {
-			NexUApp.launch(NexUApp.class, args);
+			NexUApp.launch(getApplicationClass(), args);
 		}
 	}
 
@@ -179,4 +181,11 @@ public class NexuLauncher {
 		return config;
 	}
 
+	/**
+	 * Returns the JavaFX {@link Application} class to launch.
+	 * @return The JavaFX {@link Application} class to launch.
+	 */
+	protected Class<? extends Application> getApplicationClass() {
+		return NexUApp.class;
+	}
 }
