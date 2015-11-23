@@ -148,7 +148,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		return new OperationResult<Map<TokenOperationResultKey, Object>>(map);
 	}
 
-	private boolean isAdvancedModeAvailable() {
+	protected boolean isAdvancedModeAvailable() {
 		return NexuLauncher.getConfig().isAdvancedModeAvailable();
 	}
 	

@@ -101,6 +101,7 @@ public class NexUApp extends Application implements UIDisplay {
 		loader.start();
 
 		this.operationFactory = new BasicOperationFactory();
+		this.operationFactory.setDisplay(this);
 		InternalAPI api = new InternalAPI(this, prefs, db, detector, loader, new BasicFlowRegistry(), this.operationFactory);
 
 		for (String key : getProperties().stringPropertyNames()) {

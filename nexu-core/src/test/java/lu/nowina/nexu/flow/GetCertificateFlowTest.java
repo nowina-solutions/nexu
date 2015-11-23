@@ -32,6 +32,8 @@ import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.flow.operation.BasicOperationFactory;
+import lu.nowina.nexu.flow.operation.CreateTokenOperation;
 import lu.nowina.nexu.flow.operation.Operation;
 import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.flow.operation.OperationResult;
@@ -58,6 +60,12 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 
 		final OperationFactory operationFactory = mock(OperationFactory.class);
 
+		final CreateTokenOperation createTokenOperation = new CreateTokenOperation();
+		createTokenOperation.setParams(api);
+		createTokenOperation.setDisplay(display);
+		createTokenOperation.setOperationFactory(operationFactory);
+		when(operationFactory.getOperation(CreateTokenOperation.class, api)).thenReturn(createTokenOperation);
+
 		final Operation<Void> successOperation = mock(Operation.class);
 		when(successOperation.perform()).thenReturn(new OperationResult<Void>(OperationStatus.SUCCESS));
 		
@@ -80,18 +88,27 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 	@Test
 	@SuppressWarnings("unchecked")
 	public void testNotRecognizedRequestSupport() throws Exception {
-
 		final UIDisplay display = mock(UIDisplay.class);
 
 		final NexuAPI api = mock(NexuAPI.class);
 		when(api.detectCards()).thenReturn(Arrays.asList(new DetectedCard("atr", 0)));
 
 		final OperationFactory operationFactory = mock(OperationFactory.class);
-
+		final CreateTokenOperation createTokenOperation = new CreateTokenOperation() {
+			@Override
+			protected boolean isAdvancedModeAvailable() {
+				return true;
+			}
+		};
+		createTokenOperation.setParams(api);
+		createTokenOperation.setDisplay(display);
+		createTokenOperation.setOperationFactory(operationFactory);
+		when(operationFactory.getOperation(CreateTokenOperation.class, api)).thenReturn(createTokenOperation);
+		
 		final Operation<Boolean> returnFalseOperation = mock(Operation.class);
 		when(returnFalseOperation.perform()).thenReturn(new OperationResult<Boolean>(false));
 		when(operationFactory.getOperation(
-				UIOperation.class, display, "/fxml/unsupported-product.fxml", new Object[0])).thenReturn(returnFalseOperation);
+				UIOperation.class, display, "/fxml/unsupported-product.fxml")).thenReturn(returnFalseOperation);
 
 		final Operation<Void> successOperation = mock(Operation.class);
 		when(successOperation.perform()).thenReturn(new OperationResult<Void>(OperationStatus.SUCCESS));
@@ -121,17 +138,19 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 
 		NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
 		DetectedCard detectedCard = new DetectedCard("atr", 0);
+
 		when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
 		when(api.matchingCardAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
 		when(api.registerTokenConnection(token)).thenReturn(new TokenId("id"));
 		when(api.getTokenConnection(new TokenId("id"))).thenReturn(token);
-
 		when(adapter.connect(eq(api), eq(detectedCard), any())).thenReturn(token);
 
-		GetCertificateRequest req = new GetCertificateRequest();
-
+		final OperationFactory operationFactory = new BasicOperationFactory();
+		operationFactory.setDisplay(display);
+		
 		GetCertificateFlow flow = new GetCertificateFlow(display);
-		GetCertificateResponse resp = flow.process(api, req);
+		flow.setOperationFactory(operationFactory);
+		GetCertificateResponse resp = flow.process(api, new GetCertificateRequest());
 		Assert.assertNotNull(resp);
 		Assert.assertNotNull(resp.getEncryptionAlgorithm());
 		Assert.assertNotNull(resp.getTokenId());

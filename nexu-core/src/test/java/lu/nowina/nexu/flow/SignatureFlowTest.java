@@ -30,6 +30,7 @@ import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.flow.operation.BasicOperationFactory;
 import lu.nowina.nexu.flow.operation.Operation;
 import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.flow.operation.OperationResult;
@@ -48,9 +49,7 @@ import eu.europa.esig.dss.token.SignatureTokenConnection;
 public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 
 	@Test
-	@SuppressWarnings("unchecked")
 	public void testCardRecognized() throws Exception {
-
 		UIDisplay display = mock(UIDisplay.class);
 
 		CardAdapter adapter = mock(CardAdapter.class, withSettings().verboseLogging());
@@ -70,15 +69,11 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 		req.setToBeSigned(new ToBeSigned("hello".getBytes()));
 		req.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
-		Operation<Void> successOperation = mock(Operation.class);
-		when(successOperation.perform()).thenReturn(new OperationResult<Void>(OperationStatus.SUCCESS));
-		
-		OperationFactory operationFactory = mock(OperationFactory.class);
-		when(operationFactory.getOperation(UIOperation.class, display,
-				"/fxml/message.fxml", new Object[]{"Signature performed"})).thenReturn(successOperation);
+		final OperationFactory noUIOperationFactory = new NoUIOperationFactory();
+		noUIOperationFactory.setDisplay(display);
 
 		SignatureFlow flow = new SignatureFlow(display);
-		flow.setOperationFactory(operationFactory);
+		flow.setOperationFactory(noUIOperationFactory);
 		SignatureResponse resp = flow.process(api, req);
 		Assert.assertNotNull(resp);
 		Assert.assertNotNull(resp.getSignatureValue());
@@ -130,4 +125,24 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 
 	}
 
+	private static class NoUIOperationFactory extends BasicOperationFactory {
+		
+		@SuppressWarnings("rawtypes")
+		private final Operation successOperation;
+		
+		public NoUIOperationFactory() {
+			this.successOperation = mock(Operation.class);
+			when(successOperation.perform()).thenReturn(new OperationResult<Void>(OperationStatus.SUCCESS));
+		}
+		
+		@Override
+		@SuppressWarnings("unchecked")
+		public <R, T extends Operation<R>> Operation<R> getOperation(Class<T> clazz, Object... params) {
+			if(UIOperation.class.isAssignableFrom(clazz)) {
+				return successOperation;
+			} else {
+				return super.getOperation(clazz, params);
+			}
+		}
+	}
 }
