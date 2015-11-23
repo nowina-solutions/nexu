@@ -17,6 +17,11 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.PatternLayout;
 import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Abstract base class for test classes that need to configure logging.
@@ -25,6 +30,8 @@ import org.junit.BeforeClass;
  */
 public abstract class AbstractConfigureLoggerTest {
 
+	private static final Logger LOG = LoggerFactory.getLogger(AbstractConfigureLoggerTest.class.getName());
+	
 	public AbstractConfigureLoggerTest() {
 		super();
 	}
@@ -43,5 +50,12 @@ public abstract class AbstractConfigureLoggerTest {
 		org.apache.log4j.Logger.getLogger("freemarker").setLevel(Level.INFO);
 		org.apache.log4j.Logger.getLogger("lu.nowina").setLevel(Level.DEBUG);
 	}
-	
+
+	@Rule
+	public TestWatcher watcher = new TestWatcher() {
+		@Override
+		protected void starting(Description description) {
+			LOG.info("Starting test: " + description.getMethodName());
+		}
+	}; 
 }
