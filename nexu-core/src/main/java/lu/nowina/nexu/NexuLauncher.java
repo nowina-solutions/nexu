@@ -76,7 +76,7 @@ public class NexuLauncher {
 
 	private void configureLogger(AppConfig config) {
 		ConsoleAppender console = new ConsoleAppender(); // create appender
-		String PATTERN = "%d [%p|%c|%C{1}] %m%n";
+		String PATTERN = "%d [%p|%c|%C{1}|%t] %m%n";
 		console.setLayout(new PatternLayout(PATTERN));
 		console.setThreshold(config.isDebug() ? Level.DEBUG : Level.WARN);
 		console.activateOptions();
