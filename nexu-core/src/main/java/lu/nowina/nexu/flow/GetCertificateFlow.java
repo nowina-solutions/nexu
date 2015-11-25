@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.NexuAPI;
@@ -99,12 +98,7 @@ class GetCertificateFlow extends Flow<GetCertificateRequest, GetCertificateRespo
 					new Object[]{"Finished"}).perform();
 		} catch (final Exception e) {
 			logger.error("Flow error", e);
-			final Feedback feedback = new Feedback(e);
-			getOperationFactory().getOperation(
-					UIOperation.class, getDisplay(), "/fxml/provide-feedback.fxml",
-					new Object[]{feedback}).perform();
-			getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
-					new Object[]{"Failure"}).perform();
+			handleException(e);
 		} finally {
 			if(token != null) {
 				token.close();

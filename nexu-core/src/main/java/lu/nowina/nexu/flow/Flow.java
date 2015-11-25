@@ -14,10 +14,12 @@
 package lu.nowina.nexu.flow;
 
 import lu.nowina.nexu.NexuException;
+import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.flow.operation.Operation;
 import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.view.core.UIDisplay;
+import lu.nowina.nexu.view.core.UIOperation;
 
 /**
  * A flow is a sequence of {@link Operation}.
@@ -55,5 +57,15 @@ public abstract class Flow<I, O> {
 
 	protected final UIDisplay getDisplay() {
 		return display;
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected void handleException(final Exception e) {
+		final Feedback feedback = new Feedback(e);
+		getOperationFactory().getOperation(
+				UIOperation.class, getDisplay(), "/fxml/provide-feedback.fxml",
+				new Object[]{feedback}).perform();
+		getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+				new Object[]{"Failure"}).perform();
 	}
 }

@@ -16,7 +16,6 @@ package lu.nowina.nexu.flow;
 import java.util.Map;
 
 import lu.nowina.nexu.NexuException;
-import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
@@ -106,12 +105,7 @@ class SignatureFlow extends Flow<SignatureRequest, SignatureResponse> {
 			}
 		} catch (Exception e) {
 			logger.error("Flow error", e);
-			final Feedback feedback = new Feedback(e);
-			getOperationFactory().getOperation(
-					UIOperation.class, getDisplay(), "/fxml/provide-feedback.fxml",
-					new Object[]{feedback}).perform();
-			getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
-					new Object[]{"Failure"}).perform();
+			handleException(e);
 		} finally {
 			if (token != null) {
 				token.close();
