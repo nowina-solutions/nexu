@@ -40,6 +40,18 @@ public interface CardAdapter {
 	 * @param callback
 	 * @return
 	 */
-	public SignatureTokenConnection connect(NexuAPI api, DetectedCard card, PasswordInputCallback callback);
+	SignatureTokenConnection connect(NexuAPI api, DetectedCard card, PasswordInputCallback callback);
 
+	/**
+	 * Returns <code>true</code> if this card adapter can return identity information for the given <code>card</code>.
+	 * @return <code>true</code> if this card adapter can return identity information for the given <code>card</code>.
+	 */
+	boolean canReturnIdentityInfo(DetectedCard card);
+	
+	/**
+	 * Returns the identity information using the given <code>token</code>.
+	 * @param token The token to use to get the identity information.
+	 * @return The identity information using the given <code>token</code>.
+	 */
+	GetIdentityInfoResponse getIdentityInfo(SignatureTokenConnection token);
 }

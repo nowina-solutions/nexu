@@ -20,6 +20,7 @@ import eu.europa.esig.dss.token.SignatureTokenConnection;
 import eu.europa.esig.dss.token.mocca.MOCCASignatureTokenConnection;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
+import lu.nowina.nexu.api.GetIdentityInfoResponse;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.ScAPI;
 
@@ -54,4 +55,13 @@ public class GenericCardAdapter implements CardAdapter {
 		}
 	}
 
+	@Override
+	public boolean canReturnIdentityInfo(DetectedCard card) {
+		return false;
+	}
+
+	@Override
+	public GetIdentityInfoResponse getIdentityInfo(SignatureTokenConnection token) {
+		throw new IllegalStateException("This card adapter cannot return identity information.");
+	}
 }
