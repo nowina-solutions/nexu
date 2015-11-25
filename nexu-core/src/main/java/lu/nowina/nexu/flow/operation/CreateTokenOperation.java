@@ -13,7 +13,6 @@
  */
 package lu.nowina.nexu.flow.operation;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +42,11 @@ import eu.europa.esig.dss.token.mocca.MOCCASignatureTokenConnection;
 /**
  * This {@link CompositeOperation} allows to create a {@link TokenId}.
  *
- * <p>Expected parameter: {@link NexuAPI}.
+ * <p>Expected parameters:
+ * <ol>
+ * <li>{@link NexuAPI}</li>
+ * <li>List of {@link Match}</li>
+ * </ol>
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
@@ -52,55 +55,30 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 	private static final Logger LOG = LoggerFactory.getLogger(CreateTokenOperation.class.getName());
 
 	private NexuAPI api;
+	private List<Match> matchingCardAdapters;
 	
 	public CreateTokenOperation() {
 		super();
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void setParams(Object... params) {
 		try {
 			this.api = (NexuAPI) params[0];
+			this.matchingCardAdapters = (List<Match>) params[1];
 		} catch(final ArrayIndexOutOfBoundsException | ClassCastException e) {
-			throw new IllegalArgumentException("Expected parameter: NexuAPI");
+			throw new IllegalArgumentException("Expected parameters: NexuAPI, List of Match");
 		}
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public OperationResult<Map<TokenOperationResultKey, Object>> perform() {
-		final List<DetectedCard> detectedCards = api.detectCards();
-		LOG.info(detectedCards.size() + " card detected");
+		LOG.info(matchingCardAdapters.size() + " matching card adapters");
 
-		if (detectedCards.size() == 0) {
-			final Feedback feedback = new Feedback();
-			feedback.setFeedbackStatus(FeedbackStatus.NO_PRODUCT_FOUND);
-			operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml",
-					new Object[]{feedback}).perform();
-			return new OperationResult<Map<TokenOperationResultKey, Object>>(OperationStatus.FAILED);
-		} else {
-			return createToken(detectedCards);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private OperationResult<Map<TokenOperationResultKey, Object>> createToken(List<DetectedCard> detectedCards) {
-		if(detectedCards.size() > 1) {
-			LOG.warn("More than one card. Not supported yet. We will take the first one having a matching adapter.");
-		}
-		
-		final List<DetectedCard> supportedCards = new ArrayList<>();
-		for (final DetectedCard d : detectedCards) {
-			final List<Match> matchingAdapters = api.matchingCardAdapters(d);
-			if (matchingAdapters != null && !matchingAdapters.isEmpty()) {
-				supportedCards.add(d);
-			}
-		}
-
-		LOG.info(supportedCards.size() + " card supported");
-
-		if (supportedCards.size() != 0) {
-			return createTokenAuto(supportedCards.get(0));
+		if (!matchingCardAdapters.isEmpty()) {
+			return createTokenAuto();
 		} else {
 			boolean advanced = false;
 			if (isAdvancedModeAvailable()) {
@@ -115,7 +93,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 			
 			if (advanced) {
 				LOG.info("Advanced mode");
-				return createTokenAdvanced(detectedCards.get(0));
+				return createTokenAdvanced();
 			} else {
 				LOG.info("Request support");
 				final Feedback feedback = new Feedback();
@@ -126,10 +104,10 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		}
 	}
 
-	private OperationResult<Map<TokenOperationResultKey, Object>> createTokenAuto(final DetectedCard supportedCard) {
-		final List<Match> adapters = api.matchingCardAdapters(supportedCard);
-		final Match firstMatch = adapters.get(0);
-		final CardAdapter adapter = firstMatch.getAdapter();
+	private OperationResult<Map<TokenOperationResultKey, Object>> createTokenAuto() {
+		final Match match = matchingCardAdapters.get(0);
+		final DetectedCard supportedCard = match.getCard();
+		final CardAdapter adapter = match.getAdapter();
 
 		final SignatureTokenConnection connect = adapter.connect(api, supportedCard, display.getPasswordInputCallback());
 		if (connect == null) {
@@ -145,6 +123,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		map.put(TokenOperationResultKey.TOKEN_ID, tokenId);
 		map.put(TokenOperationResultKey.ADVANCED_CREATION, false);
 		map.put(TokenOperationResultKey.SELECTED_CARD, supportedCard);
+		map.put(TokenOperationResultKey.SELECTED_CARD_ADAPTER, adapter);
 		return new OperationResult<Map<TokenOperationResultKey, Object>>(map);
 	}
 
@@ -152,7 +131,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		return NexuLauncher.getConfig().isAdvancedModeAvailable();
 	}
 	
-	private OperationResult<Map<TokenOperationResultKey, Object>> createTokenAdvanced(final DetectedCard detectedCard) {
+	private OperationResult<Map<TokenOperationResultKey, Object>> createTokenAdvanced() {
 		LOG.info("Advanced mode selected");
 		@SuppressWarnings("unchecked")
 		final OperationResult<ScAPI> result =
@@ -163,7 +142,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		final Map<TokenOperationResultKey, Object> map = new HashMap<TokenOperationResultKey, Object>();
 		map.put(TokenOperationResultKey.ADVANCED_CREATION, true);
 		map.put(TokenOperationResultKey.SELECTED_API, result.getResult());
-		map.put(TokenOperationResultKey.SELECTED_CARD, detectedCard);
+		map.put(TokenOperationResultKey.SELECTED_CARD, api.detectCards().get(0));
 		final TokenId tokenId;
 		switch (result.getResult()) {
 		case MOCCA:

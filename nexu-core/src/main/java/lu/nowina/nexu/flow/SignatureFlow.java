@@ -107,8 +107,12 @@ class SignatureFlow extends Flow<SignatureRequest, SignatureResponse> {
 			logger.error("Flow error", e);
 			handleException(e);
 		} finally {
-			if (token != null) {
-				token.close();
+			if(token != null) {
+				try {
+					token.close();
+				} catch(final Exception e) {
+					logger.error("Exception when closing token", e);
+				}
 			}
 		}
 

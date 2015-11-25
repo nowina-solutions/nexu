@@ -14,8 +14,10 @@
 package lu.nowina.nexu.flow.operation;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.TokenId;
 
@@ -57,7 +59,18 @@ public class GetTokenOperation extends AbstractCompositeOperation<Map<TokenOpera
 			map.put(TokenOperationResultKey.TOKEN_ID, previousTokenId);
 			return new OperationResult<Map<TokenOperationResultKey, Object>>(map);
 		} else {
-			return operationFactory.getOperation(CreateTokenOperation.class, api).perform();
+			final OperationResult<List<Match>> getMatchingCardAdaptersOperationResult =
+					operationFactory.getOperation(GetMatchingCardAdaptersOperation.class, api).perform();
+			if(getMatchingCardAdaptersOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+				final List<Match> matchingCardAdapters = getMatchingCardAdaptersOperationResult.getResult();
+				return operationFactory.getOperation(CreateTokenOperation.class, api, matchingCardAdapters).perform();
+			} else {
+				if(getMatchingCardAdaptersOperationResult.getStatus().equals(OperationStatus.EXCEPTION)) {
+					return new OperationResult<Map<TokenOperationResultKey,Object>>(getMatchingCardAdaptersOperationResult.getException());
+				} else {
+					return new OperationResult<Map<TokenOperationResultKey,Object>>(getMatchingCardAdaptersOperationResult.getStatus());
+				}
+			}
 		}
 	}
 }

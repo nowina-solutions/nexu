@@ -13,6 +13,7 @@
  */
 package lu.nowina.nexu.flow.operation;
 
+import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.TokenId;
@@ -37,6 +38,11 @@ public enum TokenOperationResultKey {
 	 * {@link DetectedCard}
 	 */
 	SELECTED_CARD,
+	
+	/**
+	 * {@link CardAdapter}
+	 */
+	SELECTED_CARD_ADAPTER,
 	
 	/**
 	 * {@link ScAPI}
