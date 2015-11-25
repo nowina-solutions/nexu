@@ -120,7 +120,7 @@ public class InternalAPI implements NexuAPI {
 		if (cards.isEmpty()) {
 			SCInfo info = null;
 			if (webDatabase != null && webDatabase.getDatabase() != null) {
-				info = myDatabase.getInfo(d.getAtr());
+				info = webDatabase.getDatabase().getInfo(d.getAtr());
 				if (info == null) {
 					logger.warn("Card " + d.getAtr() + " is not in the web database");
 				} else {
@@ -192,7 +192,7 @@ public class InternalAPI implements NexuAPI {
 			}
 			return resp;
 		}  catch (Exception e) {
-			logger.error("Cannot execute get certificates", e);
+			logger.error("Cannot execute request", e);
 			resp.setSuccess(false);
 			resp.setError("exception");
 			resp.setErrorMessage("Exception during execution");
