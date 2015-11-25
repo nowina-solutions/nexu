@@ -13,32 +13,15 @@
  */
 package lu.nowina.nexu.api;
 
-import java.util.List;
-
-import eu.europa.esig.dss.token.SignatureTokenConnection;
-
 /**
- * The API exposes the functionalities to the developer of Plugin.
- * 
- * @author David Naramski
+ * Request used to get identity information.
+ *
+ * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public interface NexuAPI {
+public class GetIdentityInfoRequest extends NexuRequest {
 
-	List<DetectedCard> detectCards();
+	public GetIdentityInfoRequest() {
+		super();
+	}
 
-	List<Match> matchingCardAdapters(DetectedCard d);
-
-	EnvironmentInfo getEnvironmentInfo();
-
-	void registerCardAdapter(CardAdapter adapter);
-
-	TokenId registerTokenConnection(SignatureTokenConnection connection);
-
-	SignatureTokenConnection getTokenConnection(TokenId tokenId);
-
-	Execution<GetCertificateResponse> getCertificate(GetCertificateRequest request);
-
-	Execution<SignatureResponse> sign(SignatureRequest request);
-
-	Execution<GetIdentityInfoResponse> getIdentityInfo(GetIdentityInfoRequest request);
 }

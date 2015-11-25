@@ -21,6 +21,8 @@ public interface FlowRegistry {
 
 	static final String CERTIFICATE_FLOW = "certificate";
 
+	static final String GET_IDENTITY_INFO_FLOW = "getIdentityInfo";
+	
 	<I, O> Flow<I, O> getFlow(String code, UIDisplay display);
 
 }

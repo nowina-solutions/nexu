@@ -32,7 +32,7 @@ public class BasicFlowRegistry implements FlowRegistry {
 			return new SignatureFlow(display);
 		default:
 			logger.warn("Unknown flow code " + code);
-			throw new NullPointerException("Flow not recognized");
+			throw new NullPointerException("Flow not recognized/not implemented in this version.");
 		}
 	}
 

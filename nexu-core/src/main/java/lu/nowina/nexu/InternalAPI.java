@@ -28,6 +28,8 @@ import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetCertificateResponse;
+import lu.nowina.nexu.api.GetIdentityInfoRequest;
+import lu.nowina.nexu.api.GetIdentityInfoResponse;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.ScAPI;
@@ -200,7 +202,6 @@ public class InternalAPI implements NexuAPI {
 
 	@Override
 	public Execution<GetCertificateResponse> getCertificate(GetCertificateRequest request) {
-
 		Flow<GetCertificateRequest, GetCertificateResponse> flow = flowRegistry.getFlow(FlowRegistry.CERTIFICATE_FLOW, display);
 		flow.setOperationFactory(operationFactory);
 		return executeRequest(flow, request);
@@ -208,13 +209,19 @@ public class InternalAPI implements NexuAPI {
 
 	@Override
 	public Execution<SignatureResponse> sign(SignatureRequest request) {
-
 		Flow<SignatureRequest, SignatureResponse> flow = flowRegistry.getFlow(FlowRegistry.SIGNATURE_FLOW, display);
 		flow.setOperationFactory(operationFactory);
 		return executeRequest(flow, request);
-
 	}
 
+	@Override
+	public Execution<GetIdentityInfoResponse> getIdentityInfo(GetIdentityInfoRequest request) {
+		final Flow<GetIdentityInfoRequest, GetIdentityInfoResponse> flow =
+				flowRegistry.getFlow(FlowRegistry.GET_IDENTITY_INFO_FLOW, display);
+		flow.setOperationFactory(operationFactory);
+		return executeRequest(flow, request);
+	}
+	
 	public HttpPlugin getPlugin(String context) {
 		return httpPlugins.get(context);
 	}
