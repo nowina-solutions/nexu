@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import lu.nowina.nexu.AbstractConfigureLoggerTest;
 import lu.nowina.nexu.api.CardAdapter;
@@ -33,6 +34,7 @@ import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.flow.operation.BasicOperationFactory;
 import lu.nowina.nexu.flow.operation.CreateTokenOperation;
+import lu.nowina.nexu.flow.operation.GetMatchingCardAdaptersOperation;
 import lu.nowina.nexu.flow.operation.Operation;
 import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.flow.operation.OperationResult;
@@ -59,11 +61,11 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 
 		final OperationFactory operationFactory = mock(OperationFactory.class);
 
-		final CreateTokenOperation createTokenOperation = new CreateTokenOperation();
-		createTokenOperation.setParams(api);
-		createTokenOperation.setDisplay(display);
-		createTokenOperation.setOperationFactory(operationFactory);
-		when(operationFactory.getOperation(CreateTokenOperation.class, api)).thenReturn(createTokenOperation);
+		final GetMatchingCardAdaptersOperation operation = new GetMatchingCardAdaptersOperation();
+		operation.setParams(api);
+		operation.setDisplay(display);
+		operation.setOperationFactory(operationFactory);
+		when(operationFactory.getOperation(GetMatchingCardAdaptersOperation.class, api)).thenReturn(operation);
 
 		final Operation<Void> successOperation = mock(Operation.class);
 		when(successOperation.perform()).thenReturn(new OperationResult<Void>(OperationStatus.SUCCESS));
@@ -93,16 +95,21 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		when(api.detectCards()).thenReturn(Arrays.asList(new DetectedCard("atr", 0)));
 
 		final OperationFactory operationFactory = mock(OperationFactory.class);
+		
+		final Operation<List<Match>> getMatchingCardAdaptersOperation = mock(Operation.class);
+		when(getMatchingCardAdaptersOperation.perform()).thenReturn(new OperationResult<List<Match>>(Collections.emptyList()));
+		when(operationFactory.getOperation(GetMatchingCardAdaptersOperation.class, api)).thenReturn(getMatchingCardAdaptersOperation);
+		
 		final CreateTokenOperation createTokenOperation = new CreateTokenOperation() {
 			@Override
 			protected boolean isAdvancedModeAvailable() {
 				return true;
 			}
 		};
-		createTokenOperation.setParams(api);
+		createTokenOperation.setParams(api, Collections.emptyList());
 		createTokenOperation.setDisplay(display);
 		createTokenOperation.setOperationFactory(operationFactory);
-		when(operationFactory.getOperation(CreateTokenOperation.class, api)).thenReturn(createTokenOperation);
+		when(operationFactory.getOperation(CreateTokenOperation.class, api, Collections.emptyList())).thenReturn(createTokenOperation);
 		
 		final Operation<Boolean> returnFalseOperation = mock(Operation.class);
 		when(returnFalseOperation.perform()).thenReturn(new OperationResult<Boolean>(false));
