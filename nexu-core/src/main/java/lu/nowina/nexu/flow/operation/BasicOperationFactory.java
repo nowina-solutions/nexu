@@ -32,12 +32,12 @@ public class BasicOperationFactory implements OperationFactory {
 	public <R, T extends Operation<R>> Operation<R> getOperation(Class<T> clazz, Object... params) {
 		try {
 			final T operation = clazz.newInstance();
-			operation.setParams(params);
 			if(operation instanceof CompositeOperation) {
 				final CompositeOperation<R> compositeOperation = (CompositeOperation<R>) operation;
 				compositeOperation.setOperationFactory(this);
 				compositeOperation.setDisplay(display);
 			}
+			operation.setParams(params);
 			return operation;
 		} catch (InstantiationException e) {
 			throw new IllegalArgumentException(e);
