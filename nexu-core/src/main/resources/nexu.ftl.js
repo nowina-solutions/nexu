@@ -16,6 +16,10 @@ function nexu_sign(dataToSign, digestAlgo, success_callback, error_callback) {
 	callUrl("${nexuUrl}/rest/sign", "POST", data, success_callback, error_callback);
 }
 
+function nexu_get_identity_info(success_callback, error_callback) {
+	callUrl("${nexuUrl}/rest/identityInfo", "GET", {}, success_callback, error_callback);
+}
+
 function callUrl(url, type, data, success_callback, error_callback) {
 	$.ajax({
 		  type: type,
