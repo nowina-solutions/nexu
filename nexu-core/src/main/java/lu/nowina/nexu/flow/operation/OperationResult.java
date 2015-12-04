@@ -19,23 +19,23 @@ public class OperationResult<R> {
 
 	private OperationStatus status;
 
-	private Exception exception;
+	private Throwable exception;
 
 	public OperationResult(R result) {
 		this.status = OperationStatus.SUCCESS;
 		this.result = result;
 	}
 
-	public OperationResult(Exception ex) {
+	public OperationResult(Throwable t) {
 		this.status = OperationStatus.EXCEPTION;
-		this.exception = ex;
+		this.exception = t;
 	}
 
 	public OperationResult(OperationStatus status) {
 		this.status = status;
 	}
 
-	public Exception getException() {
+	public Throwable getException() {
 		return exception;
 	}
 
