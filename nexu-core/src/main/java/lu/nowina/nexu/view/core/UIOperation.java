@@ -69,7 +69,11 @@ public class UIOperation<R> implements Operation<R> {
 			this.display = (UIDisplay) params[0];
 			this.fxml = (String) params[1];
 			if(params.length > 2) {
-				this.params = (Object[]) params[2];
+				if(params[2] instanceof Object[]) {
+					this.params = (Object[]) params[2];
+				} else {
+					this.params = Arrays.copyOfRange(params, 2, params.length);
+				}
 			}
 		} catch(ClassCastException e) {
 			throw new IllegalArgumentException("Expected parameters: display, fxml, controller params.");
