@@ -43,6 +43,7 @@ public class GetIdentityInfoResponse {
 	private String city;
 	
 	private String photo; // Encoded in base 64
+	private String photoMimeType;
 	
 	public GetIdentityInfoResponse() {
 		super();
@@ -198,6 +199,14 @@ public class GetIdentityInfoResponse {
 
 	public void setPhoto(String photo) {
 		this.photo = photo;
+	}
+
+	public String getPhotoMimeType() {
+		return photoMimeType;
+	}
+
+	public void setPhotoMimeType(String photoMimeType) {
+		this.photoMimeType = photoMimeType;
 	}
 
 	public enum Gender {
