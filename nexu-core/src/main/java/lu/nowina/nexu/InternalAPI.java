@@ -22,6 +22,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import lu.nowina.nexu.api.AuthenticateRequest;
+import lu.nowina.nexu.api.AuthenticateResponse;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.EnvironmentInfo;
@@ -222,6 +224,14 @@ public class InternalAPI implements NexuAPI {
 		return executeRequest(flow, request);
 	}
 	
+	@Override
+	public Execution<AuthenticateResponse> authenticate(AuthenticateRequest request) {
+		final Flow<AuthenticateRequest, AuthenticateResponse> flow =
+				flowRegistry.getFlow(FlowRegistry.AUTHENTICATE_FLOW, display);
+		flow.setOperationFactory(operationFactory);
+		return executeRequest(flow, request);
+	}
+
 	public HttpPlugin getPlugin(String context) {
 		return httpPlugins.get(context);
 	}

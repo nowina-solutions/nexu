@@ -24,6 +24,7 @@ import com.google.gson.Gson;
 
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.ToBeSigned;
+import lu.nowina.nexu.api.AuthenticateRequest;
 import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetIdentityInfoRequest;
@@ -66,6 +67,8 @@ public class RestHttpPlugin implements HttpPlugin {
 			return getCertificates(api, payload);
 		case "/identityInfo":
 			return getIdentityInfo(api, payload);
+		case "/authenticate":
+			return authenticate(api, req, payload);
 		default:
 			throw new RuntimeException("Target not recognized " + target);
 		}
@@ -136,7 +139,28 @@ public class RestHttpPlugin implements HttpPlugin {
 		final Execution<?> respObj = api.getIdentityInfo(payloadObj);
 		return toHttpResponse(respObj);
 	}
-	
+
+	private HttpResponse authenticate(NexuAPI api, HttpRequest req, String payload) {
+		logger.info("Authenticate");
+		final AuthenticateRequest r;
+		if (StringUtils.isEmpty(payload)) {
+			r = new AuthenticateRequest();
+
+			String data = req.getParameter("dataToSign");
+			if (data != null) {
+				logger.info("Data to sign " + data);
+				ToBeSigned tbs = new ToBeSigned();
+				tbs.setBytes(DatatypeConverter.parseBase64Binary(data));
+				r.setChallenge(tbs);
+			}
+		} else {
+			r = gson.fromJson(payload, AuthenticateRequest.class);
+		}
+
+		final Execution<?> respObj = api.authenticate(r);
+		return toHttpResponse(respObj);
+	}
+
 	private HttpResponse toHttpResponse(final Execution<?> respObj) {
 		if (respObj.isSuccess()) {
 			return new HttpResponse(gson.toJson(respObj), "application/json", HttpStatus.OK);

@@ -41,4 +41,6 @@ public interface NexuAPI {
 	Execution<SignatureResponse> sign(SignatureRequest request);
 
 	Execution<GetIdentityInfoResponse> getIdentityInfo(GetIdentityInfoRequest request);
+	
+	Execution<AuthenticateResponse> authenticate(AuthenticateRequest request);
 }

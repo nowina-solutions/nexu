@@ -11,20 +11,28 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.flow;
+package lu.nowina.nexu.api;
 
-import lu.nowina.nexu.view.core.UIDisplay;
+import eu.europa.esig.dss.ToBeSigned;
 
-public interface FlowRegistry {
+/**
+ * Request used to perform the authentication.
+ *
+ * @author Jean Lepropre (jean.lepropre@nowina.lu)
+ */
+public class AuthenticateRequest extends NexuRequest {
 
-	static final String SIGNATURE_FLOW = "signature";
-
-	static final String CERTIFICATE_FLOW = "certificate";
-
-	static final String GET_IDENTITY_INFO_FLOW = "getIdentityInfo";
-
-	static final String AUTHENTICATE_FLOW = "authenticate";
+	private ToBeSigned challenge;
 	
-	<I, O> Flow<I, O> getFlow(String code, UIDisplay display);
+	public AuthenticateRequest() {
+		super();
+	}
 
+	public ToBeSigned getChallenge() {
+		return challenge;
+	}
+
+	public void setChallenge(ToBeSigned challenge) {
+		this.challenge = challenge;
+	}
 }
