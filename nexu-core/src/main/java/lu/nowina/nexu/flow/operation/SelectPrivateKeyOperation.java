@@ -16,17 +16,23 @@ package lu.nowina.nexu.flow.operation;
 import java.util.Iterator;
 import java.util.List;
 
+import lu.nowina.nexu.api.CardAdapter;
+import lu.nowina.nexu.api.CertificateFilter;
+import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.view.core.UIOperation;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 
 /**
  * This {@link CompositeOperation} allows to retrieve a private key for a given {@link SignatureTokenConnection}
- * and optional <code>key filter</code>.
+ * and optional <code>certificate filter</code> and/or <code>key filter</code>.
  *
  * Expected parameters:
  * <ol>
  * <li>{@link SignatureTokenConnection}</li>
+ * <li>{@link DetectedCard} (optional)</li>
+ * <li>{@link CardAdapter} (optional)</li>
+ * <li>{@link CertificateFilter} (optional)</li>
  * <li>Key filter (optional): {@link String}</li>
  * </ol>
  *
@@ -35,6 +41,9 @@ import eu.europa.esig.dss.token.SignatureTokenConnection;
 public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPrivateKeyEntry> {
 
 	private SignatureTokenConnection token;
+	private DetectedCard card;
+	private CardAdapter cardAdapter;
+	private CertificateFilter certificateFilter;
 	private String keyFilter;
 	
 	public SelectPrivateKeyOperation() {
@@ -45,21 +54,31 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 	public void setParams(Object... params) {
 		try {
 			this.token = (SignatureTokenConnection) params[0];
-		} catch(final ClassCastException | ArrayIndexOutOfBoundsException e) {
-			throw new IllegalArgumentException("Expected parameters: SignatureTokenConnection, key filter (optional)");
-		}
-		if(params.length > 1) {
-			try {
-				keyFilter = (String) params[1];
-			} catch(final ClassCastException e) {
-				throw new IllegalArgumentException("Expected parameters: SignatureTokenConnection, key filter (optional)");
+			if(params.length > 1) {
+				this.card = (DetectedCard) params[1];
 			}
+			if(params.length > 2) {
+				this.cardAdapter = (CardAdapter) params[2];
+			}
+			if(params.length > 3) {
+				certificateFilter = (CertificateFilter) params[3];
+			}
+			if(params.length > 4) {
+				keyFilter = (String) params[4];
+			}
+		} catch(final ClassCastException | ArrayIndexOutOfBoundsException e) {
+			throw new IllegalArgumentException("Expected parameters: SignatureTokenConnection, DetectedCard (optional), CardAdapter (optional), CertificateFilter (optional), key filter (optional)");
 		}
 	}
 	
 	@Override
 	public OperationResult<DSSPrivateKeyEntry> perform() {
-		final List<DSSPrivateKeyEntry> keys = token.getKeys();
+		final List<DSSPrivateKeyEntry> keys;
+		if((cardAdapter != null) && (card != null) && cardAdapter.supportCertificateFilter(card) && (certificateFilter != null)) {
+			keys = cardAdapter.getKeys(token, certificateFilter);
+		} else {
+			keys = token.getKeys();
+		}
 		
 		DSSPrivateKeyEntry key = null;
 

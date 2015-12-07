@@ -16,6 +16,8 @@ package lu.nowina.nexu.flow;
 import java.util.Map;
 
 import lu.nowina.nexu.NexuException;
+import lu.nowina.nexu.api.CardAdapter;
+import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
@@ -71,9 +73,11 @@ class SignatureFlow extends Flow<SignatureRequest, SignatureResponse> {
 					token = getTokenConnectionOperationResult.getResult();
 					logger.info("Token " + token);
 					
+					final DetectedCard card = (DetectedCard) map.get(TokenOperationResultKey.SELECTED_CARD);
+					final CardAdapter cardAdapter = (CardAdapter) map.get(TokenOperationResultKey.SELECTED_CARD_ADAPTER);
 					final OperationResult<DSSPrivateKeyEntry> selectPrivateKeyOperationResult =
 							getOperationFactory().getOperation(
-									SelectPrivateKeyOperation.class, token, req.getKeyId()).perform();
+									SelectPrivateKeyOperation.class, token, card, cardAdapter, null, req.getKeyId()).perform();
 					if (selectPrivateKeyOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
 						final DSSPrivateKeyEntry key = selectPrivateKeyOperationResult.getResult();
 

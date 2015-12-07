@@ -13,12 +13,16 @@
  */
 package lu.nowina.nexu.generic;
 
+import java.util.List;
+
+import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.MSCAPISignatureToken;
 import eu.europa.esig.dss.token.PasswordInputCallback;
 import eu.europa.esig.dss.token.Pkcs11SignatureToken;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 import eu.europa.esig.dss.token.mocca.MOCCASignatureTokenConnection;
 import lu.nowina.nexu.api.CardAdapter;
+import lu.nowina.nexu.api.CertificateFilter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.GetIdentityInfoResponse;
 import lu.nowina.nexu.api.NexuAPI;
@@ -63,5 +67,15 @@ public class GenericCardAdapter implements CardAdapter {
 	@Override
 	public GetIdentityInfoResponse getIdentityInfo(SignatureTokenConnection token) {
 		throw new IllegalStateException("This card adapter cannot return identity information.");
+	}
+	
+	@Override
+	public boolean supportCertificateFilter(DetectedCard card) {
+		return false;
+	}
+
+	@Override
+	public List<DSSPrivateKeyEntry> getKeys(SignatureTokenConnection token, CertificateFilter certificateFilter) {
+		throw new IllegalStateException("This card adapter does not support certificate filter.");
 	}
 }

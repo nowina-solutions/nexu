@@ -15,6 +15,6 @@ package lu.nowina.nexu.api;
 
 public enum Purpose {
 
-	SIGNATURE, AUTHENTIFICATION
+	SIGNATURE, AUTHENTICATION
 
 }

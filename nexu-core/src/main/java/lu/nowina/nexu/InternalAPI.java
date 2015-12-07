@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 
 import lu.nowina.nexu.api.AuthenticateRequest;
 import lu.nowina.nexu.api.AuthenticateResponse;
@@ -62,6 +63,8 @@ import eu.europa.esig.dss.token.SignatureTokenConnection;
  */
 public class InternalAPI implements NexuAPI {
 
+	public static final ThreadGroup EXECUTOR_THREAD_GROUP = new ThreadGroup("ExecutorThreadGroup");
+	
 	private Logger logger = LoggerFactory.getLogger(InternalAPI.class.getName());
 
 	private UserPreferences prefs;
@@ -87,7 +90,7 @@ public class InternalAPI implements NexuAPI {
 	private ExecutorService executor;
 
 	private Future<?> currentTask;
-
+	
 	public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store, CardDetector detector, DatabaseWebLoader webLoader,
 			FlowRegistry flowRegistry, OperationFactory operationFactory) {
 		this.display = display;
@@ -97,7 +100,12 @@ public class InternalAPI implements NexuAPI {
 		this.webDatabase = webLoader;
 		this.flowRegistry = flowRegistry;
 		this.operationFactory = operationFactory;
-		this.executor = Executors.newSingleThreadExecutor();
+		this.executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
+			@Override
+			public Thread newThread(Runnable r) {
+				return new Thread(EXECUTOR_THREAD_GROUP, r);
+			}
+		});
 		this.currentTask = null;
 	}
 
@@ -149,7 +157,6 @@ public class InternalAPI implements NexuAPI {
 
 	@Override
 	public EnvironmentInfo getEnvironmentInfo() {
-
 		EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
 		return info;
 	}
@@ -170,20 +177,26 @@ public class InternalAPI implements NexuAPI {
 		final Execution<O> resp = new Execution<>();
 
 		try {
-			final Future<O> task;
-			// Prevent race condition on currentTask
-			synchronized (this) {
-				if((currentTask != null) && !currentTask.isDone()) {
-					currentTask.cancel(true);
+			final O response;
+			if(!EXECUTOR_THREAD_GROUP.equals(Thread.currentThread().getThreadGroup())) {
+				final Future<O> task;
+				// Prevent race condition on currentTask
+				synchronized (this) {
+					if((currentTask != null) && !currentTask.isDone()) {
+						currentTask.cancel(true);
+					}
+
+					task = executor.submit(() -> {
+						return flow.execute(this, request);
+					});
+					currentTask = task;
 				}
 
-				task = executor.submit(() -> {
-					return flow.execute(this, request);
-				});
-				currentTask = task;
+				response = task.get();
+			} else {
+				// Allow re-entrant calls
+				response = flow.execute(this, request);
 			}
-			
-			final O response = task.get();
 			if (response != null) {
 				resp.setSuccess(true);
 				resp.setResponse(response);

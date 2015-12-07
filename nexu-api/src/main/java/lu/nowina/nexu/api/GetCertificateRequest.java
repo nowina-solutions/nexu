@@ -15,8 +15,18 @@ package lu.nowina.nexu.api;
 
 public class GetCertificateRequest extends NexuRequest {
 
+	private CertificateFilter certificateFilter;
+
 	public GetCertificateRequest() {
 		super();
+	}
+	
+	public CertificateFilter getCertificateFilter() {
+		return certificateFilter;
+	}
+
+	public void setCertificateFilter(CertificateFilter certificateFilter) {
+		this.certificateFilter = certificateFilter;
 	}
 
 }

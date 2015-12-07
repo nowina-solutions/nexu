@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import lu.nowina.nexu.api.CardAdapter;
+import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.Match;
@@ -69,8 +71,10 @@ class GetCertificateFlow extends Flow<GetCertificateRequest, GetCertificateRespo
 					if (getTokenConnectionOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
 						token = getTokenConnectionOperationResult.getResult();
 
+						final DetectedCard card = (DetectedCard) map.get(TokenOperationResultKey.SELECTED_CARD);
+						final CardAdapter cardAdapter = (CardAdapter) map.get(TokenOperationResultKey.SELECTED_CARD_ADAPTER);
 						final OperationResult<DSSPrivateKeyEntry> selectPrivateKeyOperationResult =
-								getOperationFactory().getOperation(SelectPrivateKeyOperation.class, token).perform();
+								getOperationFactory().getOperation(SelectPrivateKeyOperation.class, token, card, cardAdapter, req.getCertificateFilter()).perform();
 						if (selectPrivateKeyOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
 							final DSSPrivateKeyEntry key = selectPrivateKeyOperationResult.getResult();
 

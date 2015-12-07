@@ -25,10 +25,12 @@ import com.google.gson.Gson;
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.ToBeSigned;
 import lu.nowina.nexu.api.AuthenticateRequest;
+import lu.nowina.nexu.api.CertificateFilter;
 import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetIdentityInfoRequest;
 import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.Purpose;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
@@ -64,7 +66,7 @@ public class RestHttpPlugin implements HttpPlugin {
 		case "/sign":
 			return signRequest(api, req, payload);
 		case "/certificates":
-			return getCertificates(api, payload);
+			return getCertificates(api, req, payload);
 		case "/identityInfo":
 			return getIdentityInfo(api, payload);
 		case "/authenticate":
@@ -112,17 +114,26 @@ public class RestHttpPlugin implements HttpPlugin {
 		return toHttpResponse(respObj);
 	}
 
-	private HttpResponse getCertificates(NexuAPI api, String payload) {
+	private HttpResponse getCertificates(NexuAPI api, HttpRequest req, String payload) {
 		logger.info("API call certificates");
-		final GetCertificateRequest payloadObj;
+		final GetCertificateRequest r;
 		if (StringUtils.isEmpty(payload)) {
-			payloadObj = new GetCertificateRequest();
+			r = new GetCertificateRequest();
+
+			final String certificatePurpose = req.getParameter("certificatePurpose");
+			if (certificatePurpose != null) {
+				logger.info("Certificate purpose " + certificatePurpose);
+				final Purpose purpose = Enum.valueOf(Purpose.class, certificatePurpose);
+				final CertificateFilter certificateFilter = new CertificateFilter();
+				certificateFilter.setPurpose(purpose);
+				r.setCertificateFilter(certificateFilter);
+			}
 		} else {
-			payloadObj = gson.fromJson(payload, GetCertificateRequest.class);
+			r = gson.fromJson(payload, GetCertificateRequest.class);
 		}
 
 		logger.info("Call API");
-		final Execution<?> respObj = api.getCertificate(payloadObj);
+		final Execution<?> respObj = api.getCertificate(r);
 		return toHttpResponse(respObj);
 	}
 
@@ -146,10 +157,10 @@ public class RestHttpPlugin implements HttpPlugin {
 		if (StringUtils.isEmpty(payload)) {
 			r = new AuthenticateRequest();
 
-			String data = req.getParameter("dataToSign");
+			final String data = req.getParameter("challenge");
 			if (data != null) {
-				logger.info("Data to sign " + data);
-				ToBeSigned tbs = new ToBeSigned();
+				logger.info("Challenge " + data);
+				final ToBeSigned tbs = new ToBeSigned();
 				tbs.setBytes(DatatypeConverter.parseBase64Binary(data));
 				r.setChallenge(tbs);
 			}
