@@ -15,8 +15,6 @@ package lu.nowina.nexu.api;
 
 import java.util.List;
 
-import eu.europa.esig.dss.DigestAlgorithm;
-import eu.europa.esig.dss.EncryptionAlgorithm;
 import eu.europa.esig.dss.SignatureValue;
 
 /**
@@ -33,19 +31,14 @@ public class AuthenticateResponse {
 	private final String keyId;
 	private final String certificate;
 	private final List<String> certificateChain;
-	private final EncryptionAlgorithm encryptionAlgorithm;
-	private final DigestAlgorithm digestAlgorithm;
 	
 	private final SignatureValue signatureValue;
 
-	public AuthenticateResponse(String keyId, String certificate, List<String> certificateChain,
-			EncryptionAlgorithm encryptionAlgorithm, DigestAlgorithm digestAlgorithm, SignatureValue signatureValue) {
+	public AuthenticateResponse(String keyId, String certificate, List<String> certificateChain, SignatureValue signatureValue) {
 		super();
 		this.keyId = keyId;
 		this.certificate = certificate;
 		this.certificateChain = certificateChain;
-		this.encryptionAlgorithm = encryptionAlgorithm;
-		this.digestAlgorithm = digestAlgorithm;
 		this.signatureValue = signatureValue;
 	}
 
@@ -59,14 +52,6 @@ public class AuthenticateResponse {
 
 	public List<String> getCertificateChain() {
 		return certificateChain;
-	}
-
-	public EncryptionAlgorithm getEncryptionAlgorithm() {
-		return encryptionAlgorithm;
-	}
-	
-	public DigestAlgorithm getDigestAlgorithm() {
-		return digestAlgorithm;
 	}
 
 	public SignatureValue getSignatureValue() {
