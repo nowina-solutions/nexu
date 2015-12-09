@@ -32,7 +32,7 @@ public class SCDataBaseManagerTest {
 	public void test2() {
 		SCDatabaseManager manager = new SCDatabaseManager();
 		manager.nexuDatabaseFile = new FileSystemResource("src/test/resources/db.xml");
-		Assert.assertEquals("98259f589138d7509e90cb3668f47be8", manager.getDatabaseDigest());
+		Assert.assertEquals("78aed59cb9db6d5e176b1eecab86f96d", manager.getDatabaseDigest());
 	}
 
 	@Test(expected = ConfigurationException.class)

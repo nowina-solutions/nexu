@@ -18,14 +18,18 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import javax.annotation.PostConstruct;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.io.IOUtils;
+import org.apache.xml.security.Init;
+import org.apache.xml.security.c14n.Canonicalizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.Document;
 
 import lu.nowina.nexu.ConfigurationException;
 import lu.nowina.nexu.TechnicalException;
@@ -44,6 +48,10 @@ public class SCDatabaseManager {
 
 	private String databaseDigest;
 
+	public SCDatabaseManager() {
+		Init.init();
+	}
+	
 	@PostConstruct
 	public void postConstruct() {
 		if (nexuDatabaseFile == null) {
@@ -58,8 +66,16 @@ public class SCDatabaseManager {
 		}
 
 		if (data == null) {
+			
 			try (InputStream in = nexuDatabaseFile.getInputStream()) {
-				data = IOUtils.toByteArray(in);
+
+				DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+				Document root = db.parse(in);
+				
+				Canonicalizer c14n = Canonicalizer.getInstance("http://www.w3.org/2001/10/xml-exc-c14n#");
+				byte c14nBytes[] = c14n.canonicalizeSubtree(root);
+				this.data = c14nBytes;
+				
 			} catch (Exception e) {
 				logger.error("Cannot read file " + nexuDatabaseFile, e);
 				throw new TechnicalException("Cannot read file " + nexuDatabaseFile);
@@ -74,7 +90,8 @@ public class SCDatabaseManager {
 		if (databaseDigest == null) {
 			try {
 				MessageDigest digest = MessageDigest.getInstance(DIGEST);
-				databaseDigest = Hex.encodeHexString(digest.digest(getData()));
+				byte[] value = digest.digest(getData());
+				databaseDigest = Hex.encodeHexString(value);
 			} catch (NoSuchAlgorithmException e) {
 				logger.error("Algorithm " + DIGEST + " not found", e);
 				throw new TechnicalException("Algorithm " + DIGEST + " not found");
