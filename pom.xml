@@ -23,8 +23,14 @@
 		<encoding>UTF-8</encoding>
 		<skip.package>false</skip.package>
 		<dss.version>4.6.RC1</dss.version>
+        <maven.release.plugin.version>2.5.3</maven.release.plugin.version>
 	</properties>
 
+    <scm>
+        <developerConnection>scm:git:https://github.com/nowina-solutions/nexu.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+    
 	<licenses>
 		<license>
 			<name>European Union Public Licence (EUPL) v1.1</name>
@@ -66,6 +72,13 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>${maven.release.plugin.version}</version>
+            </plugin>
+        </plugins>
 	</build>
 
 	<profiles>
