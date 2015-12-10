@@ -1,23 +1,27 @@
 var nexuVersion = "1.0";
 
 function nexu_get_certificates(success_callback, error_callback) {
-	callUrl("${nexuUrl}/rest/certificates", "POST", {}, success_callback, error_callback);
+	transmitRequest("certificates", {}, success_callback, error_callback);
 }
 
 /* function to use if we already know a certificate and its tokenId/keyId */
 function nexu_sign_with_token_infos(tokenId, keyId, dataToSign, digestAlgo, success_callback, error_callback) {
 	var data = '{ "tokenId":{"id":"' + tokenId + '"}, "keyId":"' + keyId + '", "toBeSigned": { "bytes": "' + dataToSign + '" } , "digestAlgorithm":"' + digestAlgo + '"}';
-	callUrl("${nexuUrl}/rest/sign", "POST", data, success_callback, error_callback);
+	transmitRequest("sign", data, success_callback, error_callback);
 }
 
 /* function to use without tokenId/keyId */
 function nexu_sign(dataToSign, digestAlgo, success_callback, error_callback) {
 	var data = { dataToSign:dataToSign, digestAlgo:digestAlgo };
-	callUrl("${nexuUrl}/rest/sign", "POST", data, success_callback, error_callback);
+	transmitRequest("sign", data, success_callback, error_callback);
 }
 
 function nexu_get_identity_info(success_callback, error_callback) {
-	callUrl("${nexuUrl}/rest/identityInfo", "GET", {}, success_callback, error_callback);
+	transmitRequest("identityInfo", {}, success_callback, error_callback);
+}
+
+function transmitRequest(service, data, success_callback, error_callback) {
+	callUrl("${nexuUrl}/rest/" + service, "POST", data, success_callback, error_callback);
 }
 
 function callUrl(url, type, data, success_callback, error_callback) {
@@ -34,7 +38,6 @@ function callUrl(url, type, data, success_callback, error_callback) {
 		  }
 		}).fail(function (error) {
 			console.log(url + " : KO");
-			eval(error);
 			error_callback.call(this, error);
 		});
 } 
