@@ -10,7 +10,7 @@
 		<module>nexu-core</module>
 		<module>nexu-rest-plugin</module>
 		<module>nexu-api</module>
-		<module>nexu-server-web</module>
+		<module>nexu-proxy</module>
 		<module>nexu-ws-client</module>
 		<module>nexu-app</module>
 		<module>nexu-model</module>
