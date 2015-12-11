@@ -13,13 +13,11 @@
  */
 package lu.nowina.nexu.server.business;
 
-import java.util.List;
+import lu.nowina.nexu.ConfigurationException;
+import lu.nowina.nexu.api.Feedback;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import lu.nowina.nexu.ConfigurationException;
-import lu.nowina.nexu.api.Feedback;
 
 public class FeedbackManagerTest {
 
@@ -52,29 +50,11 @@ public class FeedbackManagerTest {
 		FeedbackManager endpoint = new FeedbackManager();
 		endpoint.setRepository("target");
 		endpoint.postConstruct();
-		List<FeedbackFile> list = endpoint.feedbackList();
-		int size = list.size();
+		int size = endpoint.countFeedback();
 
 		Feedback f = new Feedback();
 		endpoint.reportError(f);
 
-		list = endpoint.feedbackList();
-		Assert.assertEquals(size + 1, list.size());
+		Assert.assertEquals(size + 1, endpoint.countFeedback());
 	}
-
-	@Test
-	public void test5() throws Exception {
-
-		FeedbackManager endpoint = new FeedbackManager();
-		endpoint.setRepository("target");
-		endpoint.postConstruct();
-		List<FeedbackFile> list = endpoint.feedbackList();
-
-		for (FeedbackFile f : list) {
-			Assert.assertNotNull(f.getId());
-			Assert.assertNotNull(f.getDate());
-		}
-
-	}
-
 }

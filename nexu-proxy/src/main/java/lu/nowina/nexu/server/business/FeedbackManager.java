@@ -16,31 +16,28 @@ package lu.nowina.nexu.server.business;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 import javax.xml.bind.JAXBContext;
 
-import org.apache.commons.io.IOUtils;
+import lu.nowina.nexu.ConfigurationException;
+import lu.nowina.nexu.TechnicalException;
+import lu.nowina.nexu.api.Feedback;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import lu.nowina.nexu.ConfigurationException;
-import lu.nowina.nexu.TechnicalException;
-import lu.nowina.nexu.api.Feedback;
-
 @Service
 public class FeedbackManager {
 
 	private static final Logger logger = LoggerFactory.getLogger(FeedbackManager.class.getName());
+
+	private static final Pattern UUID_PATTERN = Pattern.compile("........-....-....-....-............");
 
 	@Value("${repository}")
 	private String repository;
@@ -86,36 +83,16 @@ public class FeedbackManager {
 		return reportFile;
 	}
 
-	public List<FeedbackFile> feedbackList() throws Exception {
-
-		Pattern pattern = Pattern.compile("........-....-....-....-............");
-
-		File[] listFiles = repositoryDir.listFiles(new FilenameFilter() {
-
-			@Override
-			public boolean accept(File dir, String name) {
-				return pattern.matcher(name).matches();
-			}
-		});
-
-		List<FeedbackFile> files = new ArrayList<>();
-		for (File f : listFiles) {
-			files.add(new FeedbackFile(f));
-		}
-		return files;
-	}
-
-	public String feedback(String id) {
-		File file = getFile(id);
-		try (FileReader r = new FileReader(file)) {
-			return IOUtils.toString(r);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	public void setRepository(String repository) {
 		this.repository = repository;
 	}
 
+	public int countFeedback() {
+		return repositoryDir.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return UUID_PATTERN.matcher(name).matches();
+			}
+		}).length;
+	}
 }
