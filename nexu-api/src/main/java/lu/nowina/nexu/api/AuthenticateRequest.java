@@ -27,6 +27,11 @@ public class AuthenticateRequest extends NexuRequest {
 	public AuthenticateRequest() {
 		super();
 	}
+	
+	public AuthenticateRequest(ToBeSigned challenge) {
+		super();
+		this.challenge = challenge;
+	}
 
 	public ToBeSigned getChallenge() {
 		return challenge;

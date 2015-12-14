@@ -67,8 +67,8 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		operation.setOperationFactory(operationFactory);
 		when(operationFactory.getOperation(GetMatchingCardAdaptersOperation.class, api)).thenReturn(operation);
 
-		final Operation<Void> successOperation = mock(Operation.class);
-		when(successOperation.perform()).thenReturn(new OperationResult<Void>(OperationStatus.SUCCESS));
+		final Operation<Object> successOperation = mock(Operation.class);
+		when(successOperation.perform()).thenReturn(new OperationResult<Object>(OperationStatus.SUCCESS));
 		
 		final Feedback feedback = new Feedback();
 		feedback.setFeedbackStatus(FeedbackStatus.NO_PRODUCT_FOUND);
@@ -111,13 +111,13 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		createTokenOperation.setOperationFactory(operationFactory);
 		when(operationFactory.getOperation(CreateTokenOperation.class, api, Collections.emptyList())).thenReturn(createTokenOperation);
 		
-		final Operation<Boolean> returnFalseOperation = mock(Operation.class);
-		when(returnFalseOperation.perform()).thenReturn(new OperationResult<Boolean>(false));
+		final Operation<Object> returnFalseOperation = mock(Operation.class);
+		when(returnFalseOperation.perform()).thenReturn(new OperationResult<Object>(false));
 		when(operationFactory.getOperation(
 				UIOperation.class, display, "/fxml/unsupported-product.fxml")).thenReturn(returnFalseOperation);
 
-		final Operation<Void> successOperation = mock(Operation.class);
-		when(successOperation.perform()).thenReturn(new OperationResult<Void>(OperationStatus.SUCCESS));
+		final Operation<Object> successOperation = mock(Operation.class);
+		when(successOperation.perform()).thenReturn(new OperationResult<Object>(OperationStatus.SUCCESS));
 		final Feedback feedback = new Feedback();
 		feedback.setFeedbackStatus(FeedbackStatus.PRODUCT_NOT_SUPPORTED);
 		when(operationFactory.getOperation(
