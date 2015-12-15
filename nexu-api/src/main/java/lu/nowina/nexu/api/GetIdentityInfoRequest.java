@@ -20,8 +20,18 @@ package lu.nowina.nexu.api;
  */
 public class GetIdentityInfoRequest extends NexuRequest {
 
+	private boolean ignoreIfUnsupported;
+	
 	public GetIdentityInfoRequest() {
 		super();
+	}
+
+	public boolean isIgnoreIfUnsupported() {
+		return ignoreIfUnsupported;
+	}
+
+	public void setIgnoreIfUnsupported(boolean ignoreIfUnsupported) {
+		this.ignoreIfUnsupported = ignoreIfUnsupported;
 	}
 
 }
