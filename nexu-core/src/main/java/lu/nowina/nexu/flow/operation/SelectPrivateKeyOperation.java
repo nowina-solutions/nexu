@@ -19,6 +19,8 @@ import java.util.List;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.CertificateFilter;
 import lu.nowina.nexu.api.DetectedCard;
+import lu.nowina.nexu.api.flow.OperationResult;
+import lu.nowina.nexu.api.flow.OperationStatus;
 import lu.nowina.nexu.view.core.UIOperation;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.SignatureTokenConnection;

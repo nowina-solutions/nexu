@@ -16,7 +16,7 @@ package lu.nowina.nexu.flow;
 import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.NexuAPI;
-import lu.nowina.nexu.flow.operation.Operation;
+import lu.nowina.nexu.api.flow.Operation;
 import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;

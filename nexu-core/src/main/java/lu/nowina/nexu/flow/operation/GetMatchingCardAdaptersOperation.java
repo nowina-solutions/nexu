@@ -21,6 +21,8 @@ import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackStatus;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.flow.OperationResult;
+import lu.nowina.nexu.api.flow.OperationStatus;
 import lu.nowina.nexu.view.core.UIOperation;
 
 import org.slf4j.Logger;

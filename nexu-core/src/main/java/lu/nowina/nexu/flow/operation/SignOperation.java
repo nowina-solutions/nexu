@@ -18,6 +18,8 @@ import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.ToBeSigned;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
+import lu.nowina.nexu.api.flow.Operation;
+import lu.nowina.nexu.api.flow.OperationResult;
 
 /**
  * This {@link Operation} allows to perform a signature.

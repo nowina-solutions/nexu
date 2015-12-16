@@ -11,9 +11,7 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.flow.operation;
-
-import lu.nowina.nexu.flow.Flow;
+package lu.nowina.nexu.api.flow;
 
 /**
  * An <code>Operation</code> is an element of a {@link Flow}.

@@ -20,6 +20,8 @@ import java.util.Map;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.api.flow.OperationResult;
+import lu.nowina.nexu.api.flow.OperationStatus;
 
 /**
  * This {@link CompositeOperation} allows to get or create a {@link TokenId}.

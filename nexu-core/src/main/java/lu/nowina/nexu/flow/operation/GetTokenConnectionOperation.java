@@ -15,6 +15,9 @@ package lu.nowina.nexu.flow.operation;
 
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.api.flow.Operation;
+import lu.nowina.nexu.api.flow.OperationResult;
+import lu.nowina.nexu.api.flow.OperationStatus;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 
 /**
