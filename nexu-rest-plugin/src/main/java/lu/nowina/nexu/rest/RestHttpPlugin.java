@@ -110,6 +110,10 @@ public class RestHttpPlugin implements HttpPlugin {
 			r = gson.fromJson(payload, SignatureRequest.class);
 		}
 
+		if(r.isOnlyEncryptionRequired()) {
+			return toHttpResponse(new Execution("not_supported_only_encryption_required", ""));
+		}
+		
 		final Execution<?> respObj = api.sign(r);
 		return toHttpResponse(respObj);
 	}
