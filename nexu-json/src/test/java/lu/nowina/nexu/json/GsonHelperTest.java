@@ -79,7 +79,7 @@ public class GsonHelperTest {
 		Execution<GetCertificateResponse> exec2 = GsonHelper.fromExecution(json, GetCertificateResponse.class);
 
 		Assert.assertEquals(true, exec.isSuccess());
-		Assert.assertArrayEquals(resp.getCertificate().getEncoded(), exec2.getResponse().getCertificate().getEncoded());
+		Assert.assertEquals(resp.getCertificate(), exec2.getResponse().getCertificate());
 		
 	}
 
