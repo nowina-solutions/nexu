@@ -1,0 +1,86 @@
+package lu.nowina.nexu.json;
+
+import java.io.FileInputStream;
+
+import org.apache.commons.codec.binary.Base64;
+import org.junit.Assert;
+import org.junit.Test;
+
+import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
+import eu.europa.esig.dss.token.JKSSignatureToken;
+import lu.nowina.nexu.api.CertificateFilter;
+import lu.nowina.nexu.api.Execution;
+import lu.nowina.nexu.api.GetCertificateRequest;
+import lu.nowina.nexu.api.GetCertificateResponse;
+import lu.nowina.nexu.api.Purpose;
+import lu.nowina.nexu.json.pojo.TestWithCertificate;
+
+public class GsonHelperTest {
+
+	@Test
+	public void test1() throws Exception {
+
+		GetCertificateRequest req = new GetCertificateRequest();
+		req.setCertificateFilter(new CertificateFilter(Purpose.SIGNATURE));
+		req.setExternalId("externalId");
+		req.setNonce("nonce");
+		req.setRequestSeal("seal");
+		req.setUserLocale("fr");
+		
+		String json = GsonHelper.toJson(req);
+		Assert.assertEquals("{\"certificateFilter\":{\"purpose\":\"SIGNATURE\"},\"userLocale\":\"fr\",\"externalId\":\"externalId\",\"requestSeal\":\"seal\",\"nonce\":\"nonce\"}", json);
+
+	}
+	
+	@Test
+	public void test2() throws Exception {
+
+		GetCertificateResponse resp = GsonHelper.fromJson("{\"certificate\":\"MIIDhTCCAm2gAwIBAgIEXy8mrjANBgkqhkiG9w0BAQsFADBzMRAwDgYDVQQGEwdVbmtub3duMRAw\r\nDgYDVQQIEwdVbmtub3duMRAwDgYDVQQHEwdVbmtub3duMRAwDgYDVQQKEwdVbmtub3duMRAwDgYD\r\nVQQLEwdVbmtub3duMRcwFQYDVQQDEw5EYXZpZCBOYXJhbXNraTAeFw0xNTEyMDMxNTIzMzJaFw0x\r\nNjExMjcxNTIzMzJaMHMxEDAOBgNVBAYTB1Vua25vd24xEDAOBgNVBAgTB1Vua25vd24xEDAOBgNV\r\nBAcTB1Vua25vd24xEDAOBgNVBAoTB1Vua25vd24xEDAOBgNVBAsTB1Vua25vd24xFzAVBgNVBAMT\r\nDkRhdmlkIE5hcmFtc2tpMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgdtMIcLoZ2Su\r\na2IjRW8Lg6ElmEJdpEpyhTRL6Xep+fNIWB2nPFxhG+7RtDm4kSf5dPxmRJFuHhw8yO1gyZ9R7m7C\r\nCACudr9wRlkr9r96giUYrB6S0MLKRIhuqY452Ekg/iWU13AUQsvXsmOQE5SXD3vRTaKauUa8txJa\r\ncbqWbrDK4LuE/WqOuIeNc+8Sjfv06K2eE/WQsMqa32LRjp1zomT029nUnYpm1ZTq41GGhSrSLFab\r\nIYOknLdN2tbBPzmvt3qGf9q4Kx5gC35fLjZASGSmk1EXKO1huDsIcgjO1NFmHdFvqgbygPBtED63\r\ngZhAVBlpmbxUdKMLtTaz+pWf8wIDAQABoyEwHzAdBgNVHQ4EFgQUH2kJilwO3YF8FOY7AWCriSHl\r\nIBgwDQYJKoZIhvcNAQELBQADggEBAIBU1oZe03VJsdmxQCtB40eYl6W76CSD8Ik66O81YrsjfH1U\r\ntyxrGrS8gonrsC3agLqe3MTvkD99KC6GRVrQw96PKfZK2SjFsOevMxCvq3U7OHisoyDMXIUPHzae\r\nc1eDYkVsrj3d7Q4++LIJ7W+fpfY+5VZLHD+osTQGwfdDAbhbtw3sySTAXCWWnI6bJAD6JBh0SzTo\r\n82MAiGb0KnuzBPVdkuW5BmdicPnkWx4llVxG3A5deBATxtA3k1cUZNI9xzTCRFD3+h9x8PdPTtIA\r\nf4+NiKMIfG/eRWUXuYFlm9vuryL8vvXaHuYjxBXDhGmPeDWEJMSzDQJtLewGklr6MfI\u003d\r\n\"}", GetCertificateResponse.class);
+		System.out.println(resp.getCertificate());
+
+	}
+	
+	@Test
+	public void test3() throws Exception {
+		
+		JKSSignatureToken token = new JKSSignatureToken(new FileInputStream("src/test/resources/keystore.jks"), "password");
+		DSSPrivateKeyEntry key = token.getKeys().get(0);
+		TestWithCertificate cert = new TestWithCertificate(key);
+		
+		String json = GsonHelper.toJson(cert);
+		System.out.println(json);
+		TestWithCertificate cert2 = GsonHelper.fromJson(json, TestWithCertificate.class);
+		Assert.assertArrayEquals(cert2.getToken().getEncoded(), cert.getToken().getEncoded());
+
+	}
+	
+	@Test
+	public void test4() throws Exception {
+		
+		System.out.println(Base64.encodeBase64String("Hello World".getBytes()));
+		String json = GsonHelper.toJson("Hello World".getBytes());
+		System.out.println(json);
+
+		String compare = GsonHelper.fromJson(json, String.class);
+		System.out.println(compare);
+		
+	}
+	
+	@Test
+	public void test5() throws Exception {
+
+		GetCertificateResponse resp = GsonHelper.fromJson("{\"certificate\":\"MIIDhTCCAm2gAwIBAgIEXy8mrjANBgkqhkiG9w0BAQsFADBzMRAwDgYDVQQGEwdVbmtub3duMRAw\r\nDgYDVQQIEwdVbmtub3duMRAwDgYDVQQHEwdVbmtub3duMRAwDgYDVQQKEwdVbmtub3duMRAwDgYD\r\nVQQLEwdVbmtub3duMRcwFQYDVQQDEw5EYXZpZCBOYXJhbXNraTAeFw0xNTEyMDMxNTIzMzJaFw0x\r\nNjExMjcxNTIzMzJaMHMxEDAOBgNVBAYTB1Vua25vd24xEDAOBgNVBAgTB1Vua25vd24xEDAOBgNV\r\nBAcTB1Vua25vd24xEDAOBgNVBAoTB1Vua25vd24xEDAOBgNVBAsTB1Vua25vd24xFzAVBgNVBAMT\r\nDkRhdmlkIE5hcmFtc2tpMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgdtMIcLoZ2Su\r\na2IjRW8Lg6ElmEJdpEpyhTRL6Xep+fNIWB2nPFxhG+7RtDm4kSf5dPxmRJFuHhw8yO1gyZ9R7m7C\r\nCACudr9wRlkr9r96giUYrB6S0MLKRIhuqY452Ekg/iWU13AUQsvXsmOQE5SXD3vRTaKauUa8txJa\r\ncbqWbrDK4LuE/WqOuIeNc+8Sjfv06K2eE/WQsMqa32LRjp1zomT029nUnYpm1ZTq41GGhSrSLFab\r\nIYOknLdN2tbBPzmvt3qGf9q4Kx5gC35fLjZASGSmk1EXKO1huDsIcgjO1NFmHdFvqgbygPBtED63\r\ngZhAVBlpmbxUdKMLtTaz+pWf8wIDAQABoyEwHzAdBgNVHQ4EFgQUH2kJilwO3YF8FOY7AWCriSHl\r\nIBgwDQYJKoZIhvcNAQELBQADggEBAIBU1oZe03VJsdmxQCtB40eYl6W76CSD8Ik66O81YrsjfH1U\r\ntyxrGrS8gonrsC3agLqe3MTvkD99KC6GRVrQw96PKfZK2SjFsOevMxCvq3U7OHisoyDMXIUPHzae\r\nc1eDYkVsrj3d7Q4++LIJ7W+fpfY+5VZLHD+osTQGwfdDAbhbtw3sySTAXCWWnI6bJAD6JBh0SzTo\r\n82MAiGb0KnuzBPVdkuW5BmdicPnkWx4llVxG3A5deBATxtA3k1cUZNI9xzTCRFD3+h9x8PdPTtIA\r\nf4+NiKMIfG/eRWUXuYFlm9vuryL8vvXaHuYjxBXDhGmPeDWEJMSzDQJtLewGklr6MfI\\u003d\r\n\"}", GetCertificateResponse.class);
+		Execution<GetCertificateResponse> exec = new Execution<>(resp);
+		
+		String json = GsonHelper.toJson(exec);
+		System.out.println(json);
+
+		
+		Execution<GetCertificateResponse> exec2 = GsonHelper.fromExecution(json, GetCertificateResponse.class);
+
+		Assert.assertEquals(true, exec.isSuccess());
+		Assert.assertArrayEquals(resp.getCertificate().getEncoded(), exec2.getResponse().getCertificate().getEncoded());
+		
+	}
+
+}
