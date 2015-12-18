@@ -23,6 +23,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.api.AuthenticateRequest;
 import lu.nowina.nexu.api.AuthenticateResponse;
 import lu.nowina.nexu.api.CardAdapter;
@@ -35,8 +39,6 @@ import lu.nowina.nexu.api.GetIdentityInfoRequest;
 import lu.nowina.nexu.api.GetIdentityInfoResponse;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
-import lu.nowina.nexu.api.NexuRequest;
-import lu.nowina.nexu.api.RequestValidator;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
@@ -51,11 +53,6 @@ import lu.nowina.nexu.generic.GenericCardAdapter;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCInfo;
 import lu.nowina.nexu.view.core.UIDisplay;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import eu.europa.esig.dss.token.SignatureTokenConnection;
 
 /**
  * Implementation of the NexuAPI
@@ -92,8 +89,6 @@ public class InternalAPI implements NexuAPI {
 	private ExecutorService executor;
 
 	private Future<?> currentTask;
-	
-	private RequestValidator requestValidator;
 	
 	public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store, CardDetector detector, DatabaseWebLoader webLoader,
 			FlowRegistry flowRegistry, OperationFactory operationFactory) {
@@ -221,10 +216,6 @@ public class InternalAPI implements NexuAPI {
 
 	@Override
 	public Execution<GetCertificateResponse> getCertificate(GetCertificateRequest request) {
-		Execution<GetCertificateResponse> error = returnNullIfValid(request);
-		if(error != null) {
-			return error;
-		}
 		Flow<GetCertificateRequest, GetCertificateResponse> flow = flowRegistry.getFlow(FlowRegistry.CERTIFICATE_FLOW, display);
 		flow.setOperationFactory(operationFactory);
 		return executeRequest(flow, request);
@@ -232,10 +223,6 @@ public class InternalAPI implements NexuAPI {
 
 	@Override
 	public Execution<SignatureResponse> sign(SignatureRequest request) {
-		Execution<SignatureResponse> error = returnNullIfValid(request);
-		if(error != null) {
-			return error;
-		}
 		Flow<SignatureRequest, SignatureResponse> flow = flowRegistry.getFlow(FlowRegistry.SIGNATURE_FLOW, display);
 		flow.setOperationFactory(operationFactory);
 		return executeRequest(flow, request);
@@ -243,10 +230,6 @@ public class InternalAPI implements NexuAPI {
 
 	@Override
 	public Execution<GetIdentityInfoResponse> getIdentityInfo(GetIdentityInfoRequest request) {
-		Execution<GetIdentityInfoResponse> error = returnNullIfValid(request);
-		if(error != null) {
-			return error;
-		}
 		final Flow<GetIdentityInfoRequest, GetIdentityInfoResponse> flow =
 				flowRegistry.getFlow(FlowRegistry.GET_IDENTITY_INFO_FLOW, display);
 		flow.setOperationFactory(operationFactory);
@@ -255,33 +238,12 @@ public class InternalAPI implements NexuAPI {
 	
 	@Override
 	public Execution<AuthenticateResponse> authenticate(AuthenticateRequest request) {
-		Execution<AuthenticateResponse> error = returnNullIfValid(request);
-		if(error != null) {
-			return error;
-		}
 		final Flow<AuthenticateRequest, AuthenticateResponse> flow =
 				flowRegistry.getFlow(FlowRegistry.AUTHENTICATE_FLOW, display);
 		flow.setOperationFactory(operationFactory);
 		return executeRequest(flow, request);
 	}
 	
-	public <T> Execution<T> returnNullIfValid(NexuRequest request) {
-		if(requestValidator == null) {
-			// no validator
-			return null;
-		} else {
-			if(requestValidator.verify(request)) {
-				// ok
-				return null;
-			} else {
-				Execution<T> execution = new Execution<>();
-				execution.setSuccess(false);
-				execution.setError("request.not.signed");
-				execution.setErrorMessage("Request is not signed");
-				return execution;
-			}
-		}
-	}
 
 	public HttpPlugin getPlugin(String context) {
 		return httpPlugins.get(context);
@@ -312,8 +274,4 @@ public class InternalAPI implements NexuAPI {
 		return prefs;
 	}
 	
-	public void setRequestValidator(RequestValidator requestValidator) {
-		this.requestValidator = requestValidator;
-	}
-
 }

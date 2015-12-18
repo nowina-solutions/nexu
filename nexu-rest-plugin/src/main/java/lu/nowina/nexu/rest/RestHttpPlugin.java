@@ -28,6 +28,7 @@ import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetIdentityInfoRequest;
 import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.NexuRequest;
 import lu.nowina.nexu.api.Purpose;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.TokenId;
@@ -73,6 +74,10 @@ public class RestHttpPlugin implements HttpPlugin {
 		}
 	}
 
+	protected <T> Execution<T> returnNullIfValid(NexuRequest request) {
+		return null;
+	}
+	
 	private HttpResponse signRequest(NexuAPI api, HttpRequest req, String payload) {
 		logger.info("Signature");
 		final SignatureRequest r;
@@ -109,6 +114,11 @@ public class RestHttpPlugin implements HttpPlugin {
 
 		if(r.isOnlyEncryptionRequired()) {
 			return toHttpResponse(new Execution("not_supported_only_encryption_required", ""));
+		}
+		
+		Execution<Object> verification = returnNullIfValid(r);
+		if(verification != null) {
+			return toHttpResponse(verification);
 		}
 		
 		final Execution<?> respObj = api.sign(r);
