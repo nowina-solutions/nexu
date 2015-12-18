@@ -20,8 +20,6 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 
-import com.google.gson.Gson;
-
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.ToBeSigned;
 import lu.nowina.nexu.api.AuthenticateRequest;
@@ -37,6 +35,7 @@ import lu.nowina.nexu.api.plugin.HttpPlugin;
 import lu.nowina.nexu.api.plugin.HttpRequest;
 import lu.nowina.nexu.api.plugin.HttpResponse;
 import lu.nowina.nexu.api.plugin.HttpStatus;
+import lu.nowina.nexu.json.GsonHelper;
 
 /**
  * Default implementation of HttpPlugin for NexU.
@@ -46,8 +45,6 @@ import lu.nowina.nexu.api.plugin.HttpStatus;
 public class RestHttpPlugin implements HttpPlugin {
 
 	private static final Logger logger = Logger.getLogger(RestHttpPlugin.class.getName());
-
-	private static final Gson gson = GsonHelper.customGson;
 
 	@Override
 	public void init(String pluginId, NexuAPI api) {
@@ -107,7 +104,7 @@ public class RestHttpPlugin implements HttpPlugin {
 				r.setKeyId(keyId);
 			}
 		} else {
-			r = gson.fromJson(payload, SignatureRequest.class);
+			r = GsonHelper.fromJson(payload, SignatureRequest.class);
 		}
 
 		if(r.isOnlyEncryptionRequired()) {
@@ -133,7 +130,7 @@ public class RestHttpPlugin implements HttpPlugin {
 				r.setCertificateFilter(certificateFilter);
 			}
 		} else {
-			r = gson.fromJson(payload, GetCertificateRequest.class);
+			r = GsonHelper.fromJson(payload, GetCertificateRequest.class);
 		}
 
 		logger.info("Call API");
@@ -147,7 +144,7 @@ public class RestHttpPlugin implements HttpPlugin {
 		if (StringUtils.isEmpty(payload)) {
 			payloadObj = new GetIdentityInfoRequest();
 		} else {
-			payloadObj = gson.fromJson(payload, GetIdentityInfoRequest.class);
+			payloadObj = GsonHelper.fromJson(payload, GetIdentityInfoRequest.class);
 		}
 
 		logger.info("Call API");
@@ -169,7 +166,7 @@ public class RestHttpPlugin implements HttpPlugin {
 				r.setChallenge(tbs);
 			}
 		} else {
-			r = gson.fromJson(payload, AuthenticateRequest.class);
+			r = GsonHelper.fromJson(payload, AuthenticateRequest.class);
 		}
 
 		final Execution<?> respObj = api.authenticate(r);
@@ -178,9 +175,9 @@ public class RestHttpPlugin implements HttpPlugin {
 
 	private HttpResponse toHttpResponse(final Execution<?> respObj) {
 		if (respObj.isSuccess()) {
-			return new HttpResponse(gson.toJson(respObj), "application/json", HttpStatus.OK);
+			return new HttpResponse(GsonHelper.toJson(respObj), "application/json", HttpStatus.OK);
 		} else {
-			return new HttpResponse(gson.toJson(respObj), "application/json", HttpStatus.ERROR);
+			return new HttpResponse(GsonHelper.toJson(respObj), "application/json", HttpStatus.ERROR);
 		}
 	}
 }

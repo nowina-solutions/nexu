@@ -17,6 +17,7 @@ import java.util.List;
 
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.EncryptionAlgorithm;
+import eu.europa.esig.dss.x509.CertificateToken;
 
 public class GetCertificateResponse {
 
@@ -24,9 +25,9 @@ public class GetCertificateResponse {
 
 	private String keyId;
 
-	private String certificate;
+	private CertificateToken certificate;
 
-	private List<String> certificateChain;
+	private CertificateToken[] certificateChain;
 
 	private EncryptionAlgorithm encryptionAlgorithm;
 
@@ -48,19 +49,19 @@ public class GetCertificateResponse {
 		this.keyId = keyId;
 	}
 
-	public String getCertificate() {
+	public CertificateToken getCertificate() {
 		return certificate;
 	}
 
-	public void setCertificate(String certificate) {
+	public void setCertificate(CertificateToken certificate) {
 		this.certificate = certificate;
 	}
 
-	public List<String> getCertificateChain() {
+	public CertificateToken[] getCertificateChain() {
 		return certificateChain;
 	}
 
-	public void setCertificateChain(List<String> certificateChain) {
+	public void setCertificateChain(CertificateToken[] certificateChain) {
 		this.certificateChain = certificateChain;
 	}
 

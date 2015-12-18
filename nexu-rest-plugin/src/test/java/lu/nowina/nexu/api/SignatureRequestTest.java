@@ -20,7 +20,7 @@ import com.google.gson.Gson;
 
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.ToBeSigned;
-import lu.nowina.nexu.rest.GsonHelper;
+import lu.nowina.nexu.json.GsonHelper;
 
 public class SignatureRequestTest {
 
@@ -54,12 +54,11 @@ public class SignatureRequestTest {
 		obj.setToBeSigned(tbs);
 		obj.setTokenId(new TokenId("tokenId"));
 
-		Gson gson = GsonHelper.customGson;
-		String text = gson.toJson(obj);
+		String text = GsonHelper.toJson(obj);
 
 		System.out.println(text);
 
-		SignatureRequest obj2 = gson.fromJson(text, SignatureRequest.class);
+		SignatureRequest obj2 = GsonHelper.fromJson(text, SignatureRequest.class);
 
 		Assert.assertEquals(obj.getKeyId(), obj2.getKeyId());
 		Assert.assertEquals(obj.getDigestAlgorithm(), obj2.getDigestAlgorithm());

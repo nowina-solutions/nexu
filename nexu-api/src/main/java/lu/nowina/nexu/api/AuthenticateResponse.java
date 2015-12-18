@@ -16,6 +16,7 @@ package lu.nowina.nexu.api;
 import java.util.List;
 
 import eu.europa.esig.dss.SignatureValue;
+import eu.europa.esig.dss.x509.CertificateToken;
 
 /**
  * Holds the data representing the result of the authentication:
@@ -29,12 +30,12 @@ import eu.europa.esig.dss.SignatureValue;
 public class AuthenticateResponse {
 
 	private final String keyId;
-	private final String certificate;
-	private final List<String> certificateChain;
+	private final CertificateToken certificate;
+	private final CertificateToken[] certificateChain;
 	
 	private final SignatureValue signatureValue;
 
-	public AuthenticateResponse(String keyId, String certificate, List<String> certificateChain, SignatureValue signatureValue) {
+	public AuthenticateResponse(String keyId, CertificateToken certificate, CertificateToken[] certificateChain, SignatureValue signatureValue) {
 		super();
 		this.keyId = keyId;
 		this.certificate = certificate;
@@ -46,11 +47,11 @@ public class AuthenticateResponse {
 		return keyId;
 	}
 
-	public String getCertificate() {
+	public CertificateToken getCertificate() {
 		return certificate;
 	}
 
-	public List<String> getCertificateChain() {
+	public CertificateToken[] getCertificateChain() {
 		return certificateChain;
 	}
 

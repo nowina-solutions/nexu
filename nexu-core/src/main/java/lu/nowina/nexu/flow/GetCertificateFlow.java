@@ -87,17 +87,13 @@ class GetCertificateFlow extends Flow<GetCertificateRequest, GetCertificateRespo
 							resp.setTokenId(tokenId);
 
 							final CertificateToken certificate = key.getCertificate();
-							resp.setCertificate(certificate.getBase64Encoded());
+							resp.setCertificate(certificate);
 							resp.setKeyId(certificate.getDSSIdAsString());
 							resp.setEncryptionAlgorithm(certificate.getEncryptionAlgorithm());
 
 							final CertificateToken[] certificateChain = key.getCertificateChain();
 							if (certificateChain != null) {
-								final List<String> listCertificates = new ArrayList<String>();
-								for (CertificateToken certificateToken : certificateChain) {
-									listCertificates.add(certificateToken.getBase64Encoded());
-								}
-								resp.setCertificateChain(listCertificates);
+								resp.setCertificateChain(certificateChain);
 							}
 
 							return resp;
