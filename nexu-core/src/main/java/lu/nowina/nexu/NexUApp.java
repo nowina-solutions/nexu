@@ -39,6 +39,7 @@ import lu.nowina.nexu.generic.SCDatabaseLoader;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
 
+import org.apache.commons.lang.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,8 +164,8 @@ public class NexUApp extends Application implements UIDisplay {
 		try {
 			Class<?> clazz = Class.forName(pluginClassName);
 			Object plugin = clazz.newInstance();
-			for (Class<?> i : clazz.getInterfaces()) {
-				registerPlugin(api, pluginId, i, plugin);
+			for (Object o : ClassUtils.getAllInterfaces(clazz)) {
+				registerPlugin(api, pluginId, (Class<?>) o, plugin);
 			}
 		} catch (Exception e) {
 			logger.error(MessageFormat.format("Cannot register plugin {0} (id: {1})", pluginClassName, pluginId), e);
