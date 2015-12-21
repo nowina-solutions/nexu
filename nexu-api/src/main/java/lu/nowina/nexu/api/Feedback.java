@@ -15,8 +15,8 @@ package lu.nowina.nexu.api;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -31,7 +31,7 @@ public class Feedback {
 
 	protected String apiParameter;
 	@XmlElement(nillable = true)
-	protected List<DetectedCard> detected;
+	protected Set<DetectedCard> detected;
 	protected FeedbackStatus feedbackStatus;
 	protected ScAPI selectedAPI;
 	protected DetectedCard selectedCard;
@@ -155,11 +155,21 @@ public class Feedback {
 	 * 
 	 * 
 	 */
-	public List<DetectedCard> getDetected() {
+	public Set<DetectedCard> getDetected() {
 		if (detected == null) {
-			detected = new ArrayList<DetectedCard>();
+			detected = new HashSet<DetectedCard>();
 		}
 		return this.detected;
+	}
+	
+	/**
+	 * Sets the value of the detected property.
+	 * 
+	 * @param detected
+	 *            allowed object is {@link Set}
+	 */
+	public void setDetected(Set<DetectedCard> detected) {
+		this.detected = detected;
 	}
 
 	/**
