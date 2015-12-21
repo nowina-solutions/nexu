@@ -35,7 +35,9 @@ import lu.nowina.nexu.jetty.JettyServer;
 public class NexuLauncher {
 
 	private static final String ADVANCED_MODE_AVAILABLE = "advanced_mode_available";
-	
+
+	private static final String APPLICATION_NAME = "application_name";
+
 	private static final String DEBUG = "debug";
 
 	private static final String HTTP_SERVER_CLASS = "http_server_class";
@@ -169,6 +171,7 @@ public class NexuLauncher {
 	final public AppConfig loadAppConfig(Properties props) {
 		AppConfig config = new AppConfig();
 
+		config.setApplicationName(props.getProperty(APPLICATION_NAME, "NexU"));
 		config.setBindingPort(Integer.parseInt(props.getProperty(BINDING_PORT, "9876")));
 		config.setBindingIP(props.getProperty(BINDING_IP, "127.0.0.1"));
 		config.setServerUrl(props.getProperty(SERVER_URL, "http://lab.nowina.solutions/nexu"));

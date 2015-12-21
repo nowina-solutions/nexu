@@ -37,6 +37,8 @@ public class AppConfig {
 
 	private boolean advancedModeAvailable;
 	
+	private String applicationName;
+	
 	public String getBindingIP() {
 		return bindingIP;
 	}
@@ -99,5 +101,13 @@ public class AppConfig {
 
 	public void setAdvancedModeAvailable(boolean advancedModeAvailable) {
 		this.advancedModeAvailable = advancedModeAvailable;
+	}
+
+	public String getApplicationName() {
+		return applicationName;
+	}
+
+	public void setApplicationName(String applicationName) {
+		this.applicationName = applicationName;
 	}
 }
