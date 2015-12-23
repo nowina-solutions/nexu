@@ -168,8 +168,8 @@ public class NexuLauncher {
 	 * @param props
 	 * @return
 	 */
-	final public AppConfig loadAppConfig(Properties props) {
-		AppConfig config = new AppConfig();
+	public AppConfig loadAppConfig(Properties props) {
+		final AppConfig config = createAppConfig();
 
 		config.setApplicationName(props.getProperty(APPLICATION_NAME, "NexU"));
 		config.setBindingPort(Integer.parseInt(props.getProperty(BINDING_PORT, "9876")));
@@ -184,6 +184,10 @@ public class NexuLauncher {
 		return config;
 	}
 
+	protected AppConfig createAppConfig() {
+		return new AppConfig();
+	}
+	
 	/**
 	 * Returns the JavaFX {@link Application} class to launch.
 	 * @return The JavaFX {@link Application} class to launch.
