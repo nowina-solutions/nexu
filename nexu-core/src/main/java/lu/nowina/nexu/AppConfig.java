@@ -13,6 +13,12 @@
  */
 package lu.nowina.nexu;
 
+import java.io.IOException;
+
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Configuration of the NexU Platform
  * 
@@ -20,6 +26,8 @@ package lu.nowina.nexu;
  *
  */
 public class AppConfig {
+
+	private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
 
 	private String bindingIP;
 
@@ -38,6 +46,17 @@ public class AppConfig {
 	private boolean advancedModeAvailable;
 	
 	private String applicationName;
+	
+	private String applicationVersion;
+	
+	public AppConfig() {
+		try {
+			this.applicationVersion = IOUtils.toString(this.getClass().getResource("/version.txt"));
+		} catch (final IOException e) {
+			logger.error("Cannot retrieve application version: " + e.getMessage(), e);
+			this.applicationVersion = "";
+		}
+	}
 	
 	public String getBindingIP() {
 		return bindingIP;
@@ -109,5 +128,9 @@ public class AppConfig {
 
 	public void setApplicationName(String applicationName) {
 		this.applicationName = applicationName;
+	}
+
+	public String getApplicationVersion() {
+		return applicationVersion;
 	}
 }

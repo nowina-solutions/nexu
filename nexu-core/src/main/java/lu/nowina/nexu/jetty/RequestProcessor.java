@@ -25,6 +25,15 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import lu.nowina.nexu.ConfigurationException;
+import lu.nowina.nexu.InternalAPI;
+import lu.nowina.nexu.NexuLauncher;
+import lu.nowina.nexu.TechnicalException;
+import lu.nowina.nexu.UserPreferences;
+import lu.nowina.nexu.api.plugin.HttpPlugin;
+import lu.nowina.nexu.api.plugin.HttpResponse;
+import lu.nowina.nexu.api.plugin.HttpStatus;
+
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -33,13 +42,6 @@ import org.slf4j.LoggerFactory;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import lu.nowina.nexu.ConfigurationException;
-import lu.nowina.nexu.InternalAPI;
-import lu.nowina.nexu.TechnicalException;
-import lu.nowina.nexu.UserPreferences;
-import lu.nowina.nexu.api.plugin.HttpPlugin;
-import lu.nowina.nexu.api.plugin.HttpResponse;
-import lu.nowina.nexu.api.plugin.HttpStatus;
 
 public class RequestProcessor extends AbstractHandler {
 
@@ -153,7 +155,7 @@ public class RequestProcessor extends AbstractHandler {
 	private void nexuInfo(HttpServletResponse response) throws IOException {
 		response.setContentType("application/json");
 		PrintWriter writer = response.getWriter();
-		writer.write("{ \"version\": \"1.0\"}");
+		writer.write("{ \"version\": \"" + NexuLauncher.getConfig().getApplicationVersion() + "\"}");
 		writer.close();
 	}
 

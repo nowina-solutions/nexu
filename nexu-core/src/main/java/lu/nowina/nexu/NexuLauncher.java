@@ -136,7 +136,7 @@ public class NexuLauncher {
 	}
 
 	private static boolean checkAlreadyStarted() throws MalformedURLException {
-		URL url = new URL("http://" + config.getBindingIP() + ":" + config.getBindingPort() + "/info");
+		URL url = new URL("http://" + config.getBindingIP() + ":" + config.getBindingPort() + "/nexu-info");
 		try (InputStream in = url.openStream()) {
 			String info = IOUtils.toString(in);
 			logger.error("NexU already started. Version '" + info + "'");

@@ -24,16 +24,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.view.ui.AboutController;
 import lu.nowina.nexu.view.ui.PreferencesController;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SystrayMenu {
 
@@ -67,7 +66,7 @@ public class SystrayMenu {
 
 							Parent root = loader.getRoot();
 							AboutController controller = loader.getController();
-							controller.setApplicationVersion(getApplicationVersion());
+							controller.setApplicationVersion(NexuLauncher.getConfig().getApplicationVersion());
 							controller.setDisplay(display);
 							controller.setDataLoader(webLoader);
 
@@ -118,20 +117,9 @@ public class SystrayMenu {
 				tray.add(trayIcon);
 			} catch (AWTException e) {
 				logger.error("Cannot add TrayIcon", e);
-				System.err.println("TrayIcon could not be added.");
 			}
-
 		} else {
-			System.err.println("System tray is currently not supported.");
-		}
-	}
-
-	private String getApplicationVersion() {
-		try {
-			return IOUtils.toString(this.getClass().getResource("/version.txt"));
-		} catch (final IOException e) {
-			logger.error("Cannot retrieve application version: " + e.getMessage(), e);
-			return "";
+			logger.error("System tray is currently not supported.");
 		}
 	}
 }
