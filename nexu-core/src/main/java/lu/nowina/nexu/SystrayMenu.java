@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +67,7 @@ public class SystrayMenu {
 
 							Parent root = loader.getRoot();
 							AboutController controller = loader.getController();
+							controller.setApplicationVersion(getApplicationVersion());
 							controller.setDisplay(display);
 							controller.setDataLoader(webLoader);
 
@@ -124,4 +126,12 @@ public class SystrayMenu {
 		}
 	}
 
+	private String getApplicationVersion() {
+		try {
+			return IOUtils.toString(this.getClass().getResource("/version.txt"));
+		} catch (final IOException e) {
+			logger.error("Cannot retrieve application version: " + e.getMessage(), e);
+			return "";
+		}
+	}
 }
