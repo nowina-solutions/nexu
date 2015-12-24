@@ -44,6 +44,7 @@ import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
+import lu.nowina.nexu.cache.FIFOCache;
 import lu.nowina.nexu.flow.Flow;
 import lu.nowina.nexu.flow.FlowRegistry;
 import lu.nowina.nexu.flow.operation.OperationFactory;
@@ -72,7 +73,8 @@ public class InternalAPI implements NexuAPI {
 
 	private List<CardAdapter> adapters = new ArrayList<>();
 
-	private Map<TokenId, SignatureTokenConnection> connections = new HashMap<>();
+	private Map<TokenId, SignatureTokenConnection> connections =
+			new FIFOCache<>(NexuLauncher.getConfig().getConnectionsCacheMaxSize());
 
 	private Map<String, HttpPlugin> httpPlugins = new HashMap<>();
 

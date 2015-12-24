@@ -8,6 +8,11 @@
 	<artifactId>nexu-core</artifactId>
 
 	<dependencies>
+        <dependency>
+            <groupId>lu.nowina.apps</groupId>
+            <artifactId>nexu-util</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
 			<artifactId>nexu-api</artifactId>

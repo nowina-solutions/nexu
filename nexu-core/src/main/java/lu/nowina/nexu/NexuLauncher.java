@@ -52,6 +52,8 @@ public class NexuLauncher {
 
 	private static final String BINDING_PORT = "binding_port";
 
+	private static final String CONNECTIONS_CACHE_MAX_SIZE = "connections_cache_max_size";
+	
 	private static final Logger logger = LoggerFactory.getLogger(NexuLauncher.class.getName());
 
 	private static AppConfig config;
@@ -180,7 +182,8 @@ public class NexuLauncher {
 		config.setHttpServerClass(props.getProperty(HTTP_SERVER_CLASS, JettyServer.class.getName()));
 		config.setDebug(Boolean.parseBoolean(props.getProperty(DEBUG, "false")));
 		config.setAdvancedModeAvailable(Boolean.parseBoolean(props.getProperty(ADVANCED_MODE_AVAILABLE, "true")));
-
+		config.setConnectionsCacheMaxSize(Integer.parseInt(props.getProperty(CONNECTIONS_CACHE_MAX_SIZE, "50")));
+		
 		return config;
 	}
 

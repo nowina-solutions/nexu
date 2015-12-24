@@ -49,6 +49,8 @@ public class AppConfig {
 	
 	private String applicationVersion;
 	
+	private int connectionsCacheMaxSize;
+	
 	public AppConfig() {
 		try {
 			this.applicationVersion = IOUtils.toString(this.getClass().getResource("/version.txt"));
@@ -132,5 +134,13 @@ public class AppConfig {
 
 	public String getApplicationVersion() {
 		return applicationVersion;
+	}
+
+	public int getConnectionsCacheMaxSize() {
+		return connectionsCacheMaxSize;
+	}
+
+	public void setConnectionsCacheMaxSize(int connectionsCacheMaxSize) {
+		this.connectionsCacheMaxSize = connectionsCacheMaxSize;
 	}
 }
