@@ -35,6 +35,6 @@ public class FIFOCache<K, V> extends LinkedHashMap<K, V> {
 
 	@Override
 	protected boolean removeEldestEntry(java.util.Map.Entry<K, V> eldest) {
-		return size() >= maxSize;
+		return size() > maxSize;
 	}
 }
