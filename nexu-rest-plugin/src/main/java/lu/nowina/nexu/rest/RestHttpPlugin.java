@@ -185,9 +185,9 @@ public class RestHttpPlugin implements HttpPlugin {
 
 	private HttpResponse toHttpResponse(final Execution<?> respObj) {
 		if (respObj.isSuccess()) {
-			return new HttpResponse(GsonHelper.toJson(respObj), "application/json", HttpStatus.OK);
+			return new HttpResponse(GsonHelper.toJson(respObj), "application/json;charset=UTF-8", HttpStatus.OK);
 		} else {
-			return new HttpResponse(GsonHelper.toJson(respObj), "application/json", HttpStatus.ERROR);
+			return new HttpResponse(GsonHelper.toJson(respObj), "application/json;charset=UTF-8", HttpStatus.ERROR);
 		}
 	}
 }

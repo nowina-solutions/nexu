@@ -13,6 +13,8 @@
  */
 package lu.nowina.nexu;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -215,7 +217,9 @@ public class InternalAPI implements NexuAPI {
 			logger.error("Cannot execute request", e);
 			resp.setSuccess(false);
 			resp.setError("exception");
-			resp.setErrorMessage("Exception during execution");
+			final StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			resp.setErrorMessage(sw.toString());
 			return resp;
 		}
 	}
