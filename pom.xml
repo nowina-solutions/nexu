@@ -14,7 +14,7 @@
 		<module>nexu-ws-client</module>
 		<module>nexu-app</module>
 		<module>nexu-model</module>
-		<module>nexu-json</module>
+		<module>nexu-util</module>
 	</modules>
 
 	<properties>

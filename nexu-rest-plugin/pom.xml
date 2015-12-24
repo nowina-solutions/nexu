@@ -15,7 +15,7 @@
 		</dependency>
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
-			<artifactId>nexu-json</artifactId>
+			<artifactId>nexu-util</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

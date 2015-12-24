@@ -5,7 +5,7 @@
 		<artifactId>nexu</artifactId>
 		<version>1.2-SNAPSHOT</version>
 	</parent>
-	<artifactId>nexu-json</artifactId>
+	<artifactId>nexu-util</artifactId>
 
 	<dependencies>
 		<dependency>
