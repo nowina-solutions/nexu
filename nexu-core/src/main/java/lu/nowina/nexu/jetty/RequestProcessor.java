@@ -29,7 +29,9 @@ import lu.nowina.nexu.ConfigurationException;
 import lu.nowina.nexu.InternalAPI;
 import lu.nowina.nexu.TechnicalException;
 import lu.nowina.nexu.UserPreferences;
+import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Execution;
+import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
 import lu.nowina.nexu.api.plugin.HttpResponse;
 import lu.nowina.nexu.api.plugin.HttpStatus;
@@ -126,9 +128,11 @@ public class RequestProcessor extends AbstractHandler {
 				
 				final Execution<?> execution = new Execution<Object>();
 				execution.setError("exception");
-				final StringWriter sw = new StringWriter();
-				e.printStackTrace(new PrintWriter(sw));
-				execution.setErrorMessage(sw.toString());
+				execution.setErrorMessage("Exception during execution");
+				final Feedback feedback = new Feedback(e);
+				feedback.setNexuVersion(api.getAppConfig().getApplicationVersion());
+				feedback.setInfo(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
+				execution.setFeedback(feedback);
 				execution.setSuccess(false);
 				
 				final PrintWriter writer = response.getWriter();

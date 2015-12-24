@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlEnum
 public enum FeedbackStatus {
 
-	NO_PRODUCT_FOUND, PRODUCT_NOT_SUPPORTED, NO_KEYS, EXCEPTION, SUCCESS;
+	NO_PRODUCT_FOUND, PRODUCT_NOT_SUPPORTED, NO_KEYS, EXCEPTION, SUCCESS, FAILED, SIGNATURE_VERIFICATION_FAILED;
 
 	public String value() {
 		return name();

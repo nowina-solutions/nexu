@@ -29,7 +29,7 @@ public class Execution<T> {
 
 	private String errorMessage;
 
-	private String feedback;
+	private Feedback feedback;
 
 	public Execution() {
 	}
@@ -77,11 +77,11 @@ public class Execution<T> {
 		this.errorMessage = errorMessage;
 	}
 
-	public String getFeedback() {
+	public Feedback getFeedback() {
 		return feedback;
 	}
 
-	public void setFeedback(String feedback) {
+	public void setFeedback(Feedback feedback) {
 		this.feedback = feedback;
 	}
 

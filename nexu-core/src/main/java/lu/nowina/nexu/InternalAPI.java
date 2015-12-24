@@ -13,8 +13,6 @@
  */
 package lu.nowina.nexu;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,10 +23,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.AuthenticateRequest;
 import lu.nowina.nexu.api.AuthenticateResponse;
@@ -36,6 +30,7 @@ import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Execution;
+import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.GetIdentityInfoRequest;
@@ -57,6 +52,11 @@ import lu.nowina.nexu.generic.GenericCardAdapter;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCInfo;
 import lu.nowina.nexu.view.core.UIDisplay;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.europa.esig.dss.token.SignatureTokenConnection;
 
 /**
  * Implementation of the NexuAPI
@@ -217,10 +217,20 @@ public class InternalAPI implements NexuAPI {
 			logger.error("Cannot execute request", e);
 			resp.setSuccess(false);
 			resp.setError("exception");
-			final StringWriter sw = new StringWriter();
-			e.printStackTrace(new PrintWriter(sw));
-			resp.setErrorMessage(sw.toString());
+			resp.setErrorMessage("Exception during execution");
+			final Feedback feedback = new Feedback(e);
+			resp.setFeedback(feedback);
 			return resp;
+		} finally {
+			final Feedback feedback;
+			if(resp.getFeedback() == null) {
+				feedback = new Feedback();
+				resp.setFeedback(feedback);
+			} else {
+				feedback = resp.getFeedback();
+			}
+			feedback.setNexuVersion(this.getAppConfig().getApplicationVersion());
+			feedback.setInfo(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
 		}
 	}
 

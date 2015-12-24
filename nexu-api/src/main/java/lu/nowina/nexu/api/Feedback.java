@@ -26,7 +26,7 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "feedback", propOrder = { "apiParameter", "detected", "feedbackStatus", "selectedAPI", "selectedCard", "stacktrace", "userComment", "info" })
+@XmlType(name = "feedback", propOrder = { "apiParameter", "detected", "feedbackStatus", "selectedAPI", "selectedCard", "stacktrace", "userComment", "info", "nexuVersion" })
 public class Feedback {
 
 	protected String apiParameter;
@@ -38,12 +38,12 @@ public class Feedback {
 	protected String stacktrace;
 	protected String userComment;
 	protected EnvironmentInfo info;
-
+	protected String nexuVersion;
+	
 	public Feedback() {
 	}
 
 	public Feedback(Exception e) {
-
 		StringWriter buffer = new StringWriter();
 		PrintWriter writer = new PrintWriter(buffer);
 		e.printStackTrace(writer);
@@ -61,6 +61,7 @@ public class Feedback {
 		result = prime * result + ((detected == null) ? 0 : detected.hashCode());
 		result = prime * result + ((feedbackStatus == null) ? 0 : feedbackStatus.hashCode());
 		result = prime * result + ((info == null) ? 0 : info.hashCode());
+		result = prime * result + ((nexuVersion == null) ? 0 : nexuVersion.hashCode());
 		result = prime * result + ((selectedAPI == null) ? 0 : selectedAPI.hashCode());
 		result = prime * result + ((selectedCard == null) ? 0 : selectedCard.hashCode());
 		result = prime * result + ((stacktrace == null) ? 0 : stacktrace.hashCode());
@@ -93,6 +94,11 @@ public class Feedback {
 			if (other.info != null)
 				return false;
 		} else if (!info.equals(other.info))
+			return false;
+		if (nexuVersion == null) {
+			if (other.nexuVersion != null)
+				return false;
+		} else if (!nexuVersion.equals(other.nexuVersion))
 			return false;
 		if (selectedAPI != other.selectedAPI)
 			return false;
@@ -140,7 +146,7 @@ public class Feedback {
 	 * 
 	 * <p>
 	 * This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make to the returned list will be present
-	 * inside the JAXB object. This is why there is not a <CODE>set</CODE> method for the detected property.
+	 * inside the JAXB object.
 	 * 
 	 * <p>
 	 * For example, to add a new item, do as follows:
@@ -272,4 +278,11 @@ public class Feedback {
 		this.info = info;
 	}
 
+	public String getNexuVersion() {
+		return nexuVersion;
+	}
+
+	public void setNexuVersion(String nexuVersion) {
+		this.nexuVersion = nexuVersion;
+	}
 }

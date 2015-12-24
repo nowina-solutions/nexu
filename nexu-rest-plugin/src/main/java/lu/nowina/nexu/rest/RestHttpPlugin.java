@@ -24,7 +24,10 @@ import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.ToBeSigned;
 import lu.nowina.nexu.api.AuthenticateRequest;
 import lu.nowina.nexu.api.CertificateFilter;
+import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Execution;
+import lu.nowina.nexu.api.Feedback;
+import lu.nowina.nexu.api.FeedbackStatus;
 import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetIdentityInfoRequest;
 import lu.nowina.nexu.api.NexuAPI;
@@ -113,11 +116,27 @@ public class RestHttpPlugin implements HttpPlugin {
 		}
 
 		if(r.isOnlyEncryptionRequired()) {
-			return toHttpResponse(new Execution<Object>("not_supported_only_encryption_required", ""));
+			final Execution<?> execution = new Execution<Object>("not_supported_only_encryption_required", "");
+			final Feedback feedback = new Feedback();
+			execution.setFeedback(feedback);
+			feedback.setFeedbackStatus(FeedbackStatus.FAILED);
+			feedback.setInfo(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
+			feedback.setNexuVersion(api.getAppConfig().getApplicationVersion());
+			return toHttpResponse(execution);
 		}
 		
-		Execution<Object> verification = returnNullIfValid(r);
+		final Execution<Object> verification = returnNullIfValid(r);
 		if(verification != null) {
+			final Feedback feedback;
+			if(verification.getFeedback() == null) {
+				feedback = new Feedback();
+				feedback.setFeedbackStatus(FeedbackStatus.SIGNATURE_VERIFICATION_FAILED);
+				verification.setFeedback(feedback);
+			} else {
+				feedback = verification.getFeedback();
+			}
+			feedback.setInfo(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
+			feedback.setNexuVersion(api.getAppConfig().getApplicationVersion());
 			return toHttpResponse(verification);
 		}
 		
