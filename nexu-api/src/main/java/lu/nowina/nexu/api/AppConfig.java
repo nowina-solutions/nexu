@@ -11,9 +11,10 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu;
+package lu.nowina.nexu.api;
 
 import java.io.IOException;
+import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -53,7 +54,12 @@ public class AppConfig {
 	
 	public AppConfig() {
 		try {
-			this.applicationVersion = IOUtils.toString(this.getClass().getResource("/version.txt"));
+			final URL versionResourceURL = this.getClass().getResource("/version.txt");
+			if(versionResourceURL == null) {
+				logger.error("Cannot retrieve application version: version.txt not found");
+			} else {
+				this.applicationVersion = IOUtils.toString(versionResourceURL);
+			}
 		} catch (final IOException e) {
 			logger.error("Cannot retrieve application version: " + e.getMessage(), e);
 			this.applicationVersion = "";

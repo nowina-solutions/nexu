@@ -30,6 +30,7 @@ import org.apache.log4j.PatternLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.jetty.JettyServer;
 
 public class NexuLauncher {
@@ -110,7 +111,7 @@ public class NexuLauncher {
 
 	}
 
-	public static AppConfig getConfig() {
+	static AppConfig getConfig() {
 		return config;
 	}
 

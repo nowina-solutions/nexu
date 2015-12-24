@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lu.nowina.nexu.NexuLauncher;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Feedback;
@@ -83,7 +82,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 			return createTokenAuto();
 		} else {
 			boolean advanced = false;
-			if (isAdvancedModeAvailable()) {
+			if (api.getAppConfig().isAdvancedModeAvailable()) {
 				LOG.info("Advanced mode available");
 				final OperationResult<Boolean> result =
 						operationFactory.getOperation(UIOperation.class, display, "/fxml/unsupported-product.fxml").perform();
@@ -129,10 +128,6 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		return new OperationResult<Map<TokenOperationResultKey, Object>>(map);
 	}
 
-	protected boolean isAdvancedModeAvailable() {
-		return NexuLauncher.getConfig().isAdvancedModeAvailable();
-	}
-	
 	private OperationResult<Map<TokenOperationResultKey, Object>> createTokenAdvanced() {
 		LOG.info("Advanced mode selected");
 		@SuppressWarnings("unchecked")

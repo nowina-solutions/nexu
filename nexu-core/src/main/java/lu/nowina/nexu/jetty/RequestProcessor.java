@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import lu.nowina.nexu.ConfigurationException;
 import lu.nowina.nexu.InternalAPI;
-import lu.nowina.nexu.NexuLauncher;
 import lu.nowina.nexu.TechnicalException;
 import lu.nowina.nexu.UserPreferences;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
@@ -53,8 +52,6 @@ public class RequestProcessor extends AbstractHandler {
 
 	private static final String NEXUJS_TEMPLATE = "nexu.ftl.js";
 
-	private UserPreferences config;
-
 	private InternalAPI api;
 
 	String baseUrl;
@@ -78,7 +75,6 @@ public class RequestProcessor extends AbstractHandler {
 
 	public void setConfig(InternalAPI api, UserPreferences config) {
 		this.api = api;
-		this.config = config;
 	}
 
 	@Override
@@ -155,7 +151,7 @@ public class RequestProcessor extends AbstractHandler {
 	private void nexuInfo(HttpServletResponse response) throws IOException {
 		response.setContentType("application/json");
 		PrintWriter writer = response.getWriter();
-		writer.write("{ \"version\": \"" + NexuLauncher.getConfig().getApplicationVersion() + "\"}");
+		writer.write("{ \"version\": \"" + api.getAppConfig().getApplicationVersion() + "\"}");
 		writer.close();
 	}
 

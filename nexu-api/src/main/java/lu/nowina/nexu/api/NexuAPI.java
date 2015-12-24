@@ -43,4 +43,6 @@ public interface NexuAPI {
 	Execution<GetIdentityInfoResponse> getIdentityInfo(GetIdentityInfoRequest request);
 	
 	Execution<AuthenticateResponse> authenticate(AuthenticateRequest request);
+	
+	AppConfig getAppConfig();
 }

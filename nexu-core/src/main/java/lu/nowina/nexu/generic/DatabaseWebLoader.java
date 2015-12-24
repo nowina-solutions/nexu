@@ -35,8 +35,8 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lu.nowina.nexu.AppConfig;
 import lu.nowina.nexu.NexuLauncher;
+import lu.nowina.nexu.api.AppConfig;
 
 public class DatabaseWebLoader {
 

@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import lu.nowina.nexu.AbstractConfigureLoggerTest;
+import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Feedback;
@@ -93,6 +94,10 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 
 		final NexuAPI api = mock(NexuAPI.class);
 		when(api.detectCards()).thenReturn(Arrays.asList(new DetectedCard("atr", 0)));
+		
+		final AppConfig appConfig = new AppConfig();
+		appConfig.setAdvancedModeAvailable(true);
+		when(api.getAppConfig()).thenReturn(appConfig);
 
 		final OperationFactory operationFactory = mock(OperationFactory.class);
 		
@@ -100,12 +105,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		when(getMatchingCardAdaptersOperation.perform()).thenReturn(new OperationResult<List<Match>>(Collections.emptyList()));
 		when(operationFactory.getOperation(GetMatchingCardAdaptersOperation.class, api)).thenReturn(getMatchingCardAdaptersOperation);
 		
-		final CreateTokenOperation createTokenOperation = new CreateTokenOperation() {
-			@Override
-			protected boolean isAdvancedModeAvailable() {
-				return true;
-			}
-		};
+		final CreateTokenOperation createTokenOperation = new CreateTokenOperation();
 		createTokenOperation.setParams(api, Collections.emptyList());
 		createTokenOperation.setDisplay(display);
 		createTokenOperation.setOperationFactory(operationFactory);

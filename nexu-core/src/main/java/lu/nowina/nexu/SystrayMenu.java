@@ -27,6 +27,7 @@ import java.io.IOException;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.view.ui.AboutController;
 import lu.nowina.nexu.view.ui.PreferencesController;
@@ -46,7 +47,7 @@ public class SystrayMenu {
 
 	private MenuItem preferencesItem;
 
-	public SystrayMenu(NexUApp display, DatabaseWebLoader webLoader) {
+	public SystrayMenu(NexUApp display, DatabaseWebLoader webLoader, NexuAPI api) {
 
 		if (SystemTray.isSupported()) {
 
@@ -66,7 +67,7 @@ public class SystrayMenu {
 
 							Parent root = loader.getRoot();
 							AboutController controller = loader.getController();
-							controller.setApplicationVersion(NexuLauncher.getConfig().getApplicationVersion());
+							controller.setApplicationVersion(api.getAppConfig().getApplicationVersion());
 							controller.setDisplay(display);
 							controller.setDataLoader(webLoader);
 
@@ -109,7 +110,7 @@ public class SystrayMenu {
 			exitItem.addActionListener(actionListener);
 			popup.add(exitItem);
 
-			trayIcon = new TrayIcon(image, NexuLauncher.getConfig().getApplicationName(), popup);
+			trayIcon = new TrayIcon(image, api.getAppConfig().getApplicationName(), popup);
 
 			trayIcon.setImageAutoSize(true);
 

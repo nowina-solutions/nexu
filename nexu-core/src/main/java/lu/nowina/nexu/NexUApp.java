@@ -23,6 +23,7 @@ import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
@@ -73,7 +74,7 @@ public class NexUApp extends Application implements UIDisplay {
 
 			InternalAPI api = buildAPI();
 
-			new SystrayMenu(this, api.getWebDatabase());
+			new SystrayMenu(this, api.getWebDatabase(), api);
 
 			logger.info("Start Jetty");
 
@@ -105,7 +106,7 @@ public class NexUApp extends Application implements UIDisplay {
 
 		this.operationFactory = new BasicOperationFactory();
 		this.operationFactory.setDisplay(this);
-		InternalAPI api = new InternalAPI(this, prefs, db, detector, loader, getFlowRegistry(), this.operationFactory);
+		InternalAPI api = new InternalAPI(this, prefs, db, detector, loader, getFlowRegistry(), this.operationFactory, getConfig());
 
 		for (String key : getProperties().stringPropertyNames()) {
 			if (key.startsWith("plugin_")) {

@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.europa.esig.dss.token.SignatureTokenConnection;
+import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.AuthenticateRequest;
 import lu.nowina.nexu.api.AuthenticateResponse;
 import lu.nowina.nexu.api.CardAdapter;
@@ -73,8 +74,7 @@ public class InternalAPI implements NexuAPI {
 
 	private List<CardAdapter> adapters = new ArrayList<>();
 
-	private Map<TokenId, SignatureTokenConnection> connections =
-			new FIFOCache<>(NexuLauncher.getConfig().getConnectionsCacheMaxSize());
+	private Map<TokenId, SignatureTokenConnection> connections;
 
 	private Map<String, HttpPlugin> httpPlugins = new HashMap<>();
 
@@ -88,12 +88,14 @@ public class InternalAPI implements NexuAPI {
 
 	private OperationFactory operationFactory;
 	
+	private AppConfig appConfig;
+	
 	private ExecutorService executor;
 
 	private Future<?> currentTask;
 	
 	public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store, CardDetector detector, DatabaseWebLoader webLoader,
-			FlowRegistry flowRegistry, OperationFactory operationFactory) {
+			FlowRegistry flowRegistry, OperationFactory operationFactory, AppConfig appConfig) {
 		this.display = display;
 		this.prefs = prefs;
 		this.myDatabase = store;
@@ -101,6 +103,8 @@ public class InternalAPI implements NexuAPI {
 		this.webDatabase = webLoader;
 		this.flowRegistry = flowRegistry;
 		this.operationFactory = operationFactory;
+		this.appConfig = appConfig;
+		this.connections = new FIFOCache<>(this.appConfig.getConnectionsCacheMaxSize());
 		this.executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
 			@Override
 			public Thread newThread(Runnable r) {
@@ -276,4 +280,8 @@ public class InternalAPI implements NexuAPI {
 		return prefs;
 	}
 	
+	@Override
+	public AppConfig getAppConfig() {
+		return appConfig;
+	}
 }
