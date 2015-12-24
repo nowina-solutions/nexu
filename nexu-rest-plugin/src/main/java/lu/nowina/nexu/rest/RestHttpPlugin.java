@@ -113,7 +113,7 @@ public class RestHttpPlugin implements HttpPlugin {
 		}
 
 		if(r.isOnlyEncryptionRequired()) {
-			return toHttpResponse(new Execution("not_supported_only_encryption_required", ""));
+			return toHttpResponse(new Execution<Object>("not_supported_only_encryption_required", ""));
 		}
 		
 		Execution<Object> verification = returnNullIfValid(r);
