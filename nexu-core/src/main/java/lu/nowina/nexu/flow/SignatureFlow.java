@@ -18,6 +18,7 @@ import java.util.Map;
 import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
+import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
@@ -40,7 +41,7 @@ import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 
-class SignatureFlow extends Flow<SignatureRequest, SignatureResponse> {
+class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SignatureFlow.class.getName());
 
@@ -50,7 +51,7 @@ class SignatureFlow extends Flow<SignatureRequest, SignatureResponse> {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected SignatureResponse process(NexuAPI api, SignatureRequest req) throws NexuException {
+	protected Execution<SignatureResponse> process(NexuAPI api, SignatureRequest req) throws Exception {
 		if ((req.getToBeSigned() == null) || (req.getToBeSigned().getBytes() == null)) {
 			throw new NexuException("ToBeSigned is null");
 		}
@@ -96,20 +97,26 @@ class SignatureFlow extends Flow<SignatureRequest, SignatureResponse> {
 							getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
 									new Object[]{"Signature performed"}).perform();
 							
-							return new SignatureResponse(value);
+							return new Execution<SignatureResponse>(new SignatureResponse(value));
+						} else {
+							return handleErrorOperationResult(signOperationResult);
 						}
 					} else {
 						getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
 								new Object[]{"Error - No keys"}).perform();
+						return handleErrorOperationResult(selectPrivateKeyOperationResult);
 					}
 				} else {
 					getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
 							new Object[]{"Error - Token not recognized"}).perform();
+					return handleErrorOperationResult(getTokenConnectionOperationResult);
 				}
+			} else {
+				return handleErrorOperationResult(getTokenOperationResult);
 			}
 		} catch (Exception e) {
 			logger.error("Flow error", e);
-			handleException(e);
+			throw handleException(e);
 		} finally {
 			if(token != null) {
 				try {
@@ -119,8 +126,5 @@ class SignatureFlow extends Flow<SignatureRequest, SignatureResponse> {
 				}
 			}
 		}
-
-		return null;
 	}
-
 }

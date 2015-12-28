@@ -18,6 +18,7 @@ import java.util.Map;
 
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
+import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.Match;
@@ -41,7 +42,7 @@ import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 import eu.europa.esig.dss.x509.CertificateToken;
 
-class GetCertificateFlow extends Flow<GetCertificateRequest, GetCertificateResponse> {
+class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCertificateResponse> {
 
 	static final Logger logger = LoggerFactory.getLogger(GetCertificateFlow.class);
 
@@ -51,7 +52,7 @@ class GetCertificateFlow extends Flow<GetCertificateRequest, GetCertificateRespo
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected GetCertificateResponse process(NexuAPI api, GetCertificateRequest req) {
+	protected Execution<GetCertificateResponse> process(NexuAPI api, GetCertificateRequest req) throws Exception {
 		SignatureTokenConnection token = null;
 		try {
 			final OperationResult<List<Match>> getMatchingCardAdaptersOperationResult =
@@ -95,17 +96,24 @@ class GetCertificateFlow extends Flow<GetCertificateRequest, GetCertificateRespo
 								resp.setCertificateChain(certificateChain);
 							}
 
-							return resp;
+							getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+									new Object[]{"Finished"}).perform();
+							return new Execution<GetCertificateResponse>(resp);
+						} else {
+							return handleErrorOperationResult(selectPrivateKeyOperationResult);
 						}
+					} else {
+						return handleErrorOperationResult(getTokenConnectionOperationResult);
 					}
+				} else {
+					return handleErrorOperationResult(createTokenOperationResult);
 				}
+			} else {
+				return handleErrorOperationResult(getMatchingCardAdaptersOperationResult);
 			}
-
-			getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
-					new Object[]{"Finished"}).perform();
 		} catch (final Exception e) {
 			logger.error("Flow error", e);
-			handleException(e);
+			throw handleException(e);
 		} finally {
 			if(token != null) {
 				try {
@@ -115,8 +123,5 @@ class GetCertificateFlow extends Flow<GetCertificateRequest, GetCertificateRespo
 				}
 			}
 		}
-
-		return null;
 	}
-
 }

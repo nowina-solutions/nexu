@@ -181,12 +181,11 @@ public class InternalAPI implements NexuAPI {
 	}
 
 	private <I, O> Execution<O> executeRequest(Flow<I, O> flow, I request) {
-		final Execution<O> resp = new Execution<>();
+		Execution<O> resp = null;
 
 		try {
-			final O response;
 			if(!EXECUTOR_THREAD_GROUP.equals(Thread.currentThread().getThreadGroup())) {
-				final Future<O> task;
+				final Future<Execution<O>> task;
 				// Prevent race condition on currentTask
 				synchronized (this) {
 					if((currentTask != null) && !currentTask.isDone()) {
@@ -199,21 +198,20 @@ public class InternalAPI implements NexuAPI {
 					currentTask = task;
 				}
 
-				response = task.get();
+				resp = task.get();
 			} else {
 				// Allow re-entrant calls
-				response = flow.execute(this, request);
+				resp = flow.execute(this, request);
 			}
-			if (response != null) {
-				resp.setSuccess(true);
-				resp.setResponse(response);
-			} else {
+			if(resp == null) {
+				resp = new Execution<O>();
 				resp.setSuccess(false);
 				resp.setError("no_response");
 				resp.setErrorMessage("No response");
 			}
 			return resp;
 		}  catch (Exception e) {
+			resp = new Execution<O>();
 			logger.error("Cannot execute request", e);
 			resp.setSuccess(false);
 			resp.setError("exception");

@@ -24,6 +24,7 @@ import lu.nowina.nexu.AbstractConfigureLoggerTest;
 import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
+import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SignatureRequest;
@@ -73,9 +74,11 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 
 		SignatureFlow flow = new SignatureFlow(display);
 		flow.setOperationFactory(noUIOperationFactory);
-		SignatureResponse resp = flow.process(api, req);
+		Execution<SignatureResponse> resp = flow.process(api, req);
 		Assert.assertNotNull(resp);
-		Assert.assertNotNull(resp.getSignatureValue());
+		Assert.assertTrue(resp.isSuccess());
+		Assert.assertNotNull(resp.getResponse());
+		Assert.assertNotNull(resp.getResponse().getSignatureValue());
 
 	}
 
