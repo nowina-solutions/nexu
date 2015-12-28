@@ -25,8 +25,8 @@ import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.api.flow.OperationStatus;
 import lu.nowina.nexu.model.KeystoreParams;
 import lu.nowina.nexu.model.Pkcs11Params;
 import lu.nowina.nexu.view.core.UIOperation;
@@ -86,8 +86,8 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 				LOG.info("Advanced mode available");
 				final OperationResult<Boolean> result =
 						operationFactory.getOperation(UIOperation.class, display, "/fxml/unsupported-product.fxml").perform();
-				if(!result.getStatus().equals(OperationStatus.SUCCESS)) {
-					return new OperationResult<Map<TokenOperationResultKey, Object>>(OperationStatus.FAILED);
+				if(result.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
+					return new OperationResult<Map<TokenOperationResultKey, Object>>(BasicOperationStatus.USER_CANCEL);
 				}
 				advanced = result.getResult();
 			}
@@ -100,7 +100,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 				final Feedback feedback = new Feedback();
 				feedback.setFeedbackStatus(FeedbackStatus.PRODUCT_NOT_SUPPORTED);
 				operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml", new Object[]{feedback}).perform();
-				return new OperationResult<Map<TokenOperationResultKey, Object>>(OperationStatus.FAILED);
+				return new OperationResult<Map<TokenOperationResultKey, Object>>(CoreOperationStatus.UNSUPPORTED_PRODUCT);
 			}
 		}
 	}
@@ -113,12 +113,12 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		final SignatureTokenConnection connect = adapter.connect(api, supportedCard, display.getPasswordInputCallback());
 		if (connect == null) {
 			LOG.error("No connect returned");
-			return new OperationResult<Map<TokenOperationResultKey, Object>>(OperationStatus.FAILED);
+			return new OperationResult<Map<TokenOperationResultKey, Object>>(CoreOperationStatus.NO_TOKEN);
 		}
 		final TokenId tokenId = api.registerTokenConnection(connect);
 		if (tokenId == null) {
 			LOG.error("Received null TokenId after registration");
-			return new OperationResult<Map<TokenOperationResultKey, Object>>(OperationStatus.FAILED);
+			return new OperationResult<Map<TokenOperationResultKey, Object>>(CoreOperationStatus.NO_TOKEN_ID);
 		}
 		final Map<TokenOperationResultKey, Object> map = new HashMap<TokenOperationResultKey, Object>();
 		map.put(TokenOperationResultKey.TOKEN_ID, tokenId);
@@ -133,8 +133,8 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		@SuppressWarnings("unchecked")
 		final OperationResult<ScAPI> result =
 				operationFactory.getOperation(UIOperation.class, display, "/fxml/api-selection.fxml").perform();
-		if(!result.getStatus().equals(OperationStatus.SUCCESS)) {
-			return new OperationResult<Map<TokenOperationResultKey, Object>>(OperationStatus.FAILED);
+		if(result.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
+			return new OperationResult<Map<TokenOperationResultKey, Object>>(BasicOperationStatus.USER_CANCEL);
 		}
 		final Map<TokenOperationResultKey, Object> map = new HashMap<TokenOperationResultKey, Object>();
 		map.put(TokenOperationResultKey.ADVANCED_CREATION, true);
@@ -152,8 +152,8 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 			@SuppressWarnings("unchecked")
 			final OperationResult<Pkcs11Params> op2 =
 				operationFactory.getOperation(UIOperation.class, display, "/fxml/pkcs11-params.fxml").perform();
-			if(!op2.getStatus().equals(OperationStatus.SUCCESS)) {
-				return new OperationResult<Map<TokenOperationResultKey, Object>>(OperationStatus.FAILED);
+			if(op2.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
+				return new OperationResult<Map<TokenOperationResultKey, Object>>(BasicOperationStatus.USER_CANCEL);
 			}
 			final Pkcs11Params pkcs11Params = op2.getResult();
 			final String absolutePath = pkcs11Params.getPkcs11Lib().getAbsolutePath();
@@ -164,15 +164,15 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 			@SuppressWarnings("unchecked")
 			final OperationResult<KeystoreParams> op3 =
 				operationFactory.getOperation(UIOperation.class, display, "/fxml/keystore-params.fxml").perform();
-			if(!op3.getStatus().equals(OperationStatus.SUCCESS)) {
-				return new OperationResult<Map<TokenOperationResultKey, Object>>(OperationStatus.FAILED);
+			if(op3.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
+				return new OperationResult<Map<TokenOperationResultKey, Object>>(BasicOperationStatus.USER_CANCEL);
 			}
 			final KeystoreParams keysToreParams = op3.getResult();
 			map.put(TokenOperationResultKey.SELECTED_API_PARAMS, keysToreParams.getPkcs12File().getAbsolutePath());
 			tokenId = api.registerTokenConnection(new Pkcs12SignatureToken(keysToreParams.getPassword(), keysToreParams.getPkcs12File()));
 			break;
 		default:
-			return new OperationResult<Map<TokenOperationResultKey, Object>>(OperationStatus.FAILED);
+			return new OperationResult<Map<TokenOperationResultKey, Object>>(CoreOperationStatus.UNSUPPORTED_PRODUCT);
 		}
 		map.put(TokenOperationResultKey.TOKEN_ID, tokenId);
 		return new OperationResult<Map<TokenOperationResultKey,Object>>(map);

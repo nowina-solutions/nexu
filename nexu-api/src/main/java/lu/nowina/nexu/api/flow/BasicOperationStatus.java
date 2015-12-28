@@ -14,22 +14,30 @@
 package lu.nowina.nexu.api.flow;
 
 /**
- * An {@link OperationStatus} is the result status of an {@link Operation}.
+ * This enum defines some basic {@link OperationStatus}es.
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public interface OperationStatus {
-
-	/**
-	 * Returns the code corresponding to this {@link OperationStatus}.
-	 * @return The code corresponding to this {@link OperationStatus}.
-	 */
-	String getCode();
+public enum BasicOperationStatus implements OperationStatus {
+	SUCCESS("success", "The operation was completed successfully."),
+	EXCEPTION("exception", "An exception was thrown during the operation."),
+	USER_CANCEL("user_cancel", "The user has cancelled the operation.");
 	
-	/**
-	 * Returns the label corresponding to this {@link OperationStatus}.
-	 * @return The label corresponding to this {@link OperationStatus}.
-	 */
-	String getLabel();
+	private final String code;
+	private final String label;
+	
+	private BasicOperationStatus(final String code, final String label) {
+		this.code = code;
+		this.label = label;
+	}
 
+	@Override
+	public String getCode() {
+		return code;
+	}
+
+	@Override
+	public String getLabel() {
+		return label;
+	}
 }

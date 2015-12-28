@@ -67,7 +67,7 @@ public class ProvideFeedbackController extends AbstractUIOperationController<Fee
 			}
 		});
 		cancel.setOnAction((e) -> {
-			signalEnd(null);
+			signalUserCancel();
 		});
 		if (feedback != null && feedback.getFeedbackStatus() == FeedbackStatus.SUCCESS) {
 			cancel.setVisible(false);

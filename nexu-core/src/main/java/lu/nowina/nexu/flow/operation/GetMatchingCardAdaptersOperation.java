@@ -22,7 +22,6 @@ import lu.nowina.nexu.api.FeedbackStatus;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.api.flow.OperationStatus;
 import lu.nowina.nexu.view.core.UIOperation;
 
 import org.slf4j.Logger;
@@ -65,7 +64,7 @@ public class GetMatchingCardAdaptersOperation extends AbstractCompositeOperation
 			feedback.setFeedbackStatus(FeedbackStatus.NO_PRODUCT_FOUND);
 			operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml",
 					new Object[]{feedback}).perform();
-			return new OperationResult<List<Match>>(OperationStatus.FAILED);
+			return new OperationResult<List<Match>>(CoreOperationStatus.NO_PRODUCT_FOUND);
 		} else {
 			if(detectedCards.size() > 1) {
 				LOG.warn("More than one card. Not supported yet. We will take the first one having a matching adapter.");

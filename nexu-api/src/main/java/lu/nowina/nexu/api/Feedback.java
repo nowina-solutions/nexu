@@ -35,6 +35,7 @@ public class Feedback {
 	protected FeedbackStatus feedbackStatus;
 	protected ScAPI selectedAPI;
 	protected DetectedCard selectedCard;
+	protected transient Exception exception;
 	protected String stacktrace;
 	protected String userComment;
 	protected EnvironmentInfo info;
@@ -51,6 +52,7 @@ public class Feedback {
 
 		setStacktrace(buffer.toString());
 		setFeedbackStatus(FeedbackStatus.EXCEPTION);
+		setException(e);
 	}
 
 	@Override
@@ -284,5 +286,13 @@ public class Feedback {
 
 	public void setNexuVersion(String nexuVersion) {
 		this.nexuVersion = nexuVersion;
+	}
+
+	public Exception getException() {
+		return exception;
+	}
+
+	public void setException(Exception exception) {
+		this.exception = exception;
 	}
 }

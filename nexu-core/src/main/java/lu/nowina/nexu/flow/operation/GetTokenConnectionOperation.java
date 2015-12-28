@@ -17,7 +17,6 @@ import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.flow.Operation;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.api.flow.OperationStatus;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 
 /**
@@ -57,7 +56,7 @@ public class GetTokenConnectionOperation implements Operation<SignatureTokenConn
 		if(token != null) {
 			return new OperationResult<SignatureTokenConnection>(token);
 		} else {
-			return new OperationResult<SignatureTokenConnection>(OperationStatus.FAILED);
+			return new OperationResult<SignatureTokenConnection>(CoreOperationStatus.UNKNOWN_TOKEN_ID);
 		}
 	}
 	

@@ -13,7 +13,6 @@
  */
 package lu.nowina.nexu.flow;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,8 +23,8 @@ import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.api.flow.OperationStatus;
 import lu.nowina.nexu.flow.operation.AdvancedCreationFeedbackOperation;
 import lu.nowina.nexu.flow.operation.CreateTokenOperation;
 import lu.nowina.nexu.flow.operation.GetMatchingCardAdaptersOperation;
@@ -57,25 +56,25 @@ class GetCertificateFlow extends Flow<GetCertificateRequest, GetCertificateRespo
 		try {
 			final OperationResult<List<Match>> getMatchingCardAdaptersOperationResult =
 					getOperationFactory().getOperation(GetMatchingCardAdaptersOperation.class, api).perform();
-			if(getMatchingCardAdaptersOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+			if(getMatchingCardAdaptersOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 				final List<Match> matchingCardAdapters = getMatchingCardAdaptersOperationResult.getResult();
 				
 				final OperationResult<Map<TokenOperationResultKey, Object>> createTokenOperationResult =
 						getOperationFactory().getOperation(CreateTokenOperation.class, api, matchingCardAdapters).perform();
-				if (createTokenOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+				if (createTokenOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 					final Map<TokenOperationResultKey, Object> map = createTokenOperationResult.getResult();
 					final TokenId tokenId = (TokenId) map.get(TokenOperationResultKey.TOKEN_ID);
 
 					final OperationResult<SignatureTokenConnection> getTokenConnectionOperationResult =
 							getOperationFactory().getOperation(GetTokenConnectionOperation.class, api, tokenId).perform();
-					if (getTokenConnectionOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+					if (getTokenConnectionOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 						token = getTokenConnectionOperationResult.getResult();
 
 						final DetectedCard card = (DetectedCard) map.get(TokenOperationResultKey.SELECTED_CARD);
 						final CardAdapter cardAdapter = (CardAdapter) map.get(TokenOperationResultKey.SELECTED_CARD_ADAPTER);
 						final OperationResult<DSSPrivateKeyEntry> selectPrivateKeyOperationResult =
 								getOperationFactory().getOperation(SelectPrivateKeyOperation.class, token, card, cardAdapter, req.getCertificateFilter()).perform();
-						if (selectPrivateKeyOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+						if (selectPrivateKeyOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 							final DSSPrivateKeyEntry key = selectPrivateKeyOperationResult.getResult();
 
 							if ((Boolean) map.get(TokenOperationResultKey.ADVANCED_CREATION)) {

@@ -20,8 +20,8 @@ import java.util.Map;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.api.flow.OperationStatus;
 
 /**
  * This {@link CompositeOperation} allows to get or create a {@link TokenId}.
@@ -63,11 +63,11 @@ public class GetTokenOperation extends AbstractCompositeOperation<Map<TokenOpera
 		} else {
 			final OperationResult<List<Match>> getMatchingCardAdaptersOperationResult =
 					operationFactory.getOperation(GetMatchingCardAdaptersOperation.class, api).perform();
-			if(getMatchingCardAdaptersOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+			if(getMatchingCardAdaptersOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 				final List<Match> matchingCardAdapters = getMatchingCardAdaptersOperationResult.getResult();
 				return operationFactory.getOperation(CreateTokenOperation.class, api, matchingCardAdapters).perform();
 			} else {
-				if(getMatchingCardAdaptersOperationResult.getStatus().equals(OperationStatus.EXCEPTION)) {
+				if(getMatchingCardAdaptersOperationResult.getStatus().equals(BasicOperationStatus.EXCEPTION)) {
 					return new OperationResult<Map<TokenOperationResultKey,Object>>(getMatchingCardAdaptersOperationResult.getException());
 				} else {
 					return new OperationResult<Map<TokenOperationResultKey,Object>>(getMatchingCardAdaptersOperationResult.getStatus());

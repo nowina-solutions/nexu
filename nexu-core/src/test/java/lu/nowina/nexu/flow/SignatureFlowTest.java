@@ -29,9 +29,9 @@ import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.Operation;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.api.flow.OperationStatus;
 import lu.nowina.nexu.flow.operation.BasicOperationFactory;
 import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.view.core.UIDisplay;
@@ -131,7 +131,7 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 		
 		public NoUIOperationFactory() {
 			this.successOperation = mock(Operation.class);
-			when(successOperation.perform()).thenReturn(new OperationResult<Void>(OperationStatus.SUCCESS));
+			when(successOperation.perform()).thenReturn(new OperationResult<Void>(BasicOperationStatus.SUCCESS));
 		}
 		
 		@Override

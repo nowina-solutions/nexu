@@ -21,8 +21,8 @@ import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackStatus;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.ScAPI;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.api.flow.OperationStatus;
 import lu.nowina.nexu.view.core.UIOperation;
 
 /**
@@ -71,7 +71,7 @@ public class AdvancedCreationFeedbackOperation extends AbstractCompositeOperatio
 			final OperationResult<Feedback> result =
 					operationFactory.getOperation(UIOperation.class, display,
 							"/fxml/store-result.fxml", new Object[]{feedback}).perform();
-			if(result.getStatus().equals(OperationStatus.SUCCESS)) {
+			if(result.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 				final Feedback back = result.getResult();
 				if (back != null) {
 					((InternalAPI) api).store(back.getSelectedCard().getAtr(),

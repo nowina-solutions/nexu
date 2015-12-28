@@ -19,8 +19,8 @@ import java.util.List;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.CertificateFilter;
 import lu.nowina.nexu.api.DetectedCard;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.api.flow.OperationStatus;
 import lu.nowina.nexu.view.core.UIOperation;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
@@ -93,11 +93,11 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 		}
 
 		if (keys.isEmpty()) {
-			return new OperationResult<DSSPrivateKeyEntry>(OperationStatus.FAILED);
+			return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.NO_KEY);
 		} else if (keys.size() == 1) {
 			key = keys.get(0);
 			if((keyFilter != null) && !key.getCertificate().getDSSIdAsString().equals(keyFilter)) {
-				return new OperationResult<DSSPrivateKeyEntry>(OperationStatus.FAILED);
+				return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.CANNOT_SELECT_KEY);
 			} else {
 				return new OperationResult<DSSPrivateKeyEntry>(key);
 			}
@@ -110,16 +110,19 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 					}
 				}
 				if(key == null) {
-					return new OperationResult<DSSPrivateKeyEntry>(OperationStatus.FAILED);
+					return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.CANNOT_SELECT_KEY);
 				}
 			} else {
 				@SuppressWarnings("unchecked")
 				final OperationResult<DSSPrivateKeyEntry> op =
 						operationFactory.getOperation(UIOperation.class, display, "/fxml/key-selection.fxml", new Object[]{keys}).perform();
-				if(!op.getStatus().equals(OperationStatus.SUCCESS)) {
-					return new OperationResult<DSSPrivateKeyEntry>(OperationStatus.FAILED);
+				if(op.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
+					return new OperationResult<DSSPrivateKeyEntry>(BasicOperationStatus.USER_CANCEL);
 				}
 				key = op.getResult();
+				if(key == null) {
+					return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.NO_KEY_SELECTED);
+				}
 			}
 			return new OperationResult<DSSPrivateKeyEntry>(key);
 		}

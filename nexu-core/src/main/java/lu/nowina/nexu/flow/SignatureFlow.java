@@ -22,8 +22,8 @@ import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.api.flow.OperationStatus;
 import lu.nowina.nexu.flow.operation.AdvancedCreationFeedbackOperation;
 import lu.nowina.nexu.flow.operation.GetTokenConnectionOperation;
 import lu.nowina.nexu.flow.operation.GetTokenOperation;
@@ -63,13 +63,13 @@ class SignatureFlow extends Flow<SignatureRequest, SignatureResponse> {
 		try {
 			final OperationResult<Map<TokenOperationResultKey, Object>> getTokenOperationResult =
 					getOperationFactory().getOperation(GetTokenOperation.class, api, req.getTokenId()).perform();
-			if (getTokenOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+			if (getTokenOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 				final Map<TokenOperationResultKey, Object> map = getTokenOperationResult.getResult();
 				final TokenId tokenId = (TokenId) map.get(TokenOperationResultKey.TOKEN_ID);
 
 				final OperationResult<SignatureTokenConnection> getTokenConnectionOperationResult =
 						getOperationFactory().getOperation(GetTokenConnectionOperation.class, api, tokenId).perform();
-				if (getTokenConnectionOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+				if (getTokenConnectionOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 					token = getTokenConnectionOperationResult.getResult();
 					logger.info("Token " + token);
 					
@@ -78,13 +78,13 @@ class SignatureFlow extends Flow<SignatureRequest, SignatureResponse> {
 					final OperationResult<DSSPrivateKeyEntry> selectPrivateKeyOperationResult =
 							getOperationFactory().getOperation(
 									SelectPrivateKeyOperation.class, token, card, cardAdapter, null, req.getKeyId()).perform();
-					if (selectPrivateKeyOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+					if (selectPrivateKeyOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 						final DSSPrivateKeyEntry key = selectPrivateKeyOperationResult.getResult();
 
 						logger.info("Key " + key + " " + key.getCertificate().getSubjectDN() + " from " + key.getCertificate().getIssuerDN());
 						final OperationResult<SignatureValue> signOperationResult = getOperationFactory().getOperation(
 								SignOperation.class, token, req.getToBeSigned(), req.getDigestAlgorithm(), key).perform();
-						if(signOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+						if(signOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 							final SignatureValue value = signOperationResult.getResult();
 							logger.info("Signature performed " + value);
 

@@ -33,9 +33,9 @@ import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.Operation;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.api.flow.OperationStatus;
 import lu.nowina.nexu.flow.operation.BasicOperationFactory;
 import lu.nowina.nexu.flow.operation.CreateTokenOperation;
 import lu.nowina.nexu.flow.operation.GetMatchingCardAdaptersOperation;
@@ -69,7 +69,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		when(operationFactory.getOperation(GetMatchingCardAdaptersOperation.class, api)).thenReturn(operation);
 
 		final Operation<Object> successOperation = mock(Operation.class);
-		when(successOperation.perform()).thenReturn(new OperationResult<Object>(OperationStatus.SUCCESS));
+		when(successOperation.perform()).thenReturn(new OperationResult<Object>(BasicOperationStatus.SUCCESS));
 		
 		final Feedback feedback = new Feedback();
 		feedback.setFeedbackStatus(FeedbackStatus.NO_PRODUCT_FOUND);
@@ -117,7 +117,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 				UIOperation.class, display, "/fxml/unsupported-product.fxml")).thenReturn(returnFalseOperation);
 
 		final Operation<Object> successOperation = mock(Operation.class);
-		when(successOperation.perform()).thenReturn(new OperationResult<Object>(OperationStatus.SUCCESS));
+		when(successOperation.perform()).thenReturn(new OperationResult<Object>(BasicOperationStatus.SUCCESS));
 		final Feedback feedback = new Feedback();
 		feedback.setFeedbackStatus(FeedbackStatus.PRODUCT_NOT_SUPPORTED);
 		when(operationFactory.getOperation(

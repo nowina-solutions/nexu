@@ -22,12 +22,12 @@ public class OperationResult<R> {
 	private Throwable exception;
 
 	public OperationResult(R result) {
-		this.status = OperationStatus.SUCCESS;
+		this.status = BasicOperationStatus.SUCCESS;
 		this.result = result;
 	}
 
 	public OperationResult(Throwable t) {
-		this.status = OperationStatus.EXCEPTION;
+		this.status = BasicOperationStatus.EXCEPTION;
 		this.exception = t;
 	}
 

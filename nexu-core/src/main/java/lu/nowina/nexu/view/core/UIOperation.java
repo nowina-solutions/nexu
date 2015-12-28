@@ -18,9 +18,9 @@ import java.util.Arrays;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.Operation;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.api.flow.OperationStatus;
 import lu.nowina.nexu.flow.Flow;
 
 import org.slf4j.Logger;
@@ -127,7 +127,7 @@ public class UIOperation<R> implements Operation<R> {
 	}
 
 	public final void signalUserCancel() {
-		notifyResult(new OperationResult<>(OperationStatus.USER_CANCEL));
+		notifyResult(new OperationResult<>(BasicOperationStatus.USER_CANCEL));
 	}
 
 	private String getOperationName() {
