@@ -22,15 +22,15 @@ import lu.nowina.nexu.api.flow.OperationStatus;
  */
 public enum CoreOperationStatus implements OperationStatus {
 
-	UNSUPPORTED_PRODUCT("unsupported_product", "The provided product is not supported by this version of NexU."),
-	NO_TOKEN("no_token", "The card adapter did not return any token."),
-	NO_TOKEN_ID("no_token_id", "No token ID was returned after having registered the token."),
-	NO_PRODUCT_FOUND("no_product_found", "No product was found."),
-	UNKNOWN_TOKEN_ID("unknown_token_id", "There is no registered token for the given token ID."),
-	NO_KEY("no_key", "No key was retrieved from the given token."),
-	CANNOT_SELECT_KEY("cannot_select_key", "Cannot automatically select key based on given key filter."),
-	NO_KEY_SELECTED("no_key_selected", "No key was selected by the user."),
-	NO_RESPONSE("no_response", "No response returned from the flow.");
+	UNSUPPORTED_PRODUCT("unsupported.product", "The provided product is not supported by this version of NexU."),
+	NO_TOKEN("no.token", "The card adapter did not return any token."),
+	NO_TOKEN_ID("no.token.id", "No token ID was returned after having registered the token."),
+	NO_PRODUCT_FOUND("no.product.found", "No product was found."),
+	UNKNOWN_TOKEN_ID("unknown.token.id", "There is no registered token for the given token ID."),
+	NO_KEY("no.key", "No key was retrieved from the given token."),
+	CANNOT_SELECT_KEY("cannot.select.key", "Cannot automatically select key based on given key filter."),
+	NO_KEY_SELECTED("no.key.selected", "No key was selected by the user."),
+	NO_RESPONSE("no.response", "No response returned from the flow.");
 	
 	private final String code;
 	private final String label;
