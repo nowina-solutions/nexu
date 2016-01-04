@@ -9,7 +9,7 @@ import lu.nowina.nexu.api.flow.OperationStatus;
  */
 public enum RestPluginOperationStatus implements OperationStatus {
 
-	NOT_SUPPORTED_ONLY_ENCRYPTION_REQUIRED("not_supported_only_encryption_required",
+	NOT_SUPPORTED_ONLY_ENCRYPTION_REQUIRED("not.supported.only.encryption.required",
 			"The REST HTTP plugin does not support the OnlyEncryptionRequired parameter.");
 	
 	private final String code;
