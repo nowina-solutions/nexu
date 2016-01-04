@@ -13,6 +13,8 @@
  */
 package lu.nowina.nexu.api;
 
+import lu.nowina.nexu.api.flow.OperationStatus;
+
 /**
  * 
  * @author david.naramski
@@ -21,60 +23,44 @@ package lu.nowina.nexu.api;
  */
 public class Execution<T> {
 
-	private boolean success;
+	private final boolean success;
 
-	private T response;
+	private final T response;
 
-	private String error;
+	private final String error;
 
-	private String errorMessage;
+	private final String errorMessage;
 
 	private Feedback feedback;
 
-	public Execution() {
-	}
-	
 	public Execution(T response) {
 		this.response = response;
 		this.success = true;
+		this.error = null;
+		this.errorMessage = null;
 	}
 
-	public Execution(String error, String errorMessage) {
+	public Execution(final OperationStatus errorOperationStatus) {
 		this.success = false;
-		this.error = error;
-		this.errorMessage = errorMessage;
+		this.error = errorOperationStatus.getCode();
+		this.errorMessage = errorOperationStatus.getLabel();
+		this.response = null;
 	}
 	
 	public T getResponse() {
 		return response;
 	}
 
-	public void setResponse(T response) {
-		this.response = response;
-	}
-
 	public boolean isSuccess() {
 		return success;
-	}
-
-	public void setSuccess(boolean success) {
-		this.success = success;
 	}
 
 	public String getError() {
 		return error;
 	}
 
-	public void setError(String error) {
-		this.error = error;
-	}
-
 	public String getErrorMessage() {
 		return errorMessage;
-	}
-
-	public void setErrorMessage(String errorMessage) {
-		this.errorMessage = errorMessage;
 	}
 
 	public Feedback getFeedback() {

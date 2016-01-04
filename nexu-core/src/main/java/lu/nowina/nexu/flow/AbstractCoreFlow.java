@@ -44,7 +44,7 @@ abstract class AbstractCoreFlow<I, O> extends Flow<I, O> {
 		if(operationResult.getStatus().equals(BasicOperationStatus.EXCEPTION)) {
 			throw operationResult.getException();
 		} else {
-			return new Execution<>(operationResult.getStatus().getCode(), operationResult.getStatus().getLabel());
+			return new Execution<>(operationResult.getStatus());
 		}
 	}
 }

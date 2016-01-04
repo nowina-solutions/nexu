@@ -116,7 +116,8 @@ public class RestHttpPlugin implements HttpPlugin {
 		}
 
 		if(r.isOnlyEncryptionRequired()) {
-			final Execution<?> execution = new Execution<Object>("not_supported_only_encryption_required", "");
+			final Execution<?> execution =
+					new Execution<Object>(RestPluginOperationStatus.NOT_SUPPORTED_ONLY_ENCRYPTION_REQUIRED);
 			final Feedback feedback = new Feedback();
 			execution.setFeedback(feedback);
 			feedback.setFeedbackStatus(FeedbackStatus.FAILED);

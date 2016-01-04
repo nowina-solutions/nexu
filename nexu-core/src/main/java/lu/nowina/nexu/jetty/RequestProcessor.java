@@ -32,6 +32,7 @@ import lu.nowina.nexu.UserPreferences;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.Feedback;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
 import lu.nowina.nexu.api.plugin.HttpResponse;
 import lu.nowina.nexu.api.plugin.HttpStatus;
@@ -126,14 +127,11 @@ public class RequestProcessor extends AbstractHandler {
 				response.setCharacterEncoding(UTF8);
 				response.setContentType(APPLICATION_JSON);
 				
-				final Execution<?> execution = new Execution<Object>();
-				execution.setError("exception");
-				execution.setErrorMessage("Exception during execution");
+				final Execution<?> execution = new Execution<Object>(BasicOperationStatus.EXCEPTION);
 				final Feedback feedback = new Feedback(e);
 				feedback.setNexuVersion(api.getAppConfig().getApplicationVersion());
 				feedback.setInfo(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
 				execution.setFeedback(feedback);
-				execution.setSuccess(false);
 				
 				final PrintWriter writer = response.getWriter();
 				writer.write(GsonHelper.toJson(execution));

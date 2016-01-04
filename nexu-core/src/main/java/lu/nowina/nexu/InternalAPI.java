@@ -41,10 +41,12 @@ import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
 import lu.nowina.nexu.cache.FIFOCache;
 import lu.nowina.nexu.flow.Flow;
 import lu.nowina.nexu.flow.FlowRegistry;
+import lu.nowina.nexu.flow.operation.CoreOperationStatus;
 import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.generic.ConnectionInfo;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
@@ -204,18 +206,12 @@ public class InternalAPI implements NexuAPI {
 				resp = flow.execute(this, request);
 			}
 			if(resp == null) {
-				resp = new Execution<O>();
-				resp.setSuccess(false);
-				resp.setError("no_response");
-				resp.setErrorMessage("No response");
+				resp = new Execution<O>(CoreOperationStatus.NO_RESPONSE);
 			}
 			return resp;
 		}  catch (Exception e) {
-			resp = new Execution<O>();
+			resp = new Execution<O>(BasicOperationStatus.EXCEPTION);
 			logger.error("Cannot execute request", e);
-			resp.setSuccess(false);
-			resp.setError("exception");
-			resp.setErrorMessage("Exception during execution");
 			final Feedback feedback = new Feedback(e);
 			resp.setFeedback(feedback);
 			return resp;

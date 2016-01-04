@@ -29,7 +29,8 @@ public enum CoreOperationStatus implements OperationStatus {
 	UNKNOWN_TOKEN_ID("unknown_token_id", "There is no registered token for the given token ID."),
 	NO_KEY("no_key", "No key was retrieved from the given token."),
 	CANNOT_SELECT_KEY("cannot_select_key", "Cannot automatically select key based on given key filter."),
-	NO_KEY_SELECTED("no_key_selected", "No key was selected by the user.");
+	NO_KEY_SELECTED("no_key_selected", "No key was selected by the user."),
+	NO_RESPONSE("no_response", "No response returned from the flow.");
 	
 	private final String code;
 	private final String label;
