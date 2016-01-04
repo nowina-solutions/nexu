@@ -59,30 +59,31 @@ public class AdvancedCreationFeedbackOperation extends AbstractCompositeOperatio
 	@Override
 	@SuppressWarnings("unchecked")
 	public OperationResult<Void> perform() {
-		final Feedback feedback = new Feedback();
-		feedback.setFeedbackStatus(FeedbackStatus.SUCCESS);
-		feedback.setApiParameter((String) map.get(TokenOperationResultKey.SELECTED_API_PARAMS));
-		feedback.setSelectedAPI((ScAPI) map.get(TokenOperationResultKey.SELECTED_API));
-		feedback.setSelectedCard((DetectedCard) map.get(TokenOperationResultKey.SELECTED_CARD));
+		if(api.getAppConfig().isEnablePopUps()) {
+			final Feedback feedback = new Feedback();
+			feedback.setFeedbackStatus(FeedbackStatus.SUCCESS);
+			feedback.setApiParameter((String) map.get(TokenOperationResultKey.SELECTED_API_PARAMS));
+			feedback.setSelectedAPI((ScAPI) map.get(TokenOperationResultKey.SELECTED_API));
+			feedback.setSelectedCard((DetectedCard) map.get(TokenOperationResultKey.SELECTED_CARD));
 
-		if ((feedback.getSelectedCard() != null) && (feedback.getSelectedAPI() != null) &&
-			((feedback.getSelectedAPI() == ScAPI.MOCCA) || (feedback.getSelectedAPI() == ScAPI.MSCAPI) ||
-			 (feedback.getApiParameter() != null))) {
-			final OperationResult<Feedback> result =
-					operationFactory.getOperation(UIOperation.class, display,
-							"/fxml/store-result.fxml", new Object[]{feedback}).perform();
-			if(result.getStatus().equals(BasicOperationStatus.SUCCESS)) {
-				final Feedback back = result.getResult();
-				if (back != null) {
-					((InternalAPI) api).store(back.getSelectedCard().getAtr(),
-							back.getSelectedAPI(), back.getApiParameter());
+			if ((feedback.getSelectedCard() != null) && (feedback.getSelectedAPI() != null) &&
+					((feedback.getSelectedAPI() == ScAPI.MOCCA) || (feedback.getSelectedAPI() == ScAPI.MSCAPI) ||
+							(feedback.getApiParameter() != null))) {
+				final OperationResult<Feedback> result =
+						operationFactory.getOperation(UIOperation.class, display,
+								"/fxml/store-result.fxml", new Object[]{feedback}).perform();
+				if(result.getStatus().equals(BasicOperationStatus.SUCCESS)) {
+					final Feedback back = result.getResult();
+					if (back != null) {
+						((InternalAPI) api).store(back.getSelectedCard().getAtr(),
+								back.getSelectedAPI(), back.getApiParameter());
+					}
 				}
+			} else {
+				operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml",
+						new Object[]{feedback}).perform();
 			}
-		} else {
-			operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml",
-					new Object[]{feedback}).perform();
-		}
-		
+		}		
 		return new OperationResult<Void>((Void) null);
 	}
 

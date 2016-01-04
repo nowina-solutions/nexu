@@ -14,6 +14,7 @@
 package lu.nowina.nexu.flow;
 
 import lu.nowina.nexu.api.Execution;
+import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.view.core.UIDisplay;
@@ -25,8 +26,8 @@ import lu.nowina.nexu.view.core.UIDisplay;
  */
 abstract class AbstractCoreFlow<I, O> extends Flow<I, O> {
 
-	public AbstractCoreFlow(UIDisplay display) {
-		super(display);
+	public AbstractCoreFlow(UIDisplay display, NexuAPI api) {
+		super(display, api);
 	}
 
 	/**

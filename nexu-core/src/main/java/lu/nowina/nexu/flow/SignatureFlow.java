@@ -45,8 +45,8 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 
 	private static final Logger logger = LoggerFactory.getLogger(SignatureFlow.class.getName());
 
-	public SignatureFlow(UIDisplay display) {
-		super(display);
+	public SignatureFlow(UIDisplay display, NexuAPI api) {
+		super(display, api);
 	}
 
 	@Override
@@ -78,7 +78,7 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 					final CardAdapter cardAdapter = (CardAdapter) map.get(TokenOperationResultKey.SELECTED_CARD_ADAPTER);
 					final OperationResult<DSSPrivateKeyEntry> selectPrivateKeyOperationResult =
 							getOperationFactory().getOperation(
-									SelectPrivateKeyOperation.class, token, card, cardAdapter, null, req.getKeyId()).perform();
+									SelectPrivateKeyOperation.class, token, api, card, cardAdapter, null, req.getKeyId()).perform();
 					if (selectPrivateKeyOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 						final DSSPrivateKeyEntry key = selectPrivateKeyOperationResult.getResult();
 
@@ -94,21 +94,27 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 										api, map).perform();
 							}
 							
-							getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+							if(api.getAppConfig().isEnablePopUps()) {
+								getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
 									new Object[]{"Signature performed"}).perform();
+							}
 							
 							return new Execution<SignatureResponse>(new SignatureResponse(value));
 						} else {
 							return handleErrorOperationResult(signOperationResult);
 						}
 					} else {
-						getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+						if(api.getAppConfig().isEnablePopUps()) {
+							getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
 								new Object[]{"Error - No keys"}).perform();
+						}
 						return handleErrorOperationResult(selectPrivateKeyOperationResult);
 					}
 				} else {
-					getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+					if(api.getAppConfig().isEnablePopUps()) {
+						getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
 							new Object[]{"Error - Token not recognized"}).perform();
+					}
 					return handleErrorOperationResult(getTokenConnectionOperationResult);
 				}
 			} else {

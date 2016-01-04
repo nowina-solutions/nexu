@@ -82,7 +82,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 			return createTokenAuto();
 		} else {
 			boolean advanced = false;
-			if (api.getAppConfig().isAdvancedModeAvailable()) {
+			if (api.getAppConfig().isAdvancedModeAvailable() && api.getAppConfig().isEnablePopUps()) {
 				LOG.info("Advanced mode available");
 				final OperationResult<Boolean> result =
 						operationFactory.getOperation(UIOperation.class, display, "/fxml/unsupported-product.fxml").perform();
@@ -97,9 +97,11 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 				return createTokenAdvanced();
 			} else {
 				LOG.info("Request support");
-				final Feedback feedback = new Feedback();
-				feedback.setFeedbackStatus(FeedbackStatus.PRODUCT_NOT_SUPPORTED);
-				operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml", new Object[]{feedback}).perform();
+				if(api.getAppConfig().isEnablePopUps()) {
+					final Feedback feedback = new Feedback();
+					feedback.setFeedbackStatus(FeedbackStatus.PRODUCT_NOT_SUPPORTED);
+					operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml", new Object[]{feedback}).perform();
+				}
 				return new OperationResult<Map<TokenOperationResultKey, Object>>(CoreOperationStatus.UNSUPPORTED_PRODUCT);
 			}
 		}

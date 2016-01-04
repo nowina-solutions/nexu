@@ -224,20 +224,22 @@ public class InternalAPI implements NexuAPI {
 				feedback = resp.getFeedback();
 			}
 			feedback.setNexuVersion(this.getAppConfig().getApplicationVersion());
-			feedback.setInfo(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
+			feedback.setInfo(this.getEnvironmentInfo());
 		}
 	}
 
 	@Override
 	public Execution<GetCertificateResponse> getCertificate(GetCertificateRequest request) {
-		Flow<GetCertificateRequest, GetCertificateResponse> flow = flowRegistry.getFlow(FlowRegistry.CERTIFICATE_FLOW, display);
+		Flow<GetCertificateRequest, GetCertificateResponse> flow =
+				flowRegistry.getFlow(FlowRegistry.CERTIFICATE_FLOW, display, this);
 		flow.setOperationFactory(operationFactory);
 		return executeRequest(flow, request);
 	}
 
 	@Override
 	public Execution<SignatureResponse> sign(SignatureRequest request) {
-		Flow<SignatureRequest, SignatureResponse> flow = flowRegistry.getFlow(FlowRegistry.SIGNATURE_FLOW, display);
+		Flow<SignatureRequest, SignatureResponse> flow =
+				flowRegistry.getFlow(FlowRegistry.SIGNATURE_FLOW, display, this);
 		flow.setOperationFactory(operationFactory);
 		return executeRequest(flow, request);
 	}
@@ -245,7 +247,7 @@ public class InternalAPI implements NexuAPI {
 	@Override
 	public Execution<GetIdentityInfoResponse> getIdentityInfo(GetIdentityInfoRequest request) {
 		final Flow<GetIdentityInfoRequest, GetIdentityInfoResponse> flow =
-				flowRegistry.getFlow(FlowRegistry.GET_IDENTITY_INFO_FLOW, display);
+				flowRegistry.getFlow(FlowRegistry.GET_IDENTITY_INFO_FLOW, display, this);
 		flow.setOperationFactory(operationFactory);
 		return executeRequest(flow, request);
 	}
@@ -253,7 +255,7 @@ public class InternalAPI implements NexuAPI {
 	@Override
 	public Execution<AuthenticateResponse> authenticate(AuthenticateRequest request) {
 		final Flow<AuthenticateRequest, AuthenticateResponse> flow =
-				flowRegistry.getFlow(FlowRegistry.AUTHENTICATE_FLOW, display);
+				flowRegistry.getFlow(FlowRegistry.AUTHENTICATE_FLOW, display, this);
 		flow.setOperationFactory(operationFactory);
 		return executeRequest(flow, request);
 	}

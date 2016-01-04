@@ -54,6 +54,8 @@ public class NexuLauncher {
 	private static final String BINDING_PORT = "binding_port";
 
 	private static final String CONNECTIONS_CACHE_MAX_SIZE = "connections_cache_max_size";
+
+	private static final String ENABLE_POP_UPS = "enable_pop_ups";
 	
 	private static final Logger logger = LoggerFactory.getLogger(NexuLauncher.class.getName());
 
@@ -184,6 +186,7 @@ public class NexuLauncher {
 		config.setDebug(Boolean.parseBoolean(props.getProperty(DEBUG, "false")));
 		config.setAdvancedModeAvailable(Boolean.parseBoolean(props.getProperty(ADVANCED_MODE_AVAILABLE, "true")));
 		config.setConnectionsCacheMaxSize(Integer.parseInt(props.getProperty(CONNECTIONS_CACHE_MAX_SIZE, "50")));
+		config.setEnablePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_POP_UPS, "true")));
 		
 		return config;
 	}

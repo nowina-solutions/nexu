@@ -13,6 +13,7 @@
  */
 package lu.nowina.nexu.flow;
 
+import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 public interface FlowRegistry {
@@ -25,6 +26,6 @@ public interface FlowRegistry {
 
 	static final String AUTHENTICATE_FLOW = "authenticate";
 	
-	<I, O> Flow<I, O> getFlow(String code, UIDisplay display);
+	<I, O> Flow<I, O> getFlow(String code, UIDisplay display, NexuAPI api);
 
 }

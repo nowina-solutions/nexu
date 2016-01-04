@@ -60,10 +60,12 @@ public class GetMatchingCardAdaptersOperation extends AbstractCompositeOperation
 		LOG.info(detectedCards.size() + " card detected");
 
 		if (detectedCards.size() == 0) {
-			final Feedback feedback = new Feedback();
-			feedback.setFeedbackStatus(FeedbackStatus.NO_PRODUCT_FOUND);
-			operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml",
-					new Object[]{feedback}).perform();
+			if(api.getAppConfig().isEnablePopUps()) {
+				final Feedback feedback = new Feedback();
+				feedback.setFeedbackStatus(FeedbackStatus.NO_PRODUCT_FOUND);
+				operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml",
+						new Object[]{feedback}).perform();
+			}
 			return new OperationResult<List<Match>>(CoreOperationStatus.NO_PRODUCT_FOUND);
 		} else {
 			if(detectedCards.size() > 1) {

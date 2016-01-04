@@ -46,8 +46,8 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 
 	static final Logger logger = LoggerFactory.getLogger(GetCertificateFlow.class);
 
-	public GetCertificateFlow(UIDisplay display) {
-		super(display);
+	public GetCertificateFlow(UIDisplay display, NexuAPI api) {
+		super(display, api);
 	}
 
 	@Override
@@ -74,7 +74,7 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 						final DetectedCard card = (DetectedCard) map.get(TokenOperationResultKey.SELECTED_CARD);
 						final CardAdapter cardAdapter = (CardAdapter) map.get(TokenOperationResultKey.SELECTED_CARD_ADAPTER);
 						final OperationResult<DSSPrivateKeyEntry> selectPrivateKeyOperationResult =
-								getOperationFactory().getOperation(SelectPrivateKeyOperation.class, token, card, cardAdapter, req.getCertificateFilter()).perform();
+								getOperationFactory().getOperation(SelectPrivateKeyOperation.class, token, api, card, cardAdapter, req.getCertificateFilter()).perform();
 						if (selectPrivateKeyOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 							final DSSPrivateKeyEntry key = selectPrivateKeyOperationResult.getResult();
 
@@ -96,8 +96,10 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 								resp.setCertificateChain(certificateChain);
 							}
 
-							getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+							if(api.getAppConfig().isEnablePopUps()) {
+								getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
 									new Object[]{"Finished"}).perform();
+							}
 							return new Execution<GetCertificateResponse>(resp);
 						} else {
 							return handleErrorOperationResult(selectPrivateKeyOperationResult);

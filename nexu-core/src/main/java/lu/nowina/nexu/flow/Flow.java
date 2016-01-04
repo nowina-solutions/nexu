@@ -32,11 +32,14 @@ public abstract class Flow<I, O> {
 
 	private OperationFactory operationFactory;
 
-	public Flow(UIDisplay display) {
+	private NexuAPI api;
+	
+	public Flow(UIDisplay display, NexuAPI api) {
 		if (display == null) {
 			throw new IllegalArgumentException("display cannot be null");
 		}
 		this.display = display;
+		this.api = api;
 	}
 
 	public final void setOperationFactory(final OperationFactory operationFactory) {
@@ -61,12 +64,14 @@ public abstract class Flow<I, O> {
 	
 	@SuppressWarnings("unchecked")
 	protected Exception handleException(final Exception e) {
-		final Feedback feedback = new Feedback(e);
-		getOperationFactory().getOperation(
-				UIOperation.class, getDisplay(), "/fxml/provide-feedback.fxml",
-				new Object[]{feedback}).perform();
-		getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
-				new Object[]{"Failure"}).perform();
+		if(api.getAppConfig().isEnablePopUps()) {
+			final Feedback feedback = new Feedback(e);
+			getOperationFactory().getOperation(
+					UIOperation.class, getDisplay(), "/fxml/provide-feedback.fxml",
+					new Object[]{feedback}).perform();
+			getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+					new Object[]{"Failure"}).perform();
+		}
 		return e;
 	}
 }

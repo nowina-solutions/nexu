@@ -17,14 +17,8 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.DatatypeConverter;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-
-import eu.europa.esig.dss.DigestAlgorithm;
-import eu.europa.esig.dss.ToBeSigned;
 import lu.nowina.nexu.api.AuthenticateRequest;
 import lu.nowina.nexu.api.CertificateFilter;
-import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackStatus;
@@ -40,6 +34,12 @@ import lu.nowina.nexu.api.plugin.HttpRequest;
 import lu.nowina.nexu.api.plugin.HttpResponse;
 import lu.nowina.nexu.api.plugin.HttpStatus;
 import lu.nowina.nexu.json.GsonHelper;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+
+import eu.europa.esig.dss.DigestAlgorithm;
+import eu.europa.esig.dss.ToBeSigned;
 
 /**
  * Default implementation of HttpPlugin for NexU.
@@ -121,7 +121,7 @@ public class RestHttpPlugin implements HttpPlugin {
 			final Feedback feedback = new Feedback();
 			execution.setFeedback(feedback);
 			feedback.setFeedbackStatus(FeedbackStatus.FAILED);
-			feedback.setInfo(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
+			feedback.setInfo(api.getEnvironmentInfo());
 			feedback.setNexuVersion(api.getAppConfig().getApplicationVersion());
 			return toHttpResponse(execution);
 		}
@@ -136,7 +136,7 @@ public class RestHttpPlugin implements HttpPlugin {
 			} else {
 				feedback = verification.getFeedback();
 			}
-			feedback.setInfo(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
+			feedback.setInfo(api.getEnvironmentInfo());
 			feedback.setNexuVersion(api.getAppConfig().getApplicationVersion());
 			return toHttpResponse(verification);
 		}

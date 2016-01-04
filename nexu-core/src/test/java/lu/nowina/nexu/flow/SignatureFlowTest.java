@@ -22,6 +22,7 @@ import java.util.Arrays;
 
 import lu.nowina.nexu.AbstractConfigureLoggerTest;
 import lu.nowina.nexu.NexuException;
+import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Execution;
@@ -62,6 +63,9 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 		when(api.matchingCardAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
 		when(api.registerTokenConnection(token)).thenReturn(new TokenId("id"));
 		when(api.getTokenConnection(new TokenId("id"))).thenReturn(token);
+		final AppConfig appConfig = new AppConfig();
+		appConfig.setEnablePopUps(true);
+		when(api.getAppConfig()).thenReturn(appConfig);
 
 		when(adapter.connect(eq(api), eq(detectedCard), any())).thenReturn(token);
 
@@ -72,7 +76,7 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 		final OperationFactory noUIOperationFactory = new NoUIOperationFactory();
 		noUIOperationFactory.setDisplay(display);
 
-		SignatureFlow flow = new SignatureFlow(display);
+		SignatureFlow flow = new SignatureFlow(display, api);
 		flow.setOperationFactory(noUIOperationFactory);
 		Execution<SignatureResponse> resp = flow.process(api, req);
 		Assert.assertNotNull(resp);
@@ -92,7 +96,7 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 		SignatureRequest req = new SignatureRequest();
 		req.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
-		SignatureFlow flow = new SignatureFlow(display);
+		SignatureFlow flow = new SignatureFlow(display, api);
 		flow.process(api, req);
 
 	}
@@ -107,7 +111,7 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 		SignatureRequest req = new SignatureRequest();
 		req.setToBeSigned(new ToBeSigned());
 
-		SignatureFlow flow = new SignatureFlow(display);
+		SignatureFlow flow = new SignatureFlow(display, api);
 		flow.process(api, req);
 
 	}
@@ -122,7 +126,7 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 		SignatureRequest req = new SignatureRequest();
 		req.setToBeSigned(new ToBeSigned("hello".getBytes()));
 
-		SignatureFlow flow = new SignatureFlow(display);
+		SignatureFlow flow = new SignatureFlow(display, api);
 		flow.process(api, req);
 
 	}

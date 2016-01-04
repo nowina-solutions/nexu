@@ -13,8 +13,6 @@
  */
 package lu.nowina.nexu.api;
 
-import java.util.List;
-
 import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.x509.CertificateToken;
 

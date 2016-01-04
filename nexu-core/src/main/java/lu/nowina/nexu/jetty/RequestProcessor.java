@@ -29,7 +29,6 @@ import lu.nowina.nexu.ConfigurationException;
 import lu.nowina.nexu.InternalAPI;
 import lu.nowina.nexu.TechnicalException;
 import lu.nowina.nexu.UserPreferences;
-import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
@@ -130,7 +129,7 @@ public class RequestProcessor extends AbstractHandler {
 				final Execution<?> execution = new Execution<Object>(BasicOperationStatus.EXCEPTION);
 				final Feedback feedback = new Feedback(e);
 				feedback.setNexuVersion(api.getAppConfig().getApplicationVersion());
-				feedback.setInfo(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
+				feedback.setInfo(api.getEnvironmentInfo());
 				execution.setFeedback(feedback);
 				
 				final PrintWriter writer = response.getWriter();

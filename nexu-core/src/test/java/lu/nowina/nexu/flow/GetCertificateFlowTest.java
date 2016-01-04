@@ -60,6 +60,9 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		final UIDisplay display = mock(UIDisplay.class);
 
 		final NexuAPI api = mock(NexuAPI.class);
+		final AppConfig appConfig = new AppConfig();
+		appConfig.setEnablePopUps(true);
+		when(api.getAppConfig()).thenReturn(appConfig);
 		when(api.detectCards()).thenReturn(Collections.emptyList());
 
 		final OperationFactory operationFactory = mock(OperationFactory.class);
@@ -81,7 +84,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		when(operationFactory.getOperation(
 				UIOperation.class, display, "/fxml/message.fxml", new Object[]{"Finished"})).thenReturn(successOperation);
 		
-		final GetCertificateFlow flow = new GetCertificateFlow(display);
+		final GetCertificateFlow flow = new GetCertificateFlow(display, api);
 		flow.setOperationFactory(operationFactory);
 		
 		final GetCertificateRequest req = new GetCertificateRequest();
@@ -101,6 +104,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		
 		final AppConfig appConfig = new AppConfig();
 		appConfig.setAdvancedModeAvailable(true);
+		appConfig.setEnablePopUps(true);
 		when(api.getAppConfig()).thenReturn(appConfig);
 
 		final OperationFactory operationFactory = mock(OperationFactory.class);
@@ -129,7 +133,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		when(operationFactory.getOperation(
 				UIOperation.class, display, "/fxml/message.fxml", new Object[]{"Finished"})).thenReturn(successOperation);
 		
-		final GetCertificateFlow flow = new GetCertificateFlow(display);
+		final GetCertificateFlow flow = new GetCertificateFlow(display, api);
 		flow.setOperationFactory(operationFactory);
 		
 		final GetCertificateRequest req = new GetCertificateRequest();
@@ -149,6 +153,9 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		SignatureTokenConnection token = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password");
 
 		NexuAPI api = mock(NexuAPI.class);
+		final AppConfig appConfig = new AppConfig();
+		appConfig.setEnablePopUps(true);
+		when(api.getAppConfig()).thenReturn(appConfig);
 		DetectedCard detectedCard = new DetectedCard("atr", 0);
 
 		when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
@@ -160,7 +167,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		final OperationFactory operationFactory = new NoUIOperationFactory();
 		operationFactory.setDisplay(display);
 		
-		GetCertificateFlow flow = new GetCertificateFlow(display);
+		GetCertificateFlow flow = new GetCertificateFlow(display, api);
 		flow.setOperationFactory(operationFactory);
 		Execution<GetCertificateResponse> resp = flow.process(api, new GetCertificateRequest());
 		Assert.assertNotNull(resp);

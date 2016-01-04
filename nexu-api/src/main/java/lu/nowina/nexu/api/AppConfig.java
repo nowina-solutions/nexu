@@ -52,6 +52,8 @@ public class AppConfig {
 	
 	private int connectionsCacheMaxSize;
 	
+	private boolean enablePopUps;
+	
 	public AppConfig() {
 		try {
 			final URL versionResourceURL = this.getClass().getResource("/version.txt");
@@ -148,5 +150,13 @@ public class AppConfig {
 
 	public void setConnectionsCacheMaxSize(int connectionsCacheMaxSize) {
 		this.connectionsCacheMaxSize = connectionsCacheMaxSize;
+	}
+
+	public boolean isEnablePopUps() {
+		return enablePopUps;
+	}
+
+	public void setEnablePopUps(boolean enablePopUps) {
+		this.enablePopUps = enablePopUps;
 	}
 }
