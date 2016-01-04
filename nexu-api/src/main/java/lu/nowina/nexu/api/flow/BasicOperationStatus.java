@@ -21,7 +21,7 @@ package lu.nowina.nexu.api.flow;
 public enum BasicOperationStatus implements OperationStatus {
 	SUCCESS("success", "The operation was completed successfully."),
 	EXCEPTION("exception", "An exception was thrown during the operation."),
-	USER_CANCEL("user_cancel", "The user has cancelled the operation.");
+	USER_CANCEL("user.cancel", "The user has cancelled the operation.");
 	
 	private final String code;
 	private final String label;
