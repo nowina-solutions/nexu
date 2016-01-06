@@ -130,6 +130,7 @@ public class RestHttpPlugin implements HttpPlugin {
 		if(invalidRequestHttpResponse != null) {
 			return invalidRequestHttpResponse;
 		} else {
+			logger.info("Call API");
 			final Execution<?> respObj = api.sign(r);
 			return toHttpResponse(respObj);
 		}
@@ -153,12 +154,11 @@ public class RestHttpPlugin implements HttpPlugin {
 			r = GsonHelper.fromJson(payload, GetCertificateRequest.class);
 		}
 
-		logger.info("Call API");
-
 		final HttpResponse invalidRequestHttpResponse = checkRequestValidity(api, r);
 		if(invalidRequestHttpResponse != null) {
 			return invalidRequestHttpResponse;
 		} else {
+			logger.info("Call API");
 			final Execution<?> respObj = api.getCertificate(r);
 			return toHttpResponse(respObj);
 		}
@@ -173,12 +173,11 @@ public class RestHttpPlugin implements HttpPlugin {
 			r = GsonHelper.fromJson(payload, GetIdentityInfoRequest.class);
 		}
 
-		logger.info("Call API");
-		
 		final HttpResponse invalidRequestHttpResponse = checkRequestValidity(api, r);
 		if(invalidRequestHttpResponse != null) {
 			return invalidRequestHttpResponse;
 		} else {
+			logger.info("Call API");
 			final Execution<?> respObj = api.getIdentityInfo(r);
 			return toHttpResponse(respObj);
 		}
@@ -205,6 +204,7 @@ public class RestHttpPlugin implements HttpPlugin {
 		if(invalidRequestHttpResponse != null) {
 			return invalidRequestHttpResponse;
 		} else {
+			logger.info("Call API");
 			final Execution<?> respObj = api.authenticate(r);
 			return toHttpResponse(respObj);
 		}
