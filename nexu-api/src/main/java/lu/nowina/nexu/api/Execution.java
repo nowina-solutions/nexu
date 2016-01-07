@@ -31,6 +31,20 @@ public class Execution<T> {
 
 	private String feedback;
 
+	public Execution() {
+	}
+	
+	public Execution(T response) {
+		this.response = response;
+		this.success = true;
+	}
+
+	public Execution(String error, String errorMessage) {
+		this.success = false;
+		this.error = error;
+		this.errorMessage = errorMessage;
+	}
+	
 	public T getResponse() {
 		return response;
 	}

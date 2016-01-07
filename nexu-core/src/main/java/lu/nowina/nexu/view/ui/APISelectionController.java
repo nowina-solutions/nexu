@@ -21,9 +21,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
 import lu.nowina.nexu.api.ScAPI;
-import lu.nowina.nexu.view.core.UIOperation;
+import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
-public class APISelectionController extends UIOperation<ScAPI> implements Initializable {
+public class APISelectionController extends AbstractUIOperationController<ScAPI> implements Initializable {
 
 	@FXML
 	private Button select;

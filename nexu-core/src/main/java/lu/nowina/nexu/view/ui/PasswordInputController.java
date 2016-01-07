@@ -22,9 +22,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
-import lu.nowina.nexu.view.core.UIOperation;
+import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
-public class PasswordInputController extends UIOperation<char[]> implements Initializable {
+public class PasswordInputController extends AbstractUIOperationController<char[]> implements Initializable {
 
 	@FXML
 	private Button ok;

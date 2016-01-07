@@ -19,7 +19,7 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import lu.nowina.nexu.view.core.UIOperation;
+import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 /**
  * Return true if the user want to try "Advance mode"
@@ -27,7 +27,7 @@ import lu.nowina.nexu.view.core.UIOperation;
  * @author David Naramski
  *
  */
-public class UnsupportedProductController extends UIOperation<Boolean> implements Initializable {
+public class UnsupportedProductController extends AbstractUIOperationController<Boolean> implements Initializable {
 
 	@FXML
 	Button requestSupport;

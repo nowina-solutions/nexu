@@ -15,13 +15,22 @@ package lu.nowina.nexu;
 
 public class NexuException extends RuntimeException {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
+
+	public NexuException() {
+		super();
+	}
 
 	public NexuException(String message) {
 		super(message);
+	}
+
+	public NexuException(Throwable cause) {
+		super(cause);
+	}
+
+	public NexuException(String message, Throwable cause) {
+		super(message, cause);
 	}
 
 }

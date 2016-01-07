@@ -16,13 +16,35 @@ package lu.nowina.nexu.api;
 public class CertificateFilter {
 
 	private Purpose purpose;
+	
+	private byte[] certificateSHA1;
 
+	public CertificateFilter() {
+		
+	}
+	
+	public CertificateFilter(Purpose purpose) {
+		this.purpose = purpose;
+	}
+	
+	public CertificateFilter(byte[] certificateSHA1) {
+		this.certificateSHA1 = certificateSHA1;
+	}
+	
 	public Purpose getPurpose() {
 		return purpose;
 	}
 
 	public void setPurpose(Purpose purpose) {
 		this.purpose = purpose;
+	}
+
+	public byte[] getCertificateSHA1() {
+		return certificateSHA1;
+	}
+
+	public void setCertificateSHA1(byte[] certificateSHA1) {
+		this.certificateSHA1 = certificateSHA1;
 	}
 
 }

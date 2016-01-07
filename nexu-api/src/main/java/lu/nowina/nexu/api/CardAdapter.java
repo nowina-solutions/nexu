@@ -13,6 +13,9 @@
  */
 package lu.nowina.nexu.api;
 
+import java.util.List;
+
+import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.PasswordInputCallback;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 
@@ -40,6 +43,32 @@ public interface CardAdapter {
 	 * @param callback
 	 * @return
 	 */
-	public SignatureTokenConnection connect(NexuAPI api, DetectedCard card, PasswordInputCallback callback);
+	SignatureTokenConnection connect(NexuAPI api, DetectedCard card, PasswordInputCallback callback);
 
+	/**
+	 * Returns <code>true</code> if this card adapter can return identity information for the given <code>card</code>.
+	 * @return <code>true</code> if this card adapter can return identity information for the given <code>card</code>.
+	 */
+	boolean canReturnIdentityInfo(DetectedCard card);
+	
+	/**
+	 * Returns the identity information using the given <code>token</code>.
+	 * @param token The token to use to get the identity information.
+	 * @return The identity information using the given <code>token</code>.
+	 */
+	GetIdentityInfoResponse getIdentityInfo(SignatureTokenConnection token);
+	
+	/**
+	 * Returns <code>true</code> if this card adapter supports {@link CertificateFilter} for the given <code>card</code>.
+	 * @return <code>true</code> if this card adapter supports {@link CertificateFilter} for the given <code>card</code>.
+	 */
+	boolean supportCertificateFilter(DetectedCard card);
+	
+	/**
+	 * Returns the keys of <code>token</code> matching the <code>certificateFilter</code>.
+	 * @param token The token to use to retrieve the keys.
+	 * @param certificateFilter Filter that must be matched by returned keys.
+	 * @return The keys of <code>token</code> matching the <code>certificateFilter</code>.
+	 */
+	List<DSSPrivateKeyEntry> getKeys(SignatureTokenConnection token, CertificateFilter certificateFilter);
 }

@@ -17,17 +17,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
 
 import java.util.Arrays;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import eu.europa.esig.dss.DigestAlgorithm;
-import eu.europa.esig.dss.ToBeSigned;
-import eu.europa.esig.dss.token.JKSSignatureToken;
-import eu.europa.esig.dss.token.SignatureTokenConnection;
+import lu.nowina.nexu.AbstractConfigureLoggerTest;
 import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
@@ -36,20 +29,33 @@ import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.api.flow.Operation;
+import lu.nowina.nexu.api.flow.OperationResult;
+import lu.nowina.nexu.api.flow.OperationStatus;
+import lu.nowina.nexu.flow.operation.BasicOperationFactory;
+import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.view.core.UIDisplay;
+import lu.nowina.nexu.view.core.UIOperation;
 
-public class SignatureFlowTest {
+import org.junit.Assert;
+import org.junit.Test;
+
+import eu.europa.esig.dss.DigestAlgorithm;
+import eu.europa.esig.dss.ToBeSigned;
+import eu.europa.esig.dss.token.JKSSignatureToken;
+import eu.europa.esig.dss.token.SignatureTokenConnection;
+
+public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 
 	@Test
 	public void testCardRecognized() throws Exception {
-
 		UIDisplay display = mock(UIDisplay.class);
 
-		CardAdapter adapter = mock(CardAdapter.class, withSettings().verboseLogging());
+		CardAdapter adapter = mock(CardAdapter.class);
 
 		SignatureTokenConnection token = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password");
 
-		NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
+		NexuAPI api = mock(NexuAPI.class);
 		DetectedCard detectedCard = new DetectedCard("atr", 0);
 		when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
 		when(api.matchingCardAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
@@ -62,7 +68,11 @@ public class SignatureFlowTest {
 		req.setToBeSigned(new ToBeSigned("hello".getBytes()));
 		req.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
+		final OperationFactory noUIOperationFactory = new NoUIOperationFactory();
+		noUIOperationFactory.setDisplay(display);
+
 		SignatureFlow flow = new SignatureFlow(display);
+		flow.setOperationFactory(noUIOperationFactory);
 		SignatureResponse resp = flow.process(api, req);
 		Assert.assertNotNull(resp);
 		Assert.assertNotNull(resp.getSignatureValue());
@@ -74,7 +84,7 @@ public class SignatureFlowTest {
 
 		UIDisplay display = mock(UIDisplay.class);
 
-		NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
+		NexuAPI api = mock(NexuAPI.class);
 
 		SignatureRequest req = new SignatureRequest();
 		req.setDigestAlgorithm(DigestAlgorithm.SHA256);
@@ -89,7 +99,7 @@ public class SignatureFlowTest {
 
 		UIDisplay display = mock(UIDisplay.class);
 
-		NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
+		NexuAPI api = mock(NexuAPI.class);
 
 		SignatureRequest req = new SignatureRequest();
 		req.setToBeSigned(new ToBeSigned());
@@ -104,7 +114,7 @@ public class SignatureFlowTest {
 
 		UIDisplay display = mock(UIDisplay.class);
 
-		NexuAPI api = mock(NexuAPI.class, withSettings().verboseLogging());
+		NexuAPI api = mock(NexuAPI.class);
 
 		SignatureRequest req = new SignatureRequest();
 		req.setToBeSigned(new ToBeSigned("hello".getBytes()));
@@ -114,4 +124,24 @@ public class SignatureFlowTest {
 
 	}
 
+	private static class NoUIOperationFactory extends BasicOperationFactory {
+		
+		@SuppressWarnings("rawtypes")
+		private final Operation successOperation;
+		
+		public NoUIOperationFactory() {
+			this.successOperation = mock(Operation.class);
+			when(successOperation.perform()).thenReturn(new OperationResult<Void>(OperationStatus.SUCCESS));
+		}
+		
+		@Override
+		@SuppressWarnings("unchecked")
+		public <R, T extends Operation<R>> Operation<R> getOperation(Class<T> clazz, Object... params) {
+			if(UIOperation.class.isAssignableFrom(clazz)) {
+				return successOperation;
+			} else {
+				return super.getOperation(clazz, params);
+			}
+		}
+	}
 }

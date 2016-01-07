@@ -14,7 +14,6 @@
 package lu.nowina.nexu.view.core;
 
 import eu.europa.esig.dss.token.PasswordInputCallback;
-import javafx.scene.Parent;
 
 /**
  * Représente une interface graphique visible par l'utilisateur. On peut demander l'affichage d'un panel spécifique ou montrer des panels pré-définis.
@@ -22,13 +21,9 @@ import javafx.scene.Parent;
  */
 public interface UIDisplay {
 
-	void display(Parent panel);
-
-	void displayWaitingPane();
-
 	void close();
 
-	<T extends Object> OperationResult<T> displayAndWaitUIOperation(String fxml, Object... params);
+	<T> void displayAndWaitUIOperation(UIOperation<T> operation);
 
 	PasswordInputCallback getPasswordInputCallback();
 

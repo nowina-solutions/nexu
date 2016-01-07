@@ -24,9 +24,13 @@ import com.google.gson.Gson;
 
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.ToBeSigned;
+import lu.nowina.nexu.api.AuthenticateRequest;
+import lu.nowina.nexu.api.CertificateFilter;
 import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.GetCertificateRequest;
+import lu.nowina.nexu.api.GetIdentityInfoRequest;
 import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.Purpose;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
@@ -52,31 +56,29 @@ public class RestHttpPlugin implements HttpPlugin {
 	@Override
 	public HttpResponse process(NexuAPI api, HttpRequest req) throws Exception {
 
-		String target = req.getTarget();
+		final String target = req.getTarget();
 		logger.info("PathInfo " + target);
 
-		String payload = IOUtils.toString(req.getInputStream());
+		final String payload = IOUtils.toString(req.getInputStream());
 		logger.info("Payload '" + payload + "'");
 
-		if ("/sign".equals(target)) {
-
+		switch(target) {
+		case "/sign":
 			return signRequest(api, req, payload);
-
-		} else if ("/certificates".equals(target)) {
-
-			return getCertificates(api, payload);
-
-		} else {
-
+		case "/certificates":
+			return getCertificates(api, req, payload);
+		case "/identityInfo":
+			return getIdentityInfo(api, payload);
+		case "/authenticate":
+			return authenticate(api, req, payload);
+		default:
 			throw new RuntimeException("Target not recognized " + target);
-
 		}
-
 	}
 
 	private HttpResponse signRequest(NexuAPI api, HttpRequest req, String payload) {
 		logger.info("Signature");
-		SignatureRequest r = new SignatureRequest();
+		final SignatureRequest r;
 		if (StringUtils.isEmpty(payload)) {
 			r = new SignatureRequest();
 
@@ -104,37 +106,81 @@ public class RestHttpPlugin implements HttpPlugin {
 			if (keyId != null) {
 				r.setKeyId(keyId);
 			}
-
 		} else {
 			r = gson.fromJson(payload, SignatureRequest.class);
 		}
 
-		Execution<?> respObj = api.sign(r);
-		if (respObj.isSuccess()) {
-			return new HttpResponse(gson.toJson(respObj), "application/json", HttpStatus.OK);
-		} else {
-			return new HttpResponse(gson.toJson(respObj), "application/json", HttpStatus.ERROR);
+		if(r.isOnlyEncryptionRequired()) {
+			return toHttpResponse(new Execution("not_supported_only_encryption_required", ""));
 		}
-
+		
+		final Execution<?> respObj = api.sign(r);
+		return toHttpResponse(respObj);
 	}
 
-	private HttpResponse getCertificates(NexuAPI api, String payload) {
+	private HttpResponse getCertificates(NexuAPI api, HttpRequest req, String payload) {
 		logger.info("API call certificates");
-		GetCertificateRequest payloadObj = null;
+		final GetCertificateRequest r;
 		if (StringUtils.isEmpty(payload)) {
-			payloadObj = new GetCertificateRequest();
+			r = new GetCertificateRequest();
+
+			final String certificatePurpose = req.getParameter("certificatePurpose");
+			if (certificatePurpose != null) {
+				logger.info("Certificate purpose " + certificatePurpose);
+				final Purpose purpose = Enum.valueOf(Purpose.class, certificatePurpose);
+				final CertificateFilter certificateFilter = new CertificateFilter();
+				certificateFilter.setPurpose(purpose);
+				r.setCertificateFilter(certificateFilter);
+			}
 		} else {
-			payloadObj = gson.fromJson(payload, GetCertificateRequest.class);
+			r = gson.fromJson(payload, GetCertificateRequest.class);
 		}
 
 		logger.info("Call API");
-		Execution<?> respObj = api.getCertificate(payloadObj);
+		final Execution<?> respObj = api.getCertificate(r);
+		return toHttpResponse(respObj);
+	}
 
+	private HttpResponse getIdentityInfo(NexuAPI api, String payload) {
+		logger.info("API call get identity info");
+		final GetIdentityInfoRequest payloadObj;
+		if (StringUtils.isEmpty(payload)) {
+			payloadObj = new GetIdentityInfoRequest();
+		} else {
+			payloadObj = gson.fromJson(payload, GetIdentityInfoRequest.class);
+		}
+
+		logger.info("Call API");
+		final Execution<?> respObj = api.getIdentityInfo(payloadObj);
+		return toHttpResponse(respObj);
+	}
+
+	private HttpResponse authenticate(NexuAPI api, HttpRequest req, String payload) {
+		logger.info("Authenticate");
+		final AuthenticateRequest r;
+		if (StringUtils.isEmpty(payload)) {
+			r = new AuthenticateRequest();
+
+			final String data = req.getParameter("challenge");
+			if (data != null) {
+				logger.info("Challenge " + data);
+				final ToBeSigned tbs = new ToBeSigned();
+				tbs.setBytes(DatatypeConverter.parseBase64Binary(data));
+				r.setChallenge(tbs);
+			}
+		} else {
+			r = gson.fromJson(payload, AuthenticateRequest.class);
+		}
+
+		final Execution<?> respObj = api.authenticate(r);
+		return toHttpResponse(respObj);
+	}
+
+	private HttpResponse toHttpResponse(final Execution<?> respObj) {
 		if (respObj.isSuccess()) {
 			return new HttpResponse(gson.toJson(respObj), "application/json", HttpStatus.OK);
 		} else {
 			return new HttpResponse(gson.toJson(respObj), "application/json", HttpStatus.ERROR);
 		}
 	}
-
 }

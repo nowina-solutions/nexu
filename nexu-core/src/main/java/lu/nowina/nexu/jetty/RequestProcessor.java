@@ -124,7 +124,7 @@ public class RequestProcessor extends AbstractHandler {
 			PrintWriter writer = response.getWriter();
 			HttpPlugin httpPlugin = api.getPlugin(pluginId);
 
-			HttpResponse resp = httpPlugin.process(api, new DelegatedHttpServerRequest(request, "/rest"));
+			HttpResponse resp = httpPlugin.process(api, new DelegatedHttpServerRequest(request, '/' + pluginId));
 			if (resp == null || resp.getContent() == null) {
 				throw new TechnicalException("Plugin responded null");
 			} else {

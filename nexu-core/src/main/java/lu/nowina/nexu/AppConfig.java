@@ -32,9 +32,11 @@ public class AppConfig {
 	private String nexuUrl;
 
 	private String httpServerClass;
-	
+
 	private boolean debug;
 
+	private boolean advancedModeAvailable;
+	
 	public String getBindingIP() {
 		return bindingIP;
 	}
@@ -91,4 +93,11 @@ public class AppConfig {
 		this.debug = debug;
 	}
 
+	public boolean isAdvancedModeAvailable() {
+		return advancedModeAvailable;
+	}
+
+	public void setAdvancedModeAvailable(boolean advancedModeAvailable) {
+		this.advancedModeAvailable = advancedModeAvailable;
+	}
 }

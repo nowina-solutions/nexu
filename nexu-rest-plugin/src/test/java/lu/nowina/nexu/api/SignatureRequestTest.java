@@ -34,7 +34,7 @@ public class SignatureRequestTest {
 		Gson gson = new Gson();
 		String text = gson.toJson(obj);
 
-		Assert.assertEquals("{\"digestAlgorithm\":\"SHA1\",\"keyId\":\"key\"}", text);
+		Assert.assertEquals("{\"digestAlgorithm\":\"SHA1\",\"keyId\":\"key\",\"onlyEncryptionRequired\":false}", text);
 
 		SignatureRequest obj2 = gson.fromJson(text, SignatureRequest.class);
 

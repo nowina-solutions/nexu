@@ -25,6 +25,8 @@ public class NexuRequest {
 	private String externalId;
 
 	private String requestSeal;
+	
+	private String nonce;
 
 	public String getUserLocale() {
 		return userLocale;
@@ -48,6 +50,14 @@ public class NexuRequest {
 
 	public void setRequestSeal(String requestSeal) {
 		this.requestSeal = requestSeal;
+	}
+
+	public String getNonce() {
+		return nonce;
+	}
+
+	public void setNonce(String nonce) {
+		this.nonce = nonce;
 	}
 
 }

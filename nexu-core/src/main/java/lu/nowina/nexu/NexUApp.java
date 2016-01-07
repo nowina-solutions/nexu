@@ -18,27 +18,31 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import eu.europa.esig.dss.token.PasswordInputCallback;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import lu.nowina.nexu.api.EnvironmentInfo;
+import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
 import lu.nowina.nexu.api.plugin.SignaturePlugin;
+import lu.nowina.nexu.flow.BasicFlowRegistry;
+import lu.nowina.nexu.flow.Flow;
+import lu.nowina.nexu.flow.FlowRegistry;
+import lu.nowina.nexu.flow.operation.BasicOperationFactory;
+import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.generic.HttpDataLoader;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCDatabaseLoader;
-import lu.nowina.nexu.view.SystrayMenu;
-import lu.nowina.nexu.view.core.OperationResult;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.europa.esig.dss.token.PasswordInputCallback;
 
 public class NexUApp extends Application implements UIDisplay {
 
@@ -46,8 +50,10 @@ public class NexUApp extends Application implements UIDisplay {
 
 	private Stage stage;
 
-	private UIOperation<?> currentOperation;
+	private OperationFactory operationFactory;
 	
+	private UIOperation<?> currentOperation;
+
 	private AppConfig getConfig() {
 		return NexuLauncher.getConfig();
 	}
@@ -55,7 +61,7 @@ public class NexUApp extends Application implements UIDisplay {
 	private Properties getProperties() {
 		return NexuLauncher.getProperties();
 	}
-	
+
 	@Override
 	public void start(Stage primaryStage) {
 		Platform.setImplicitExit(false);
@@ -64,41 +70,13 @@ public class NexUApp extends Application implements UIDisplay {
 
 		try {
 
-			File nexuHome = NexuLauncher.getNexuHome();
-			SCDatabase db = null;
-			if (nexuHome != null) {
-				File store = new File(nexuHome, "store.xml");
-				logger.info("Load database from " + store.getAbsolutePath());
-				db = SCDatabaseLoader.load(store);
-			} else {
-				db = new SCDatabase();
-			}
+			InternalAPI api = buildAPI();
 
-			UserPreferences prefs = new UserPreferences();
-			CardDetector detector = new CardDetector(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
-
-			DatabaseWebLoader loader = new DatabaseWebLoader(getConfig(), new HttpDataLoader());
-			loader.start();
-
-			InternalAPI api = new InternalAPI(this, prefs, db, detector, loader);
-
-			for (String key : getProperties().stringPropertyNames()) {
-				if (key.startsWith("plugin_")) {
-
-					String pluginClassName = getProperties().getProperty(key);
-					String pluginId = key.substring("plugin_".length());
-
-					logger.info(" + Plugin " + pluginClassName);
-					buildAndRegisterPlugin(api, pluginClassName, pluginId, false);
-
-				}
-			}
-
-			new SystrayMenu(this, loader);
+			new SystrayMenu(this, api.getWebDatabase());
 
 			logger.info("Start Jetty");
 
-			startHttpServer(prefs, api);
+			startHttpServer(api.getPrefs(), api);
 
 			logger.info("Start finished");
 
@@ -107,6 +85,49 @@ public class NexUApp extends Application implements UIDisplay {
 		}
 	}
 
+	protected InternalAPI buildAPI() throws IOException {
+		File nexuHome = NexuLauncher.getNexuHome();
+		SCDatabase db = null;
+		if (nexuHome != null) {
+			File store = new File(nexuHome, "store.xml");
+			logger.info("Load database from " + store.getAbsolutePath());
+			db = SCDatabaseLoader.load(store);
+		} else {
+			db = new SCDatabase();
+		}
+
+		UserPreferences prefs = new UserPreferences();
+		CardDetector detector = new CardDetector(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
+
+		DatabaseWebLoader loader = new DatabaseWebLoader(getConfig(), new HttpDataLoader());
+		loader.start();
+
+		this.operationFactory = new BasicOperationFactory();
+		this.operationFactory.setDisplay(this);
+		InternalAPI api = new InternalAPI(this, prefs, db, detector, loader, getFlowRegistry(), this.operationFactory);
+
+		for (String key : getProperties().stringPropertyNames()) {
+			if (key.startsWith("plugin_")) {
+
+				String pluginClassName = getProperties().getProperty(key);
+				String pluginId = key.substring("plugin_".length());
+
+				logger.info(" + Plugin " + pluginClassName);
+				buildAndRegisterPlugin(api, pluginClassName, pluginId, false);
+
+			}
+		}
+		return api;
+	}
+
+	/**
+	 * Returns the {@link FlowRegistry} to use to resolve {@link Flow}s.
+	 * @return The {@link FlowRegistry} to use to resolve {@link Flow}s.
+	 */
+	protected FlowRegistry getFlowRegistry() {
+		return new BasicFlowRegistry();
+	}
+	
 	private void startHttpServer(UserPreferences prefs, InternalAPI api) {
 		new Thread(() -> {
 			HttpServer server = buildHttpServer();
@@ -124,6 +145,7 @@ public class NexUApp extends Application implements UIDisplay {
 	 * 
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	private HttpServer buildHttpServer() {
 		try {
 			Class<HttpServer> cla = (Class<HttpServer>) Class.forName(getConfig().getHttpServerClass());
@@ -165,8 +187,7 @@ public class NexUApp extends Application implements UIDisplay {
 		}
 	}
 
-	@Override
-	public void display(Parent panel) {
+	void display(Parent panel) {
 		logger.info("Display " + panel + " in display " + this + " from Thread " + Thread.currentThread().getName());
 		Platform.runLater(() -> {
 			logger.info("Display " + panel + " in display " + this + " from Thread " + Thread.currentThread().getName());
@@ -189,15 +210,14 @@ public class NexUApp extends Application implements UIDisplay {
 			stage.hide();
 			e.consume();
 
-			if(currentOperation != null) {
+			if (currentOperation != null) {
 				currentOperation.signalUserCancel();
 			}
-			
+
 		});
 		return newStage;
 	}
 
-	@Override
 	public void displayWaitingPane() {
 	}
 
@@ -210,7 +230,7 @@ public class NexUApp extends Application implements UIDisplay {
 			stage = createStage();
 			oldStage.hide();
 		});
-		
+
 	}
 
 	@Override
@@ -218,34 +238,20 @@ public class NexUApp extends Application implements UIDisplay {
 		logger.warn("Can only happen with explicite user request");
 	}
 
-	public <T extends Object> OperationResult<T> displayAndWaitUIOperation(String fxml, Object... params) {
-
-		logger.info("Loading " + fxml + " view");
-		FXMLLoader loader = new FXMLLoader();
-		try {
-			loader.load(getClass().getResourceAsStream(fxml));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-		Parent root = loader.getRoot();
-		UIOperation<T> controller = loader.getController();
-
-		display(root);
-		return waitForUser(controller, params);
+	public <T> void displayAndWaitUIOperation(final UIOperation<T> operation) {
+		display(operation.getRoot());
+		waitForUser(operation);
 	}
 
-	private <T> OperationResult<T> waitForUser(UIOperation<T> controller, Object... params) {
+	private <T> void waitForUser(UIOperation<T> operation) {
 		try {
 			logger.info("Wait on Thread " + Thread.currentThread().getName());
-			controller.init(params);
-			currentOperation = controller; 
-			OperationResult<T> result = controller.waitEnd();
+			currentOperation = operation;
+			operation.waitEnd();
 			currentOperation = null;
 			displayWaitingPane();
-			return result;
 		} catch (InterruptedException e) {
-			throw new RuntimeException();
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -253,7 +259,9 @@ public class NexUApp extends Application implements UIDisplay {
 		@Override
 		public char[] getPassword() {
 			logger.info("Request password");
-			OperationResult<char[]> passwordResult = displayAndWaitUIOperation("/fxml/password-input.fxml");
+			@SuppressWarnings("unchecked")
+			final OperationResult<char[]> passwordResult = NexUApp.this.operationFactory.getOperation(
+					UIOperation.class, NexUApp.this, "/fxml/password-input.fxml").perform();
 			return passwordResult.getResult();
 		}
 	}

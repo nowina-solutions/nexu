@@ -17,6 +17,15 @@ public class GetCertificateRequest extends NexuRequest {
 
 	private CertificateFilter certificateFilter;
 
+	public GetCertificateRequest() {
+		super();
+	}
+	
+	public GetCertificateRequest(CertificateFilter filter) {
+		super();
+		this.certificateFilter = filter;
+	}
+	
 	public CertificateFilter getCertificateFilter() {
 		return certificateFilter;
 	}

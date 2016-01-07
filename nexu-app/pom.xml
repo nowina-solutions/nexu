@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>lu.nowina.apps</groupId>
 		<artifactId>nexu</artifactId>
-		<version>1.0.RC2</version>
+		<version>1.1</version>
 	</parent>
 	<artifactId>nexu-app</artifactId>
 
@@ -12,12 +11,12 @@
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
 			<artifactId>nexu-core</artifactId>
-			<version>1.0.RC2</version>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
 			<artifactId>nexu-rest-plugin</artifactId>
-			<version>1.0.RC2</version>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 
@@ -43,55 +42,10 @@
 								</filter>
 							</filters>
 							<transformers>
-								<transformer
-									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>lu.nowina.nexu.NexUApp</mainClass>
+								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>lu.nowina.nexu.NexuLauncher</mainClass>
 								</transformer>
 							</transformers>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>package-jar</id>
-						<phase>package</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<skip>${skip.package}</skip>
-							<executable>
-								${env.JAVA_HOME}/bin/javapackager
-							</executable>
-							<arguments>
-								<argument>-deploy</argument>
-								<argument>-appclass</argument>
-								<argument>lu.nowina.nexu.NexUApp</argument>
-								<argument>-srcfiles</argument>
-								<argument>
-									${project.build.directory}/${project.build.finalName}.jar
-								</argument>
-								<argument>-outdir</argument>
-								<argument>./target</argument>
-								<argument>-outfile</argument>
-								<argument>
-									${project.artifactId}-app
-								</argument>
-								<argument>-v</argument>
-								<argument>-name</argument>
-								<argument>NexU</argument>
-								<argument>-title</argument>
-								<argument>NexU</argument>
-								<argument>-native</argument>
-								<argument>${installer.format}</argument>
-								<argument>-vendor</argument>
-								<argument>"Nowina Solutions"</argument>
-								<argument>-BsystemWide=true</argument>
-							</arguments>
 						</configuration>
 					</execution>
 				</executions>
@@ -104,37 +58,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-
-		<profile>
-			<id>windows</id>
-			<activation>
-				<os>
-					<family>windows</family>
-				</os>
-			</activation>
-
-			<properties>
-				<installer.format>msi</installer.format>
-			</properties>
-
-		</profile>
-
-		<profile>
-			<id>macosx</id>
-			<activation>
-				<os>
-					<family>mac</family>
-				</os>
-			</activation>
-
-			<properties>
-				<installer.format>dmg</installer.format>
-			</properties>
-
-		</profile>
-
-	</profiles>
-
 </project>

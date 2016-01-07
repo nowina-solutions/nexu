@@ -16,24 +16,25 @@ package lu.nowina.nexu;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.mockito.Mockito;
-
-import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Match;
-import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.view.core.UIDisplay;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.mockito.Mockito;
+
+import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
+import eu.europa.esig.dss.token.SignatureTokenConnection;
 
 public class InternalAPITest {
 
 	@Test
 	public void testEnvironment() throws Exception {
 
-		InternalAPI api = new InternalAPI(null, null, null, null, null);
+		InternalAPI api = new InternalAPI(null, null, null, null, null, null, null);
 
 		EnvironmentInfo info = api.getEnvironmentInfo();
 		Assert.assertNotNull(info.getOs());
@@ -56,7 +57,7 @@ public class InternalAPITest {
 
 		UIDisplay display = Mockito.mock(UIDisplay.class);
 
-		InternalAPI api = new InternalAPI(display, null, null, detector, null);
+		InternalAPI api = new InternalAPI(display, null, null, detector, null, null, null);
 		Assert.assertEquals(0, api.detectCards().size());
 
 	}
@@ -69,7 +70,7 @@ public class InternalAPITest {
 
 		UIDisplay display = Mockito.mock(UIDisplay.class);
 
-		InternalAPI api = new InternalAPI(display, null, null, detector, null);
+		InternalAPI api = new InternalAPI(display, null, null, detector, null, null, null);
 		Assert.assertEquals(1, api.detectCards().size());
 
 	}
@@ -82,7 +83,7 @@ public class InternalAPITest {
 
 		UIDisplay display = Mockito.mock(UIDisplay.class);
 
-		InternalAPI api = new InternalAPI(display, null, null, detector, null);
+		InternalAPI api = new InternalAPI(display, null, null, detector, null, null, null);
 		Assert.assertEquals(2, api.detectCards().size());
 
 	}
@@ -93,10 +94,10 @@ public class InternalAPITest {
 		DetectedCard card = new DetectedCard("ATR", 0);
 
 		UIDisplay display = Mockito.mock(UIDisplay.class);
-		InternalAPI api = new InternalAPI(display, null, null, null, null);
+		InternalAPI api = new InternalAPI(display, null, null, null, null, null, null);
 
-		SignatureTokenConnection c = new MockSignatureTokenConnection(null);
-		TokenId id = api.registerTokenConnection(c);
+		SignatureTokenConnection c = new MockSignatureTokenConnection((DSSPrivateKeyEntry[])null);
+		api.registerTokenConnection(c);
 
 		CardAdapter adapter1 = Mockito.mock(CardAdapter.class);
 		Mockito.when(adapter1.accept(card)).thenReturn(Boolean.TRUE);

@@ -20,6 +20,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
+import javafx.application.Application;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.FileAppender;
@@ -32,6 +34,8 @@ import lu.nowina.nexu.jetty.JettyServer;
 
 public class NexuLauncher {
 
+	private static final String ADVANCED_MODE_AVAILABLE = "advanced_mode_available";
+	
 	private static final String DEBUG = "debug";
 
 	private static final String HTTP_SERVER_CLASS = "http_server_class";
@@ -68,13 +72,13 @@ public class NexuLauncher {
 
 		boolean started = checkAlreadyStarted();
 		if (!started) {
-			NexUApp.launch(NexUApp.class, args);
+			NexUApp.launch(getApplicationClass(), args);
 		}
 	}
 
 	private void configureLogger(AppConfig config) {
 		ConsoleAppender console = new ConsoleAppender(); // create appender
-		String PATTERN = "%d [%p|%c|%C{1}] %m%n";
+		String PATTERN = "%d [%p|%c|%C{1}|%t] %m%n";
 		console.setLayout(new PatternLayout(PATTERN));
 		console.setThreshold(config.isDebug() ? Level.DEBUG : Level.WARN);
 		console.activateOptions();
@@ -172,8 +176,16 @@ public class NexuLauncher {
 		config.setNexuUrl(props.getProperty(NEXU_URL, "http://localhost:9876"));
 		config.setHttpServerClass(props.getProperty(HTTP_SERVER_CLASS, JettyServer.class.getName()));
 		config.setDebug(Boolean.parseBoolean(props.getProperty(DEBUG, "false")));
+		config.setAdvancedModeAvailable(Boolean.parseBoolean(props.getProperty(ADVANCED_MODE_AVAILABLE, "true")));
 
 		return config;
 	}
 
+	/**
+	 * Returns the JavaFX {@link Application} class to launch.
+	 * @return The JavaFX {@link Application} class to launch.
+	 */
+	protected Class<? extends Application> getApplicationClass() {
+		return NexUApp.class;
+	}
 }

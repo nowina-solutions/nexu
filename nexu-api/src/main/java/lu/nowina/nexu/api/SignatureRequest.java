@@ -25,6 +25,8 @@ public class SignatureRequest extends NexuRequest {
 	private DigestAlgorithm digestAlgorithm;
 
 	private String keyId;
+	
+	private boolean onlyEncryptionRequired;
 
 	public SignatureRequest() {
 	}
@@ -59,6 +61,14 @@ public class SignatureRequest extends NexuRequest {
 
 	public void setKeyId(String keyId) {
 		this.keyId = keyId;
+	}
+
+	public boolean isOnlyEncryptionRequired() {
+		return onlyEncryptionRequired;
+	}
+
+	public void setOnlyEncryptionRequired(boolean onlyEncryptionRequired) {
+		this.onlyEncryptionRequired = onlyEncryptionRequired;
 	}
 
 }

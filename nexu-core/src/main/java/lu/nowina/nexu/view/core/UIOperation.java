@@ -13,40 +13,99 @@
  */
 package lu.nowina.nexu.view.core;
 
+import java.io.IOException;
+import java.util.Arrays;
+
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import lu.nowina.nexu.api.flow.Operation;
+import lu.nowina.nexu.api.flow.OperationResult;
+import lu.nowina.nexu.api.flow.OperationStatus;
+import lu.nowina.nexu.flow.Flow;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A UIOperation control the user interaction with the UIFlow. The UIFlow trigger the UIOperation and call the method "waitEnd()". When the user finished the
- * operation, the UIOperation notify the UIFlow through the method "signalEnd()".
+ * An <code>UIOperation</code> controls the user interaction with the {@link Flow}.
+ * The {@link Flow} triggers the <code>UIOperation</code> and calls the method {@link #perform()}.
+ * When the user finished the operation, the {@link UIOperationController} notifies the <code>UIOperation</code>
+ * through the method {@link #signalEnd(Object)}.
+ * 
+ * <p>Expected parameters:
+ * <ol>
+ * <li>{@link UIDisplay}</li>
+ * <li>FXML</li>
+ * <li>Controller parameters (optional): array of {@link Object}.</li>
+ * </ol>
  * 
  * @author david.naramski
- *
- * @param <R>
+ * @author Jean Lepropre (jean.lepropre@nowina.lu)
+ * @param <R> The return type of the operation.
  */
-public abstract class UIOperation<R> {
+public class UIOperation<R> implements Operation<R> {
 
 	private static final Logger logger = LoggerFactory.getLogger(UIOperation.class.getName());
 
-	private Object lock = new Object();
+	private transient Object lock = new Object();
+	private transient volatile OperationResult<R> result = null;
 
-	private volatile OperationResult<R> result = null;
+	private UIDisplay display;
+	private String fxml;
+	private Object[] params;
+	
+	private transient Parent root;
+	private transient UIOperationController<R> controller;
+	
+	public UIOperation() {
+		super();
+	}
+	
+	public void setParams(final Object... params) {
+		if(params.length < 2) {
+			throw new IllegalArgumentException("An UIOperation needs at least the display and the fxml.");
+		}
+		try {
+			this.display = (UIDisplay) params[0];
+			this.fxml = (String) params[1];
+			if(params.length > 2) {
+				if(params[2] instanceof Object[]) {
+					this.params = (Object[]) params[2];
+				} else {
+					this.params = Arrays.copyOfRange(params, 2, params.length);
+				}
+			}
+		} catch(ClassCastException e) {
+			throw new IllegalArgumentException("Expected parameters: display, fxml, controller params.");
+		}
+	}
+	
+	@Override
+	public final OperationResult<R> perform() {		
+		logger.info("Loading " + fxml + " view");
+		final FXMLLoader loader = new FXMLLoader();
+		try {
+			loader.load(getClass().getResourceAsStream(fxml));
+		} catch(final IOException e) {
+			throw new RuntimeException(e);
+		}
 
-	/**
-	 * Once the UIOperation has been instanciated and initialized, the UIFlow will call the "waitEnd()" method.
-	 * 
-	 * @return
-	 * @throws InterruptedException
-	 */
-	public final OperationResult<R> waitEnd() throws InterruptedException {
+	    root = loader.getRoot();
+		controller = loader.getController();
+		controller.init(params);
+		controller.setUIOperation(this);
+
+		display.displayAndWaitUIOperation(this);
+		return result;
+	}
+	
+	public void waitEnd() throws InterruptedException {
 		String name = getOperationName();
-
 		logger.info("Thread " + Thread.currentThread().getName() + " wait on " + name);
 		synchronized (lock) {
 			lock.wait();
 		}
 		logger.info("Thread " + Thread.currentThread().getName() + " resumed on " + name);
-		return result;
 	}
 
 	/**
@@ -54,7 +113,7 @@ public abstract class UIOperation<R> {
 	 * 
 	 * @param result
 	 */
-	protected final void signalEnd(R result) {
+	public final void signalEnd(R result) {
 		String name = getOperationName();
 		logger.info("Notify from " + Thread.currentThread().getName() + " on " + name);
 		notifyResult(new OperationResult<>(result));
@@ -66,17 +125,51 @@ public abstract class UIOperation<R> {
 			lock.notify();
 		}
 	}
-	
+
 	public final void signalUserCancel() {
 		notifyResult(new OperationResult<>(OperationStatus.USER_CANCEL));
 	}
 
 	private String getOperationName() {
-		return this.getClass().getSimpleName();
+		return this.controller.getClass().getSimpleName();
 	}
 
-	public void init(Object... params) {
+	public Parent getRoot() {
+		return root;
+	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((display == null) ? 0 : display.hashCode());
+		result = prime * result + ((fxml == null) ? 0 : fxml.hashCode());
+		result = prime * result + Arrays.hashCode(params);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UIOperation<?> other = (UIOperation<?>) obj;
+		if (display == null) {
+			if (other.display != null)
+				return false;
+		} else if (!display.equals(other.display))
+			return false;
+		if (fxml == null) {
+			if (other.fxml != null)
+				return false;
+		} else if (!fxml.equals(other.fxml))
+			return false;
+		if (!Arrays.equals(params, other.params))
+			return false;
+		return true;
 	}
 
 }
