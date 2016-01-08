@@ -133,10 +133,11 @@ public class DatabaseWebLoader {
 	public void fetchDatabase() throws IOException {
 
 		databaseData = dataLoader.fetchDatabase(serverUrl + "/database.xml");
-		try (FileOutputStream out = new FileOutputStream(getDatabaseFile())) {
-			out.write(databaseData);
+		if(databaseData != null) {
+			try (FileOutputStream out = new FileOutputStream(getDatabaseFile())) {
+				out.write(databaseData);
+			}
 		}
-
 	}
 
 	public NexuInfo fetchNexuInfo() throws IOException, JAXBException {
