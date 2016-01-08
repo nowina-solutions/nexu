@@ -35,6 +35,10 @@ public class TokenId {
 		return id;
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
+	
 	public Date getCreationDate() {
 		return creationDate;
 	}
@@ -68,5 +72,4 @@ public class TokenId {
 		}
 		return true;
 	}
-
 }
