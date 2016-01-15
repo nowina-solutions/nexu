@@ -51,9 +51,12 @@ public abstract class Flow<I, O> {
 	}
 
 	public final Execution<O> execute(NexuAPI api, I input) throws Exception {
-		final Execution<O> out = process(api, input);
-		display.close();
-		return out;
+		try {
+			final Execution<O> out = process(api, input);
+			return out;
+		} finally {
+			display.close();
+		}
 	}
 
 	protected abstract Execution<O> process(NexuAPI api, I input) throws Exception;
