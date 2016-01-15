@@ -33,7 +33,7 @@ import lu.nowina.nexu.server.business.FeedbackManager;
 public class FeedbackEndpoint {
 
 	@Autowired
-	FeedbackManager feedbackService;
+	private FeedbackManager feedbackService;
 
 	@WebMethod
 	public void reportError(Feedback feedback) throws Exception {

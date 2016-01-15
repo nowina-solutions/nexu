@@ -1,5 +1,7 @@
 package lu.nowina.nexu.server.config;
 
+import lu.nowina.nexu.server.api.ws.FeedbackEndpoint;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
@@ -11,30 +13,18 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.ws.config.annotation.EnableWs;
-import org.thymeleaf.spring4.SpringTemplateEngine;
-import org.thymeleaf.spring4.view.ThymeleafViewResolver;
-import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
-
-import lu.nowina.nexu.server.api.ws.FeedbackEndpoint;
 
 @Configuration
 @ComponentScan(basePackages = { "lu.nowina.nexu.server" })
-@EnableWebMvc
 @EnableWs
 @ImportResource({ "classpath:META-INF/cxf/cxf.xml", "classpath:META-INF/cxf/cxf-servlet.xml" })
 public class WebConfig extends WebMvcConfigurerAdapter {
 
 	@Autowired
 	private ApplicationContext applicationContext;
-	
-	private boolean debug = false;
 	
 	@Bean
 	public ReloadableResourceBundleMessageSource messageSource() {
@@ -43,37 +33,6 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 		messageSource.setBasenames(resources);
 		messageSource.setFallbackToSystemLocale(false);
 		return messageSource;
-	}
-
-	@Bean
-	public ServletContextTemplateResolver defaultTemplateResolver() {
-		ServletContextTemplateResolver templateResolver = new ServletContextTemplateResolver();
-		templateResolver.setPrefix("/WEB-INF/html/");
-		templateResolver.setSuffix(".html");
-		templateResolver.setCacheable(false);
-		return templateResolver;
-	}
-
-	@Bean
-	public SpringTemplateEngine templateEngine() {
-		SpringTemplateEngine templateEngine = new SpringTemplateEngine();
-		templateEngine.setTemplateResolver(defaultTemplateResolver());
-		return templateEngine;
-	}
-
-	@Bean
-	public ThymeleafViewResolver viewResolver() {
-		ThymeleafViewResolver viewResolver = new ThymeleafViewResolver();
-		viewResolver.setTemplateEngine(templateEngine());
-		return viewResolver;
-	}
-	
-	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/public/**").addResourceLocations("/webjars/");
-		registry.addResourceHandler("/script/**").addResourceLocations("/script/");
-		registry.addResourceHandler("/style/**").addResourceLocations("/style/");
-		registry.addResourceHandler("/controllers/**").addResourceLocations("/controllers/");
 	}
 
 	@Override

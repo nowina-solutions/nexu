@@ -29,7 +29,7 @@ public class SCDatabaseController {
 	private static final String UTF8 = "UTF-8";
 
 	@Autowired
-	SCDatabaseManager databaseManager;
+	private SCDatabaseManager databaseManager;
 
 	@RequestMapping("/database.xml")
 	public ResponseEntity<byte[]> getDatabase() throws Exception {
