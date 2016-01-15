@@ -141,7 +141,8 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		final Map<TokenOperationResultKey, Object> map = new HashMap<TokenOperationResultKey, Object>();
 		map.put(TokenOperationResultKey.ADVANCED_CREATION, true);
 		map.put(TokenOperationResultKey.SELECTED_API, result.getResult());
-		map.put(TokenOperationResultKey.SELECTED_CARD, api.detectCards().get(0));
+		final DetectedCard selectedCard = api.detectCards().get(0);
+		map.put(TokenOperationResultKey.SELECTED_CARD, selectedCard);
 		final TokenId tokenId;
 		switch (result.getResult()) {
 		case MOCCA:
@@ -160,7 +161,8 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 			final Pkcs11Params pkcs11Params = op2.getResult();
 			final String absolutePath = pkcs11Params.getPkcs11Lib().getAbsolutePath();
 			map.put(TokenOperationResultKey.SELECTED_API_PARAMS, absolutePath);
-			tokenId = api.registerTokenConnection(new Pkcs11SignatureToken(absolutePath, display.getPasswordInputCallback()));
+			tokenId = api.registerTokenConnection(new Pkcs11SignatureToken(absolutePath, display.getPasswordInputCallback(),
+					selectedCard.getTerminalIndex()));
 			break;
 		case PKCS_12:
 			@SuppressWarnings("unchecked")
