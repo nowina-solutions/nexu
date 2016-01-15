@@ -79,10 +79,10 @@ public class AdvancedCreationFeedbackOperation extends AbstractCompositeOperatio
 								back.getSelectedAPI(), back.getApiParameter());
 					}
 				}
-			} else {
-				operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml",
-						new Object[]{feedback}).perform();
 			}
+			
+			operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml",
+					new Object[]{feedback}).perform();
 		}		
 		return new OperationResult<Void>((Void) null);
 	}
