@@ -16,7 +16,6 @@ package lu.nowina.nexu.server.controller;
 import lu.nowina.nexu.server.config.OverrideConfig;
 import lu.nowina.nexu.server.config.ServiceConfig;
 import lu.nowina.nexu.server.config.WebConfig;
-import lu.nowina.nexu.server.manager.SCDatabaseManager;
 
 import org.junit.Assert;
 import org.junit.Test;
