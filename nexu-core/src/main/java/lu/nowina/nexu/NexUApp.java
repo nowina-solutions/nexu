@@ -134,10 +134,17 @@ public class NexUApp extends Application implements UIDisplay {
 		new Thread(() -> {
 			HttpServer server = buildHttpServer();
 			server.setConfig(api, prefs, getConfig());
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+				try {
+					server.stop();
+				} catch (Exception e) {
+					logger.error("Cannot stop server", e);
+				}
+			}));
 			try {
 				server.start();
 			} catch (Exception e) {
-				logger.error("Cannot Jetty", e);
+				logger.error("Cannot start server", e);
 			}
 		}).start();
 	}

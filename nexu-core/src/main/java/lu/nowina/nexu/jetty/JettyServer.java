@@ -13,67 +13,25 @@
  */
 package lu.nowina.nexu.jetty;
 
-import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.ServerConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lu.nowina.nexu.HttpServer;
-import lu.nowina.nexu.InternalAPI;
-import lu.nowina.nexu.UserPreferences;
-import lu.nowina.nexu.api.AppConfig;
-
-public class JettyServer implements HttpServer {
+public class JettyServer extends AbstractJettyServer {
 
 	private static final Logger logger = LoggerFactory.getLogger(JettyServer.class.getName());
 
-	private UserPreferences prefs;
-
-	private AppConfig conf;
-
-	private Server server;
-
-	private InternalAPI api;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see lu.nowina.nexu.jetty.HttpServer#setConfig(lu.nowina.nexu.InternalAPI, lu.nowina.nexu.UserPreferences, lu.nowina.nexu.AppConfig)
-	 */
 	@Override
-	public void setConfig(InternalAPI api, UserPreferences prefs, AppConfig config) {
-		this.api = api;
-		this.prefs = prefs;
-		this.conf = config;
+	protected Connector[] getConnectors() {
+		logger.info("Start HTTP server, binding on " + getConf().getBindingPort());
+		final HttpConfiguration http = new HttpConfiguration();
+		final ServerConnector connector = new ServerConnector(getServer());
+		connector.addConnectionFactory(new HttpConnectionFactory(http));
+		// Setting HTTP port
+		connector.setPort(getConf().getBindingPort());
+		return new Connector[]{connector};
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see lu.nowina.nexu.jetty.HttpServer#start()
-	 */
-	@Override
-	public void start() throws Exception {
-		logger.info("Start HTTP server, binding on " + conf.getBindingPort());
-
-		Server server = new Server(conf.getBindingPort());
-
-		RequestProcessor handler = new RequestProcessor(conf.getInstallUrl(), conf.getNexuUrl());
-		handler.setConfig(api, prefs);
-
-		server.setHandler(handler);
-		server.start();
-		server.join();
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see lu.nowina.nexu.jetty.HttpServer#stop()
-	 */
-	@Override
-	public void stop() throws Exception {
-		server.stop();
-		server = null;
-	}
-
 }

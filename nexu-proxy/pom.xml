@@ -16,7 +16,6 @@
 		<encoding>UTF-8</encoding>
 		<skip.package>false</skip.package>
 		<spring.version>4.1.7.RELEASE</spring.version>
-		<slf4j.version>1.7.12</slf4j.version>
 		<logback.version>1.0.13</logback.version>
 	</properties>
 
@@ -48,12 +47,6 @@
 			<groupId>lu.nowina.apps</groupId>
 			<artifactId>nexu-model</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.freemarker</groupId>
-			<artifactId>freemarker</artifactId>
-			<version>2.3.22</version>
 		</dependency>
 
 		<dependency>
@@ -147,12 +140,6 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-			<version>1.6.6</version>
 		</dependency>
 
         <dependency>

@@ -29,6 +29,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.PatternLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.jetty.JettyServer;
@@ -69,7 +70,6 @@ public class NexuLauncher {
 	}
 
 	public void launch(String[] args) throws IOException {
-		logger.info("Read configuration");
 		props = loadProperties();
 		config = loadAppConfig(props);
 
@@ -84,6 +84,9 @@ public class NexuLauncher {
 	}
 
 	private void configureLogger(AppConfig config) {
+		SLF4JBridgeHandler.removeHandlersForRootLogger();
+		SLF4JBridgeHandler.install();
+		
 		ConsoleAppender console = new ConsoleAppender(); // create appender
 		String PATTERN = "%d [%p|%c|%C{1}|%t] %m%n";
 		console.setLayout(new PatternLayout(PATTERN));

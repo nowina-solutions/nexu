@@ -13,8 +13,6 @@
  */
 package lu.nowina.nexu.rest;
 
-import java.util.logging.Logger;
-
 import javax.xml.bind.DatatypeConverter;
 
 import lu.nowina.nexu.api.AuthenticateRequest;
@@ -37,6 +35,8 @@ import lu.nowina.nexu.json.GsonHelper;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.ToBeSigned;
@@ -48,7 +48,7 @@ import eu.europa.esig.dss.ToBeSigned;
  */
 public class RestHttpPlugin implements HttpPlugin {
 
-	private static final Logger logger = Logger.getLogger(RestHttpPlugin.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(RestHttpPlugin.class.getName());
 
 	@Override
 	public void init(String pluginId, NexuAPI api) {
