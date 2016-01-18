@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Properties;
 
 import javafx.application.Application;
@@ -52,7 +53,9 @@ public class NexuLauncher {
 
 	private static final String BINDING_IP = "binding_ip";
 
-	private static final String BINDING_PORT = "binding_port";
+	private static final String MIN_BINDING_PORT_RANGE = "min_binding_port_range";
+	
+	private static final String MAX_BINDING_PORT_RANGE = "max_binding_port_range";
 
 	private static final String CONNECTIONS_CACHE_MAX_SIZE = "connections_cache_max_size";
 
@@ -144,15 +147,26 @@ public class NexuLauncher {
 	}
 
 	private static boolean checkAlreadyStarted() throws MalformedURLException {
-		URL url = new URL("http://" + config.getBindingIP() + ":" + config.getBindingPort() + "/nexu-info");
-		try (InputStream in = url.openStream()) {
-			String info = IOUtils.toString(in);
-			logger.error("NexU already started. Version '" + info + "'");
-			return true;
-		} catch (Exception e) {
-			logger.info("no " + url.toString() + " detected, " + e.getMessage());
-			return false;
+		for(int port = config.getMinBindingPortRange(); port <= config.getMaxBindingPortRange(); ++port) {
+			final URL url = new URL("http://" + config.getBindingIP() + ":" + port + "/nexu-info");
+			final URLConnection connection;
+			try {
+				connection = url.openConnection();
+				connection.setConnectTimeout(2000);
+				connection.setReadTimeout(2000);
+			} catch(IOException e) {
+				logger.warn("IOException when trying to open a connection to " + url + ": " + e.getMessage(), e);
+				continue;
+			}
+			try (InputStream in = connection.getInputStream()) {
+				final String info = IOUtils.toString(in);
+				logger.error("NexU already started. Version '" + info + "'");
+				return true;
+			} catch (Exception e) {
+				logger.info("No " + url.toString() + " detected, " + e.getMessage());
+			}
 		}
+		return false;
 	}
 
 	public Properties loadProperties() throws IOException {
@@ -180,7 +194,8 @@ public class NexuLauncher {
 		final AppConfig config = createAppConfig();
 
 		config.setApplicationName(props.getProperty(APPLICATION_NAME, "NexU"));
-		config.setBindingPort(Integer.parseInt(props.getProperty(BINDING_PORT, "9876")));
+		config.setMinBindingPortRange(Integer.parseInt(props.getProperty(MIN_BINDING_PORT_RANGE, "9876")));
+		config.setMaxBindingPortRange(Integer.parseInt(props.getProperty(MAX_BINDING_PORT_RANGE, "9878")));
 		config.setBindingIP(props.getProperty(BINDING_IP, "127.0.0.1"));
 		config.setServerUrl(props.getProperty(SERVER_URL, "http://lab.nowina.solutions/nexu"));
 		config.setInstallUrl(props.getProperty(INSTALL_URL, "http://nowina.lu/nexu/"));

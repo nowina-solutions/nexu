@@ -29,4 +29,5 @@ public interface HttpServer {
 
 	void stop() throws Exception;
 
+	void join() throws Exception;
 }

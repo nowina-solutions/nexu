@@ -65,26 +65,20 @@ public class NexUApp extends Application implements UIDisplay {
 	}
 
 	@Override
-	public void start(Stage primaryStage) {
+	public void start(Stage primaryStage) throws Exception {
 		Platform.setImplicitExit(false);
 
 		this.stage = new Stage();
 
-		try {
+		InternalAPI api = buildAPI();
 
-			InternalAPI api = buildAPI();
+		logger.info("Start Jetty");
 
-			new SystrayMenu(this, api.getWebDatabase(), api);
+		startHttpServer(api.getPrefs(), api);
 
-			logger.info("Start Jetty");
+		new SystrayMenu(this, api.getWebDatabase(), api);
 
-			startHttpServer(api.getPrefs(), api);
-
-			logger.info("Start finished");
-
-		} catch (Exception e) {
-			logger.error("Cannot start", e);
-		}
+		logger.info("Start finished");
 	}
 
 	protected InternalAPI buildAPI() throws IOException {
@@ -130,23 +124,31 @@ public class NexUApp extends Application implements UIDisplay {
 		return new BasicFlowRegistry();
 	}
 	
-	private void startHttpServer(UserPreferences prefs, InternalAPI api) {
-		new Thread(() -> {
-			HttpServer server = buildHttpServer();
-			server.setConfig(api, prefs, getConfig());
-			Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-				try {
-					server.stop();
-				} catch (Exception e) {
-					logger.error("Cannot stop server", e);
-				}
-			}));
+	private void startHttpServer(UserPreferences prefs, InternalAPI api) throws Exception {
+		final HttpServer server = buildHttpServer();
+		server.setConfig(api, prefs, getConfig());
+		try {
+			server.start();
+		} catch(Exception e) {
 			try {
-				server.start();
+				server.stop();
+			} catch(Exception e1) {}
+			throw e;
+		}
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			try {
+				server.stop();
 			} catch (Exception e) {
-				logger.error("Cannot start server", e);
+				logger.error("Cannot stop server", e);
 			}
-		}).start();
+		}));
+		new Thread(() -> {
+			try {
+				server.join();
+			} catch(Exception e) {
+				logger.error("Exception on join", e);
+			}
+		});
 	}
 
 	/**
@@ -244,7 +246,7 @@ public class NexUApp extends Application implements UIDisplay {
 
 	@Override
 	public void stop() throws Exception {
-		logger.warn("Can only happen with explicite user request");
+		// Can only happen with explicit user request
 	}
 
 	public <T> void displayAndWaitUIOperation(final UIOperation<T> operation) {

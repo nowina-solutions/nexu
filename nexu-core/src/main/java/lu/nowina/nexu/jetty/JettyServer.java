@@ -13,25 +13,21 @@
  */
 package lu.nowina.nexu.jetty;
 
+import java.net.InetAddress;
+
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.ServerConnector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JettyServer extends AbstractJettyServer {
 
-	private static final Logger logger = LoggerFactory.getLogger(JettyServer.class.getName());
-
 	@Override
 	protected Connector[] getConnectors() {
-		logger.info("Start HTTP server, binding on " + getConf().getBindingPort());
 		final HttpConfiguration http = new HttpConfiguration();
-		final ServerConnector connector = new ServerConnector(getServer());
+		final JettyRangeAwareServerConnector connector = new JettyRangeAwareServerConnector(getServer());
 		connector.addConnectionFactory(new HttpConnectionFactory(http));
-		// Setting HTTP port
-		connector.setPort(getConf().getBindingPort());
+		connector.setPortRange(getConf().getMinBindingPortRange(), getConf().getMaxBindingPortRange());
+		connector.setHost(InetAddress.getLoopbackAddress().getCanonicalHostName());
 		return new Connector[]{connector};
 	}
 }

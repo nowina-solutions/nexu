@@ -32,7 +32,8 @@ public class AppConfig {
 
 	private String bindingIP;
 
-	private int bindingPort;
+	private int minBindingPortRange;
+	private int maxBindingPortRange;
 
 	private String serverUrl;
 
@@ -76,14 +77,22 @@ public class AppConfig {
 		this.bindingIP = bindingIP;
 	}
 
-	public int getBindingPort() {
-		return bindingPort;
+	public int getMinBindingPortRange() {
+		return minBindingPortRange;
 	}
 
-	public void setBindingPort(int bindingPort) {
-		this.bindingPort = bindingPort;
+	public void setMinBindingPortRange(int minBindingPortRange) {
+		this.minBindingPortRange = minBindingPortRange;
 	}
 
+	public int getMaxBindingPortRange() {
+		return maxBindingPortRange;
+	}
+
+	public void setMaxBindingPortRange(int maxBindingPortRange) {
+		this.maxBindingPortRange = maxBindingPortRange;
+	}
+	
 	public String getServerUrl() {
 		return serverUrl;
 	}

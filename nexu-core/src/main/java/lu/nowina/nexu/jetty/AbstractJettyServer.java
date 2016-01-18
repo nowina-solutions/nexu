@@ -48,7 +48,7 @@ public abstract class AbstractJettyServer implements HttpServer {
 
 	@Override
 	public void start() throws Exception {
-		server = new Server(conf.getBindingPort());
+		server = new Server();
 		server.setConnectors(getConnectors());
 		
 		final RequestProcessor handler = new RequestProcessor(conf.getInstallUrl(), conf.getNexuUrl());
@@ -56,13 +56,17 @@ public abstract class AbstractJettyServer implements HttpServer {
 
 		server.setHandler(handler);
 		server.start();
-		server.join();
 	}
 
 	@Override
 	public void stop() throws Exception {
 		server.stop();
 		server = null;
+	}
+	
+	@Override
+	public void join() throws Exception {
+		server.join();
 	}
 	
 	/**
