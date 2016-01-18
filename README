@@ -1,19 +1,7 @@
-# Nexu
+Overview 
 
-## Build
+http://nowina.lu/news/nexu/
 
-**Build requirements**
+Demo 
 
-* WiX on Windows Platform
-
-**Maven**
-
-```
-mvn clean install
-
-```
-
-## Execute
-
-1. Start lu.nowina.nexu.NexUApp in project nexu-app.
-2. Try URL http://localhost:9876/rest/certificates
+http://labs.nowina.solutions/nexu-demo/
