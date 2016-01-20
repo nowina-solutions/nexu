@@ -1,5 +1,3 @@
-var nexuVersion = "1.0";
-
 function nexu_get_certificates(success_callback, error_callback) {
 	transmitRequest("certificates", {}, success_callback, error_callback);
 }
