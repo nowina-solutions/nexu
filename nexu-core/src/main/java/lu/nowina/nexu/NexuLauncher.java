@@ -45,7 +45,7 @@ public class NexuLauncher {
 
 	private static final String HTTP_SERVER_CLASS = "http_server_class";
 
-	private static final String NEXU_URL = "nexu_url";
+	private static final String NEXU_HOSTNAME = "nexu_hostname";
 
 	private static final String INSTALL_URL = "install_url";
 
@@ -199,7 +199,7 @@ public class NexuLauncher {
 		config.setBindingIP(props.getProperty(BINDING_IP, "127.0.0.1"));
 		config.setServerUrl(props.getProperty(SERVER_URL, "http://lab.nowina.solutions/nexu"));
 		config.setInstallUrl(props.getProperty(INSTALL_URL, "http://nowina.lu/nexu/"));
-		config.setNexuUrl(props.getProperty(NEXU_URL, "http://localhost:9876"));
+		config.setNexuHostname(props.getProperty(NEXU_HOSTNAME, "localhost"));
 		config.setHttpServerClass(props.getProperty(HTTP_SERVER_CLASS, JettyServer.class.getName()));
 		config.setDebug(Boolean.parseBoolean(props.getProperty(DEBUG, "false")));
 		config.setAdvancedModeAvailable(Boolean.parseBoolean(props.getProperty(ADVANCED_MODE_AVAILABLE, "true")));

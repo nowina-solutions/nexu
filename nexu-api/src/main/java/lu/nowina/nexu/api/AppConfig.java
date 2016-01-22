@@ -39,7 +39,7 @@ public class AppConfig {
 
 	private String installUrl;
 
-	private String nexuUrl;
+	private String nexuHostname;
 
 	private String httpServerClass;
 
@@ -109,12 +109,12 @@ public class AppConfig {
 		this.installUrl = installUrl;
 	}
 
-	public String getNexuUrl() {
-		return nexuUrl;
+	public String getNexuHostname() {
+		return nexuHostname;
 	}
 
-	public void setNexuUrl(String nexuUrl) {
-		this.nexuUrl = nexuUrl;
+	public void setNexuHostname(String nexuHostname) {
+		this.nexuHostname = nexuHostname;
 	}
 
 	public String getHttpServerClass() {

@@ -19,7 +19,7 @@ function nexu_get_identity_info(success_callback, error_callback) {
 }
 
 function transmitRequest(service, data, success_callback, error_callback) {
-	callUrl("${nexuUrl}/rest/" + service, "POST", data, success_callback, error_callback);
+	callUrl("${scheme}://${nexu_hostname}:${nexu_port}/rest/" + service, "POST", data, success_callback, error_callback);
 }
 
 function callUrl(url, type, data, success_callback, error_callback) {

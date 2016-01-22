@@ -61,15 +61,12 @@ public class RequestProcessor extends AbstractHandler {
 
 	private InternalAPI api;
 
-	private String baseUrl;
-
-	private String nexuUrl = "http://localhost:9876/";
+	private String nexuHostname;
 
 	private Template template;
 
-	public RequestProcessor(String baseUrl, String nexuUrl) {
-		this.baseUrl = baseUrl;
-		this.nexuUrl = nexuUrl;
+	public RequestProcessor(String nexuHostname) {
+		this.nexuHostname = nexuHostname;
 		try {
 			Configuration cfg = new Configuration(Configuration.VERSION_2_3_22);
 			cfg.setClassForTemplateLoading(getClass(), "/");
@@ -113,7 +110,7 @@ public class RequestProcessor extends AbstractHandler {
 			if ("/favicon.ico".equals(target)) {
 				favIcon(response);
 			} else if ("/nexu.js".equals(target)) {
-				nexuJs(response);
+				nexuJs(request, response);
 			} else if ("/".equals(target) || "/nexu-info".equals(target)) {
 				nexuInfo(response);
 			} else {
@@ -177,12 +174,12 @@ public class RequestProcessor extends AbstractHandler {
 		out.close();
 	}
 
-	private void nexuJs(HttpServletResponse response) throws IOException {
+	private void nexuJs(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		final StringWriter writer = new StringWriter();
 		final Map<String, String> model = new HashMap<>();
-
-		model.put("baseUrl", baseUrl);
-		model.put("nexuUrl", nexuUrl);
+		model.put("scheme", request.getScheme());
+		model.put("nexu_hostname", nexuHostname);
+		model.put("nexu_port", Integer.toString(request.getLocalPort()));
 
 		try {
 			template.process(model, writer);
