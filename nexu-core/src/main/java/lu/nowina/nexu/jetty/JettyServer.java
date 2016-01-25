@@ -24,9 +24,9 @@ public class JettyServer extends AbstractJettyServer {
 	@Override
 	protected Connector[] getConnectors() {
 		final HttpConfiguration http = new HttpConfiguration();
-		final JettyRangeAwareServerConnector connector = new JettyRangeAwareServerConnector(getServer());
+		final JettyListAwareServerConnector connector = new JettyListAwareServerConnector(getServer());
 		connector.addConnectionFactory(new HttpConnectionFactory(http));
-		connector.setPortRange(getConf().getMinBindingPortRange(), getConf().getMaxBindingPortRange());
+		connector.setPorts(getConf().getBindingPorts());
 		connector.setHost(InetAddress.getLoopbackAddress().getCanonicalHostName());
 		return new Connector[]{connector};
 	}

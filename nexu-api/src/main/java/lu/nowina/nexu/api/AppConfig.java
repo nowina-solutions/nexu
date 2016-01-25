@@ -15,6 +15,8 @@ package lu.nowina.nexu.api;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -32,8 +34,7 @@ public class AppConfig {
 
 	private String bindingIP;
 
-	private int minBindingPortRange;
-	private int maxBindingPortRange;
+	private List<Integer> bindingPorts;
 
 	private String serverUrl;
 
@@ -77,22 +78,14 @@ public class AppConfig {
 		this.bindingIP = bindingIP;
 	}
 
-	public int getMinBindingPortRange() {
-		return minBindingPortRange;
+	public List<Integer> getBindingPorts() {
+		return bindingPorts;
 	}
 
-	public void setMinBindingPortRange(int minBindingPortRange) {
-		this.minBindingPortRange = minBindingPortRange;
+	public void setBindingPorts(List<Integer> bindingPorts) {
+		this.bindingPorts = Collections.unmodifiableList(bindingPorts);
 	}
 
-	public int getMaxBindingPortRange() {
-		return maxBindingPortRange;
-	}
-
-	public void setMaxBindingPortRange(int maxBindingPortRange) {
-		this.maxBindingPortRange = maxBindingPortRange;
-	}
-	
 	public String getServerUrl() {
 		return serverUrl;
 	}

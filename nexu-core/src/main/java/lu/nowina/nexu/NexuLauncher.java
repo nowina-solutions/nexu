@@ -19,6 +19,8 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import javafx.application.Application;
@@ -53,10 +55,8 @@ public class NexuLauncher {
 
 	private static final String BINDING_IP = "binding_ip";
 
-	private static final String MIN_BINDING_PORT_RANGE = "min_binding_port_range";
+	private static final String BINDING_PORTS = "binding_ports";
 	
-	private static final String MAX_BINDING_PORT_RANGE = "max_binding_port_range";
-
 	private static final String CONNECTIONS_CACHE_MAX_SIZE = "connections_cache_max_size";
 
 	private static final String ENABLE_POP_UPS = "enable_pop_ups";
@@ -147,7 +147,7 @@ public class NexuLauncher {
 	}
 
 	private static boolean checkAlreadyStarted() throws MalformedURLException {
-		for(int port = config.getMinBindingPortRange(); port <= config.getMaxBindingPortRange(); ++port) {
+		for(int port : config.getBindingPorts()) {
 			final URL url = new URL("http://" + config.getBindingIP() + ":" + port + "/nexu-info");
 			final URLConnection connection;
 			try {
@@ -194,8 +194,7 @@ public class NexuLauncher {
 		final AppConfig config = createAppConfig();
 
 		config.setApplicationName(props.getProperty(APPLICATION_NAME, "NexU"));
-		config.setMinBindingPortRange(Integer.parseInt(props.getProperty(MIN_BINDING_PORT_RANGE, "9876")));
-		config.setMaxBindingPortRange(Integer.parseInt(props.getProperty(MAX_BINDING_PORT_RANGE, "9878")));
+		config.setBindingPorts(toListOfInt(props.getProperty(BINDING_PORTS, "9876, 9877, 9878")));
 		config.setBindingIP(props.getProperty(BINDING_IP, "127.0.0.1"));
 		config.setServerUrl(props.getProperty(SERVER_URL, "http://lab.nowina.solutions/nexu"));
 		config.setInstallUrl(props.getProperty(INSTALL_URL, "http://nowina.lu/nexu/"));
@@ -219,5 +218,19 @@ public class NexuLauncher {
 	 */
 	protected Class<? extends Application> getApplicationClass() {
 		return NexUApp.class;
+	}
+	
+	/**
+	 * Returns a list of {@link Integer} from <code>portsStr</code> which should be
+	 * tokenized by commas.
+	 * @param portsStr A list of ports tokenized by commas.
+	 * @return A list of {@link Integer}.
+	 */
+	protected List<Integer> toListOfInt(String portsStr) {
+		final List<Integer> ports = new ArrayList<Integer>();
+		for(final String port: portsStr.split(",")) {
+			ports.add(Integer.parseInt(port.trim()));
+		}
+		return ports;
 	}
 }

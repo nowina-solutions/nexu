@@ -16,6 +16,8 @@ package lu.nowina.nexu.jetty;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.util.Arrays;
+import java.util.List;
 
 import lu.nowina.nexu.AbstractConfigureLoggerTest;
 
@@ -27,26 +29,25 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * JUnit test class for {@link JettyRangeAwareServerConnector}.
+ * JUnit test class for {@link JettyListAwareServerConnector}.
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public class JettyRangeAwareServerConnectorTest extends AbstractConfigureLoggerTest {
+public class JettyListAwareServerConnectorTest extends AbstractConfigureLoggerTest {
 
-	private static final int MIN_PORT = 65000;
-	private static final int MAX_PORT = 65004;
+	private static final List<Integer> PORTS = Arrays.asList(65000, 65001, 65002, 65003, 65004);
 	
 	private Server server;
 	
-	public JettyRangeAwareServerConnectorTest() {
+	public JettyListAwareServerConnectorTest() {
 		super();
 	}
 
 	@Before
 	public void createServer() {
 		server = new Server();
-		final JettyRangeAwareServerConnector connector = new JettyRangeAwareServerConnector(server);
-		connector.setPortRange(MIN_PORT, MAX_PORT);
+		final JettyListAwareServerConnector connector = new JettyListAwareServerConnector(server);
+		connector.setPorts(PORTS);
 		server.addConnector(connector);
 	}
 	
@@ -62,19 +63,19 @@ public class JettyRangeAwareServerConnectorTest extends AbstractConfigureLoggerT
 		server.start();
 		Assert.assertNotNull(server.getConnectors());
 		Assert.assertEquals(server.getConnectors().length, 1);
-		Assert.assertEquals(((NetworkConnector)server.getConnectors()[0]).getPort(), MIN_PORT);
+		Assert.assertEquals(((NetworkConnector)server.getConnectors()[0]).getPort(), PORTS.get(0).intValue());
 	}
 
 	@Test
 	public void testFirstPortReserved() throws Exception {
 		final ServerSocket socket = new ServerSocket();
 		socket.setReuseAddress(true);
-		socket.bind(new InetSocketAddress(MIN_PORT));
+		socket.bind(new InetSocketAddress(PORTS.get(0)));
 		try {
 			server.start();
 			Assert.assertNotNull(server.getConnectors());
 			Assert.assertEquals(server.getConnectors().length, 1);
-			Assert.assertEquals(((NetworkConnector)server.getConnectors()[0]).getPort(), MIN_PORT+1);
+			Assert.assertEquals(((NetworkConnector)server.getConnectors()[0]).getPort(), PORTS.get(1).intValue());
 		} finally {
 			socket.close();
 		}
@@ -82,12 +83,13 @@ public class JettyRangeAwareServerConnectorTest extends AbstractConfigureLoggerT
 	
 	@Test(expected=IOException.class)
 	public void testAllPortReserverd() throws Exception {
-		final ServerSocket[] sockets = new ServerSocket[MAX_PORT - MIN_PORT + 1];
+		final ServerSocket[] sockets = new ServerSocket[PORTS.size()];
 		try {
-			for(int port = MIN_PORT; port <= MAX_PORT; ++port) {
-				sockets[port - MIN_PORT] = new ServerSocket();
-				sockets[port - MIN_PORT].setReuseAddress(true);
-				sockets[port - MIN_PORT].bind(new InetSocketAddress(port));
+			int i = 0;
+			for(int port : PORTS) {
+				sockets[i] = new ServerSocket();
+				sockets[i].setReuseAddress(true);
+				sockets[i++].bind(new InetSocketAddress(port));
 			}
 			server.start();
 		} finally {

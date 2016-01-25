@@ -14,6 +14,8 @@
 package lu.nowina.nexu.jetty;
 
 import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.jetty.server.ConnectionFactory;
 import org.eclipse.jetty.server.Server;
@@ -22,24 +24,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Adapter class of {@link ServerConnector} that supports a range of ports.
+ * Adapter class of {@link ServerConnector} that supports a list of ports.
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public class JettyRangeAwareServerConnector extends ServerConnector {
+public class JettyListAwareServerConnector extends ServerConnector {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(JettyRangeAwareServerConnector.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(JettyListAwareServerConnector.class);
 	
-	private int minPort;
-	private int maxPort;
-
+	private List<Integer> ports;
 	private int currentPort;
 	
-	public JettyRangeAwareServerConnector(Server server) {
+	public JettyListAwareServerConnector(Server server) {
 		super(server);
 	}
 
-	public JettyRangeAwareServerConnector(Server server, ConnectionFactory... factories) {
+	public JettyListAwareServerConnector(Server server, ConnectionFactory... factories) {
 		super(server, factories);
 	}
 
@@ -54,43 +54,41 @@ public class JettyRangeAwareServerConnector extends ServerConnector {
 	
 	/**
 	 * This implementation throws an {@link IllegalStateException}.
-	 * <p>Use {@link #setPortRange(int, int)} instead.
+	 * <p>Use {@link #setPorts(List)} instead.
 	 */
 	@Override
 	public void setPort(int port) {
-		throw new IllegalStateException("This implementation only supports setPortRange(int, int).");
+		throw new IllegalStateException("This implementation only supports setPorts(List<Integer>).");
 	}
 	
 	/**
-	 * Sets the range of ports that will be tried by this connector.
-	 * @param minPort The lower bound of the range.
-	 * @param maxPort The upper bound of the range.
-	 * @throws IllegalArgumentException If <code>minPort</code> is strictly greater than <code>maxPort</code> or
-	 * if <code>minPort</code> or <code>maxPort</code> is not between 0 and 65535.
+	 * Sets the ports that will be tried by this connector.
+	 * @param ports The ports.
+	 * @throws IllegalArgumentException If <code>ports</code> is <code>null</code>, empty or if one element
+	 * is not between 0 and 65535.
 	 * @throws IllegalStateException If connector is already opened.
 	 */
-	public void setPortRange(int minPort, int maxPort) {
+	public void setPorts(List<Integer> ports) {
 		if(isOpen()) {
 			throw new IllegalStateException("Connector is already opened.");
 		}
-        if(minPort < 0 || minPort > 0xFFFF) {
-            throw new IllegalArgumentException("Min port out of range:" + minPort);
-        }
-        if(maxPort < 0 || maxPort > 0xFFFF) {
-            throw new IllegalArgumentException("Max port out of range:" + maxPort);
-        }
-		if(minPort > maxPort) {
-			throw new IllegalArgumentException("Min port = " + minPort +", max port = " + maxPort);
+		if((ports == null) || ports.isEmpty()) {
+			throw new IllegalArgumentException("List of ports cannot be null or empty.");
+		}
+		for(int port : ports) {
+			if(port < 0 || port > 0xFFFF) {
+				throw new IllegalArgumentException("Port out of range:" + port);
+			}
 		}
         
-		this.minPort = minPort;
-		this.maxPort = maxPort;
-		this.currentPort = minPort;
+		this.ports = ports;
+		currentPort = ports.get(0);
 	}
 
 	@Override
 	public void open() throws IOException {
-		for(; currentPort <= maxPort; ++currentPort) {
+		for(final Iterator<Integer> it = ports.iterator(); it.hasNext(); ) {
+			currentPort = it.next();
 			try {
 				super.open();
 				LOGGER.info("Bound on port " + currentPort);
@@ -99,6 +97,18 @@ public class JettyRangeAwareServerConnector extends ServerConnector {
 				LOGGER.warn("IOException (" + e.getMessage() + ") when trying to bind on port " + currentPort +", will try next port.");
 			}
 		}
-		throw new IOException("Cannot bind a free port in range [" + minPort + ", " + maxPort + "].");
+		throw new IOException("Cannot bind a free port in list " + toString(ports) + ".");
+	}
+	
+	private String toString(List<Integer> ports) {
+		final StringBuilder sb = new StringBuilder("(");
+		for(final Iterator<Integer> it = ports.iterator(); it.hasNext(); ) {
+			sb.append(it.next());
+			if(it.hasNext()) {
+				sb.append(", ");
+			}
+		}
+		sb.append(")");
+		return sb.toString();
 	}
 }
