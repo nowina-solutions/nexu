@@ -15,6 +15,7 @@ package lu.nowina.nexu.view.ui;
 
 import java.util.Arrays;
 
+import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackClient;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
@@ -34,22 +35,24 @@ public abstract class AbstractFeedbackUIOperationController extends AbstractUIOp
 	
 	private Feedback feedback;
 	private String serverUrl;
+	private String applicationVersion;
 	
 	@Override
 	public final void init(Object... params) {
 		try {
 			feedback = (Feedback) params[0];
 			serverUrl = (String) params[1];
+			applicationVersion = (String) params[2];
 		} catch(final ClassCastException | ArrayIndexOutOfBoundsException e) {
-			throw new IllegalArgumentException("Expected parameters: Feedback and serverUrl (String)");
+			throw new IllegalArgumentException("Expected parameters: Feedback, serverUrl (String) and application version (String)");
 		}
 		
-		if((feedback == null) || (serverUrl == null)) {
-			throw new IllegalArgumentException("Expected parameters: Feedback and serverUrl (String)");
+		if((feedback == null) || (serverUrl == null) || (applicationVersion == null)) {
+			throw new IllegalArgumentException("Expected parameters: Feedback, serverUrl (String) and application version (String)");
 		}
 
-		if(params.length > 2) {
-			doInit(Arrays.copyOfRange(params, 2, params.length));
+		if(params.length > 3) {
+			doInit(Arrays.copyOfRange(params, 3, params.length));
 		} else {
 			doInit((Object) null); 
 		}
@@ -71,6 +74,9 @@ public abstract class AbstractFeedbackUIOperationController extends AbstractUIOp
 	 */
 	protected final void sendFeedback() {
 		try {
+			feedback.setNexuVersion(applicationVersion);
+			feedback.setInfo(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
+			
 			final FeedbackClient client = new FeedbackClient(serverUrl);
 			client.reportError(feedback);
 			signalEnd(feedback);

@@ -71,7 +71,8 @@ public class AdvancedCreationFeedbackOperation extends AbstractCompositeOperatio
 							(feedback.getApiParameter() != null))) {
 				final OperationResult<Feedback> result =
 						operationFactory.getOperation(UIOperation.class, display,
-								"/fxml/store-result.fxml", new Object[]{feedback, api.getAppConfig().getServerUrl()}).perform();
+								"/fxml/store-result.fxml",
+								new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion()}).perform();
 				if(result.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 					final Feedback back = result.getResult();
 					if (back != null) {
@@ -81,7 +82,7 @@ public class AdvancedCreationFeedbackOperation extends AbstractCompositeOperatio
 				}
 			} else {
 				operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml",
-						new Object[]{feedback, api.getAppConfig().getServerUrl()}).perform();
+						new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion()}).perform();
 			}
 		}		
 		return new OperationResult<Void>((Void) null);
