@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Properties;
 
 import javafx.application.Application;
+import lu.nowina.nexu.NexUPreLoader.PreLoaderMessage;
+import lu.nowina.nexu.api.AppConfig;
+import lu.nowina.nexu.jetty.JettyServer;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.ConsoleAppender;
@@ -33,9 +36,6 @@ import org.apache.log4j.PatternLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-
-import lu.nowina.nexu.api.AppConfig;
-import lu.nowina.nexu.jetty.JettyServer;
 
 public class NexuLauncher {
 
@@ -67,12 +67,15 @@ public class NexuLauncher {
 
 	private static Properties props;
 
+	private static List<PreLoaderMessage> preLoaderMessages;
+	
 	public static void main(String[] args) throws Exception {
 		NexuLauncher launcher = new NexuLauncher();
 		launcher.launch(args);
 	}
 
 	public void launch(String[] args) throws IOException {
+		preLoaderMessages = new ArrayList<NexUPreLoader.PreLoaderMessage>();
 		props = loadProperties();
 		config = loadAppConfig(props);
 
@@ -123,6 +126,10 @@ public class NexuLauncher {
 		return config;
 	}
 
+	static List<PreLoaderMessage> getPreLoaderMessages() {
+		return preLoaderMessages;
+	}
+	
 	public static Properties getProperties() {
 		return props;
 	}

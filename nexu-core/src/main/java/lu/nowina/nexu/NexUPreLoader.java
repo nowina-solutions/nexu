@@ -13,10 +13,10 @@
  */
 package lu.nowina.nexu;
 
+import java.text.MessageFormat;
+import java.util.List;
 import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.ResourceBundle;
 
 import javafx.application.Preloader;
 import javafx.scene.control.Alert;
@@ -28,6 +28,9 @@ import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackClient;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * JavaFX {@link Preloader} used to display and log error messages during JavaFX startup.
  *
@@ -36,18 +39,37 @@ import lu.nowina.nexu.api.FeedbackClient;
 public class NexUPreLoader extends Preloader {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(NexUPreLoader.class);
+	private final ResourceBundle resourceBundle;
 	
 	public NexUPreLoader() {
 		super();
+		resourceBundle = ResourceBundle.getBundle("bundles/nexu");
 	}
 
 	private AppConfig getConfig() {
 		return NexuLauncher.getConfig();
 	}
 	
-    @Override
+	private List<PreLoaderMessage> getPreLoaderMessages() {
+		return NexuLauncher.getPreLoaderMessages();
+	}
+	
+	@Override
 	public void start(Stage primaryStage) throws Exception {
-    	// Nothing to do
+    	// Check if some messages must be displayed
+    	for(final PreLoaderMessage preLoaderMessage : getPreLoaderMessages()) {
+    		LOGGER.warn("PreLoaderMessage: type = " + preLoaderMessage.getMessageType() + ", title = " + preLoaderMessage.getTitle()
+    				+", header = " + preLoaderMessage.getHeaderText() + ", content = " + preLoaderMessage.getContentText());
+    		
+    		final Alert alert = new Alert(preLoaderMessage.getMessageType());
+    		alert.setTitle(preLoaderMessage.getTitle());
+    		alert.setHeaderText(preLoaderMessage.getHeaderText());
+    		alert.setContentText(preLoaderMessage.getContentText());
+    		final Optional<ButtonType> result = alert.showAndWait();
+    		if(preLoaderMessage.isSendFeedback() && (result.get() == ButtonType.OK)) {
+    			sendFeedback(preLoaderMessage.getException());
+    		}
+    	}
     }
 
 	@Override
@@ -57,25 +79,77 @@ public class NexUPreLoader extends Preloader {
 		
 		// Display dialog
 		final Alert alert = new Alert(AlertType.CONFIRMATION);
-		alert.setTitle("Error");
-		alert.setHeaderText("An error has occurred when starting " + getConfig().getApplicationName());
-		alert.setContentText("Do want to provide some anonymous feedback to improve application?");
+		alert.setTitle(resourceBundle.getString("preloader.error"));
+		alert.setHeaderText(MessageFormat.format(resourceBundle.getString("preloader.error.occurred"), getConfig().getApplicationName()));
+		alert.setContentText(resourceBundle.getString("provide.feedback"));
 		
 		final Optional<ButtonType> result = alert.showAndWait();
 		if(result.get() == ButtonType.OK) {
-			final Throwable cause = info.getCause();
-			final Exception exception;
-			if(cause instanceof Exception) {
-				exception = (Exception) cause;
-			} else {
-				exception = new NexuException(cause);
-			}
-			final Feedback feedback = new Feedback(exception);
-			feedback.setNexuVersion(getConfig().getApplicationVersion());
-			feedback.setInfo(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
-			final FeedbackClient client = new FeedbackClient(getConfig().getServerUrl());
-			client.reportError(feedback);
+			sendFeedback(info.getCause());
 		}
 		return true;
+	}
+	
+	private void sendFeedback(final Throwable t) {
+		final Exception exception;
+		if(t instanceof Exception) {
+			exception = (Exception) t;
+		} else {
+			exception = new NexuException(t);
+		}
+		final Feedback feedback = new Feedback(exception);
+		feedback.setNexuVersion(getConfig().getApplicationVersion());
+		feedback.setInfo(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
+		final FeedbackClient client = new FeedbackClient(getConfig().getServerUrl());
+		client.reportError(feedback);
+	}
+	
+	/**
+	 * POJO that holds information about a message that must be displayed by {@link NexUPreLoader}.
+	 *
+	 * @author Jean Lepropre (jean.lepropre@nowina.lu)
+	 */
+	static class PreLoaderMessage {
+		private final AlertType messageType;
+		private final String title;
+		private final String headerText;
+		private final String contentText;
+		private final boolean sendFeedback;
+		private final Throwable exception;
+		
+		public PreLoaderMessage(AlertType messageType, String title, String headerText, String contentText, boolean sendFeedback,
+				Throwable exception) {
+			super();
+			this.messageType = messageType;
+			this.title = title;
+			this.headerText = headerText;
+			this.contentText = contentText;
+			this.sendFeedback = sendFeedback;
+			this.exception = exception;
+		}
+
+		public AlertType getMessageType() {
+			return messageType;
+		}
+
+		public String getTitle() {
+			return title;
+		}
+
+		public String getHeaderText() {
+			return headerText;
+		}
+
+		public String getContentText() {
+			return contentText;
+		}
+		
+		public boolean isSendFeedback() {
+			return sendFeedback;
+		}
+		
+		public Throwable getException() {
+			return exception;
+		}
 	}
 }
