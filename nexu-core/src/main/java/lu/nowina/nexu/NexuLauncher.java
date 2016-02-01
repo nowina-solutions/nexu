@@ -40,26 +40,17 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 public class NexuLauncher {
 
 	private static final String ADVANCED_MODE_AVAILABLE = "advanced_mode_available";
-
 	private static final String APPLICATION_NAME = "application_name";
-
 	private static final String DEBUG = "debug";
-
 	private static final String HTTP_SERVER_CLASS = "http_server_class";
-
 	private static final String NEXU_HOSTNAME = "nexu_hostname";
-
 	private static final String INSTALL_URL = "install_url";
-
 	private static final String SERVER_URL = "server_url";
-
 	private static final String BINDING_IP = "binding_ip";
-
 	private static final String BINDING_PORTS = "binding_ports";
-	
 	private static final String CONNECTIONS_CACHE_MAX_SIZE = "connections_cache_max_size";
-
 	private static final String ENABLE_POP_UPS = "enable_pop_ups";
+	private static final String SEND_ANONYMOUS_INFO_TO_PROXY = "send_anonymous_info_to_proxy";
 	
 	private static final Logger logger = LoggerFactory.getLogger(NexuLauncher.class.getName());
 
@@ -211,6 +202,7 @@ public class NexuLauncher {
 		config.setAdvancedModeAvailable(Boolean.parseBoolean(props.getProperty(ADVANCED_MODE_AVAILABLE, "true")));
 		config.setConnectionsCacheMaxSize(Integer.parseInt(props.getProperty(CONNECTIONS_CACHE_MAX_SIZE, "50")));
 		config.setEnablePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_POP_UPS, "true")));
+		config.setSendAnonymousInfoToProxy(Boolean.parseBoolean(props.getProperty(SEND_ANONYMOUS_INFO_TO_PROXY, "true")));
 		
 		return config;
 	}

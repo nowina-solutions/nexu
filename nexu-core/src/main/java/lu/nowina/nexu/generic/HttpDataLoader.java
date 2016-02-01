@@ -15,8 +15,6 @@ package lu.nowina.nexu.generic;
 
 import java.io.IOException;
 
-import javax.xml.bind.JAXBException;
-
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.plugin.HttpStatus;
 
@@ -30,46 +28,43 @@ public class HttpDataLoader {
 
 	private static final Logger logger = LoggerFactory.getLogger(HttpDataLoader.class.getName());
 	
-	private HttpClient client = new HttpClient();
+	private final HttpClient client;
+	private final String applicationVersion;
+	private final boolean sendAnonymousInfoToProxy;
 
+	public HttpDataLoader(final String applicationVersion, final boolean sendAnonymousInfoToProxy) {
+		this.client = new HttpClient();
+		this.applicationVersion = applicationVersion;
+		this.sendAnonymousInfoToProxy = sendAnonymousInfoToProxy;
+	}
+	
 	public byte[] fetchDatabase(String databaseUrl) throws IOException {
-
-		GetMethod get = new GetMethod(databaseUrl);
-
-		EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
-
-		get.setQueryString(new NameValuePair[] { new NameValuePair("os.name", info.getOsName()), new NameValuePair("os.arch", info.getOsArch()),
-				new NameValuePair("os.version", info.getOsVersion()) });
-
-		client.executeMethod(get);
-
-		if(!HttpStatus.OK.equals(get.getStatusCode())) {
-			logger.info("Cannot retrieve database from " + databaseUrl + ", status code = " + get.getStatusCode());
-			return null;
-		}
-		
-		return get.getResponseBody();
-
+		return performGetRequest(databaseUrl);
 	}
 
-	public byte[] fetchNexuInfo(String infoUrl) throws IOException, JAXBException {
-
-		GetMethod get = new GetMethod(infoUrl);
-
-		EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
-
-		get.setQueryString(new NameValuePair[] { new NameValuePair("os.name", info.getOsName()), new NameValuePair("os.arch", info.getOsArch()),
-				new NameValuePair("os.version", info.getOsVersion()) });
-
-		client.executeMethod(get);
-
-		if(!HttpStatus.OK.equals(get.getStatusCode())) {
-			logger.info("Cannot retrieve NexU info from " + infoUrl + ", status code = " + get.getStatusCode());
-			return null;
-		}
-		
-		return get.getResponseBody();
-
+	public byte[] fetchNexuInfo(String infoUrl) throws IOException {
+		return performGetRequest(infoUrl);
 	}
 
+	private byte[] performGetRequest(String requestUrl) throws IOException {
+		final GetMethod get = new GetMethod(requestUrl);
+		
+		if(sendAnonymousInfoToProxy) {
+			final EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
+			get.setQueryString(new NameValuePair[] {
+					new NameValuePair("application.version", applicationVersion),
+					new NameValuePair("jre.vendor", info.getJreVendor().toString()),
+					new NameValuePair("os.name", info.getOsName()),
+					new NameValuePair("os.arch", info.getOsArch()),
+					new NameValuePair("os.version", info.getOsVersion())
+			});
+		}
+
+		client.executeMethod(get);
+		if(!HttpStatus.OK.equals(get.getStatusCode())) {
+			logger.info("Cannot perform GET request at " + requestUrl + ", status code = " + get.getStatusCode());
+			return null;
+		}
+		return get.getResponseBody();
+	}
 }

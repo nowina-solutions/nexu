@@ -56,6 +56,8 @@ public class AppConfig {
 	
 	private boolean enablePopUps;
 	
+	private boolean sendAnonymousInfoToProxy;
+	
 	public AppConfig() {
 		try {
 			final URL versionResourceURL = this.getClass().getResource("/version.txt");
@@ -160,5 +162,13 @@ public class AppConfig {
 
 	public void setEnablePopUps(boolean enablePopUps) {
 		this.enablePopUps = enablePopUps;
+	}
+
+	public boolean isSendAnonymousInfoToProxy() {
+		return sendAnonymousInfoToProxy;
+	}
+
+	public void setSendAnonymousInfoToProxy(boolean sendAnonymousInfoToProxy) {
+		this.sendAnonymousInfoToProxy = sendAnonymousInfoToProxy;
 	}
 }
