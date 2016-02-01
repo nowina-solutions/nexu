@@ -79,7 +79,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		final Feedback feedback = new Feedback();
 		feedback.setFeedbackStatus(FeedbackStatus.NO_PRODUCT_FOUND);
 		when(operationFactory.getOperation(
-				UIOperation.class, display, "/fxml/provide-feedback.fxml", new Object[]{feedback})).thenReturn(successOperation);
+				UIOperation.class, display, "/fxml/provide-feedback.fxml", new Object[]{feedback, null})).thenReturn(successOperation);
 
 		when(operationFactory.getOperation(
 				UIOperation.class, display, "/fxml/message.fxml", new Object[]{"Finished"})).thenReturn(successOperation);
@@ -129,7 +129,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		final Feedback feedback = new Feedback();
 		feedback.setFeedbackStatus(FeedbackStatus.PRODUCT_NOT_SUPPORTED);
 		when(operationFactory.getOperation(
-				UIOperation.class, display, "/fxml/provide-feedback.fxml", new Object[]{feedback})).thenReturn(successOperation);
+				UIOperation.class, display, "/fxml/provide-feedback.fxml", new Object[]{feedback, null})).thenReturn(successOperation);
 		when(operationFactory.getOperation(
 				UIOperation.class, display, "/fxml/message.fxml", new Object[]{"Finished"})).thenReturn(successOperation);
 		

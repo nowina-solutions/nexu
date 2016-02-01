@@ -13,7 +13,6 @@
  */
 package lu.nowina.nexu.view.ui;
 
-import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -23,14 +22,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-import lu.nowina.nexu.api.Feedback;
-import lu.nowina.nexu.api.FeedbackClient;
-import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class StoreResultController extends AbstractUIOperationController<Feedback> implements Initializable {
+public class StoreResultController extends AbstractFeedbackUIOperationController implements Initializable {
 
 	private static final Logger logger = LoggerFactory.getLogger(StoreResultController.class.getName());
 
@@ -46,22 +42,13 @@ public class StoreResultController extends AbstractUIOperationController<Feedbac
 	@FXML
 	private CheckBox publish;
 
-	private Feedback feedback;
-
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		store.setOnAction((e) -> {
-			logger.info("Store for " + feedback.getSelectedCard().getAtr() + " parameters: " + feedback.getSelectedAPI() + " - " + feedback.getApiParameter());
-			logger.info(new File(".").getAbsolutePath());
+			logger.info("Store for " + getFeedback().getSelectedCard().getAtr()
+					+ " parameters: " + getFeedback().getSelectedAPI() + " - " + getFeedback().getApiParameter());
 			if (publish.isSelected()) {
-				try {
-					FeedbackClient client = new FeedbackClient("http://lab.nowina.solutions/nexu/");
-					client.reportError(feedback);
-					signalEnd(feedback);
-				} catch (Exception ex) {
-					logger.error("Cannot send feedback", ex);
-					signalEnd(feedback);
-				}
+				sendFeedback();
 			}
 		});
 		forget.setOnAction((e) -> {
@@ -71,26 +58,14 @@ public class StoreResultController extends AbstractUIOperationController<Feedbac
 	}
 
 	@Override
-	public void init(Object... params) {
-
-		if (params.length != 1) {
-			throw new IllegalArgumentException("Feedback object expected");
+	protected void doInit(Object... params) {
+		if ((getFeedback().getSelectedCard() == null) || (getFeedback().getSelectedAPI() == null)) {
+			throw new IllegalArgumentException("Invalid Feedback (card: " + getFeedback().getSelectedCard()
+					+ ", api: " + getFeedback().getSelectedAPI() + ")");
 		}
 
-		Feedback feedback = (Feedback) params[0];
-		if (feedback == null) {
-			throw new IllegalArgumentException("Feedback object expected");
-		}
-
-		if (feedback.getSelectedCard() == null || feedback.getSelectedAPI() == null) {
-			throw new IllegalArgumentException("Invalid Feedback (card:" + feedback.getSelectedCard() + ",api:" + feedback.getSelectedAPI() + ")");
-		}
-
-		this.feedback = feedback;
 		Platform.runLater(() -> {
-			label.setText(feedback.getFeedbackStatus().toString());
+			label.setText(getFeedback().getFeedbackStatus().toString());
 		});
-
 	}
-
 }

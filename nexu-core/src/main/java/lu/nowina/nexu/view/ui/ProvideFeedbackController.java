@@ -22,17 +22,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import lu.nowina.nexu.api.Feedback;
-import lu.nowina.nexu.api.FeedbackClient;
 import lu.nowina.nexu.api.FeedbackStatus;
-import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-public class ProvideFeedbackController extends AbstractUIOperationController<Feedback> implements Initializable {
-
-	private static final Logger logger = LoggerFactory.getLogger(ProvideFeedbackController.class.getName());
+public class ProvideFeedbackController extends AbstractFeedbackUIOperationController implements Initializable {
 
 	@FXML
 	private Button ok;
@@ -49,43 +41,29 @@ public class ProvideFeedbackController extends AbstractUIOperationController<Fee
 	@FXML
 	private TextArea userComment;
 
-	private Feedback feedback;
-
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		ok.setOnAction((e) -> {
-			if (feedback != null && feedback.getFeedbackStatus() != FeedbackStatus.SUCCESS) {
-				try {
-					feedback.setUserComment(userComment.getText());
-					FeedbackClient client = new FeedbackClient("http://lab.nowina.solutions/nexu/");
-					client.reportError(feedback);
-					signalEnd(feedback);
-				} catch (Exception ex) {
-					logger.error("Cannot send feedback", ex);
-					signalEnd(null);
-				}
+			if (getFeedback().getFeedbackStatus() != FeedbackStatus.SUCCESS) {
+				getFeedback().setUserComment(userComment.getText());
+				sendFeedback();
 			}
 		});
 		cancel.setOnAction((e) -> {
 			signalUserCancel();
 		});
-		if (feedback != null && feedback.getFeedbackStatus() == FeedbackStatus.SUCCESS) {
-			cancel.setVisible(false);
-			userComment.setVisible(false);
-			what.setVisible(false);
-		}
 	}
 
 	@Override
-	public void init(Object... params) {
-		this.feedback = null;
-		if (params.length > 0 && params[0] != null) {
-			Feedback feedback = (Feedback) params[0];
-			this.feedback = feedback;
-			Platform.runLater(() -> {
-				label.setText(feedback.getFeedbackStatus().toString());
-			});
-		}
+	protected void doInit(Object... params) {
+		Platform.runLater(() -> {
+			label.setText(getFeedback().getFeedbackStatus().toString());
+			if (getFeedback().getFeedbackStatus() == FeedbackStatus.SUCCESS) {
+				cancel.setVisible(false);
+				userComment.setVisible(false);
+				what.setVisible(false);
+			}
+		});
 	}
 
 }
