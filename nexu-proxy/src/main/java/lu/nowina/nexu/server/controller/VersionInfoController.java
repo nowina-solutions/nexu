@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import lu.nowina.nexu.ConfigurationException;
 import lu.nowina.nexu.TechnicalException;
 import lu.nowina.nexu.generic.NexuInfo;
+import lu.nowina.nexu.server.business.PlatformStatisticManager;
 import lu.nowina.nexu.server.manager.SCDatabaseManager;
 
 @Controller
@@ -41,6 +42,9 @@ public class VersionInfoController {
 
 	@Autowired
 	private SCDatabaseManager databaseManager;
+
+	@Autowired
+	private PlatformStatisticManager platformStatisticManager;
 
 	private JAXBContext ctx;
 
@@ -65,7 +69,8 @@ public class VersionInfoController {
 
 	@RequestMapping("/info")
 	public void info(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-
+		platformStatisticManager.addNewStatistic(req.getParameterMap());
+		
 		NexuInfo info = new NexuInfo();
 		info.setNexuVersion(nexuVersion);
 		info.setDatabaseVersion(databaseManager.getDatabaseDigest());

@@ -23,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
@@ -37,7 +38,7 @@ public class SCDatabaseControllerTest {
 	
 	@Test
 	public void test1() throws Exception {
-		final ResponseEntity<byte[]> resp = controller.getDatabase();
+		final ResponseEntity<byte[]> resp = controller.getDatabase(new MockHttpServletRequest());
 
 		Assert.assertEquals(MediaType.parseMediaType("application/xml"), resp.getHeaders().getContentType());
 		Assert.assertTrue(resp.getBody() != null);

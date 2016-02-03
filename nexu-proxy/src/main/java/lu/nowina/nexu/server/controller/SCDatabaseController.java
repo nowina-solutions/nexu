@@ -13,6 +13,11 @@
  */
 package lu.nowina.nexu.server.controller;
 
+import javax.servlet.http.HttpServletRequest;
+
+import lu.nowina.nexu.server.business.PlatformStatisticManager;
+import lu.nowina.nexu.server.manager.SCDatabaseManager;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,8 +25,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import lu.nowina.nexu.server.manager.SCDatabaseManager;
 
 @Controller
 public class SCDatabaseController {
@@ -31,9 +34,13 @@ public class SCDatabaseController {
 	@Autowired
 	private SCDatabaseManager databaseManager;
 
-	@RequestMapping("/database.xml")
-	public ResponseEntity<byte[]> getDatabase() throws Exception {
+	@Autowired
+	private PlatformStatisticManager platformStatisticManager;
 
+	@RequestMapping("/database.xml")
+	public ResponseEntity<byte[]> getDatabase(HttpServletRequest req) throws Exception {
+		platformStatisticManager.addNewStatistic(req.getParameterMap());
+		
 		HttpHeaders headers = new HttpHeaders();
 		headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_VALUE);
 		headers.add(HttpHeaders.CONTENT_ENCODING, UTF8);

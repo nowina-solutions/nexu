@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.plugin.HttpStatus;
+import lu.nowina.nexu.stats.PlatformStatistic;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.NameValuePair;
@@ -52,16 +53,16 @@ public class HttpDataLoader {
 		if(sendAnonymousInfoToProxy) {
 			final EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
 			get.setQueryString(new NameValuePair[] {
-					new NameValuePair("application.version", applicationVersion),
-					new NameValuePair("jre.vendor", info.getJreVendor().toString()),
-					new NameValuePair("os.name", info.getOsName()),
-					new NameValuePair("os.arch", info.getOsArch()),
-					new NameValuePair("os.version", info.getOsVersion())
+					new NameValuePair(PlatformStatistic.APPLICATION_VERSION, applicationVersion),
+					new NameValuePair(PlatformStatistic.JRE_VENDOR, info.getJreVendor().toString()),
+					new NameValuePair(PlatformStatistic.OS_NAME, info.getOsName()),
+					new NameValuePair(PlatformStatistic.OS_ARCH, info.getOsArch()),
+					new NameValuePair(PlatformStatistic.OS_VERSION, info.getOsVersion())
 			});
 		}
 
 		client.executeMethod(get);
-		if(!HttpStatus.OK.equals(get.getStatusCode())) {
+		if(HttpStatus.OK.getHttpCode() != get.getStatusCode()) {
 			logger.info("Cannot perform GET request at " + requestUrl + ", status code = " + get.getStatusCode());
 			return null;
 		}
