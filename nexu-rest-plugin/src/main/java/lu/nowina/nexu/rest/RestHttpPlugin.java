@@ -17,19 +17,15 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.DatatypeConverter;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-
-import com.google.gson.Gson;
-
-import eu.europa.esig.dss.DigestAlgorithm;
-import eu.europa.esig.dss.ToBeSigned;
 import lu.nowina.nexu.api.AuthenticateRequest;
 import lu.nowina.nexu.api.CertificateFilter;
 import lu.nowina.nexu.api.Execution;
+import lu.nowina.nexu.api.Feedback;
+import lu.nowina.nexu.api.FeedbackStatus;
 import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetIdentityInfoRequest;
 import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.NexuRequest;
 import lu.nowina.nexu.api.Purpose;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.TokenId;
@@ -37,6 +33,13 @@ import lu.nowina.nexu.api.plugin.HttpPlugin;
 import lu.nowina.nexu.api.plugin.HttpRequest;
 import lu.nowina.nexu.api.plugin.HttpResponse;
 import lu.nowina.nexu.api.plugin.HttpStatus;
+import lu.nowina.nexu.json.GsonHelper;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+
+import eu.europa.esig.dss.DigestAlgorithm;
+import eu.europa.esig.dss.ToBeSigned;
 
 /**
  * Default implementation of HttpPlugin for NexU.
@@ -46,8 +49,6 @@ import lu.nowina.nexu.api.plugin.HttpStatus;
 public class RestHttpPlugin implements HttpPlugin {
 
 	private static final Logger logger = Logger.getLogger(RestHttpPlugin.class.getName());
-
-	private static final Gson gson = GsonHelper.customGson;
 
 	@Override
 	public void init(String pluginId, NexuAPI api) {
@@ -76,6 +77,10 @@ public class RestHttpPlugin implements HttpPlugin {
 		}
 	}
 
+	protected <T> Execution<T> returnNullIfValid(NexuRequest request) {
+		return null;
+	}
+	
 	private HttpResponse signRequest(NexuAPI api, HttpRequest req, String payload) {
 		logger.info("Signature");
 		final SignatureRequest r;
@@ -107,15 +112,28 @@ public class RestHttpPlugin implements HttpPlugin {
 				r.setKeyId(keyId);
 			}
 		} else {
-			r = gson.fromJson(payload, SignatureRequest.class);
+			r = GsonHelper.fromJson(payload, SignatureRequest.class);
 		}
 
 		if(r.isOnlyEncryptionRequired()) {
-			return toHttpResponse(new Execution("not_supported_only_encryption_required", ""));
+			final Execution<?> execution =
+					new Execution<Object>(RestPluginOperationStatus.NOT_SUPPORTED_ONLY_ENCRYPTION_REQUIRED);
+			final Feedback feedback = new Feedback();
+			execution.setFeedback(feedback);
+			feedback.setFeedbackStatus(FeedbackStatus.FAILED);
+			feedback.setInfo(api.getEnvironmentInfo());
+			feedback.setNexuVersion(api.getAppConfig().getApplicationVersion());
+			return toHttpResponse(execution);
 		}
 		
-		final Execution<?> respObj = api.sign(r);
-		return toHttpResponse(respObj);
+		final HttpResponse invalidRequestHttpResponse = checkRequestValidity(api, r);
+		if(invalidRequestHttpResponse != null) {
+			return invalidRequestHttpResponse;
+		} else {
+			logger.info("Call API");
+			final Execution<?> respObj = api.sign(r);
+			return toHttpResponse(respObj);
+		}
 	}
 
 	private HttpResponse getCertificates(NexuAPI api, HttpRequest req, String payload) {
@@ -133,26 +151,36 @@ public class RestHttpPlugin implements HttpPlugin {
 				r.setCertificateFilter(certificateFilter);
 			}
 		} else {
-			r = gson.fromJson(payload, GetCertificateRequest.class);
+			r = GsonHelper.fromJson(payload, GetCertificateRequest.class);
 		}
 
-		logger.info("Call API");
-		final Execution<?> respObj = api.getCertificate(r);
-		return toHttpResponse(respObj);
+		final HttpResponse invalidRequestHttpResponse = checkRequestValidity(api, r);
+		if(invalidRequestHttpResponse != null) {
+			return invalidRequestHttpResponse;
+		} else {
+			logger.info("Call API");
+			final Execution<?> respObj = api.getCertificate(r);
+			return toHttpResponse(respObj);
+		}
 	}
 
 	private HttpResponse getIdentityInfo(NexuAPI api, String payload) {
 		logger.info("API call get identity info");
-		final GetIdentityInfoRequest payloadObj;
+		final GetIdentityInfoRequest r;
 		if (StringUtils.isEmpty(payload)) {
-			payloadObj = new GetIdentityInfoRequest();
+			r = new GetIdentityInfoRequest();
 		} else {
-			payloadObj = gson.fromJson(payload, GetIdentityInfoRequest.class);
+			r = GsonHelper.fromJson(payload, GetIdentityInfoRequest.class);
 		}
 
-		logger.info("Call API");
-		final Execution<?> respObj = api.getIdentityInfo(payloadObj);
-		return toHttpResponse(respObj);
+		final HttpResponse invalidRequestHttpResponse = checkRequestValidity(api, r);
+		if(invalidRequestHttpResponse != null) {
+			return invalidRequestHttpResponse;
+		} else {
+			logger.info("Call API");
+			final Execution<?> respObj = api.getIdentityInfo(r);
+			return toHttpResponse(respObj);
+		}
 	}
 
 	private HttpResponse authenticate(NexuAPI api, HttpRequest req, String payload) {
@@ -169,18 +197,43 @@ public class RestHttpPlugin implements HttpPlugin {
 				r.setChallenge(tbs);
 			}
 		} else {
-			r = gson.fromJson(payload, AuthenticateRequest.class);
+			r = GsonHelper.fromJson(payload, AuthenticateRequest.class);
 		}
 
-		final Execution<?> respObj = api.authenticate(r);
-		return toHttpResponse(respObj);
+		final HttpResponse invalidRequestHttpResponse = checkRequestValidity(api, r);
+		if(invalidRequestHttpResponse != null) {
+			return invalidRequestHttpResponse;
+		} else {
+			logger.info("Call API");
+			final Execution<?> respObj = api.authenticate(r);
+			return toHttpResponse(respObj);
+		}
 	}
 
+	private HttpResponse checkRequestValidity(final NexuAPI api, final NexuRequest request) {
+		final Execution<Object> verification = returnNullIfValid(request);
+		if(verification != null) {
+			final Feedback feedback;
+			if(verification.getFeedback() == null) {
+				feedback = new Feedback();
+				feedback.setFeedbackStatus(FeedbackStatus.SIGNATURE_VERIFICATION_FAILED);
+				verification.setFeedback(feedback);
+			} else {
+				feedback = verification.getFeedback();
+			}
+			feedback.setInfo(api.getEnvironmentInfo());
+			feedback.setNexuVersion(api.getAppConfig().getApplicationVersion());
+			return toHttpResponse(verification);
+		} else {
+			return null;
+		}
+	}
+	
 	private HttpResponse toHttpResponse(final Execution<?> respObj) {
 		if (respObj.isSuccess()) {
-			return new HttpResponse(gson.toJson(respObj), "application/json", HttpStatus.OK);
+			return new HttpResponse(GsonHelper.toJson(respObj), "application/json;charset=UTF-8", HttpStatus.OK);
 		} else {
-			return new HttpResponse(gson.toJson(respObj), "application/json", HttpStatus.ERROR);
+			return new HttpResponse(GsonHelper.toJson(respObj), "application/json;charset=UTF-8", HttpStatus.ERROR);
 		}
 	}
 }

@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>lu.nowina.apps</groupId>
 		<artifactId>nexu</artifactId>
-		<version>1.1</version>
+		<version>1.2</version>
 	</parent>
 	<artifactId>nexu-app</artifactId>
 
@@ -21,6 +21,22 @@
 	</dependencies>
 
 	<build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/version.txt</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/version.txt</exclude>
+                </excludes>
+            </resource>
+        </resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

@@ -29,6 +29,9 @@ public class AboutController implements Initializable {
 	private Button ok;
 
 	@FXML
+	private Label applicationVersion;
+	
+	@FXML
 	private Label dbVersion;
 
 	@FXML
@@ -53,4 +56,7 @@ public class AboutController implements Initializable {
 		this.display = display;
 	}
 
+	public void setApplicationVersion(String applicationVersion) {
+		this.applicationVersion.setText(applicationVersion);
+	}
 }

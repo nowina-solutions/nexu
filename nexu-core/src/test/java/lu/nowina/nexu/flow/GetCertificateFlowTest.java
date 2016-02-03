@@ -23,8 +23,10 @@ import java.util.Collections;
 import java.util.List;
 
 import lu.nowina.nexu.AbstractConfigureLoggerTest;
+import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
+import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackStatus;
 import lu.nowina.nexu.api.GetCertificateRequest;
@@ -32,10 +34,11 @@ import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.Operation;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.api.flow.OperationStatus;
 import lu.nowina.nexu.flow.operation.BasicOperationFactory;
+import lu.nowina.nexu.flow.operation.CoreOperationStatus;
 import lu.nowina.nexu.flow.operation.CreateTokenOperation;
 import lu.nowina.nexu.flow.operation.GetMatchingCardAdaptersOperation;
 import lu.nowina.nexu.flow.operation.OperationFactory;
@@ -57,6 +60,9 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		final UIDisplay display = mock(UIDisplay.class);
 
 		final NexuAPI api = mock(NexuAPI.class);
+		final AppConfig appConfig = new AppConfig();
+		appConfig.setEnablePopUps(true);
+		when(api.getAppConfig()).thenReturn(appConfig);
 		when(api.detectCards()).thenReturn(Collections.emptyList());
 
 		final OperationFactory operationFactory = mock(OperationFactory.class);
@@ -68,7 +74,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		when(operationFactory.getOperation(GetMatchingCardAdaptersOperation.class, api)).thenReturn(operation);
 
 		final Operation<Object> successOperation = mock(Operation.class);
-		when(successOperation.perform()).thenReturn(new OperationResult<Object>(OperationStatus.SUCCESS));
+		when(successOperation.perform()).thenReturn(new OperationResult<Object>(BasicOperationStatus.SUCCESS));
 		
 		final Feedback feedback = new Feedback();
 		feedback.setFeedbackStatus(FeedbackStatus.NO_PRODUCT_FOUND);
@@ -78,12 +84,14 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		when(operationFactory.getOperation(
 				UIOperation.class, display, "/fxml/message.fxml", new Object[]{"Finished"})).thenReturn(successOperation);
 		
-		final GetCertificateFlow flow = new GetCertificateFlow(display);
+		final GetCertificateFlow flow = new GetCertificateFlow(display, api);
 		flow.setOperationFactory(operationFactory);
 		
 		final GetCertificateRequest req = new GetCertificateRequest();
-		final GetCertificateResponse resp = flow.process(api, req);
-		Assert.assertNull(resp);
+		final Execution<GetCertificateResponse> resp = flow.process(api, req);
+		Assert.assertNotNull(resp);
+		Assert.assertFalse(resp.isSuccess());
+		Assert.assertEquals(CoreOperationStatus.NO_PRODUCT_FOUND.getCode(), resp.getError());
 	}
 
 	@Test
@@ -93,6 +101,11 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 
 		final NexuAPI api = mock(NexuAPI.class);
 		when(api.detectCards()).thenReturn(Arrays.asList(new DetectedCard("atr", 0)));
+		
+		final AppConfig appConfig = new AppConfig();
+		appConfig.setAdvancedModeAvailable(true);
+		appConfig.setEnablePopUps(true);
+		when(api.getAppConfig()).thenReturn(appConfig);
 
 		final OperationFactory operationFactory = mock(OperationFactory.class);
 		
@@ -100,12 +113,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		when(getMatchingCardAdaptersOperation.perform()).thenReturn(new OperationResult<List<Match>>(Collections.emptyList()));
 		when(operationFactory.getOperation(GetMatchingCardAdaptersOperation.class, api)).thenReturn(getMatchingCardAdaptersOperation);
 		
-		final CreateTokenOperation createTokenOperation = new CreateTokenOperation() {
-			@Override
-			protected boolean isAdvancedModeAvailable() {
-				return true;
-			}
-		};
+		final CreateTokenOperation createTokenOperation = new CreateTokenOperation();
 		createTokenOperation.setParams(api, Collections.emptyList());
 		createTokenOperation.setDisplay(display);
 		createTokenOperation.setOperationFactory(operationFactory);
@@ -117,7 +125,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 				UIOperation.class, display, "/fxml/unsupported-product.fxml")).thenReturn(returnFalseOperation);
 
 		final Operation<Object> successOperation = mock(Operation.class);
-		when(successOperation.perform()).thenReturn(new OperationResult<Object>(OperationStatus.SUCCESS));
+		when(successOperation.perform()).thenReturn(new OperationResult<Object>(BasicOperationStatus.SUCCESS));
 		final Feedback feedback = new Feedback();
 		feedback.setFeedbackStatus(FeedbackStatus.PRODUCT_NOT_SUPPORTED);
 		when(operationFactory.getOperation(
@@ -125,16 +133,18 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		when(operationFactory.getOperation(
 				UIOperation.class, display, "/fxml/message.fxml", new Object[]{"Finished"})).thenReturn(successOperation);
 		
-		final GetCertificateFlow flow = new GetCertificateFlow(display);
+		final GetCertificateFlow flow = new GetCertificateFlow(display, api);
 		flow.setOperationFactory(operationFactory);
 		
 		final GetCertificateRequest req = new GetCertificateRequest();
-		final GetCertificateResponse resp = flow.process(api, req);
-		Assert.assertNull(resp);
+		final Execution<GetCertificateResponse> resp = flow.process(api, req);
+		Assert.assertNotNull(resp);
+		Assert.assertFalse(resp.isSuccess());
+		Assert.assertEquals(CoreOperationStatus.UNSUPPORTED_PRODUCT.getCode(), resp.getError());
 	}
 
 	@Test
-	public void testCardRecognized() {
+	public void testCardRecognized() throws Exception {
 
 		UIDisplay display = mock(UIDisplay.class);
 
@@ -143,6 +153,9 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		SignatureTokenConnection token = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password");
 
 		NexuAPI api = mock(NexuAPI.class);
+		final AppConfig appConfig = new AppConfig();
+		appConfig.setEnablePopUps(true);
+		when(api.getAppConfig()).thenReturn(appConfig);
 		DetectedCard detectedCard = new DetectedCard("atr", 0);
 
 		when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
@@ -151,18 +164,40 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		when(api.getTokenConnection(new TokenId("id"))).thenReturn(token);
 		when(adapter.connect(eq(api), eq(detectedCard), any())).thenReturn(token);
 
-		final OperationFactory operationFactory = new BasicOperationFactory();
+		final OperationFactory operationFactory = new NoUIOperationFactory();
 		operationFactory.setDisplay(display);
 		
-		GetCertificateFlow flow = new GetCertificateFlow(display);
+		GetCertificateFlow flow = new GetCertificateFlow(display, api);
 		flow.setOperationFactory(operationFactory);
-		GetCertificateResponse resp = flow.process(api, new GetCertificateRequest());
+		Execution<GetCertificateResponse> resp = flow.process(api, new GetCertificateRequest());
 		Assert.assertNotNull(resp);
-		Assert.assertNotNull(resp.getEncryptionAlgorithm());
-		Assert.assertNotNull(resp.getTokenId());
-		Assert.assertEquals(new TokenId("id"), resp.getTokenId());
-		Assert.assertNotNull(resp.getKeyId());
+		Assert.assertTrue(resp.isSuccess());
+		Assert.assertNotNull(resp.getResponse());
+		Assert.assertNotNull(resp.getResponse().getEncryptionAlgorithm());
+		Assert.assertNotNull(resp.getResponse().getTokenId());
+		Assert.assertEquals(new TokenId("id"), resp.getResponse().getTokenId());
+		Assert.assertNotNull(resp.getResponse().getKeyId());
 
 	}
 
+	private static class NoUIOperationFactory extends BasicOperationFactory {
+		
+		@SuppressWarnings("rawtypes")
+		private final Operation successOperation;
+		
+		public NoUIOperationFactory() {
+			this.successOperation = mock(Operation.class);
+			when(successOperation.perform()).thenReturn(new OperationResult<Void>(BasicOperationStatus.SUCCESS));
+		}
+		
+		@Override
+		@SuppressWarnings("unchecked")
+		public <R, T extends Operation<R>> Operation<R> getOperation(Class<T> clazz, Object... params) {
+			if(UIOperation.class.isAssignableFrom(clazz)) {
+				return successOperation;
+			} else {
+				return super.getOperation(clazz, params);
+			}
+		}
+	}
 }

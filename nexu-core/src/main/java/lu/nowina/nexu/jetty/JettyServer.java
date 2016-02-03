@@ -17,10 +17,10 @@ import org.eclipse.jetty.server.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lu.nowina.nexu.AppConfig;
 import lu.nowina.nexu.HttpServer;
 import lu.nowina.nexu.InternalAPI;
 import lu.nowina.nexu.UserPreferences;
+import lu.nowina.nexu.api.AppConfig;
 
 public class JettyServer implements HttpServer {
 

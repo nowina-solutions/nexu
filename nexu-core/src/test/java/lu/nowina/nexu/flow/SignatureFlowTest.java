@@ -22,16 +22,18 @@ import java.util.Arrays;
 
 import lu.nowina.nexu.AbstractConfigureLoggerTest;
 import lu.nowina.nexu.NexuException;
+import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
+import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.Operation;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.api.flow.OperationStatus;
 import lu.nowina.nexu.flow.operation.BasicOperationFactory;
 import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.view.core.UIDisplay;
@@ -61,6 +63,9 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 		when(api.matchingCardAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
 		when(api.registerTokenConnection(token)).thenReturn(new TokenId("id"));
 		when(api.getTokenConnection(new TokenId("id"))).thenReturn(token);
+		final AppConfig appConfig = new AppConfig();
+		appConfig.setEnablePopUps(true);
+		when(api.getAppConfig()).thenReturn(appConfig);
 
 		when(adapter.connect(eq(api), eq(detectedCard), any())).thenReturn(token);
 
@@ -71,11 +76,13 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 		final OperationFactory noUIOperationFactory = new NoUIOperationFactory();
 		noUIOperationFactory.setDisplay(display);
 
-		SignatureFlow flow = new SignatureFlow(display);
+		SignatureFlow flow = new SignatureFlow(display, api);
 		flow.setOperationFactory(noUIOperationFactory);
-		SignatureResponse resp = flow.process(api, req);
+		Execution<SignatureResponse> resp = flow.process(api, req);
 		Assert.assertNotNull(resp);
-		Assert.assertNotNull(resp.getSignatureValue());
+		Assert.assertTrue(resp.isSuccess());
+		Assert.assertNotNull(resp.getResponse());
+		Assert.assertNotNull(resp.getResponse().getSignatureValue());
 
 	}
 
@@ -89,7 +96,7 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 		SignatureRequest req = new SignatureRequest();
 		req.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
-		SignatureFlow flow = new SignatureFlow(display);
+		SignatureFlow flow = new SignatureFlow(display, api);
 		flow.process(api, req);
 
 	}
@@ -104,7 +111,7 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 		SignatureRequest req = new SignatureRequest();
 		req.setToBeSigned(new ToBeSigned());
 
-		SignatureFlow flow = new SignatureFlow(display);
+		SignatureFlow flow = new SignatureFlow(display, api);
 		flow.process(api, req);
 
 	}
@@ -119,7 +126,7 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 		SignatureRequest req = new SignatureRequest();
 		req.setToBeSigned(new ToBeSigned("hello".getBytes()));
 
-		SignatureFlow flow = new SignatureFlow(display);
+		SignatureFlow flow = new SignatureFlow(display, api);
 		flow.process(api, req);
 
 	}
@@ -131,7 +138,7 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 		
 		public NoUIOperationFactory() {
 			this.successOperation = mock(Operation.class);
-			when(successOperation.perform()).thenReturn(new OperationResult<Void>(OperationStatus.SUCCESS));
+			when(successOperation.perform()).thenReturn(new OperationResult<Void>(BasicOperationStatus.SUCCESS));
 		}
 		
 		@Override

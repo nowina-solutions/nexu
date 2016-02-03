@@ -11,7 +11,14 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu;
+package lu.nowina.nexu.api;
+
+import java.io.IOException;
+import java.net.URL;
+
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configuration of the NexU Platform
@@ -20,6 +27,8 @@ package lu.nowina.nexu;
  *
  */
 public class AppConfig {
+
+	private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
 
 	private String bindingIP;
 
@@ -36,6 +45,28 @@ public class AppConfig {
 	private boolean debug;
 
 	private boolean advancedModeAvailable;
+	
+	private String applicationName;
+	
+	private String applicationVersion;
+	
+	private int connectionsCacheMaxSize;
+	
+	private boolean enablePopUps;
+	
+	public AppConfig() {
+		try {
+			final URL versionResourceURL = this.getClass().getResource("/version.txt");
+			if(versionResourceURL == null) {
+				logger.error("Cannot retrieve application version: version.txt not found");
+			} else {
+				this.applicationVersion = IOUtils.toString(versionResourceURL);
+			}
+		} catch (final IOException e) {
+			logger.error("Cannot retrieve application version: " + e.getMessage(), e);
+			this.applicationVersion = "";
+		}
+	}
 	
 	public String getBindingIP() {
 		return bindingIP;
@@ -99,5 +130,33 @@ public class AppConfig {
 
 	public void setAdvancedModeAvailable(boolean advancedModeAvailable) {
 		this.advancedModeAvailable = advancedModeAvailable;
+	}
+
+	public String getApplicationName() {
+		return applicationName;
+	}
+
+	public void setApplicationName(String applicationName) {
+		this.applicationName = applicationName;
+	}
+
+	public String getApplicationVersion() {
+		return applicationVersion;
+	}
+
+	public int getConnectionsCacheMaxSize() {
+		return connectionsCacheMaxSize;
+	}
+
+	public void setConnectionsCacheMaxSize(int connectionsCacheMaxSize) {
+		this.connectionsCacheMaxSize = connectionsCacheMaxSize;
+	}
+
+	public boolean isEnablePopUps() {
+		return enablePopUps;
+	}
+
+	public void setEnablePopUps(boolean enablePopUps) {
+		this.enablePopUps = enablePopUps;
 	}
 }

@@ -43,7 +43,7 @@ public class PasswordInputController extends AbstractUIOperationController<char[
 		ok.setOnAction(handler);
 		password.setOnAction(handler);
 		cancel.setOnAction((e) -> {
-			signalEnd(null);
+			signalUserCancel();
 		});
 	}
 

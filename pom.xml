@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>lu.nowina.apps</groupId>
 	<artifactId>nexu</artifactId>
-	<version>1.1</version>
+	<version>1.2</version>
 	<packaging>pom</packaging>
 	<name>NexU</name>
 
@@ -14,7 +14,7 @@
 		<module>nexu-ws-client</module>
 		<module>nexu-app</module>
 		<module>nexu-model</module>
-		<module>nexu-json</module>
+		<module>nexu-util</module>
 	</modules>
 
 	<properties>
@@ -28,7 +28,7 @@
 
     <scm>
         <developerConnection>scm:git:https://github.com/nowina-solutions/nexu.git</developerConnection>
-        <tag>nexu-1.1</tag>
+        <tag>nexu-1.2</tag>
     </scm>
     
 	<licenses>

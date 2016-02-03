@@ -35,8 +35,8 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lu.nowina.nexu.AppConfig;
 import lu.nowina.nexu.NexuLauncher;
+import lu.nowina.nexu.api.AppConfig;
 
 public class DatabaseWebLoader {
 
@@ -133,10 +133,11 @@ public class DatabaseWebLoader {
 	public void fetchDatabase() throws IOException {
 
 		databaseData = dataLoader.fetchDatabase(serverUrl + "/database.xml");
-		try (FileOutputStream out = new FileOutputStream(getDatabaseFile())) {
-			out.write(databaseData);
+		if(databaseData != null) {
+			try (FileOutputStream out = new FileOutputStream(getDatabaseFile())) {
+				out.write(databaseData);
+			}
 		}
-
 	}
 
 	public NexuInfo fetchNexuInfo() throws IOException, JAXBException {

@@ -14,15 +14,22 @@
 package lu.nowina.nexu.api.flow;
 
 /**
- * This enum gathers all possible result statuses for an {@link Operation}.
+ * An {@link OperationStatus} is the result status of an {@link Operation}.
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public enum OperationStatus {
+public interface OperationStatus {
 
-	SUCCESS,
-	EXCEPTION,
-	USER_CANCEL,
-	FAILED;
+	/**
+	 * Returns the code corresponding to this {@link OperationStatus}.
+	 * @return The code corresponding to this {@link OperationStatus}.
+	 */
+	String getCode();
+	
+	/**
+	 * Returns the label corresponding to this {@link OperationStatus}.
+	 * @return The label corresponding to this {@link OperationStatus}.
+	 */
+	String getLabel();
 
 }

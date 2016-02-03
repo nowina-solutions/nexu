@@ -18,12 +18,13 @@ import java.util.Map;
 import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
+import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.api.flow.OperationStatus;
 import lu.nowina.nexu.flow.operation.AdvancedCreationFeedbackOperation;
 import lu.nowina.nexu.flow.operation.GetTokenConnectionOperation;
 import lu.nowina.nexu.flow.operation.GetTokenOperation;
@@ -40,17 +41,17 @@ import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 
-class SignatureFlow extends Flow<SignatureRequest, SignatureResponse> {
+class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse> {
 
 	private static final Logger logger = LoggerFactory.getLogger(SignatureFlow.class.getName());
 
-	public SignatureFlow(UIDisplay display) {
-		super(display);
+	public SignatureFlow(UIDisplay display, NexuAPI api) {
+		super(display, api);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected SignatureResponse process(NexuAPI api, SignatureRequest req) throws NexuException {
+	protected Execution<SignatureResponse> process(NexuAPI api, SignatureRequest req) throws Exception {
 		if ((req.getToBeSigned() == null) || (req.getToBeSigned().getBytes() == null)) {
 			throw new NexuException("ToBeSigned is null");
 		}
@@ -63,13 +64,13 @@ class SignatureFlow extends Flow<SignatureRequest, SignatureResponse> {
 		try {
 			final OperationResult<Map<TokenOperationResultKey, Object>> getTokenOperationResult =
 					getOperationFactory().getOperation(GetTokenOperation.class, api, req.getTokenId()).perform();
-			if (getTokenOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+			if (getTokenOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 				final Map<TokenOperationResultKey, Object> map = getTokenOperationResult.getResult();
 				final TokenId tokenId = (TokenId) map.get(TokenOperationResultKey.TOKEN_ID);
 
 				final OperationResult<SignatureTokenConnection> getTokenConnectionOperationResult =
 						getOperationFactory().getOperation(GetTokenConnectionOperation.class, api, tokenId).perform();
-				if (getTokenConnectionOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+				if (getTokenConnectionOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 					token = getTokenConnectionOperationResult.getResult();
 					logger.info("Token " + token);
 					
@@ -77,14 +78,14 @@ class SignatureFlow extends Flow<SignatureRequest, SignatureResponse> {
 					final CardAdapter cardAdapter = (CardAdapter) map.get(TokenOperationResultKey.SELECTED_CARD_ADAPTER);
 					final OperationResult<DSSPrivateKeyEntry> selectPrivateKeyOperationResult =
 							getOperationFactory().getOperation(
-									SelectPrivateKeyOperation.class, token, card, cardAdapter, null, req.getKeyId()).perform();
-					if (selectPrivateKeyOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+									SelectPrivateKeyOperation.class, token, api, card, cardAdapter, null, req.getKeyId()).perform();
+					if (selectPrivateKeyOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 						final DSSPrivateKeyEntry key = selectPrivateKeyOperationResult.getResult();
 
 						logger.info("Key " + key + " " + key.getCertificate().getSubjectDN() + " from " + key.getCertificate().getIssuerDN());
 						final OperationResult<SignatureValue> signOperationResult = getOperationFactory().getOperation(
 								SignOperation.class, token, req.getToBeSigned(), req.getDigestAlgorithm(), key).perform();
-						if(signOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+						if(signOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 							final SignatureValue value = signOperationResult.getResult();
 							logger.info("Signature performed " + value);
 
@@ -93,23 +94,35 @@ class SignatureFlow extends Flow<SignatureRequest, SignatureResponse> {
 										api, map).perform();
 							}
 							
-							getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+							if(api.getAppConfig().isEnablePopUps()) {
+								getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
 									new Object[]{"Signature performed"}).perform();
+							}
 							
-							return new SignatureResponse(value);
+							return new Execution<SignatureResponse>(new SignatureResponse(value));
+						} else {
+							return handleErrorOperationResult(signOperationResult);
 						}
 					} else {
-						getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+						if(api.getAppConfig().isEnablePopUps()) {
+							getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
 								new Object[]{"Error - No keys"}).perform();
+						}
+						return handleErrorOperationResult(selectPrivateKeyOperationResult);
 					}
 				} else {
-					getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+					if(api.getAppConfig().isEnablePopUps()) {
+						getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
 							new Object[]{"Error - Token not recognized"}).perform();
+					}
+					return handleErrorOperationResult(getTokenConnectionOperationResult);
 				}
+			} else {
+				return handleErrorOperationResult(getTokenOperationResult);
 			}
 		} catch (Exception e) {
 			logger.error("Flow error", e);
-			handleException(e);
+			throw handleException(e);
 		} finally {
 			if(token != null) {
 				try {
@@ -119,8 +132,5 @@ class SignatureFlow extends Flow<SignatureRequest, SignatureResponse> {
 				}
 			}
 		}
-
-		return null;
 	}
-
 }

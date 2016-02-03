@@ -32,9 +32,6 @@ public class PreferencesController implements Initializable {
 	private Button ok;
 
 	@FXML
-	private Button cancel;
-
-	@FXML
 	private TextField proxyHost;
 
 	@FXML

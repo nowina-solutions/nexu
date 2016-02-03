@@ -56,7 +56,7 @@ public class KeystoreParamsController extends AbstractUIOperationController<Keys
 			signalEnd(result);
 		});
 		cancel.setOnAction((e) -> {
-			signalEnd(null);
+			signalUserCancel();
 		});
 		selectFile.setOnAction((e) -> {
 			FileChooser fileChooser = new FileChooser();

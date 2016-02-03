@@ -13,6 +13,8 @@
  */
 package lu.nowina.nexu;
 
+import lu.nowina.nexu.api.AppConfig;
+
 /**
  * Interface for the local HTTP Server.
  * 

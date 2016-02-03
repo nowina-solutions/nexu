@@ -28,14 +28,6 @@ public class FeedbackManagerTest {
 		endpoint.postConstruct();
 	}
 
-	@Test(expected = ConfigurationException.class)
-	public void test2() throws Exception {
-
-		FeedbackManager endpoint = new FeedbackManager();
-		endpoint.setRepository("non-existing");
-		endpoint.postConstruct();
-	}
-
 	@Test
 	public void test3() throws Exception {
 

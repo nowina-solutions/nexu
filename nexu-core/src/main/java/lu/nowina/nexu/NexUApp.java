@@ -23,6 +23,7 @@ import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
@@ -39,6 +40,7 @@ import lu.nowina.nexu.generic.SCDatabaseLoader;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
 
+import org.apache.commons.lang.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +74,7 @@ public class NexUApp extends Application implements UIDisplay {
 
 			InternalAPI api = buildAPI();
 
-			new SystrayMenu(this, api.getWebDatabase());
+			new SystrayMenu(this, api.getWebDatabase(), api);
 
 			logger.info("Start Jetty");
 
@@ -104,7 +106,7 @@ public class NexUApp extends Application implements UIDisplay {
 
 		this.operationFactory = new BasicOperationFactory();
 		this.operationFactory.setDisplay(this);
-		InternalAPI api = new InternalAPI(this, prefs, db, detector, loader, getFlowRegistry(), this.operationFactory);
+		InternalAPI api = new InternalAPI(this, prefs, db, detector, loader, getFlowRegistry(), this.operationFactory, getConfig());
 
 		for (String key : getProperties().stringPropertyNames()) {
 			if (key.startsWith("plugin_")) {
@@ -163,8 +165,8 @@ public class NexUApp extends Application implements UIDisplay {
 		try {
 			Class<?> clazz = Class.forName(pluginClassName);
 			Object plugin = clazz.newInstance();
-			for (Class<?> i : clazz.getInterfaces()) {
-				registerPlugin(api, pluginId, i, plugin);
+			for (Object o : ClassUtils.getAllInterfaces(clazz)) {
+				registerPlugin(api, pluginId, (Class<?>) o, plugin);
 			}
 		} catch (Exception e) {
 			logger.error(MessageFormat.format("Cannot register plugin {0} (id: {1})", pluginClassName, pluginId), e);

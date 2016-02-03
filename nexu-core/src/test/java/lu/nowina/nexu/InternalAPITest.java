@@ -13,9 +13,12 @@
  */
 package lu.nowina.nexu;
 
+import static org.mockito.Mockito.mock;
+
 import java.util.Arrays;
 import java.util.List;
 
+import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.EnvironmentInfo;
@@ -34,7 +37,7 @@ public class InternalAPITest {
 	@Test
 	public void testEnvironment() throws Exception {
 
-		InternalAPI api = new InternalAPI(null, null, null, null, null, null, null);
+		InternalAPI api = new InternalAPI(null, null, null, null, null, null, null, mock(AppConfig.class));
 
 		EnvironmentInfo info = api.getEnvironmentInfo();
 		Assert.assertNotNull(info.getOs());
@@ -57,7 +60,7 @@ public class InternalAPITest {
 
 		UIDisplay display = Mockito.mock(UIDisplay.class);
 
-		InternalAPI api = new InternalAPI(display, null, null, detector, null, null, null);
+		InternalAPI api = new InternalAPI(display, null, null, detector, null, null, null, mock(AppConfig.class));
 		Assert.assertEquals(0, api.detectCards().size());
 
 	}
@@ -70,7 +73,7 @@ public class InternalAPITest {
 
 		UIDisplay display = Mockito.mock(UIDisplay.class);
 
-		InternalAPI api = new InternalAPI(display, null, null, detector, null, null, null);
+		InternalAPI api = new InternalAPI(display, null, null, detector, null, null, null, mock(AppConfig.class));
 		Assert.assertEquals(1, api.detectCards().size());
 
 	}
@@ -83,7 +86,7 @@ public class InternalAPITest {
 
 		UIDisplay display = Mockito.mock(UIDisplay.class);
 
-		InternalAPI api = new InternalAPI(display, null, null, detector, null, null, null);
+		InternalAPI api = new InternalAPI(display, null, null, detector, null, null, null, mock(AppConfig.class));
 		Assert.assertEquals(2, api.detectCards().size());
 
 	}
@@ -94,7 +97,7 @@ public class InternalAPITest {
 		DetectedCard card = new DetectedCard("ATR", 0);
 
 		UIDisplay display = Mockito.mock(UIDisplay.class);
-		InternalAPI api = new InternalAPI(display, null, null, null, null, null, null);
+		InternalAPI api = new InternalAPI(display, null, null, null, null, null, null, mock(AppConfig.class));
 
 		SignatureTokenConnection c = new MockSignatureTokenConnection((DSSPrivateKeyEntry[])null);
 		api.registerTokenConnection(c);

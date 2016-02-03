@@ -35,6 +35,10 @@ public abstract class AbstractUIOperationController<R> implements UIOperationCon
 		uiOperation.signalEnd(result);
 	}
 	
+	protected final void signalUserCancel() {
+		uiOperation.signalUserCancel();
+	}
+	
 	/**
 	 * This implementation does nothing.
 	 */

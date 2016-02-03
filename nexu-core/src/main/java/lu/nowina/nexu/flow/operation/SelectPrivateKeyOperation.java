@@ -19,8 +19,9 @@ import java.util.List;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.CertificateFilter;
 import lu.nowina.nexu.api.DetectedCard;
+import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.api.flow.OperationStatus;
 import lu.nowina.nexu.view.core.UIOperation;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
@@ -32,6 +33,7 @@ import eu.europa.esig.dss.token.SignatureTokenConnection;
  * Expected parameters:
  * <ol>
  * <li>{@link SignatureTokenConnection}</li>
+ * <li>{@link NexuAPI}</li>
  * <li>{@link DetectedCard} (optional)</li>
  * <li>{@link CardAdapter} (optional)</li>
  * <li>{@link CertificateFilter} (optional)</li>
@@ -43,6 +45,7 @@ import eu.europa.esig.dss.token.SignatureTokenConnection;
 public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPrivateKeyEntry> {
 
 	private SignatureTokenConnection token;
+	private NexuAPI api;
 	private DetectedCard card;
 	private CardAdapter cardAdapter;
 	private CertificateFilter certificateFilter;
@@ -56,20 +59,21 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 	public void setParams(Object... params) {
 		try {
 			this.token = (SignatureTokenConnection) params[0];
-			if(params.length > 1) {
-				this.card = (DetectedCard) params[1];
-			}
+			this.api = (NexuAPI) params[1];
 			if(params.length > 2) {
-				this.cardAdapter = (CardAdapter) params[2];
+				this.card = (DetectedCard) params[2];
 			}
 			if(params.length > 3) {
-				certificateFilter = (CertificateFilter) params[3];
+				this.cardAdapter = (CardAdapter) params[3];
 			}
 			if(params.length > 4) {
-				keyFilter = (String) params[4];
+				certificateFilter = (CertificateFilter) params[4];
+			}
+			if(params.length > 5) {
+				keyFilter = (String) params[5];
 			}
 		} catch(final ClassCastException | ArrayIndexOutOfBoundsException e) {
-			throw new IllegalArgumentException("Expected parameters: SignatureTokenConnection, DetectedCard (optional), CardAdapter (optional), CertificateFilter (optional), key filter (optional)");
+			throw new IllegalArgumentException("Expected parameters: SignatureTokenConnection, NexuAPI, DetectedCard (optional), CardAdapter (optional), CertificateFilter (optional), key filter (optional)");
 		}
 	}
 	
@@ -93,11 +97,11 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 		}
 
 		if (keys.isEmpty()) {
-			return new OperationResult<DSSPrivateKeyEntry>(OperationStatus.FAILED);
+			return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.NO_KEY);
 		} else if (keys.size() == 1) {
 			key = keys.get(0);
 			if((keyFilter != null) && !key.getCertificate().getDSSIdAsString().equals(keyFilter)) {
-				return new OperationResult<DSSPrivateKeyEntry>(OperationStatus.FAILED);
+				return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.CANNOT_SELECT_KEY);
 			} else {
 				return new OperationResult<DSSPrivateKeyEntry>(key);
 			}
@@ -110,16 +114,21 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 					}
 				}
 				if(key == null) {
-					return new OperationResult<DSSPrivateKeyEntry>(OperationStatus.FAILED);
+					return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.CANNOT_SELECT_KEY);
 				}
-			} else {
+			} else if(api.getAppConfig().isEnablePopUps()) {
 				@SuppressWarnings("unchecked")
 				final OperationResult<DSSPrivateKeyEntry> op =
 						operationFactory.getOperation(UIOperation.class, display, "/fxml/key-selection.fxml", new Object[]{keys}).perform();
-				if(!op.getStatus().equals(OperationStatus.SUCCESS)) {
-					return new OperationResult<DSSPrivateKeyEntry>(OperationStatus.FAILED);
+				if(op.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
+					return new OperationResult<DSSPrivateKeyEntry>(BasicOperationStatus.USER_CANCEL);
 				}
 				key = op.getResult();
+				if(key == null) {
+					return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.NO_KEY_SELECTED);
+				}
+			} else {
+				return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.CANNOT_SELECT_KEY);
 			}
 			return new OperationResult<DSSPrivateKeyEntry>(key);
 		}

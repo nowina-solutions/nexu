@@ -13,7 +13,7 @@
  */
 package lu.nowina.nexu.flow;
 
-import lu.nowina.nexu.NexuException;
+import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.flow.Operation;
@@ -32,11 +32,14 @@ public abstract class Flow<I, O> {
 
 	private OperationFactory operationFactory;
 
-	public Flow(UIDisplay display) {
+	private NexuAPI api;
+	
+	public Flow(UIDisplay display, NexuAPI api) {
 		if (display == null) {
 			throw new IllegalArgumentException("display cannot be null");
 		}
 		this.display = display;
+		this.api = api;
 	}
 
 	public final void setOperationFactory(final OperationFactory operationFactory) {
@@ -47,25 +50,28 @@ public abstract class Flow<I, O> {
 		return operationFactory;
 	}
 
-	public final O execute(NexuAPI api, I input) {
-		final O out = process(api, input);
+	public final Execution<O> execute(NexuAPI api, I input) throws Exception {
+		final Execution<O> out = process(api, input);
 		display.close();
 		return out;
 	}
 
-	protected abstract O process(NexuAPI api, I input) throws NexuException;
+	protected abstract Execution<O> process(NexuAPI api, I input) throws Exception;
 
 	protected final UIDisplay getDisplay() {
 		return display;
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected void handleException(final Exception e) {
-		final Feedback feedback = new Feedback(e);
-		getOperationFactory().getOperation(
-				UIOperation.class, getDisplay(), "/fxml/provide-feedback.fxml",
-				new Object[]{feedback}).perform();
-		getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
-				new Object[]{"Failure"}).perform();
+	protected Exception handleException(final Exception e) {
+		if(api.getAppConfig().isEnablePopUps()) {
+			final Feedback feedback = new Feedback(e);
+			getOperationFactory().getOperation(
+					UIOperation.class, getDisplay(), "/fxml/provide-feedback.fxml",
+					new Object[]{feedback}).perform();
+			getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+					new Object[]{"Failure"}).perform();
+		}
+		return e;
 	}
 }

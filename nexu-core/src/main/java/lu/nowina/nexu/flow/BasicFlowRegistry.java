@@ -16,6 +16,7 @@ package lu.nowina.nexu.flow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 public class BasicFlowRegistry implements FlowRegistry {
@@ -24,12 +25,12 @@ public class BasicFlowRegistry implements FlowRegistry {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public Flow<?, ?> getFlow(String code, UIDisplay display) {
+	public Flow<?, ?> getFlow(String code, UIDisplay display, NexuAPI api) {
 		switch (code) {
 		case CERTIFICATE_FLOW:
-			return new GetCertificateFlow(display);
+			return new GetCertificateFlow(display, api);
 		case SIGNATURE_FLOW:
-			return new SignatureFlow(display);
+			return new SignatureFlow(display, api);
 		default:
 			logger.warn("Unknown flow code " + code);
 			throw new NullPointerException("Flow not recognized/not implemented in this version.");

@@ -30,12 +30,15 @@ import org.apache.log4j.PatternLayout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.jetty.JettyServer;
 
 public class NexuLauncher {
 
 	private static final String ADVANCED_MODE_AVAILABLE = "advanced_mode_available";
-	
+
+	private static final String APPLICATION_NAME = "application_name";
+
 	private static final String DEBUG = "debug";
 
 	private static final String HTTP_SERVER_CLASS = "http_server_class";
@@ -50,6 +53,10 @@ public class NexuLauncher {
 
 	private static final String BINDING_PORT = "binding_port";
 
+	private static final String CONNECTIONS_CACHE_MAX_SIZE = "connections_cache_max_size";
+
+	private static final String ENABLE_POP_UPS = "enable_pop_ups";
+	
 	private static final Logger logger = LoggerFactory.getLogger(NexuLauncher.class.getName());
 
 	private static AppConfig config;
@@ -106,7 +113,7 @@ public class NexuLauncher {
 
 	}
 
-	public static AppConfig getConfig() {
+	static AppConfig getConfig() {
 		return config;
 	}
 
@@ -134,7 +141,7 @@ public class NexuLauncher {
 	}
 
 	private static boolean checkAlreadyStarted() throws MalformedURLException {
-		URL url = new URL("http://" + config.getBindingIP() + ":" + config.getBindingPort() + "/info");
+		URL url = new URL("http://" + config.getBindingIP() + ":" + config.getBindingPort() + "/nexu-info");
 		try (InputStream in = url.openStream()) {
 			String info = IOUtils.toString(in);
 			logger.error("NexU already started. Version '" + info + "'");
@@ -166,9 +173,10 @@ public class NexuLauncher {
 	 * @param props
 	 * @return
 	 */
-	final public AppConfig loadAppConfig(Properties props) {
-		AppConfig config = new AppConfig();
+	public AppConfig loadAppConfig(Properties props) {
+		final AppConfig config = createAppConfig();
 
+		config.setApplicationName(props.getProperty(APPLICATION_NAME, "NexU"));
 		config.setBindingPort(Integer.parseInt(props.getProperty(BINDING_PORT, "9876")));
 		config.setBindingIP(props.getProperty(BINDING_IP, "127.0.0.1"));
 		config.setServerUrl(props.getProperty(SERVER_URL, "http://lab.nowina.solutions/nexu"));
@@ -177,10 +185,16 @@ public class NexuLauncher {
 		config.setHttpServerClass(props.getProperty(HTTP_SERVER_CLASS, JettyServer.class.getName()));
 		config.setDebug(Boolean.parseBoolean(props.getProperty(DEBUG, "false")));
 		config.setAdvancedModeAvailable(Boolean.parseBoolean(props.getProperty(ADVANCED_MODE_AVAILABLE, "true")));
-
+		config.setConnectionsCacheMaxSize(Integer.parseInt(props.getProperty(CONNECTIONS_CACHE_MAX_SIZE, "50")));
+		config.setEnablePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_POP_UPS, "true")));
+		
 		return config;
 	}
 
+	protected AppConfig createAppConfig() {
+		return new AppConfig();
+	}
+	
 	/**
 	 * Returns the JavaFX {@link Application} class to launch.
 	 * @return The JavaFX {@link Application} class to launch.

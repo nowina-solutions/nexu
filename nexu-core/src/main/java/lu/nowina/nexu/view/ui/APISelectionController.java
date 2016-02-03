@@ -46,7 +46,7 @@ public class APISelectionController extends AbstractUIOperationController<ScAPI>
 			signalEnd(getSelectedAPI());
 		});
 		cancel.setOnAction((e) -> {
-			signalEnd(null);
+			signalUserCancel();
 		});
 	}
 

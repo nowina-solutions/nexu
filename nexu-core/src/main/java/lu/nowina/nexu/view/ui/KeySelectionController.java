@@ -57,7 +57,7 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 			}
 		});
 		cancel.setOnAction((e) -> {
-			signalEnd(null);
+			signalUserCancel();
 		});
 		listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 		listView.setCellFactory((param) -> {

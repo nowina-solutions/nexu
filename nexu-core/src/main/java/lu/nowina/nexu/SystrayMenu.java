@@ -24,15 +24,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.view.ui.AboutController;
 import lu.nowina.nexu.view.ui.PreferencesController;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SystrayMenu {
 
@@ -46,7 +47,7 @@ public class SystrayMenu {
 
 	private MenuItem preferencesItem;
 
-	public SystrayMenu(NexUApp display, DatabaseWebLoader webLoader) {
+	public SystrayMenu(NexUApp display, DatabaseWebLoader webLoader, NexuAPI api) {
 
 		if (SystemTray.isSupported()) {
 
@@ -66,6 +67,7 @@ public class SystrayMenu {
 
 							Parent root = loader.getRoot();
 							AboutController controller = loader.getController();
+							controller.setApplicationVersion(api.getAppConfig().getApplicationVersion());
 							controller.setDisplay(display);
 							controller.setDataLoader(webLoader);
 
@@ -108,7 +110,7 @@ public class SystrayMenu {
 			exitItem.addActionListener(actionListener);
 			popup.add(exitItem);
 
-			trayIcon = new TrayIcon(image, "NexU", popup);
+			trayIcon = new TrayIcon(image, api.getAppConfig().getApplicationName(), popup);
 
 			trayIcon.setImageAutoSize(true);
 
@@ -116,12 +118,9 @@ public class SystrayMenu {
 				tray.add(trayIcon);
 			} catch (AWTException e) {
 				logger.error("Cannot add TrayIcon", e);
-				System.err.println("TrayIcon could not be added.");
 			}
-
 		} else {
-			System.err.println("System tray is currently not supported.");
+			logger.error("System tray is currently not supported.");
 		}
 	}
-
 }

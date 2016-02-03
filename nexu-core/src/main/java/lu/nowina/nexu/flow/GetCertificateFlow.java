@@ -13,19 +13,19 @@
  */
 package lu.nowina.nexu.flow;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
+import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.api.flow.OperationStatus;
 import lu.nowina.nexu.flow.operation.AdvancedCreationFeedbackOperation;
 import lu.nowina.nexu.flow.operation.CreateTokenOperation;
 import lu.nowina.nexu.flow.operation.GetMatchingCardAdaptersOperation;
@@ -42,40 +42,40 @@ import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 import eu.europa.esig.dss.x509.CertificateToken;
 
-class GetCertificateFlow extends Flow<GetCertificateRequest, GetCertificateResponse> {
+class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCertificateResponse> {
 
 	static final Logger logger = LoggerFactory.getLogger(GetCertificateFlow.class);
 
-	public GetCertificateFlow(UIDisplay display) {
-		super(display);
+	public GetCertificateFlow(UIDisplay display, NexuAPI api) {
+		super(display, api);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected GetCertificateResponse process(NexuAPI api, GetCertificateRequest req) {
+	protected Execution<GetCertificateResponse> process(NexuAPI api, GetCertificateRequest req) throws Exception {
 		SignatureTokenConnection token = null;
 		try {
 			final OperationResult<List<Match>> getMatchingCardAdaptersOperationResult =
 					getOperationFactory().getOperation(GetMatchingCardAdaptersOperation.class, api).perform();
-			if(getMatchingCardAdaptersOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+			if(getMatchingCardAdaptersOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 				final List<Match> matchingCardAdapters = getMatchingCardAdaptersOperationResult.getResult();
 				
 				final OperationResult<Map<TokenOperationResultKey, Object>> createTokenOperationResult =
 						getOperationFactory().getOperation(CreateTokenOperation.class, api, matchingCardAdapters).perform();
-				if (createTokenOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+				if (createTokenOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 					final Map<TokenOperationResultKey, Object> map = createTokenOperationResult.getResult();
 					final TokenId tokenId = (TokenId) map.get(TokenOperationResultKey.TOKEN_ID);
 
 					final OperationResult<SignatureTokenConnection> getTokenConnectionOperationResult =
 							getOperationFactory().getOperation(GetTokenConnectionOperation.class, api, tokenId).perform();
-					if (getTokenConnectionOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+					if (getTokenConnectionOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 						token = getTokenConnectionOperationResult.getResult();
 
 						final DetectedCard card = (DetectedCard) map.get(TokenOperationResultKey.SELECTED_CARD);
 						final CardAdapter cardAdapter = (CardAdapter) map.get(TokenOperationResultKey.SELECTED_CARD_ADAPTER);
 						final OperationResult<DSSPrivateKeyEntry> selectPrivateKeyOperationResult =
-								getOperationFactory().getOperation(SelectPrivateKeyOperation.class, token, card, cardAdapter, req.getCertificateFilter()).perform();
-						if (selectPrivateKeyOperationResult.getStatus().equals(OperationStatus.SUCCESS)) {
+								getOperationFactory().getOperation(SelectPrivateKeyOperation.class, token, api, card, cardAdapter, req.getCertificateFilter()).perform();
+						if (selectPrivateKeyOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 							final DSSPrivateKeyEntry key = selectPrivateKeyOperationResult.getResult();
 
 							if ((Boolean) map.get(TokenOperationResultKey.ADVANCED_CREATION)) {
@@ -87,30 +87,35 @@ class GetCertificateFlow extends Flow<GetCertificateRequest, GetCertificateRespo
 							resp.setTokenId(tokenId);
 
 							final CertificateToken certificate = key.getCertificate();
-							resp.setCertificate(certificate.getBase64Encoded());
+							resp.setCertificate(certificate);
 							resp.setKeyId(certificate.getDSSIdAsString());
 							resp.setEncryptionAlgorithm(certificate.getEncryptionAlgorithm());
 
 							final CertificateToken[] certificateChain = key.getCertificateChain();
 							if (certificateChain != null) {
-								final List<String> listCertificates = new ArrayList<String>();
-								for (CertificateToken certificateToken : certificateChain) {
-									listCertificates.add(certificateToken.getBase64Encoded());
-								}
-								resp.setCertificateChain(listCertificates);
+								resp.setCertificateChain(certificateChain);
 							}
 
-							return resp;
+							if(api.getAppConfig().isEnablePopUps()) {
+								getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+									new Object[]{"Finished"}).perform();
+							}
+							return new Execution<GetCertificateResponse>(resp);
+						} else {
+							return handleErrorOperationResult(selectPrivateKeyOperationResult);
 						}
+					} else {
+						return handleErrorOperationResult(getTokenConnectionOperationResult);
 					}
+				} else {
+					return handleErrorOperationResult(createTokenOperationResult);
 				}
+			} else {
+				return handleErrorOperationResult(getMatchingCardAdaptersOperationResult);
 			}
-
-			getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
-					new Object[]{"Finished"}).perform();
 		} catch (final Exception e) {
 			logger.error("Flow error", e);
-			handleException(e);
+			throw handleException(e);
 		} finally {
 			if(token != null) {
 				try {
@@ -120,8 +125,5 @@ class GetCertificateFlow extends Flow<GetCertificateRequest, GetCertificateRespo
 				}
 			}
 		}
-
-		return null;
 	}
-
 }

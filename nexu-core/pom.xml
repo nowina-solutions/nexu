@@ -3,11 +3,16 @@
 	<parent>
 		<groupId>lu.nowina.apps</groupId>
 		<artifactId>nexu</artifactId>
-		<version>1.1</version>
+		<version>1.2</version>
 	</parent>
 	<artifactId>nexu-core</artifactId>
 
 	<dependencies>
+        <dependency>
+            <groupId>lu.nowina.apps</groupId>
+            <artifactId>nexu-util</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
 			<artifactId>nexu-api</artifactId>

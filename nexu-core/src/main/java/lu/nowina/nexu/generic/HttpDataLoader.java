@@ -17,14 +17,19 @@ import java.io.IOException;
 
 import javax.xml.bind.JAXBException;
 
+import lu.nowina.nexu.api.EnvironmentInfo;
+import lu.nowina.nexu.api.plugin.HttpStatus;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.methods.GetMethod;
-
-import lu.nowina.nexu.api.EnvironmentInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpDataLoader {
 
+	private static final Logger logger = LoggerFactory.getLogger(HttpDataLoader.class.getName());
+	
 	private HttpClient client = new HttpClient();
 
 	public byte[] fetchDatabase(String databaseUrl) throws IOException {
@@ -38,6 +43,11 @@ public class HttpDataLoader {
 
 		client.executeMethod(get);
 
+		if(!HttpStatus.OK.equals(get.getStatusCode())) {
+			logger.info("Cannot retrieve database from " + databaseUrl + ", status code = " + get.getStatusCode());
+			return null;
+		}
+		
 		return get.getResponseBody();
 
 	}
@@ -53,6 +63,11 @@ public class HttpDataLoader {
 
 		client.executeMethod(get);
 
+		if(!HttpStatus.OK.equals(get.getStatusCode())) {
+			logger.info("Cannot retrieve NexU info from " + infoUrl + ", status code = " + get.getStatusCode());
+			return null;
+		}
+		
 		return get.getResponseBody();
 
 	}

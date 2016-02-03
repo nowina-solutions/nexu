@@ -63,6 +63,11 @@ public class FeedbackManager {
 		}
 
 		repositoryDir = new File(repository);
+		if (!repositoryDir.exists()) {
+			if(!repositoryDir.mkdir()) {
+				throw new ConfigurationException("Cannot create repository " + repositoryDir.getAbsolutePath());
+			}
+		}
 
 		if (!repositoryDir.exists() || !repositoryDir.isDirectory() || !repositoryDir.canWrite()) {
 			throw new ConfigurationException(repositoryDir.getAbsolutePath() + " cannot be used for repository");

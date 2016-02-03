@@ -50,7 +50,7 @@ public class Pkcs11ParamsController extends AbstractUIOperationController<Pkcs11
 			signalEnd(result);
 		});
 		cancel.setOnAction((e) -> {
-			signalEnd(null);
+			signalUserCancel();
 		});
 		selectFile.setOnAction((e) -> {
 			FileChooser fileChooser = new FileChooser();

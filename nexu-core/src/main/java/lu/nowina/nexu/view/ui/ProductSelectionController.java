@@ -46,7 +46,7 @@ public class ProductSelectionController extends AbstractUIOperationController<Sc
 			signalEnd(getSelectedAPI());
 		});
 		cancel.setOnAction((e) -> {
-			signalEnd(null);
+			signalUserCancel();
 		});
 	}
 

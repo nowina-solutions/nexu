@@ -23,27 +23,30 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
+import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.AuthenticateRequest;
 import lu.nowina.nexu.api.AuthenticateResponse;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Execution;
+import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.GetIdentityInfoRequest;
 import lu.nowina.nexu.api.GetIdentityInfoResponse;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
-import lu.nowina.nexu.api.NexuRequest;
-import lu.nowina.nexu.api.RequestValidator;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
+import lu.nowina.nexu.cache.FIFOCache;
 import lu.nowina.nexu.flow.Flow;
 import lu.nowina.nexu.flow.FlowRegistry;
+import lu.nowina.nexu.flow.operation.CoreOperationStatus;
 import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.generic.ConnectionInfo;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
@@ -75,7 +78,7 @@ public class InternalAPI implements NexuAPI {
 
 	private List<CardAdapter> adapters = new ArrayList<>();
 
-	private Map<TokenId, SignatureTokenConnection> connections = new HashMap<>();
+	private Map<TokenId, SignatureTokenConnection> connections;
 
 	private Map<String, HttpPlugin> httpPlugins = new HashMap<>();
 
@@ -89,14 +92,14 @@ public class InternalAPI implements NexuAPI {
 
 	private OperationFactory operationFactory;
 	
+	private AppConfig appConfig;
+	
 	private ExecutorService executor;
 
 	private Future<?> currentTask;
 	
-	private RequestValidator requestValidator;
-	
 	public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store, CardDetector detector, DatabaseWebLoader webLoader,
-			FlowRegistry flowRegistry, OperationFactory operationFactory) {
+			FlowRegistry flowRegistry, OperationFactory operationFactory, AppConfig appConfig) {
 		this.display = display;
 		this.prefs = prefs;
 		this.myDatabase = store;
@@ -104,6 +107,8 @@ public class InternalAPI implements NexuAPI {
 		this.webDatabase = webLoader;
 		this.flowRegistry = flowRegistry;
 		this.operationFactory = operationFactory;
+		this.appConfig = appConfig;
+		this.connections = new FIFOCache<>(this.appConfig.getConnectionsCacheMaxSize());
 		this.executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
 			@Override
 			public Thread newThread(Runnable r) {
@@ -178,12 +183,11 @@ public class InternalAPI implements NexuAPI {
 	}
 
 	private <I, O> Execution<O> executeRequest(Flow<I, O> flow, I request) {
-		final Execution<O> resp = new Execution<>();
+		Execution<O> resp = null;
 
 		try {
-			final O response;
 			if(!EXECUTOR_THREAD_GROUP.equals(Thread.currentThread().getThreadGroup())) {
-				final Future<O> task;
+				final Future<Execution<O>> task;
 				// Prevent race condition on currentTask
 				synchronized (this) {
 					if((currentTask != null) && !currentTask.isDone()) {
@@ -196,92 +200,66 @@ public class InternalAPI implements NexuAPI {
 					currentTask = task;
 				}
 
-				response = task.get();
+				resp = task.get();
 			} else {
 				// Allow re-entrant calls
-				response = flow.execute(this, request);
+				resp = flow.execute(this, request);
 			}
-			if (response != null) {
-				resp.setSuccess(true);
-				resp.setResponse(response);
-			} else {
-				resp.setSuccess(false);
-				resp.setError("no_response");
-				resp.setErrorMessage("No response");
+			if(resp == null) {
+				resp = new Execution<O>(CoreOperationStatus.NO_RESPONSE);
 			}
 			return resp;
 		}  catch (Exception e) {
+			resp = new Execution<O>(BasicOperationStatus.EXCEPTION);
 			logger.error("Cannot execute request", e);
-			resp.setSuccess(false);
-			resp.setError("exception");
-			resp.setErrorMessage("Exception during execution");
+			final Feedback feedback = new Feedback(e);
+			resp.setFeedback(feedback);
 			return resp;
+		} finally {
+			final Feedback feedback;
+			if(resp.getFeedback() == null) {
+				feedback = new Feedback();
+				resp.setFeedback(feedback);
+			} else {
+				feedback = resp.getFeedback();
+			}
+			feedback.setNexuVersion(this.getAppConfig().getApplicationVersion());
+			feedback.setInfo(this.getEnvironmentInfo());
 		}
 	}
 
 	@Override
 	public Execution<GetCertificateResponse> getCertificate(GetCertificateRequest request) {
-		Execution<GetCertificateResponse> error = returnNullIfValid(request);
-		if(error != null) {
-			return error;
-		}
-		Flow<GetCertificateRequest, GetCertificateResponse> flow = flowRegistry.getFlow(FlowRegistry.CERTIFICATE_FLOW, display);
+		Flow<GetCertificateRequest, GetCertificateResponse> flow =
+				flowRegistry.getFlow(FlowRegistry.CERTIFICATE_FLOW, display, this);
 		flow.setOperationFactory(operationFactory);
 		return executeRequest(flow, request);
 	}
 
 	@Override
 	public Execution<SignatureResponse> sign(SignatureRequest request) {
-		Execution<SignatureResponse> error = returnNullIfValid(request);
-		if(error != null) {
-			return error;
-		}
-		Flow<SignatureRequest, SignatureResponse> flow = flowRegistry.getFlow(FlowRegistry.SIGNATURE_FLOW, display);
+		Flow<SignatureRequest, SignatureResponse> flow =
+				flowRegistry.getFlow(FlowRegistry.SIGNATURE_FLOW, display, this);
 		flow.setOperationFactory(operationFactory);
 		return executeRequest(flow, request);
 	}
 
 	@Override
 	public Execution<GetIdentityInfoResponse> getIdentityInfo(GetIdentityInfoRequest request) {
-		Execution<GetIdentityInfoResponse> error = returnNullIfValid(request);
-		if(error != null) {
-			return error;
-		}
 		final Flow<GetIdentityInfoRequest, GetIdentityInfoResponse> flow =
-				flowRegistry.getFlow(FlowRegistry.GET_IDENTITY_INFO_FLOW, display);
+				flowRegistry.getFlow(FlowRegistry.GET_IDENTITY_INFO_FLOW, display, this);
 		flow.setOperationFactory(operationFactory);
 		return executeRequest(flow, request);
 	}
 	
 	@Override
 	public Execution<AuthenticateResponse> authenticate(AuthenticateRequest request) {
-		Execution<AuthenticateResponse> error = returnNullIfValid(request);
-		if(error != null) {
-			return error;
-		}
 		final Flow<AuthenticateRequest, AuthenticateResponse> flow =
-				flowRegistry.getFlow(FlowRegistry.AUTHENTICATE_FLOW, display);
+				flowRegistry.getFlow(FlowRegistry.AUTHENTICATE_FLOW, display, this);
 		flow.setOperationFactory(operationFactory);
 		return executeRequest(flow, request);
 	}
 	
-	public <T> Execution<T> returnNullIfValid(NexuRequest request) {
-		if(requestValidator == null) {
-			// no validator
-			return null;
-		} else {
-			if(requestValidator.verify(request)) {
-				// ok
-				return null;
-			} else {
-				Execution<T> execution = new Execution<>();
-				execution.setSuccess(false);
-				execution.setError("request.not.signed");
-				execution.setErrorMessage("Request is not signed");
-				return execution;
-			}
-		}
-	}
 
 	public HttpPlugin getPlugin(String context) {
 		return httpPlugins.get(context);
@@ -312,8 +290,8 @@ public class InternalAPI implements NexuAPI {
 		return prefs;
 	}
 	
-	public void setRequestValidator(RequestValidator requestValidator) {
-		this.requestValidator = requestValidator;
+	@Override
+	public AppConfig getAppConfig() {
+		return appConfig;
 	}
-
 }

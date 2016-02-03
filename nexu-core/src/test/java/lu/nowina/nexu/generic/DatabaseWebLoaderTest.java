@@ -16,7 +16,7 @@ package lu.nowina.nexu.generic;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import lu.nowina.nexu.AppConfig;
+import lu.nowina.nexu.api.AppConfig;
 
 public class DatabaseWebLoaderTest {
 

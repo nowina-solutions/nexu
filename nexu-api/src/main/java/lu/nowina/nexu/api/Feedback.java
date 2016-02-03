@@ -15,8 +15,8 @@ package lu.nowina.nexu.api;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -26,24 +26,25 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "feedback", propOrder = { "apiParameter", "detected", "feedbackStatus", "selectedAPI", "selectedCard", "stacktrace", "userComment", "info" })
+@XmlType(name = "feedback", propOrder = { "apiParameter", "detected", "feedbackStatus", "selectedAPI", "selectedCard", "stacktrace", "userComment", "info", "nexuVersion" })
 public class Feedback {
 
 	protected String apiParameter;
 	@XmlElement(nillable = true)
-	protected List<DetectedCard> detected;
+	protected Set<DetectedCard> detected;
 	protected FeedbackStatus feedbackStatus;
 	protected ScAPI selectedAPI;
 	protected DetectedCard selectedCard;
+	protected transient Exception exception;
 	protected String stacktrace;
 	protected String userComment;
 	protected EnvironmentInfo info;
-
+	protected String nexuVersion;
+	
 	public Feedback() {
 	}
 
 	public Feedback(Exception e) {
-
 		StringWriter buffer = new StringWriter();
 		PrintWriter writer = new PrintWriter(buffer);
 		e.printStackTrace(writer);
@@ -51,6 +52,7 @@ public class Feedback {
 
 		setStacktrace(buffer.toString());
 		setFeedbackStatus(FeedbackStatus.EXCEPTION);
+		setException(e);
 	}
 
 	@Override
@@ -61,6 +63,7 @@ public class Feedback {
 		result = prime * result + ((detected == null) ? 0 : detected.hashCode());
 		result = prime * result + ((feedbackStatus == null) ? 0 : feedbackStatus.hashCode());
 		result = prime * result + ((info == null) ? 0 : info.hashCode());
+		result = prime * result + ((nexuVersion == null) ? 0 : nexuVersion.hashCode());
 		result = prime * result + ((selectedAPI == null) ? 0 : selectedAPI.hashCode());
 		result = prime * result + ((selectedCard == null) ? 0 : selectedCard.hashCode());
 		result = prime * result + ((stacktrace == null) ? 0 : stacktrace.hashCode());
@@ -93,6 +96,11 @@ public class Feedback {
 			if (other.info != null)
 				return false;
 		} else if (!info.equals(other.info))
+			return false;
+		if (nexuVersion == null) {
+			if (other.nexuVersion != null)
+				return false;
+		} else if (!nexuVersion.equals(other.nexuVersion))
 			return false;
 		if (selectedAPI != other.selectedAPI)
 			return false;
@@ -140,7 +148,7 @@ public class Feedback {
 	 * 
 	 * <p>
 	 * This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make to the returned list will be present
-	 * inside the JAXB object. This is why there is not a <CODE>set</CODE> method for the detected property.
+	 * inside the JAXB object.
 	 * 
 	 * <p>
 	 * For example, to add a new item, do as follows:
@@ -155,11 +163,21 @@ public class Feedback {
 	 * 
 	 * 
 	 */
-	public List<DetectedCard> getDetected() {
+	public Set<DetectedCard> getDetected() {
 		if (detected == null) {
-			detected = new ArrayList<DetectedCard>();
+			detected = new HashSet<DetectedCard>();
 		}
 		return this.detected;
+	}
+	
+	/**
+	 * Sets the value of the detected property.
+	 * 
+	 * @param detected
+	 *            allowed object is {@link Set}
+	 */
+	public void setDetected(Set<DetectedCard> detected) {
+		this.detected = detected;
 	}
 
 	/**
@@ -262,4 +280,19 @@ public class Feedback {
 		this.info = info;
 	}
 
+	public String getNexuVersion() {
+		return nexuVersion;
+	}
+
+	public void setNexuVersion(String nexuVersion) {
+		this.nexuVersion = nexuVersion;
+	}
+
+	public Exception getException() {
+		return exception;
+	}
+
+	public void setException(Exception exception) {
+		this.exception = exception;
+	}
 }
