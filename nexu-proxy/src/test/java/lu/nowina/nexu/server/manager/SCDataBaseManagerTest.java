@@ -13,6 +13,10 @@
  */
 package lu.nowina.nexu.server.manager;
 
+import lu.nowina.nexu.ConfigurationException;
+import lu.nowina.nexu.server.config.OverrideConfig;
+import lu.nowina.nexu.server.config.ServiceConfig;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,14 +26,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
-import lu.nowina.nexu.ConfigurationException;
-import lu.nowina.nexu.server.config.OverrideConfig;
-import lu.nowina.nexu.server.config.ServiceConfig;
-import lu.nowina.nexu.server.config.WebConfig;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader=AnnotationConfigContextLoader.class,
-  classes={ServiceConfig.class, WebConfig.class, OverrideConfig.class})
+  classes={ServiceConfig.class, OverrideConfig.class})
 public class SCDataBaseManagerTest {
 
 	@Autowired

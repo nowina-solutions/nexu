@@ -7,7 +7,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
-@ComponentScan(basePackages = { "lu.nowina.nexu.server.business" })
+@ComponentScan(basePackages = { "lu.nowina.nexu.server.business", "lu.nowina.nexu.server.manager", "lu.nowina.nexu.server.controller" })
 @PropertySource("classpath:" + ServiceConfig.PROPERTIES_FILE + ".properties")
 public class ServiceConfig {
 

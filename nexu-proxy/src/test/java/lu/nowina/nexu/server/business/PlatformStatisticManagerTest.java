@@ -31,7 +31,6 @@ import lu.nowina.nexu.api.JREVendor;
 import lu.nowina.nexu.api.OS;
 import lu.nowina.nexu.server.config.OverrideConfig;
 import lu.nowina.nexu.server.config.ServiceConfig;
-import lu.nowina.nexu.server.config.WebConfig;
 import lu.nowina.nexu.stats.PlatformStatistic;
 
 import org.apache.commons.io.FileUtils;
@@ -54,7 +53,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader=AnnotationConfigContextLoader.class,
-  classes={PlatformStatisticManagerTest.class, ServiceConfig.class, WebConfig.class, OverrideConfig.class})
+  classes={PlatformStatisticManagerTest.class, ServiceConfig.class, OverrideConfig.class})
 @Configuration
 public class PlatformStatisticManagerTest {
 

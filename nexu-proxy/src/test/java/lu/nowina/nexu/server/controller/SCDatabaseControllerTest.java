@@ -15,7 +15,6 @@ package lu.nowina.nexu.server.controller;
 
 import lu.nowina.nexu.server.config.OverrideConfig;
 import lu.nowina.nexu.server.config.ServiceConfig;
-import lu.nowina.nexu.server.config.WebConfig;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,7 +29,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader=AnnotationConfigContextLoader.class,
-  classes={ServiceConfig.class, WebConfig.class, OverrideConfig.class})
+  classes={ServiceConfig.class, OverrideConfig.class})
 public class SCDatabaseControllerTest {
 
 	@Autowired
