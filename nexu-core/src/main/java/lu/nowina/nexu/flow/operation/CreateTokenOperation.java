@@ -13,10 +13,13 @@
  */
 package lu.nowina.nexu.flow.operation;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Feedback;
@@ -34,6 +37,7 @@ import lu.nowina.nexu.view.core.UIOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.europa.esig.dss.token.JKSSignatureToken;
 import eu.europa.esig.dss.token.MSCAPISignatureToken;
 import eu.europa.esig.dss.token.Pkcs11SignatureToken;
 import eu.europa.esig.dss.token.Pkcs12SignatureToken;
@@ -172,9 +176,22 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 			if(op3.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
 				return new OperationResult<Map<TokenOperationResultKey, Object>>(BasicOperationStatus.USER_CANCEL);
 			}
-			final KeystoreParams keysToreParams = op3.getResult();
-			map.put(TokenOperationResultKey.SELECTED_API_PARAMS, keysToreParams.getPkcs12File().getAbsolutePath());
-			tokenId = api.registerTokenConnection(new Pkcs12SignatureToken(keysToreParams.getPassword(), keysToreParams.getPkcs12File()));
+			final KeystoreParams keystoreParams = op3.getResult();
+			map.put(TokenOperationResultKey.SELECTED_API_PARAMS, keystoreParams.getPkcs12File().getAbsolutePath());
+			switch(keystoreParams.getType()) {
+			case PKCS12:
+				tokenId = api.registerTokenConnection(new Pkcs12SignatureToken(keystoreParams.getPassword(), keystoreParams.getPkcs12File()));
+				break;
+			case JKS:
+				try {
+					tokenId = api.registerTokenConnection(new JKSSignatureToken(new FileInputStream(keystoreParams.getPkcs12File()), keystoreParams.getPassword()));
+				} catch (FileNotFoundException e) {
+					throw new NexuException(e);
+				}
+				break;
+			default:
+				throw new IllegalStateException("Unhandled keystore type: " + keystoreParams.getType());
+			}
 			break;
 		default:
 			return new OperationResult<Map<TokenOperationResultKey, Object>>(CoreOperationStatus.UNSUPPORTED_PRODUCT);

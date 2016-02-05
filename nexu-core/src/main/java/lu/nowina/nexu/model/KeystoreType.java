@@ -13,32 +13,14 @@
  */
 package lu.nowina.nexu.model;
 
-import java.io.File;
+/**
+ * This enum gathers various keystore types supported by NexU.
+ *
+ * @author Jean Lepropre (jean.lepropre@nowina.lu)
+ */
+public enum KeystoreType {
 
-public class KeystoreParams {
-
-	private File pkcs12File;
-
-	private String password;
-
-	private KeystoreType type;
-
-	public KeystoreParams(File pkcs12File, String password, KeystoreType type) {
-		super();
-		this.pkcs12File = pkcs12File;
-		this.password = password;
-		this.type = type;
-	}
-
-	public File getPkcs12File() {
-		return pkcs12File;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public KeystoreType getType() {
-		return type;
-	}
+	JKS,
+	PKCS12;
+	
 }
