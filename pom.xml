@@ -15,6 +15,7 @@
 		<module>nexu-app</module>
 		<module>nexu-model</module>
 		<module>nexu-util</module>
+		<module>nexu-bundle</module>
 	</modules>
 
 	<properties>
@@ -40,6 +41,10 @@
 	</licenses>
 
 	<repositories>
+		<repository>
+            <id>joinup-dss-thirdparty</id>
+            <url>http://joinup.ec.europa.eu/site/sd-dss/maven2</url>
+        </repository>
 		<repository>
 			<id>joinup</id>
 			<name>Joinup</name>
@@ -76,6 +81,11 @@
 					<artifactId>sonar-maven-plugin</artifactId>
 					<version>2.6</version>
 				</plugin>
+				<plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.5.3</version>
+                </plugin>
 			</plugins>
 		</pluginManagement>
         <plugins>
