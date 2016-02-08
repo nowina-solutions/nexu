@@ -107,6 +107,12 @@ public class NexuLauncher {
 		org.apache.log4j.Logger.getLogger("httpclient").setLevel(Level.INFO);
 		org.apache.log4j.Logger.getLogger("freemarker").setLevel(Level.INFO);
 		org.apache.log4j.Logger.getLogger("lu.nowina").setLevel(Level.DEBUG);
+		// Disable warnings for java.util.prefs: when loading userRoot on Windows,
+		// JRE will also try to load/create systemRoot which is under HKLM. This last
+		// operation will not be permitted unless user is Administrator. If it is not
+		// the case, a warning will be issued but we can ignore it safely as we only
+		// use userRoot which is under HKCU.
+		org.apache.log4j.Logger.getLogger("java.util.prefs").setLevel(Level.ERROR);
 	}
 
 	public void beforeLaunch() {
