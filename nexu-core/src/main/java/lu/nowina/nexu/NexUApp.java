@@ -209,7 +209,7 @@ public class NexUApp extends Application implements UIDisplay {
 			} else {
 				logger.info("Stage still showing, display " + panel);
 			}
-			stage.setScene(new Scene(panel, 300, 250));
+			stage.setScene(new Scene(panel));
 			stage.show();
 		});
 	}

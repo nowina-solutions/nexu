@@ -22,7 +22,7 @@
 
 
 <BorderPane fx:controller="lu.nowina.nexu.view.ui.ProductSelectionController"
-	prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8"
+	prefHeight="250.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8"
 	xmlns:fx="http://javafx.com/fxml/1">
 
 	<stylesheets>
