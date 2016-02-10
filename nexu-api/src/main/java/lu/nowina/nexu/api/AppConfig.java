@@ -58,6 +58,15 @@ public class AppConfig {
 	
 	private boolean sendAnonymousInfoToProxy;
 	
+	private boolean useSystemProxy;
+	private String proxyServer;
+	private Integer proxyPort;
+	private boolean proxyAuthentication;
+	private String proxyUsername;
+	private String proxyPassword;
+	
+	private boolean userPreferencesEditable;
+	
 	public AppConfig() {
 		try {
 			final URL versionResourceURL = this.getClass().getResource("/version.txt");
@@ -170,5 +179,61 @@ public class AppConfig {
 
 	public void setSendAnonymousInfoToProxy(boolean sendAnonymousInfoToProxy) {
 		this.sendAnonymousInfoToProxy = sendAnonymousInfoToProxy;
+	}
+
+	public boolean isUseSystemProxy() {
+		return useSystemProxy;
+	}
+
+	public void setUseSystemProxy(boolean useSystemProxy) {
+		this.useSystemProxy = useSystemProxy;
+	}
+
+	public String getProxyServer() {
+		return proxyServer;
+	}
+
+	public void setProxyServer(String proxyServer) {
+		this.proxyServer = proxyServer;
+	}
+
+	public Integer getProxyPort() {
+		return proxyPort;
+	}
+
+	public void setProxyPort(Integer proxyPort) {
+		this.proxyPort = proxyPort;
+	}
+
+	public boolean isProxyAuthentication() {
+		return proxyAuthentication;
+	}
+
+	public void setProxyAuthentication(boolean proxyAuthentication) {
+		this.proxyAuthentication = proxyAuthentication;
+	}
+
+	public String getProxyUsername() {
+		return proxyUsername;
+	}
+
+	public void setProxyUsername(String proxyUsername) {
+		this.proxyUsername = proxyUsername;
+	}
+
+	public String getProxyPassword() {
+		return proxyPassword;
+	}
+
+	public void setProxyPassword(String proxyPassword) {
+		this.proxyPassword = proxyPassword;
+	}
+
+	public boolean isUserPreferencesEditable() {
+		return userPreferencesEditable;
+	}
+
+	public void setUserPreferencesEditable(boolean userPreferencesEditable) {
+		this.userPreferencesEditable = userPreferencesEditable;
 	}
 }

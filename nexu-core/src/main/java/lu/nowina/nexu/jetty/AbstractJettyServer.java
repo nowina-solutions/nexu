@@ -15,8 +15,6 @@ package lu.nowina.nexu.jetty;
 
 import lu.nowina.nexu.HttpServer;
 import lu.nowina.nexu.InternalAPI;
-import lu.nowina.nexu.UserPreferences;
-import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.NexuAPI;
 
 import org.eclipse.jetty.server.Connector;
@@ -30,8 +28,6 @@ import org.eclipse.jetty.server.Server;
 public abstract class AbstractJettyServer implements HttpServer {
 
 	private InternalAPI api;
-	private UserPreferences prefs;
-	private AppConfig conf;
 	
 	private Server server;
 	
@@ -40,10 +36,8 @@ public abstract class AbstractJettyServer implements HttpServer {
 	}
 
 	@Override
-	public void setConfig(InternalAPI api, UserPreferences prefs, AppConfig config) {
+	public void setConfig(InternalAPI api) {
 		this.api = api;
-		this.prefs = prefs;
-		this.conf = config;
 	}
 
 	@Override
@@ -51,8 +45,8 @@ public abstract class AbstractJettyServer implements HttpServer {
 		server = new Server();
 		server.setConnectors(getConnectors());
 		
-		final RequestProcessor handler = new RequestProcessor(conf.getNexuHostname());
-		handler.setConfig(api, prefs);
+		final RequestProcessor handler = new RequestProcessor(api.getAppConfig().getNexuHostname());
+		handler.setConfig(api);
 
 		server.setHandler(handler);
 		server.start();
@@ -75,22 +69,6 @@ public abstract class AbstractJettyServer implements HttpServer {
 	 */
 	protected NexuAPI getApi() {
 		return api;
-	}
-	
-	/**
-	 * Returns the configured user preferences.
-	 * @return The configured user preferences.
-	 */
-	protected UserPreferences getPrefs() {
-		return prefs;
-	}
-	
-	/**
-	 * Returns the configuration of the application.
-	 * @return The configuration of the application.
-	 */
-	protected AppConfig getConf() {
-		return conf;
 	}
 	
 	/**

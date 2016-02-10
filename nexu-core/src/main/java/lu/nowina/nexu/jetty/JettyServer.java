@@ -26,7 +26,7 @@ public class JettyServer extends AbstractJettyServer {
 		final HttpConfiguration http = new HttpConfiguration();
 		final JettyListAwareServerConnector connector = new JettyListAwareServerConnector(getServer());
 		connector.addConnectionFactory(new HttpConnectionFactory(http));
-		connector.setPorts(getConf().getBindingPorts());
+		connector.setPorts(getApi().getAppConfig().getBindingPorts());
 		connector.setHost(InetAddress.getLoopbackAddress().getCanonicalHostName());
 		return new Connector[]{connector};
 	}

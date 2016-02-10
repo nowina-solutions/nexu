@@ -13,7 +13,6 @@
  */
 package lu.nowina.nexu;
 
-import lu.nowina.nexu.api.AppConfig;
 
 /**
  * Interface for the local HTTP Server.
@@ -23,7 +22,7 @@ import lu.nowina.nexu.api.AppConfig;
  */
 public interface HttpServer {
 
-	void setConfig(InternalAPI api, UserPreferences prefs, AppConfig config);
+	void setConfig(InternalAPI api);
 
 	void start() throws Exception;
 

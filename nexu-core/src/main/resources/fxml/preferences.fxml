@@ -21,38 +21,45 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.PreferencesController">
+<BorderPane minHeight="400.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.PreferencesController">
 
 	<stylesheets>
 		<URL value="@/styles/nexu.css" />
 	</stylesheets>
 
 	<top>
-		<VBox BorderPane.alignment="CENTER">
+		<GridPane hgap="10" vgap="5" alignment="CENTER">
 			<children>
-				<Label styleClass="message" text="Preferences" wrapText="true" />
-				<Label text="Proxy Host" />
-				<TextField fx:id="proxyHost" />
-				<Label text="Proxy Port" />
-				<TextField fx:id="proxyPort" />
-				<Label text="Authentication required" />
-				<CheckBox id="authenticationRequired" fx:id="authenticationRequired" />
-				<Label text="Proxy Username" />
-				<TextField fx:id="proxyUsername" disable="${!authenticationRequired.selected}"/>
-				<Label text="Proxy Password" />
-				<PasswordField fx:id="proxyPassword" disable="${!authenticationRequired.selected}" />
-			</children>
-		</VBox>
-	</top>
+				<Label styleClass="message" text="Preferences" wrapText="true"
+				  GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2" GridPane.rowSpan="1"/>
+				
+                <Label text="Use system proxy" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <CheckBox id="useSystemProxy" fx:id="useSystemProxy" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                
+				<Label text="Proxy Server" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+				<TextField fx:id="proxyServer" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+				
+				<Label text="Proxy Port" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+				<TextField fx:id="proxyPort" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+				
+				<Label text="Authentication required" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+				<CheckBox id="proxyAuthentication" fx:id="proxyAuthentication" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+				
+				<Label text="Proxy Username" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+				<TextField fx:id="proxyUsername" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+				
+				<Label text="Proxy Password" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+				<PasswordField fx:id="proxyPassword" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
 
-	<bottom>
-		<HBox styleClass="btn-container" BorderPane.alignment="CENTER">
-			<children>
-				<Button fx:id="ok" mnemonicParsing="false" styleClass="btn-primary" text="Ok" />
+                <HBox styleClass="btn-container" BorderPane.alignment="CENTER"
+                  GridPane.columnIndex="0" GridPane.rowIndex="7" GridPane.columnSpan="2" GridPane.rowSpan="1">
+                    <children>
+                        <Button fx:id="ok" mnemonicParsing="false" styleClass="btn-primary" text="Ok" />
+                        <Button fx:id="cancel" mnemonicParsing="false" styleClass="btn-primary" text="Cancel" />
+                        <Button fx:id="reset" mnemonicParsing="false" styleClass="btn-primary" text="Reset" />
+                    </children>
+                </HBox>
 			</children>
-		</HBox>
-	</bottom>
-	<center>
-		<VBox styleClass="form-container" BorderPane.alignment="CENTER" />
-	</center>
+		</GridPane>
+	</top>
 </BorderPane>

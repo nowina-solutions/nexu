@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 import lu.nowina.nexu.ConfigurationException;
 import lu.nowina.nexu.InternalAPI;
 import lu.nowina.nexu.TechnicalException;
-import lu.nowina.nexu.UserPreferences;
 import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
@@ -77,7 +76,7 @@ public class RequestProcessor extends AbstractHandler {
 		}
 	}
 
-	public void setConfig(InternalAPI api, UserPreferences config) {
+	public void setConfig(InternalAPI api) {
 		this.api = api;
 	}
 

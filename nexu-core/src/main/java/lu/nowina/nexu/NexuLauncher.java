@@ -51,6 +51,13 @@ public class NexuLauncher {
 	private static final String CONNECTIONS_CACHE_MAX_SIZE = "connections_cache_max_size";
 	private static final String ENABLE_POP_UPS = "enable_pop_ups";
 	private static final String SEND_ANONYMOUS_INFO_TO_PROXY = "send_anonymous_info_to_proxy";
+	private static final String USE_SYSTEM_PROXY = "use_system_proxy";
+	private static final String PROXY_SERVER = "proxy_server";
+	private static final String PROXY_PORT = "proxy_port";
+	private static final String PROXY_AUTHENTICATION = "proxy_authentication";
+	private static final String PROXY_USERNAME = "proxy_username";
+	private static final String PROXY_PASSWORD = "proxy_password";
+	private static final String USER_PREFERENCES_EDITABLE = "user_preferences_editable";
 	
 	private static final Logger logger = LoggerFactory.getLogger(NexuLauncher.class.getName());
 
@@ -72,6 +79,8 @@ public class NexuLauncher {
 
 		configureLogger(config);
 
+		new ProxyConfigurer(config, new UserPreferences(config.getApplicationName())).setupProxy();
+		
 		beforeLaunch();
 
 		boolean started = checkAlreadyStarted();
@@ -209,6 +218,15 @@ public class NexuLauncher {
 		config.setConnectionsCacheMaxSize(Integer.parseInt(props.getProperty(CONNECTIONS_CACHE_MAX_SIZE, "50")));
 		config.setEnablePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_POP_UPS, "true")));
 		config.setSendAnonymousInfoToProxy(Boolean.parseBoolean(props.getProperty(SEND_ANONYMOUS_INFO_TO_PROXY, "true")));
+
+		config.setUseSystemProxy(Boolean.parseBoolean(props.getProperty(USE_SYSTEM_PROXY, "false")));
+		config.setProxyServer(props.getProperty(PROXY_SERVER, ""));
+		final String proxyPortStr = props.getProperty(PROXY_PORT, null);
+		config.setProxyPort((proxyPortStr != null) ? Integer.valueOf(proxyPortStr) : null);
+		config.setProxyAuthentication(Boolean.parseBoolean(props.getProperty(PROXY_AUTHENTICATION, "false")));
+		config.setProxyUsername(props.getProperty(PROXY_USERNAME, ""));
+		config.setProxyPassword(props.getProperty(PROXY_PASSWORD, ""));
+		config.setUserPreferencesEditable(Boolean.parseBoolean(props.getProperty(USER_PREFERENCES_EDITABLE, "true")));
 		
 		return config;
 	}

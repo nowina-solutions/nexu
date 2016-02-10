@@ -74,7 +74,7 @@ public class NexUApp extends Application implements UIDisplay {
 
 		logger.info("Start Jetty");
 
-		startHttpServer(api.getPrefs(), api);
+		startHttpServer(api);
 
 		new SystrayMenu(this, api.getWebDatabase(), api);
 
@@ -92,7 +92,6 @@ public class NexUApp extends Application implements UIDisplay {
 			db = new SCDatabase();
 		}
 
-		UserPreferences prefs = new UserPreferences();
 		CardDetector detector = new CardDetector(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
 
 		DatabaseWebLoader loader = new DatabaseWebLoader(getConfig(),
@@ -101,7 +100,8 @@ public class NexUApp extends Application implements UIDisplay {
 
 		this.operationFactory = new BasicOperationFactory();
 		this.operationFactory.setDisplay(this);
-		InternalAPI api = new InternalAPI(this, prefs, db, detector, loader, getFlowRegistry(), this.operationFactory, getConfig());
+		InternalAPI api = new InternalAPI(this, new UserPreferences(getConfig().getApplicationName()), db, detector, loader,
+				getFlowRegistry(), this.operationFactory, getConfig());
 
 		for (String key : getProperties().stringPropertyNames()) {
 			if (key.startsWith("plugin_")) {
@@ -125,9 +125,9 @@ public class NexUApp extends Application implements UIDisplay {
 		return new BasicFlowRegistry();
 	}
 	
-	private void startHttpServer(UserPreferences prefs, InternalAPI api) throws Exception {
+	private void startHttpServer(InternalAPI api) throws Exception {
 		final HttpServer server = buildHttpServer();
-		server.setConfig(api, prefs, getConfig());
+		server.setConfig(api);
 		try {
 			server.start();
 		} catch(Exception e) {

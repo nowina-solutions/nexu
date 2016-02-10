@@ -23,6 +23,7 @@ import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ResourceBundle;
 
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
@@ -82,11 +83,16 @@ public class SystrayMenu {
 
 						FXMLLoader loader = new FXMLLoader();
 						try {
+							loader.setResources(ResourceBundle.getBundle("bundles/nexu"));
 							loader.load(getClass().getResourceAsStream("/fxml/preferences.fxml"));
 
 							Parent root = loader.getRoot();
 							PreferencesController controller = loader.getController();
 							controller.setDisplay(display);
+							final UserPreferences prefs = ((InternalAPI) api).getPrefs();
+							controller.init(new ProxyConfigurer(api.getAppConfig(), prefs));
+							controller.setUserPreferences(prefs);
+							controller.setReadOnly(!api.getAppConfig().isUserPreferencesEditable());
 
 							Platform.runLater(() -> {
 								display.display(root);
