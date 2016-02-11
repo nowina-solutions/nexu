@@ -154,6 +154,7 @@ public class PreferencesController implements Initializable {
 		});
 		reset.setOnAction((e) -> {
 			userPreferences.clear();
+			NexuLauncher.getProxyConfigurer().updateValues(NexuLauncher.getConfig(), userPreferences);
 			display.close();
 		});
 	}

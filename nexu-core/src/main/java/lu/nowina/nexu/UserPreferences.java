@@ -155,6 +155,7 @@ public class UserPreferences {
 			throw new IllegalStateException(e);
 		}
 		useSystemProxy = null;
+		proxyUseHttps = null;
 		proxyServer = null;
 		proxyPort = null;
 		proxyAuthentication = null;
