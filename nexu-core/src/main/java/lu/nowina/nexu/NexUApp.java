@@ -94,8 +94,8 @@ public class NexUApp extends Application implements UIDisplay {
 
 		CardDetector detector = new CardDetector(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
 
-		DatabaseWebLoader loader = new DatabaseWebLoader(getConfig(),
-				new HttpDataLoader(getConfig().getApplicationVersion(), getConfig().isSendAnonymousInfoToProxy()));
+		DatabaseWebLoader loader = new DatabaseWebLoader(NexuLauncher.getConfig(),
+				new HttpDataLoader(NexuLauncher.getProxyConfigurer(), getConfig().getApplicationVersion(), getConfig().isSendAnonymousInfoToProxy()));
 		loader.start();
 
 		this.operationFactory = new BasicOperationFactory();

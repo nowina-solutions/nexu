@@ -26,7 +26,8 @@ import javafx.stage.Stage;
 import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Feedback;
-import lu.nowina.nexu.api.FeedbackClient;
+import lu.nowina.nexu.generic.FeedbackSender;
+import lu.nowina.nexu.generic.HttpDataSender;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,8 +101,8 @@ public class NexUPreLoader extends Preloader {
 		final Feedback feedback = new Feedback(exception);
 		feedback.setNexuVersion(getConfig().getApplicationVersion());
 		feedback.setInfo(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
-		final FeedbackClient client = new FeedbackClient(getConfig().getServerUrl());
-		client.reportError(feedback);
+		final FeedbackSender sender = new FeedbackSender(getConfig(), new HttpDataSender(NexuLauncher.getProxyConfigurer()));
+		sender.sendFeedback(feedback);
 	}
 	
 	/**

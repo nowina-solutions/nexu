@@ -19,11 +19,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>lu.nowina.apps</groupId>
-			<artifactId>nexu-ws-client</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 			<artifactId>sscd-mocca-adapter</artifactId>
 			<version>${dss.version}</version>
@@ -34,9 +29,9 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.1</version>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.1</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>commons-logging</artifactId>

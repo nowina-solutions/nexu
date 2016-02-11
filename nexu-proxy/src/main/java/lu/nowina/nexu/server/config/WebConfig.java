@@ -1,11 +1,5 @@
 package lu.nowina.nexu.server.config;
 
-import lu.nowina.nexu.server.api.ws.FeedbackEndpoint;
-
-import org.apache.cxf.Bus;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.jaxws.EndpointImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -67,16 +61,4 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
 	}
-
-	@Bean
-	public EndpointImpl endpoint1() {
-		final Bus bus = (Bus) this.applicationContext.getBean(Bus.DEFAULT_BUS_ID);
-		final Object implementor = this.applicationContext.getBean(FeedbackEndpoint.class);
-		final EndpointImpl endpoint = new EndpointImpl(bus, implementor);
-		endpoint.publish("/feedback");
-		endpoint.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-		endpoint.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
-		return endpoint;
-	}
-
 }

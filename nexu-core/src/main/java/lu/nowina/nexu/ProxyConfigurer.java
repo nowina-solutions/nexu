@@ -16,9 +16,12 @@ package lu.nowina.nexu;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 
-import lu.nowina.nexu.api.AppConfig;
-
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpHost;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpRequestBase;
+
+import lu.nowina.nexu.api.AppConfig;
 
 /**
  * Configurer for the HTTP proxy that takes into account properties and user preferences.
@@ -33,11 +36,17 @@ public class ProxyConfigurer {
 	private boolean proxyAuthentication;
 	private String proxyUsername;
 	private String proxyPassword;
+	private boolean proxyUseHttps;
 	
 	public ProxyConfigurer(final AppConfig config, final UserPreferences preferences) {
+		updateValues(config, preferences);
+	}
+	
+	public void updateValues(final AppConfig config, final UserPreferences preferences) {
 		useSystemProxy = (preferences.isUseSystemProxy() != null) ? preferences.isUseSystemProxy() : config.isUseSystemProxy();
 		proxyServer = (preferences.getProxyServer() != null) ? preferences.getProxyServer() : config.getProxyServer();
 		proxyPort = (preferences.getProxyPort() != null) ? preferences.getProxyPort() : config.getProxyPort();
+		proxyUseHttps = (preferences.isProxyUseHttps() != null) ? preferences.isProxyUseHttps() : config.isProxyUseHttps();
 		proxyAuthentication = (preferences.isProxyAuthentication() != null) ? preferences.isProxyAuthentication() : config.isProxyAuthentication();
 		proxyUsername = (preferences.getProxyUsername() != null) ? preferences.getProxyUsername() : config.getProxyUsername();
 		proxyPassword = (preferences.getProxyPassword() != null) ? preferences.getProxyPassword() : config.getProxyPassword();
@@ -58,6 +67,10 @@ public class ProxyConfigurer {
 	public boolean isProxyAuthentication() {
 		return proxyAuthentication;
 	}
+	
+	public boolean isProxyUseHttps() {
+		return proxyUseHttps;
+	}
 
 	public String getProxyUsername() {
 		return proxyUsername;
@@ -66,17 +79,13 @@ public class ProxyConfigurer {
 	public String getProxyPassword() {
 		return proxyPassword;
 	}
-
-	public void setupProxy() {
-		if(useSystemProxy) {
-			System.setProperty("java.net.useSystemProxies", "true");
+	
+	public void setupProxy(HttpRequestBase request) {
+		if(!StringUtils.isEmpty(proxyServer)) {
 			setupProxyAuthentication();
-		} else if(!StringUtils.isEmpty(proxyServer)) {
-			System.setProperty("http.proxyHost", proxyServer);
-			System.setProperty("http.proxyPort", proxyPort.toString());
-			System.setProperty("https.proxyHost", proxyServer);
-			System.setProperty("https.proxyPort", proxyPort.toString());
-			setupProxyAuthentication();
+			HttpHost proxy = new HttpHost(proxyServer, proxyPort, proxyUseHttps ? "https" : "http");
+			RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
+			request.setConfig(config);
 		}
 	}
 	

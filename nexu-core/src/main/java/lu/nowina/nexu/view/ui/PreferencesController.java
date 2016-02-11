@@ -16,6 +16,7 @@ package lu.nowina.nexu.view.ui;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
@@ -27,6 +28,8 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import lu.nowina.nexu.NexUApp;
+import lu.nowina.nexu.NexuLauncher;
 import lu.nowina.nexu.ProxyConfigurer;
 import lu.nowina.nexu.UserPreferences;
 import lu.nowina.nexu.view.core.UIDisplay;
@@ -56,6 +59,9 @@ public class PreferencesController implements Initializable {
 
 	@FXML
 	private TextField proxyUsername;
+	
+	@FXML
+	private CheckBox useHttps;
 
 	@FXML
 	private PasswordField proxyPassword;
@@ -72,6 +78,7 @@ public class PreferencesController implements Initializable {
 
 	public void init(final ProxyConfigurer proxyConfigurer) {
 		useSystemProxy.setSelected(proxyConfigurer.isUseSystemProxy());
+		useHttps.setSelected(proxyConfigurer.isProxyUseHttps());
 		proxyServer.setText(proxyConfigurer.getProxyServer());
 		final Integer proxyPortInt = proxyConfigurer.getProxyPort();
 		proxyPort.setText((proxyPortInt != null) ? proxyPortInt.toString() : "");
@@ -108,6 +115,8 @@ public class PreferencesController implements Initializable {
 						proxyServer.textProperty().length().lessThanOrEqualTo(0).and(
 								useSystemProxy.selectedProperty().not())));
 		
+		useHttps.disableProperty().bind(readOnly);
+		
 		proxyUsername.disableProperty().bind(proxyAuthentication.disabledProperty().or(
 						proxyAuthentication.selectedProperty().not()));
 		
@@ -134,9 +143,11 @@ public class PreferencesController implements Initializable {
 			userPreferences.setProxyAuthentication(proxyAuthentication.isDisabled() ? null : proxyAuthentication.isSelected());
 			userPreferences.setProxyUsername(proxyUsername.isDisabled() ? null : proxyUsername.getText());
 			userPreferences.setProxyPassword(proxyPassword.isDisabled() ? null : proxyPassword.getText());
+			userPreferences.setProxyUseHttps(useHttps.isDisabled() ? null : useHttps.isSelected());
+			
+			NexuLauncher.getProxyConfigurer().updateValues(NexuLauncher.getConfig(), userPreferences);
 
 			display.close();
-			displayWarn(resources);
 		});
 		cancel.setOnAction((e) -> {
 			display.close();
@@ -144,15 +155,6 @@ public class PreferencesController implements Initializable {
 		reset.setOnAction((e) -> {
 			userPreferences.clear();
 			display.close();
-			displayWarn(resources);
 		});
-	}
-	
-	private void displayWarn(final ResourceBundle resources) {
-		final Alert alert = new Alert(AlertType.WARNING);
-		alert.setTitle(resources.getString("preferences.controller.restart.dialog.title"));
-		alert.setHeaderText(resources.getString("preferences.controller.restart.dialog.header"));
-		alert.setContentText(resources.getString("preferences.controller.restart.dialog.content"));
-		alert.showAndWait();
 	}
 }

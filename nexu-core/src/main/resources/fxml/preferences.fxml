@@ -21,7 +21,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane minHeight="300.0" minWidth="250" prefHeight="300" prefWidth="300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.PreferencesController">
+<BorderPane minHeight="350.0" minWidth="250" prefHeight="300" prefWidth="300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.PreferencesController">
 
 	<stylesheets>
 		<URL value="@/styles/nexu.css" />
@@ -50,9 +50,12 @@
 				
 				<Label text="Proxy Password" GridPane.columnIndex="0" GridPane.rowIndex="6" />
 				<PasswordField fx:id="proxyPassword" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+				
+				<Label text="Use https" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+                <CheckBox id="useHttps" fx:id="useHttps" GridPane.columnIndex="1" GridPane.rowIndex="7" />
 
                 <HBox styleClass="btn-container" BorderPane.alignment="CENTER"
-                  GridPane.columnIndex="0" GridPane.rowIndex="7" GridPane.columnSpan="2" GridPane.rowSpan="1">
+                  GridPane.columnIndex="0" GridPane.rowIndex="8" GridPane.columnSpan="2" GridPane.rowSpan="1">
                     <children>
                         <Button fx:id="ok" mnemonicParsing="false" styleClass="btn-primary" text="Ok" />
                         <Button fx:id="cancel" mnemonicParsing="false" styleClass="btn-primary" text="Cancel" />

@@ -24,12 +24,14 @@ public class UserPreferences {
 	private static final String PROXY_AUTHENTICATION = "nowina.nexu.proxyAuthentication";
 	private static final String PROXY_USERNAME = "nowina.nexu.proxyUsername";
 	private static final String PROXY_PASSWORD = "nowina.nexu.proxyPassword";
+	private static final String PROXY_USE_HTTPS = "nowina.nexu.proxyHttps";
 
 	private final Preferences prefs;
 
 	private Boolean useSystemProxy;
 	private String proxyServer;
 	private Integer proxyPort;
+	private Boolean proxyUseHttps;
 	private Boolean proxyAuthentication;
 	private String proxyUsername;
 	private String proxyPassword;
@@ -44,6 +46,9 @@ public class UserPreferences {
 		
 		final String proxyPortStr = prefs.get(PROXY_PORT, null);
 		proxyPort = (proxyPortStr != null) ? Integer.valueOf(proxyPortStr) : null;
+		
+		final String proxyHttps = prefs.get(PROXY_USE_HTTPS, null);
+		proxyUseHttps = (proxyHttps != null) ? Boolean.valueOf(proxyHttps) : null;
 		
 		final String proxyAuthenticationStr = prefs.get(PROXY_AUTHENTICATION, null);
 		proxyAuthentication = (proxyAuthenticationStr != null) ? Boolean.valueOf(proxyAuthenticationStr) : null;
@@ -77,6 +82,15 @@ public class UserPreferences {
 			prefs.remove(PROXY_PORT);
 		}
 		this.proxyPort = proxyPort;
+	}
+	
+	public void setProxyUseHttps(Boolean proxyUseHttps) {
+		if(proxyUseHttps != null) {
+			prefs.putBoolean(PROXY_USE_HTTPS, proxyUseHttps);
+		} else {
+			prefs.remove(PROXY_USE_HTTPS);
+		}
+		this.proxyUseHttps = proxyUseHttps;
 	}
 
 	public void setProxyAuthentication(Boolean proxyAuthentication) {
@@ -116,6 +130,10 @@ public class UserPreferences {
 
 	public Integer getProxyPort() {
 		return proxyPort;
+	}
+	
+	public Boolean isProxyUseHttps() {
+		return proxyUseHttps;
 	}
 
 	public Boolean isProxyAuthentication() {

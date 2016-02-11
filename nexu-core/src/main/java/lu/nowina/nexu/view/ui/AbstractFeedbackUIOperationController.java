@@ -15,9 +15,11 @@ package lu.nowina.nexu.view.ui;
 
 import java.util.Arrays;
 
+import lu.nowina.nexu.NexuLauncher;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Feedback;
-import lu.nowina.nexu.api.FeedbackClient;
+import lu.nowina.nexu.generic.FeedbackSender;
+import lu.nowina.nexu.generic.HttpDataSender;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 import lu.nowina.nexu.view.core.UIOperationController;
 
@@ -77,8 +79,8 @@ public abstract class AbstractFeedbackUIOperationController extends AbstractUIOp
 			feedback.setNexuVersion(applicationVersion);
 			feedback.setInfo(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
 			
-			final FeedbackClient client = new FeedbackClient(serverUrl);
-			client.reportError(feedback);
+			FeedbackSender sender = new FeedbackSender(NexuLauncher.getConfig(), new HttpDataSender(NexuLauncher.getProxyConfigurer()));
+			sender.sendFeedback(feedback);
 			signalEnd(feedback);
 		} catch (Exception ex) {
 			LOGGER.error("Cannot send feedback", ex);

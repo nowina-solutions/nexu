@@ -54,6 +54,7 @@ public class NexuLauncher {
 	private static final String USE_SYSTEM_PROXY = "use_system_proxy";
 	private static final String PROXY_SERVER = "proxy_server";
 	private static final String PROXY_PORT = "proxy_port";
+	private static final String PROXY_PROTOCOLE = "proxy_use_https";
 	private static final String PROXY_AUTHENTICATION = "proxy_authentication";
 	private static final String PROXY_USERNAME = "proxy_username";
 	private static final String PROXY_PASSWORD = "proxy_password";
@@ -67,6 +68,8 @@ public class NexuLauncher {
 
 	private static List<PreLoaderMessage> preLoaderMessages;
 	
+	private static ProxyConfigurer proxyConfigurer;
+	
 	public static void main(String[] args) throws Exception {
 		NexuLauncher launcher = new NexuLauncher();
 		launcher.launch(args);
@@ -79,7 +82,7 @@ public class NexuLauncher {
 
 		configureLogger(config);
 
-		new ProxyConfigurer(config, new UserPreferences(config.getApplicationName())).setupProxy();
+		proxyConfigurer = new ProxyConfigurer(config, new UserPreferences(config.getApplicationName()));
 		
 		beforeLaunch();
 
@@ -128,7 +131,7 @@ public class NexuLauncher {
 
 	}
 
-	static AppConfig getConfig() {
+	public static AppConfig getConfig() {
 		return config;
 	}
 
@@ -138,6 +141,10 @@ public class NexuLauncher {
 	
 	public static Properties getProperties() {
 		return props;
+	}
+	
+	public static ProxyConfigurer getProxyConfigurer() {
+		return proxyConfigurer;
 	}
 
 	/**
@@ -223,6 +230,7 @@ public class NexuLauncher {
 		config.setProxyServer(props.getProperty(PROXY_SERVER, ""));
 		final String proxyPortStr = props.getProperty(PROXY_PORT, null);
 		config.setProxyPort((proxyPortStr != null) ? Integer.valueOf(proxyPortStr) : null);
+		config.setProxyProtocole(Boolean.parseBoolean(props.getProperty(PROXY_PROTOCOLE, "false")));
 		config.setProxyAuthentication(Boolean.parseBoolean(props.getProperty(PROXY_AUTHENTICATION, "false")));
 		config.setProxyUsername(props.getProperty(PROXY_USERNAME, ""));
 		config.setProxyPassword(props.getProperty(PROXY_PASSWORD, ""));

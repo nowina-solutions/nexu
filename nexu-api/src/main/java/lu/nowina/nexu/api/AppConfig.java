@@ -61,6 +61,7 @@ public class AppConfig {
 	private boolean useSystemProxy;
 	private String proxyServer;
 	private Integer proxyPort;
+	private boolean proxyUseHttps;
 	private boolean proxyAuthentication;
 	private String proxyUsername;
 	private String proxyPassword;
@@ -203,6 +204,14 @@ public class AppConfig {
 
 	public void setProxyPort(Integer proxyPort) {
 		this.proxyPort = proxyPort;
+	}
+
+	public boolean isProxyUseHttps() {
+		return proxyUseHttps;
+	}
+
+	public void setProxyProtocole(boolean proxyProtocole) {
+		this.proxyUseHttps = proxyProtocole;
 	}
 
 	public boolean isProxyAuthentication() {
