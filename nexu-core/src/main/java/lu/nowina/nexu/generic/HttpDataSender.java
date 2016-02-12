@@ -19,11 +19,9 @@ public class HttpDataSender {
 	
 	private static final Logger logger = LoggerFactory.getLogger(HttpDataSender.class);
 	
-	private HttpClient client;
 	private ProxyConfigurer proxyConfigurer;
 	
 	public HttpDataSender(ProxyConfigurer proxyConfigurer) {
-		client = HttpClients.createDefault();
 		this.proxyConfigurer = proxyConfigurer;
 	}
 	
@@ -36,10 +34,12 @@ public class HttpDataSender {
 		post.setHeader("Content-type", "application/xml");
 		post.setEntity(new StringEntity(entity));
 		proxyConfigurer.setupProxy(post);
+		HttpClient client = HttpClients.custom().setDefaultCredentialsProvider(
+				proxyConfigurer.getProxyCredentialsProvider(post.getConfig().getProxy())).build();
 		
 		HttpResponse response = client.execute(post);
 		if(HttpStatus.OK.getHttpCode() != response.getStatusLine().getStatusCode()) {
-			logger.info("Cannot perform POST request at " + requestUrl + ", status code = " + response.getStatusLine().getStatusCode());
+			logger.warn("Cannot perform POST request at " + requestUrl + ", status code = " + response.getStatusLine().getStatusCode());
 		}
 	}
 }

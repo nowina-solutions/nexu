@@ -13,13 +13,16 @@
  */
 package lu.nowina.nexu;
 
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.HttpClients;
 
 import lu.nowina.nexu.api.AppConfig;
 
@@ -81,30 +84,46 @@ public class ProxyConfigurer {
 	}
 	
 	public void setupProxy(HttpRequestBase request) {
-		if(!StringUtils.isEmpty(proxyServer)) {
-			setupProxyAuthentication();
+		if(useSystemProxy) {
+			String proxyHost;
+			String proxyPort;
+			
+			if(proxyUseHttps) {
+				proxyHost = System.getProperty("https.proxyHost");
+				proxyPort = System.getProperty("https.proxyPort");
+			} else {
+				proxyHost = System.getProperty("http.proxyHost");
+				proxyPort = System.getProperty("http.proxyPort");
+			}
+			
+			HttpHost proxy;
+			if(StringUtils.isEmpty(proxyPort)) {
+				proxy = new HttpHost(proxyHost, 80, proxyUseHttps ? "https" : "http");
+			} else {
+				proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), proxyUseHttps ? "https" : "http");
+			}
+			
+			RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
+			request.setConfig(config);
+		}
+		else if(!StringUtils.isEmpty(proxyServer)) {
 			HttpHost proxy = new HttpHost(proxyServer, proxyPort, proxyUseHttps ? "https" : "http");
 			RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
 			request.setConfig(config);
 		}
+		else {
+			RequestConfig config = RequestConfig.custom().build();
+			request.setConfig(config);
+		}
 	}
 	
-	private void setupProxyAuthentication() {
-		if(proxyAuthentication) {
-			Authenticator.setDefault(new Authenticator() {
-				@Override
-				protected PasswordAuthentication getPasswordAuthentication() {
-					if ((getRequestorType() == RequestorType.PROXY) &&
-						(useSystemProxy ||
-						 ((getRequestingHost().toLowerCase().equals(proxyServer.toLowerCase())) &&
-						  (getRequestingPort() == proxyPort)))) {
-						// Request comes from proxy server ==> we can provide user and password.
-						return new PasswordAuthentication(proxyUsername,
-								proxyPassword.toCharArray());  
-					}
-					return null;
-				}  
-			});
+	public CredentialsProvider getProxyCredentialsProvider(HttpHost proxy) {
+		CredentialsProvider credsProvider = new BasicCredentialsProvider();
+		if(proxy != null && proxyAuthentication) {
+			credsProvider.setCredentials(
+					new AuthScope(proxyServer, proxyPort), 
+					new UsernamePasswordCredentials(proxyUsername, proxyPassword));
 		}
+		return credsProvider;
 	}
 }

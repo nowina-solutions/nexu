@@ -38,13 +38,11 @@ public class HttpDataLoader {
 
 	private static final Logger logger = LoggerFactory.getLogger(HttpDataLoader.class.getName());
 	
-	private final HttpClient client;
 	private final ProxyConfigurer proxyConfigurer;
 	private final String applicationVersion;
 	private final boolean sendAnonymousInfoToProxy;
 
 	public HttpDataLoader(final ProxyConfigurer proxyConfigurer, final String applicationVersion, final boolean sendAnonymousInfoToProxy) {
-		this.client = HttpClients.createDefault();
 		this.proxyConfigurer = proxyConfigurer;
 		this.applicationVersion = applicationVersion;
 		this.sendAnonymousInfoToProxy = sendAnonymousInfoToProxy;
@@ -73,15 +71,17 @@ public class HttpDataLoader {
 						.addParameter(PlatformStatistic.OS_VERSION, info.getOsVersion())
 						.build();
 			} catch (URISyntaxException e) {
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
 			get.setURI(uri);
 		}
 		proxyConfigurer.setupProxy(get);
+		HttpClient client = HttpClients.custom().setDefaultCredentialsProvider(
+				proxyConfigurer.getProxyCredentialsProvider(get.getConfig().getProxy())).build();
 
 		HttpResponse response = client.execute(get);
 		if(HttpStatus.OK.getHttpCode() != response.getStatusLine().getStatusCode()) {
-			logger.info("Cannot perform GET request at " + requestUrl + ", status code = " + response.getStatusLine().getStatusCode());
+			logger.warn("Cannot perform GET request at " + requestUrl + ", status code = " + response.getStatusLine().getStatusCode());
 			return null;
 		}
 		ResponseHandler<String> responseHandler = new BasicResponseHandler();
