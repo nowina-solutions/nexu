@@ -230,7 +230,7 @@ public class NexuLauncher {
 		config.setProxyServer(props.getProperty(PROXY_SERVER, ""));
 		final String proxyPortStr = props.getProperty(PROXY_PORT, null);
 		config.setProxyPort((proxyPortStr != null) ? Integer.valueOf(proxyPortStr) : null);
-		config.setProxyProtocole(Boolean.parseBoolean(props.getProperty(PROXY_PROTOCOLE, "false")));
+		config.setProxyUseHttps(Boolean.parseBoolean(props.getProperty(PROXY_PROTOCOLE, "false")));
 		config.setProxyAuthentication(Boolean.parseBoolean(props.getProperty(PROXY_AUTHENTICATION, "false")));
 		config.setProxyUsername(props.getProperty(PROXY_USERNAME, ""));
 		config.setProxyPassword(props.getProperty(PROXY_PASSWORD, ""));

@@ -210,8 +210,8 @@ public class AppConfig {
 		return proxyUseHttps;
 	}
 
-	public void setProxyProtocole(boolean proxyProtocole) {
-		this.proxyUseHttps = proxyProtocole;
+	public void setProxyUseHttps(boolean proxyUseHttps) {
+		this.proxyUseHttps = proxyUseHttps;
 	}
 
 	public boolean isProxyAuthentication() {

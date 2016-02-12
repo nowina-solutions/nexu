@@ -21,7 +21,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane minHeight="350.0" minWidth="250" prefHeight="300" prefWidth="300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.PreferencesController">
+<BorderPane minHeight="350.0" minWidth="300" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.PreferencesController">
 
 	<stylesheets>
 		<URL value="@/styles/nexu.css" />
@@ -42,18 +42,18 @@
 				<Label text="Proxy Port" GridPane.columnIndex="0" GridPane.rowIndex="3" />
 				<TextField fx:id="proxyPort" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 				
-				<Label text="Authentication required" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-				<CheckBox id="proxyAuthentication" fx:id="proxyAuthentication" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+				<Label text="Use https" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                <CheckBox id="useHttps" fx:id="useHttps" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 				
-				<Label text="Proxy Username" GridPane.columnIndex="0" GridPane.rowIndex="5" />
-				<TextField fx:id="proxyUsername" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+				<Label text="Authentication required" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+				<CheckBox id="proxyAuthentication" fx:id="proxyAuthentication" GridPane.columnIndex="1" GridPane.rowIndex="5" />
 				
-				<Label text="Proxy Password" GridPane.columnIndex="0" GridPane.rowIndex="6" />
-				<PasswordField fx:id="proxyPassword" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+				<Label text="Proxy Username" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+				<TextField fx:id="proxyUsername" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
 				
-				<Label text="Use https" GridPane.columnIndex="0" GridPane.rowIndex="7" />
-                <CheckBox id="useHttps" fx:id="useHttps" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-
+				<Label text="Proxy Password" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+				<PasswordField fx:id="proxyPassword" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+				
                 <HBox styleClass="btn-container" BorderPane.alignment="CENTER"
                   GridPane.columnIndex="0" GridPane.rowIndex="8" GridPane.columnSpan="2" GridPane.rowSpan="1">
                     <children>

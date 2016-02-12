@@ -115,7 +115,10 @@ public class PreferencesController implements Initializable {
 						proxyServer.textProperty().length().lessThanOrEqualTo(0).and(
 								useSystemProxy.selectedProperty().not())));
 		
-		useHttps.disableProperty().bind(readOnly);
+		useHttps.disableProperty().bind(
+				readOnly.or(
+						proxyServer.textProperty().length().lessThanOrEqualTo(0).and(
+								useSystemProxy.selectedProperty().not())));
 		
 		proxyUsername.disableProperty().bind(proxyAuthentication.disabledProperty().or(
 						proxyAuthentication.selectedProperty().not()));
