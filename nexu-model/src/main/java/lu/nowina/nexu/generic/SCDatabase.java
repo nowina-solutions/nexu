@@ -51,10 +51,15 @@ public class SCDatabase {
 			getSmartcards().add(info);
 		}
 		info.getInfos().add(cInfo);
+		onAdd();
 	}
 
 	protected void onAdd() {
-
+		if(onAddAction != null) {
+			onAddAction.execute(this);
+		} else {
+			logger.warn("No DatabaseEventHandler define, the database cannot be stored");
+		}
 	}
 
 	/**
