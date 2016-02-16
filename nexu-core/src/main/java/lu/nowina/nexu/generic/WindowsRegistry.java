@@ -12,7 +12,6 @@ public class WindowsRegistry {
 	
 	private static final Logger logger = LoggerFactory.getLogger(WindowsRegistry.class);
 	
-	private static String GET_COMMAND_RESULT_CODE = "cmd.exe /c echo %errorlevel%";
 	private static String REGISTRY_INTERNET_SETTINGS_LOCATION = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings";
 	
 	private static String PROXY_ENABLE_KEY = "ProxyEnable";
