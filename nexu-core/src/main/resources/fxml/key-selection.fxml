@@ -21,7 +21,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefWidth="275.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.KeySelectionController">
+<BorderPane prefWidth="375.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.KeySelectionController">
 
     <stylesheets>
         <URL value="@/styles/nexu.css" />
@@ -37,7 +37,26 @@
     </bottom>
 	
     <center>
-        <ListView fx:id="listView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+    	<BorderPane>
+    		<center>
+        		<ListView fx:id="listView" prefHeight="120.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+        	</center>
+        	<bottom>
+        		<GridPane vgap="5" hgap="5">
+					<TextArea fx:id="taX500Principal" prefHeight="130" 
+						GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2" />
+						
+					<Label text="Valid From: " GridPane.columnIndex="0" GridPane.rowIndex="1" />
+					<Label fx:id="startDate" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+					
+					<Label text="Valid Until: " GridPane.columnIndex="0" GridPane.rowIndex="2" />
+					<Label fx:id="endDate" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+					
+					<Label text="Usage: " GridPane.columnIndex="0" GridPane.rowIndex="3" />
+					<Label fx:id="usage" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+				</GridPane>
+        	</bottom>
+        </BorderPane>
     </center>
 
 </BorderPane>

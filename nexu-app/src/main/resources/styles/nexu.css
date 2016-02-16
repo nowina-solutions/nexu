@@ -85,3 +85,7 @@ RadioButton {
     -fx-border-color:yellow;
 
 }
+
+.text-area .content{
+    -fx-background-color: #C0C0C0;
+ }
