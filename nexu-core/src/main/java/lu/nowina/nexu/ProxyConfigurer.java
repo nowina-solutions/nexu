@@ -18,13 +18,13 @@ import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.HttpClients;
-
 import lu.nowina.nexu.api.AppConfig;
+import lu.nowina.nexu.api.EnvironmentInfo;
+import lu.nowina.nexu.api.OS;
+import lu.nowina.nexu.generic.WindowsRegistry;
 
 /**
  * Configurer for the HTTP proxy that takes into account properties and user preferences.
@@ -40,6 +40,12 @@ public class ProxyConfigurer {
 	private String proxyUsername;
 	private String proxyPassword;
 	private boolean proxyUseHttps;
+	
+	private static boolean isWindows;
+	
+	static {
+		isWindows = EnvironmentInfo.buildFromSystemProperties(System.getProperties()).getOs().equals(OS.WINDOWS);
+	}
 	
 	public ProxyConfigurer(final AppConfig config, final UserPreferences preferences) {
 		updateValues(config, preferences);
@@ -84,25 +90,17 @@ public class ProxyConfigurer {
 	}
 	
 	public void setupProxy(HttpRequestBase request) {
-		if(useSystemProxy) {
-			String proxyHost;
-			String proxyPort;
-			
-			if(proxyUseHttps) {
-				proxyHost = System.getProperty("https.proxyHost");
-				proxyPort = System.getProperty("https.proxyPort");
-			} else {
-				proxyHost = System.getProperty("http.proxyHost");
-				proxyPort = System.getProperty("http.proxyPort");
+		if(useSystemProxy && isWindows) {
+			HttpHost proxy = null;
+			if(WindowsRegistry.isProxyEnable()) {
+				String proxyAddress = WindowsRegistry.getProxyServer();
+				if(proxyAddress != null) {
+					String[] array = proxyAddress.split(":");
+					String proxyHost = array[0];
+					String proxyPort = array[1];
+					proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), proxyUseHttps ? "https" : "http");;
+				}
 			}
-			
-			HttpHost proxy;
-			if(StringUtils.isEmpty(proxyPort)) {
-				proxy = new HttpHost(proxyHost, 80, proxyUseHttps ? "https" : "http");
-			} else {
-				proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), proxyUseHttps ? "https" : "http");
-			}
-			
 			RequestConfig config = RequestConfig.custom().setProxy(proxy).build();
 			request.setConfig(config);
 		}
@@ -121,7 +119,7 @@ public class ProxyConfigurer {
 		CredentialsProvider credsProvider = new BasicCredentialsProvider();
 		if(proxy != null && proxyAuthentication) {
 			credsProvider.setCredentials(
-					new AuthScope(proxyServer, proxyPort), 
+					new AuthScope(proxy.getHostName(), proxy.getPort()), 
 					new UsernamePasswordCredentials(proxyUsername, proxyPassword));
 		}
 		return credsProvider;

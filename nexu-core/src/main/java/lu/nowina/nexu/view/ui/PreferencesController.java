@@ -28,10 +28,14 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
 import lu.nowina.nexu.NexUApp;
 import lu.nowina.nexu.NexuLauncher;
 import lu.nowina.nexu.ProxyConfigurer;
 import lu.nowina.nexu.UserPreferences;
+import lu.nowina.nexu.api.EnvironmentInfo;
+import lu.nowina.nexu.api.OS;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 public class PreferencesController implements Initializable {
@@ -44,7 +48,10 @@ public class PreferencesController implements Initializable {
 
 	@FXML
 	private Button reset;
-
+	
+	@FXML
+	private GridPane gridpane;
+	
 	@FXML
 	private CheckBox useSystemProxy;
 
@@ -65,19 +72,30 @@ public class PreferencesController implements Initializable {
 
 	@FXML
 	private PasswordField proxyPassword;
-
+	
 	private UserPreferences userPreferences;
 	
 	private UIDisplay display;
 
 	private BooleanProperty readOnly;
 	
+	private static boolean isWindows;
+	
+	static {
+		isWindows = EnvironmentInfo.buildFromSystemProperties(System.getProperties()).getOs().equals(OS.WINDOWS);
+	}
+	
 	public void setDisplay(UIDisplay display) {
 		this.display = display;
 	}
 
 	public void init(final ProxyConfigurer proxyConfigurer) {
-		useSystemProxy.setSelected(proxyConfigurer.isUseSystemProxy());
+		if(isWindows) {
+			useSystemProxy.setSelected(proxyConfigurer.isUseSystemProxy());
+		} else {
+			gridpane.getChildren().remove(1, 3);
+		}
+		
 		useHttps.setSelected(proxyConfigurer.isProxyUseHttps());
 		proxyServer.setText(proxyConfigurer.getProxyServer());
 		final Integer proxyPortInt = proxyConfigurer.getProxyPort();
@@ -86,7 +104,7 @@ public class PreferencesController implements Initializable {
 		proxyUsername.setText(proxyConfigurer.getProxyUsername());
 		proxyPassword.setText(proxyConfigurer.getProxyPassword());
 	}
-
+	
 	public void setUserPreferences(final UserPreferences userPreferences) {
 		this.userPreferences = userPreferences;
 	}
