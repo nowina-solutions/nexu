@@ -50,7 +50,7 @@ public class StoreResultController extends AbstractFeedbackUIOperationController
 			if (publish.isSelected()) {
 				sendFeedback();
 			} else {
-				signalEnd(null);
+				signalEnd(getFeedback());
 			}
 		});
 		forget.setOnAction((e) -> {
