@@ -49,6 +49,8 @@ public class StoreResultController extends AbstractFeedbackUIOperationController
 					+ " parameters: " + getFeedback().getSelectedAPI() + " - " + getFeedback().getApiParameter());
 			if (publish.isSelected()) {
 				sendFeedback();
+			} else {
+				signalEnd(null);
 			}
 		});
 		forget.setOnAction((e) -> {
