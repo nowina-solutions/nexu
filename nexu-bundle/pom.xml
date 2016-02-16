@@ -43,24 +43,6 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-webdav-jackrabbit</artifactId>
-        		<version>2.2</version>
-        	</extension>
-		</extensions>
 	</build>
-
-	<distributionManagement>
-		<repository>
-			<id>joinup-nexus</id>
-			<url>dav:https://joinup.ec.europa.eu/webdav/sd-dss/www/maven2</url>
-		</repository>
-		<snapshotRepository>
-			<id>joinup-nexus</id>
-			<url>dav:https://joinup.ec.europa.eu/webdav/sd-dss/www/maven2</url>
-		</snapshotRepository>
-	</distributionManagement>
 
 </project>
