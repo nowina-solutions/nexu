@@ -45,6 +45,11 @@ RadioButton {
 		
 }
 
+.aboutTitle {
+	-fx-margin: 5px;
+	-fx-font-weight: bold;
+}
+
 .form-container {
 	
     -fx-padding: 10 30 10 30;
