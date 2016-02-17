@@ -101,13 +101,16 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 
 			@Override
 			public void handle(MouseEvent event) {
-				CertificateToken token = listView.getSelectionModel().getSelectedItem().getCertificate();
-				taX500Principal.setText(token.getSubjectX500Principal().toString().replace(", ", "\n"));
-				
-				SimpleDateFormat format = new SimpleDateFormat("dd MMMMMM yyyy", Locale.ENGLISH);
-				startDate.setText(format.format(token.getNotBefore()));
-				endDate.setText(format.format(token.getNotAfter()));
-				usage.setText(createKeyUsageString(token));
+				DSSPrivateKeyEntry key = listView.getSelectionModel().getSelectedItem();
+				if(key != null) {
+					CertificateToken token = listView.getSelectionModel().getSelectedItem().getCertificate();
+					taX500Principal.setText(token.getSubjectX500Principal().toString().replace(", ", "\n"));
+					
+					SimpleDateFormat format = new SimpleDateFormat("dd MMMMMM yyyy", Locale.ENGLISH);
+					startDate.setText(format.format(token.getNotBefore()));
+					endDate.setText(format.format(token.getNotAfter()));
+					usage.setText(createKeyUsageString(token));
+				}
 			}
 			
 		});
