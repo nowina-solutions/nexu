@@ -33,7 +33,7 @@
 				<Label styleClass="message" text="%preferences.header" wrapText="true"
 				  GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2" GridPane.rowSpan="1"/>
 				
-                <Label text="%preferences.systemProxy" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <Label fx:id="useSystemProxyLabel" text="%preferences.systemProxy" GridPane.columnIndex="0" GridPane.rowIndex="1" />
                 <CheckBox id="useSystemProxy" fx:id="useSystemProxy" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                 
 				<Label text="%preferences.proxyServer" GridPane.columnIndex="0" GridPane.rowIndex="2" />

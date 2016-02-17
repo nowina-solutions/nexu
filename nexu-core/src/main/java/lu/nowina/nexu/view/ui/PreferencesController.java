@@ -50,7 +50,7 @@ public class PreferencesController implements Initializable {
 	private Button reset;
 	
 	@FXML
-	private GridPane gridpane;
+	private Label useSystemProxyLabel;
 	
 	@FXML
 	private CheckBox useSystemProxy;
@@ -79,7 +79,7 @@ public class PreferencesController implements Initializable {
 
 	private BooleanProperty readOnly;
 	
-	private static boolean isWindows;
+	private static final boolean isWindows;
 	
 	static {
 		isWindows = EnvironmentInfo.buildFromSystemProperties(System.getProperties()).getOs().equals(OS.WINDOWS);
@@ -93,7 +93,10 @@ public class PreferencesController implements Initializable {
 		if(isWindows) {
 			useSystemProxy.setSelected(proxyConfigurer.isUseSystemProxy());
 		} else {
-			gridpane.getChildren().remove(1, 3);
+			useSystemProxy.setVisible(false);
+			useSystemProxy.setManaged(false);
+			useSystemProxyLabel.setVisible(false);
+			useSystemProxyLabel.setManaged(false);
 		}
 		
 		useHttps.setSelected(proxyConfigurer.isProxyUseHttps());

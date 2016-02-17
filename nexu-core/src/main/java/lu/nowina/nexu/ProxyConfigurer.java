@@ -33,6 +33,8 @@ import lu.nowina.nexu.generic.WindowsRegistry;
  */
 public class ProxyConfigurer {
 
+	private static final boolean isWindows;
+	
 	private boolean useSystemProxy;
 	private String proxyServer;
 	private Integer proxyPort;
@@ -40,8 +42,6 @@ public class ProxyConfigurer {
 	private String proxyUsername;
 	private String proxyPassword;
 	private boolean proxyUseHttps;
-	
-	private static boolean isWindows;
 	
 	static {
 		isWindows = EnvironmentInfo.buildFromSystemProperties(System.getProperties()).getOs().equals(OS.WINDOWS);
@@ -90,15 +90,24 @@ public class ProxyConfigurer {
 	}
 	
 	public void setupProxy(HttpRequestBase request) {
-		if(useSystemProxy && isWindows) {
+		if(isWindows && useSystemProxy) {
 			HttpHost proxy = null;
 			if(WindowsRegistry.isProxyEnable()) {
 				String proxyAddress = WindowsRegistry.getProxyServer();
 				if(proxyAddress != null) {
-					String[] array = proxyAddress.split(":");
-					String proxyHost = array[0];
-					String proxyPort = array[1];
-					proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), proxyUseHttps ? "https" : "http");;
+					boolean bypassProxy = false;
+					for(String authority : WindowsRegistry.getBypassAddresses()) {
+						if(authority.equals(request.getURI().getAuthority())) {
+							bypassProxy = true;
+						}
+					}
+					
+					if(!bypassProxy) {
+						String[] array = proxyAddress.split(":");
+						String proxyHost = array[0];
+						String proxyPort = array[1];
+						proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort), proxyUseHttps ? "https" : "http");
+					}
 				}
 			}
 			RequestConfig config = RequestConfig.custom().setProxy(proxy).build();

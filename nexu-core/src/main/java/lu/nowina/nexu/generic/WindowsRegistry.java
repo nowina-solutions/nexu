@@ -3,48 +3,52 @@ package lu.nowina.nexu.generic;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lu.nowina.nexu.NexuException;
+
 public class WindowsRegistry {
 	
-	private static final Logger logger = LoggerFactory.getLogger(WindowsRegistry.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(WindowsRegistry.class);
 	
-	private static String REGISTRY_INTERNET_SETTINGS_LOCATION = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings";
+	private static final String REGISTRY_INTERNET_SETTINGS_LOCATION = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings";
 	
-	private static String PROXY_ENABLE_KEY = "ProxyEnable";
-	private static String PROXY_SERVER_KEY = "ProxyServer";
-	private static String PROXY_EXCEPTION_KEY = "ProxyOverride";
+	private static final String PROXY_ENABLE_KEY = "ProxyEnable";
+	private static final String PROXY_SERVER_KEY = "ProxyServer";
+	private static final String PROXY_EXCEPTION_KEY = "ProxyOverride";
 
-	private static int resultLocation = 5;
+	private static final int RESULT_LOCATION = 5;
 	
 	public static boolean isProxyEnable() {
 		String registryResult = readRegistry(REGISTRY_INTERNET_SETTINGS_LOCATION, PROXY_ENABLE_KEY);
 		String[] array = registryResult.split("\\s+");
-		byte result = Byte.decode(array[resultLocation]);
+		byte result = Byte.decode(array[RESULT_LOCATION]);
 		return result != 0x0;
 	}
 	
 	public static String getProxyServer() {
-		String registryResult = readRegistry(REGISTRY_INTERNET_SETTINGS_LOCATION, PROXY_SERVER_KEY);
-		String[] array = registryResult.split("\\s+");
-		if(array.length == 0)  {
-			logger.warn("There is no proxy server declared");
+		try {
+			String registryResult = readRegistry(REGISTRY_INTERNET_SETTINGS_LOCATION, PROXY_SERVER_KEY);
+			String[] array = registryResult.split("\\s+");
+			return array[RESULT_LOCATION];
+		} catch (NexuException e) {
+			LOGGER.info("There is no proxy server declared");
 			return null;
-		} else {
-			return array[resultLocation];
 		}
 	}
 	
 	public static String[] getBypassAddresses() {
-		String registryResult = readRegistry(REGISTRY_INTERNET_SETTINGS_LOCATION, PROXY_EXCEPTION_KEY);
-		String[] array = registryResult.split("\\s+");
-		if(array.length == 0) {
+		try {
+			String registryResult = readRegistry(REGISTRY_INTERNET_SETTINGS_LOCATION, PROXY_EXCEPTION_KEY);
+			String[] array = registryResult.split("\\s+");
+			return array[RESULT_LOCATION].split(";");
+		} catch (NexuException e) {
+			LOGGER.info("There is no address to bypass");
 			return new String[0];
-		} else {
-			return array[resultLocation].split(";");
 		}
 	}
 	
@@ -54,11 +58,13 @@ public class WindowsRegistry {
 			
 			StreamReader reader = new StreamReader(process.getInputStream());
 			reader.start();
-			int resultCode = process.waitFor();
+			process.waitFor(10000, TimeUnit.MILLISECONDS);
+			int resultCode = process.exitValue();
 			reader.join();
 			
 			if(resultCode != 0) {
-				throw new RuntimeException("Unable to find the key " + key + " on the location " + location);
+				throw new NexuException("Unable to find the key " + key + " on the location " + location 
+						+ " (result code : " + resultCode + ")");
 			}
 			
 			return reader.getResult();
@@ -69,24 +75,26 @@ public class WindowsRegistry {
 	
 	static class StreamReader extends Thread {
 		private InputStream is;
-		private StringWriter writter = new StringWriter();
+		private StringWriter writer;
 		
 		public StreamReader(InputStream is) {
 			this.is = is;
+			writer = new StringWriter();
 		}
 		
 		public void run() {
 			try {
-				int c;
-				while((c = is.read()) != -1) {
-					writter.write(c);
-				}
+				IOUtils.copy(is, writer);
 			} catch (IOException e) {
+				throw new RuntimeException("Unable to read InputStream", e);
+			} finally {
+				IOUtils.closeQuietly(is);
 			}
+			
 		}
 		
 		public String getResult() {
-			return writter.toString();
+			return writer.toString();
 		}
 	}
 }
