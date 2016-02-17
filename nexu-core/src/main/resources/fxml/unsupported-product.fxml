@@ -27,7 +27,7 @@
 	<center>
 		<VBox BorderPane.alignment="CENTER">
 			<children>
-				<Label styleClass="message" wrapText="true" text="NexU don't know your Signature Product yet. We cannot autoconfigure the connection for you. You can request more support for your product, or try to connect it yourself with more advanced features."/>
+				<Label styleClass="message" wrapText="true" text="%unsuported.product.header"/>
 			</children>
 		</VBox>
 	</center>
@@ -35,8 +35,8 @@
 	<bottom>
 		<HBox styleClass="btn-container">
 			<children>
-				<Button fx:id="requestSupport" wrapText="true" styleClass="btn-primary" mnemonicParsing="false" text="Request support" />
-				<Button fx:id="hicSuntDracones" wrapText="true" styleClass="btn-danger" mnemonicParsing="false" text="I know what I'm doing" />
+				<Button fx:id="requestSupport" wrapText="true" styleClass="btn-primary" mnemonicParsing="false" text="%button.requestSupport" />
+				<Button fx:id="hicSuntDracones" wrapText="true" styleClass="btn-danger" mnemonicParsing="false" text="%button.warningRead" />
 			</children>
 		</HBox>
 	</bottom>

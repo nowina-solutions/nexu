@@ -109,7 +109,7 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 					SimpleDateFormat format = new SimpleDateFormat("dd MMMMMM yyyy", Locale.ENGLISH);
 					startDate.setText(format.format(token.getNotBefore()));
 					endDate.setText(format.format(token.getNotAfter()));
-					usage.setText(createKeyUsageString(token));
+					usage.setText(createKeyUsageString(token, resources));
 				}
 			}
 			
@@ -120,35 +120,35 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 		taX500Principal.setFocusTraversable(false);
 	}
 	
-	private String createKeyUsageString(CertificateToken token) {
+	private String createKeyUsageString(CertificateToken token, ResourceBundle resources) {
 		StringBuilder builder = new StringBuilder();
 		boolean[] keyUsages = token.getCertificate().getKeyUsage();
 		if(keyUsages[0]) {
-			builder.append("Digital Signature\n");
+			builder.append(resources.getString("keyUsage.digitalSignature") + "\n");
 		}
 		if(keyUsages[1]) {
-			builder.append("Non Repudiation\n");
+			builder.append(resources.getString("keyUsage.nonRepudiation") + "\n");
 		}
 		if(keyUsages[2]) {
-			builder.append("Key Encipherment\n");
+			builder.append(resources.getString("keyUsage.keyEncipherment") + "\n");
 		}
 		if(keyUsages[3]) {
-			builder.append("Data Encipherment\n");
+			builder.append(resources.getString("keyUsage.dataEncipherment") + "\n");
 		}
 		if(keyUsages[4]) {
-			builder.append("Key Agreement\n");
+			builder.append(resources.getString("keyUsage.keyAgreement") + "\n");
 		}
 		if(keyUsages[5]) {
-			builder.append("Key Certificate Signature\n");
+			builder.append(resources.getString("keyUsage.keyCertSign") + "\n");
 		}
 		if(keyUsages[6]) {
-			builder.append("CRL Signing\n");
+			builder.append(resources.getString("keyUsage.crlSign") + "\n");
 		}
 		if(keyUsages[7]) {
-			builder.append("Encipher Only\n");
+			builder.append(resources.getString("keyUsage.encipherOnly") + "\n");
 		}
 		if(keyUsages[8]) {
-			builder.append("Decipher Only\n");
+			builder.append(resources.getString("keyUsage.decipherOnly") + "\n");
 		}
 		return builder.toString();
 	}

@@ -30,7 +30,7 @@
 	<bottom>
 		<HBox styleClass="btn-container" BorderPane.alignment="CENTER">
 			<children>
-				<Button fx:id="ok" mnemonicParsing="false" styleClass="btn-primary" text="Ok" />
+				<Button fx:id="ok" mnemonicParsing="false" styleClass="btn-primary" text="%button.ok" />
 			</children>
 		</HBox>
 	</bottom>

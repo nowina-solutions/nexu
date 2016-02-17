@@ -30,8 +30,8 @@
     <bottom>
         <HBox styleClass="btn-container" BorderPane.alignment="CENTER">
             <children>
-                <Button fx:id="cancel" mnemonicParsing="false" styleClass="btn-default" text="Cancel" />
-                <Button fx:id="select" mnemonicParsing="false" styleClass="btn-primary" text="Select" />
+                <Button fx:id="cancel" mnemonicParsing="false" styleClass="btn-default" text="%button.cancel" />
+                <Button fx:id="select" mnemonicParsing="false" styleClass="btn-primary" text="%button.select" />
             </children>
         </HBox>
     </bottom>
@@ -46,13 +46,13 @@
 					<TextArea fx:id="taX500Principal" prefHeight="130" 
 						GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2" />
 						
-					<Label text="Valid From: " GridPane.columnIndex="0" GridPane.rowIndex="1" />
+					<Label text="%key.selection.startDate" GridPane.columnIndex="0" GridPane.rowIndex="1" />
 					<Label fx:id="startDate" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 					
-					<Label text="Valid Until: " GridPane.columnIndex="0" GridPane.rowIndex="2" />
+					<Label text="%key.selection.endDate" GridPane.columnIndex="0" GridPane.rowIndex="2" />
 					<Label fx:id="endDate" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 					
-					<Label text="Usage: " GridPane.columnIndex="0" GridPane.rowIndex="3" />
+					<Label text="%key.selection.usage" GridPane.columnIndex="0" GridPane.rowIndex="3" />
 					<Label fx:id="usage" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 				</GridPane>
         	</bottom>

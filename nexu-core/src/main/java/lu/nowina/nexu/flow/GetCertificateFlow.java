@@ -15,6 +15,7 @@ package lu.nowina.nexu.flow;
 
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
@@ -97,8 +98,8 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 							}
 
 							if(api.getAppConfig().isEnablePopUps()) {
-								getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
-									new Object[]{"Finished"}).perform();
+								getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml", 
+										new Object[]{ ResourceBundle.getBundle("bundles/nexu").getString("operation.finished") }).perform();
 							}
 							return new Execution<GetCertificateResponse>(resp);
 						} else {

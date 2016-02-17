@@ -32,8 +32,8 @@
 	<bottom>
 		<HBox styleClass="btn-container" BorderPane.alignment="CENTER">
 			<children>
-				<Button fx:id="cancel" styleClass="btn-default" mnemonicParsing="false" text="Cancel" />
-				<Button fx:id="select" styleClass="btn-primary" mnemonicParsing="false" text="Select" />
+				<Button fx:id="cancel" styleClass="btn-default" mnemonicParsing="false" text="%button.cancel" />
+				<Button fx:id="select" styleClass="btn-primary" mnemonicParsing="false" text="%button.select" />
 			</children>
 		</HBox>
 	</bottom>
@@ -41,11 +41,11 @@
 		<VBox BorderPane.alignment="CENTER" styleClass="form-container">
 			<children>
 				<RadioButton fx:id="pkcs11" mnemonicParsing="false"
-					text="PKCS#11" />
+					text="%api.pkcs11" />
 				<RadioButton fx:id="mscapi" mnemonicParsing="false"
-					text="MSCAPI" />
+					text="%api.mscapi" />
 				<RadioButton fx:id="pkcs12" mnemonicParsing="false"
-					text="PKCS#12" />
+					text="%api.pkcs12" />
 			</children>
 		</VBox>
 	</center>

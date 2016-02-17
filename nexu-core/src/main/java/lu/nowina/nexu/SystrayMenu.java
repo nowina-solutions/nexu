@@ -64,6 +64,7 @@ public class SystrayMenu {
 
 						FXMLLoader loader = new FXMLLoader();
 						try {
+							loader.setResources(ResourceBundle.getBundle("bundles/nexu"));
 							loader.load(getClass().getResourceAsStream("/fxml/about.fxml"));
 
 							Parent root = loader.getRoot();

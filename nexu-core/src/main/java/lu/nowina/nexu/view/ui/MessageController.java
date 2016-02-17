@@ -29,12 +29,15 @@ public class MessageController extends AbstractUIOperationController<Void> imple
 
 	@FXML
 	private Button ok;
+	
+	private String defaultErrorText;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		ok.setOnAction((e) -> {
 			signalEnd(null);
-		});
+		}); 
+		defaultErrorText = resources.getString("error");
 	}
 
 	@Override
@@ -45,7 +48,7 @@ public class MessageController extends AbstractUIOperationController<Void> imple
 				message.setText(value);
 			}
 		} else {
-			message.setText("Error");
+			message.setText(defaultErrorText);
 		}
 	}
 

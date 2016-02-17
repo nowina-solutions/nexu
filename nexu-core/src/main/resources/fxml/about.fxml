@@ -28,12 +28,12 @@
 	<top>
 		<VBox BorderPane.alignment="CENTER">
 			<children>
-				<Label styleClass="message" text="About" wrapText="true" />
-                <Label text="Application version" />
+				<Label styleClass="message" text="%about.header" wrapText="true" />
+                <Label text="%about.appVersion" />
                 <Label fx:id="applicationVersion" text="" />
-				<Label text="Database version" />
+				<Label text="%about.dbVersion" />
 				<Label fx:id="dbVersion" text="" />
-				<Label text="Database file" />
+				<Label text="%about.dbFile" />
 				<Label fx:id="dbFile" text="" />
 			</children>
 		</VBox>

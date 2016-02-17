@@ -15,6 +15,7 @@ package lu.nowina.nexu.view.core;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.ResourceBundle;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -85,6 +86,7 @@ public class UIOperation<R> implements Operation<R> {
 		logger.info("Loading " + fxml + " view");
 		final FXMLLoader loader = new FXMLLoader();
 		try {
+			loader.setResources(ResourceBundle.getBundle("bundles/nexu"));
 			loader.load(getClass().getResourceAsStream(fxml));
 		} catch(final IOException e) {
 			throw new RuntimeException(e);
