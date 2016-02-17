@@ -48,6 +48,10 @@ public class ProductSelectionController extends AbstractUIOperationController<Sc
 		cancel.setOnAction((e) -> {
 			signalUserCancel();
 		});
+		
+		select.disableProperty().bind(mscapi.selectedProperty().not().and(
+				pkcs11.selectedProperty().not().and(
+						pkcs12.selectedProperty().not())));
 	}
 
 	public ScAPI getSelectedAPI() {
