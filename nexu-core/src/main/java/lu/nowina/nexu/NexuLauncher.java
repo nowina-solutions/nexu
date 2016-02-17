@@ -157,7 +157,7 @@ public class NexuLauncher {
 		if (!userHome.exists()) {
 			return null;
 		}
-		File nexuHome = new File(userHome, ".nexu");
+		File nexuHome = new File(userHome, "." + getConfig().getApplicationName());
 		if (nexuHome.exists()) {
 			return nexuHome.canWrite() ? nexuHome : null;
 		} else {
@@ -189,7 +189,7 @@ public class NexuLauncher {
 		return false;
 	}
 
-	public Properties loadProperties() throws IOException {
+	public final Properties loadProperties() throws IOException {
 
 		Properties props = new Properties();
 		loadPropertiesFromClasspath(props);
