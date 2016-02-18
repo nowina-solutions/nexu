@@ -46,9 +46,10 @@
 		<VBox BorderPane.alignment="CENTER" styleClass="form-container">
 			<children>
 				<RadioButton fx:id="pkcs11" mnemonicParsing="false" text="%api.pkcs11">
-               <toggleGroup>
-                  <ToggleGroup fx:id="api" />
-               </toggleGroup></RadioButton>
+	               	<toggleGroup>
+	        			<ToggleGroup fx:id="api" />
+	               	</toggleGroup>
+       			</RadioButton>
 				<RadioButton fx:id="mscapi" mnemonicParsing="false" text="%api.mscapi" toggleGroup="$api" />
 				<RadioButton fx:id="pkcs12" mnemonicParsing="false" text="%api.keystore" toggleGroup="$api" />
 			</children>

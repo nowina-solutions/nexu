@@ -20,6 +20,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
@@ -39,6 +40,9 @@ public class APISelectionController extends AbstractUIOperationController<ScAPI>
 
 	@FXML
 	private RadioButton pkcs12;
+	
+	@FXML
+	private ToggleGroup api;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -49,9 +53,7 @@ public class APISelectionController extends AbstractUIOperationController<ScAPI>
 			signalUserCancel();
 		});
 		
-		select.disableProperty().bind(mscapi.selectedProperty().not().and(
-				pkcs11.selectedProperty().not().and(
-						pkcs12.selectedProperty().not())));
+		select.disableProperty().bind(api.selectedToggleProperty().isNull());
 	}
 
 	public ScAPI getSelectedAPI() {
