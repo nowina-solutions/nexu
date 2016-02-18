@@ -13,9 +13,12 @@
  */
 package lu.nowina.nexu.generic;
 
+import java.util.Properties;
+
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import lu.nowina.nexu.NexuLauncher;
 import lu.nowina.nexu.api.AppConfig;
 
 public class DatabaseWebLoaderTest {
@@ -25,9 +28,9 @@ public class DatabaseWebLoaderTest {
 
 		HttpDataLoader httpLoader = Mockito.mock(HttpDataLoader.class);
 
-		AppConfig config = new AppConfig();
+		new NexuLauncher().loadAppConfig(new Properties());
 
-		DatabaseWebLoader loader = new DatabaseWebLoader(config, httpLoader);
+		DatabaseWebLoader loader = new DatabaseWebLoader(NexuLauncher.getConfig(), httpLoader);
 		loader.start();
 		Thread.sleep(3000);
 		loader.stop();

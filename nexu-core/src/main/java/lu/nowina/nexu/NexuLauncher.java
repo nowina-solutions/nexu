@@ -78,7 +78,7 @@ public class NexuLauncher {
 	public void launch(String[] args) throws IOException {
 		preLoaderMessages = new ArrayList<NexUPreLoader.PreLoaderMessage>();
 		props = loadProperties();
-		config = loadAppConfig(props);
+		loadAppConfig(props);
 
 		configureLogger(config);
 
@@ -210,8 +210,8 @@ public class NexuLauncher {
 	 * @param props
 	 * @return
 	 */
-	public AppConfig loadAppConfig(Properties props) {
-		final AppConfig config = createAppConfig();
+	public void loadAppConfig(Properties props) {
+		config = createAppConfig();
 
 		config.setApplicationName(props.getProperty(APPLICATION_NAME, "NexU"));
 		config.setBindingPorts(toListOfInt(props.getProperty(BINDING_PORTS, "9876, 9877, 9878")));
@@ -235,8 +235,6 @@ public class NexuLauncher {
 		config.setProxyUsername(props.getProperty(PROXY_USERNAME, ""));
 		config.setProxyPassword(props.getProperty(PROXY_PASSWORD, ""));
 		config.setUserPreferencesEditable(Boolean.parseBoolean(props.getProperty(USER_PREFERENCES_EDITABLE, "true")));
-		
-		return config;
 	}
 
 	protected AppConfig createAppConfig() {
