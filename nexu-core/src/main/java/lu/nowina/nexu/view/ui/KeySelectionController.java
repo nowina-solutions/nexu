@@ -106,7 +106,7 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 					CertificateToken token = listView.getSelectionModel().getSelectedItem().getCertificate();
 					taX500Principal.setText(token.getSubjectX500Principal().toString().replace(", ", "\n"));
 					
-					SimpleDateFormat format = new SimpleDateFormat("dd MMMMMM yyyy", Locale.ENGLISH);
+					SimpleDateFormat format = new SimpleDateFormat("dd MMMMMM yyyy");
 					startDate.setText(format.format(token.getNotBefore()));
 					endDate.setText(format.format(token.getNotAfter()));
 					usage.setText(createKeyUsageString(token, resources));
