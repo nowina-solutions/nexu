@@ -71,7 +71,11 @@ public class WindowsRegistry {
 			
 			StreamReader reader = new StreamReader(process.getInputStream());
 			reader.start();
-			process.waitFor(10000, TimeUnit.MILLISECONDS);
+			
+			if(!process.waitFor(10000, TimeUnit.MILLISECONDS)) {
+				reader.join();
+				throw new RuntimeException("Timeout when reading the registry");
+			}
 			int resultCode = process.exitValue();
 			reader.join();
 			

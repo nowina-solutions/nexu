@@ -24,6 +24,7 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.OS;
+import lu.nowina.nexu.generic.WebUtilities;
 import lu.nowina.nexu.generic.WindowsRegistry;
 
 /**
@@ -32,7 +33,7 @@ import lu.nowina.nexu.generic.WindowsRegistry;
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
 public class ProxyConfigurer {
-
+	
 	private static final boolean isWindows;
 	
 	private boolean useSystemProxy;
@@ -95,9 +96,19 @@ public class ProxyConfigurer {
 			if(WindowsRegistry.isProxyEnable()) {
 				String proxyAddress = WindowsRegistry.getProxyServer();
 				if(proxyAddress != null) {
+					String hostName;
+					String hostAddress;
+					if(WebUtilities.isIpAddress(request.getURI().getAuthority())) {
+						hostAddress = request.getURI().getAuthority();
+						hostName = WebUtilities.resolveHostName(hostAddress);
+					} else {
+						hostName = request.getURI().getAuthority();
+						hostAddress = WebUtilities.resolveIp(hostName);
+					}
+					
 					boolean bypassProxy = false;
-					for(String authority : WindowsRegistry.getBypassAddresses()) {
-						if(authority.equals(request.getURI().getAuthority())) {
+					for(String bypassAddress : WindowsRegistry.getBypassAddresses()) {
+						if(bypassAddress.equals(hostName) || bypassAddress.equals(hostAddress)) {
 							bypassProxy = true;
 						}
 					}
