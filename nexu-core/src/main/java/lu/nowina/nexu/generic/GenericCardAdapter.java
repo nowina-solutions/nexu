@@ -50,7 +50,7 @@ public class GenericCardAdapter implements CardAdapter {
 			return new MSCAPISignatureToken();
 		case PKCS_11:
 			String absolutePath = cInfo.getApiParam();
-			return new Pkcs11SignatureToken(absolutePath, callback);
+			return new Pkcs11SignatureToken(absolutePath, callback, card.getTerminalIndex());
 		case MOCCA:
 			MOCCASignatureTokenConnection mocca = new MOCCASignatureTokenConnection(callback);
 			return mocca;
