@@ -107,9 +107,17 @@ public class ProxyConfigurer {
 					}
 					
 					boolean bypassProxy = false;
-					for(String bypassAddress : WindowsRegistry.getBypassAddresses()) {
-						if(bypassAddress.equals(hostName) || bypassAddress.equals(hostAddress)) {
+					for(final String bypassAddress : WindowsRegistry.getBypassAddresses()) {
+						final int indexOfStar = bypassAddress.indexOf('*');
+						final String bypassPrefix = (indexOfStar == -1) ? bypassAddress : bypassAddress.substring(0, indexOfStar);
+						if(bypassPrefix.length() == 0) {
+							// If bypass address starts with *, skip it
+							continue;
+						}
+						if(((hostName != null) && hostName.startsWith(bypassPrefix)) ||
+						   ((hostAddress != null) && hostAddress.startsWith(bypassPrefix))) {
 							bypassProxy = true;
+							break;
 						}
 					}
 					

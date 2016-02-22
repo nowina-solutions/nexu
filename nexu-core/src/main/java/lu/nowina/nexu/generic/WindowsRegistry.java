@@ -73,7 +73,6 @@ public class WindowsRegistry {
 			reader.start();
 			
 			if(!process.waitFor(10000, TimeUnit.MILLISECONDS)) {
-				reader.join();
 				throw new RuntimeException("Timeout when reading the registry");
 			}
 			int resultCode = process.exitValue();
