@@ -42,7 +42,7 @@ public class GetIdentityInfoResponse {
 	private String postalCode;
 	private String city;
 	
-	private String photo; // Encoded in base 64
+	private byte[] photo;
 	private String photoMimeType;
 	
 	public GetIdentityInfoResponse() {
@@ -193,11 +193,11 @@ public class GetIdentityInfoResponse {
 		this.city = city;
 	}
 
-	public String getPhoto() {
+	public byte[] getPhoto() {
 		return photo;
 	}
 
-	public void setPhoto(String photo) {
+	public void setPhoto(byte[] photo) {
 		this.photo = photo;
 	}
 
