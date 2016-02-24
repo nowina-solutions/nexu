@@ -27,6 +27,7 @@ import javafx.application.Application;
 import lu.nowina.nexu.NexUPreLoader.PreLoaderMessage;
 import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.jetty.JettyServer;
+import lu.nowina.nexu.jetty.RequestProcessor;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.ConsoleAppender;
@@ -59,6 +60,7 @@ public class NexuLauncher {
 	private static final String PROXY_USERNAME = "proxy_username";
 	private static final String PROXY_PASSWORD = "proxy_password";
 	private static final String USER_PREFERENCES_EDITABLE = "user_preferences_editable";
+	private static final String REQUEST_PROCESSOR_CLASS = "request_processor_class";
 	
 	private static final Logger logger = LoggerFactory.getLogger(NexuLauncher.class.getName());
 
@@ -235,6 +237,7 @@ public class NexuLauncher {
 		config.setProxyUsername(props.getProperty(PROXY_USERNAME, ""));
 		config.setProxyPassword(props.getProperty(PROXY_PASSWORD, ""));
 		config.setUserPreferencesEditable(Boolean.parseBoolean(props.getProperty(USER_PREFERENCES_EDITABLE, "true")));
+		config.setRequestProcessorClass(props.getProperty(REQUEST_PROCESSOR_CLASS, RequestProcessor.class.getName()));
 	}
 
 	protected AppConfig createAppConfig() {

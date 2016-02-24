@@ -64,8 +64,7 @@ public class RequestProcessor extends AbstractHandler {
 
 	private Template template;
 
-	public RequestProcessor(String nexuHostname) {
-		this.nexuHostname = nexuHostname;
+	public RequestProcessor() {
 		try {
 			Configuration cfg = new Configuration(Configuration.VERSION_2_3_22);
 			cfg.setClassForTemplateLoading(getClass(), "/");
@@ -78,6 +77,10 @@ public class RequestProcessor extends AbstractHandler {
 
 	public void setConfig(InternalAPI api) {
 		this.api = api;
+	}
+	
+	public void setNexuHostname(String nexuHostname) {
+		this.nexuHostname = nexuHostname;
 	}
 
 	@Override
@@ -93,6 +96,18 @@ public class RequestProcessor extends AbstractHandler {
 			return;
 		}
 
+		final String errorMessage = returnNullIfValid(request);
+		if(errorMessage != null) {
+			logger.warn("Invalid request " + errorMessage);
+			response.setStatus(HttpStatus.ERROR.getHttpCode());
+			response.setCharacterEncoding(UTF8);
+			response.setContentType(TEXT_PLAIN);
+			PrintWriter writer = response.getWriter();
+			writer.write(errorMessage);
+			writer.close();
+			return;
+		}
+		
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		response.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
 		response.setHeader("Access-Control-Allow-Headers", "Content-Type");
@@ -137,6 +152,17 @@ public class RequestProcessor extends AbstractHandler {
 		}
 	}
 
+	/**
+	 * This method checks the validity of the given request.
+	 * <p>This implementation returns <code>null</code> by contract.
+	 * @param request The request to check.
+	 * @return An error message if request is invalid or <code>null</code>
+	 * if the request is valid.
+	 */
+	protected String returnNullIfValid(final HttpServletRequest request) {
+		return null;
+	}
+	
 	private void httpPlugin(String target, HttpServletRequest request, HttpServletResponse response) throws Exception {
 		int index = target.indexOf("/", 1);
 		String pluginId = target.substring(target.charAt(0) == '/' ? 1 : 0, index);

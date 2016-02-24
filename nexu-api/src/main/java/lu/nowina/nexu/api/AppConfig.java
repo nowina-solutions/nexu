@@ -68,6 +68,8 @@ public class AppConfig {
 	
 	private boolean userPreferencesEditable;
 	
+	private String requestProcessorClass;
+	
 	public AppConfig() {
 		try {
 			final URL versionResourceURL = this.getClass().getResource("/version.txt");
@@ -244,5 +246,13 @@ public class AppConfig {
 
 	public void setUserPreferencesEditable(boolean userPreferencesEditable) {
 		this.userPreferencesEditable = userPreferencesEditable;
+	}
+
+	public String getRequestProcessorClass() {
+		return requestProcessorClass;
+	}
+
+	public void setRequestProcessorClass(String requestProcessorClass) {
+		this.requestProcessorClass = requestProcessorClass;
 	}
 }
