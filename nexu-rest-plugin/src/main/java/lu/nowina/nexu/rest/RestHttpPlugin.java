@@ -115,17 +115,6 @@ public class RestHttpPlugin implements HttpPlugin {
 			r = GsonHelper.fromJson(payload, SignatureRequest.class);
 		}
 
-		if(r.isOnlyEncryptionRequired()) {
-			final Execution<?> execution =
-					new Execution<Object>(RestPluginOperationStatus.NOT_SUPPORTED_ONLY_ENCRYPTION_REQUIRED);
-			final Feedback feedback = new Feedback();
-			execution.setFeedback(feedback);
-			feedback.setFeedbackStatus(FeedbackStatus.FAILED);
-			feedback.setInfo(api.getEnvironmentInfo());
-			feedback.setNexuVersion(api.getAppConfig().getApplicationVersion());
-			return toHttpResponse(execution);
-		}
-		
 		final HttpResponse invalidRequestHttpResponse = checkRequestValidity(api, r);
 		if(invalidRequestHttpResponse != null) {
 			return invalidRequestHttpResponse;
