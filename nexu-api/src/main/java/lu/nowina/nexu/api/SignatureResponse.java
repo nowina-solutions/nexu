@@ -16,17 +16,34 @@ package lu.nowina.nexu.api;
 import javax.xml.bind.DatatypeConverter;
 
 import eu.europa.esig.dss.SignatureValue;
+import eu.europa.esig.dss.x509.CertificateToken;
 
 public class SignatureResponse {
 
 	private String signatureValue;
+	private String signingCertificate;
+	private String[] certificateChain;
 
-	public SignatureResponse(SignatureValue value) {
+	public SignatureResponse(SignatureValue value, CertificateToken signingCertificate, CertificateToken[] certificateChain) {
 		this.signatureValue = new String(DatatypeConverter.printBase64Binary(value.getValue()));
+		this.signingCertificate = signingCertificate.getBase64Encoded();
+		
+		this.certificateChain = new String[certificateChain.length];
+		for(int i=0; i<certificateChain.length; i++) {
+			this.certificateChain[i] = certificateChain[i].getBase64Encoded();
+		}
 	}
 
 	public String getSignatureValue() {
 		return signatureValue;
+	}
+
+	public String getSigningCertificate() {
+		return signingCertificate;
+	}
+
+	public String[] getCertificateChain() {
+		return certificateChain;
 	}
 
 }

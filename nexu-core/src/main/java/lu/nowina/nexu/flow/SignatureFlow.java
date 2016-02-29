@@ -100,7 +100,7 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 									new Object[]{ResourceBundle.getBundle("bundles/nexu").getString("operation.signaturePerformed")}).perform();
 							}
 							
-							return new Execution<SignatureResponse>(new SignatureResponse(value));
+							return new Execution<SignatureResponse>(new SignatureResponse(value, key.getCertificate(), key.getCertificateChain()));
 						} else {
 							return handleErrorOperationResult(signOperationResult);
 						}
