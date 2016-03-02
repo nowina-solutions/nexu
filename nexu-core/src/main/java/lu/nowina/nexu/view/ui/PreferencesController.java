@@ -16,14 +16,26 @@ package lu.nowina.nexu.view.ui;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
+import lu.nowina.nexu.NexUApp;
+import lu.nowina.nexu.NexuLauncher;
+import lu.nowina.nexu.ProxyConfigurer;
 import lu.nowina.nexu.UserPreferences;
+import lu.nowina.nexu.api.EnvironmentInfo;
+import lu.nowina.nexu.api.OS;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 public class PreferencesController implements Initializable {
@@ -32,51 +44,142 @@ public class PreferencesController implements Initializable {
 	private Button ok;
 
 	@FXML
-	private TextField proxyHost;
+	private Button cancel;
+
+	@FXML
+	private Button reset;
+	
+	@FXML
+	private Label useSystemProxyLabel;
+	
+	@FXML
+	private CheckBox useSystemProxy;
+
+	@FXML
+	private TextField proxyServer;
 
 	@FXML
 	private TextField proxyPort;
 
 	@FXML
-	private CheckBox authenticationRequired;
+	private CheckBox proxyAuthentication;
 
 	@FXML
 	private TextField proxyUsername;
+	
+	@FXML
+	private CheckBox useHttps;
 
 	@FXML
 	private PasswordField proxyPassword;
-
-	@FXML
-	private Label dbFile;
-
+	
+	private UserPreferences userPreferences;
+	
 	private UIDisplay display;
 
-	private UserPreferences preferences;
-
-	@Override
-	public void initialize(URL location, ResourceBundle resources) {
-		ok.setOnAction((e) -> {
-			display.close();
-		});
+	private BooleanProperty readOnly;
+	
+	private static final boolean isWindows;
+	
+	static {
+		isWindows = EnvironmentInfo.buildFromSystemProperties(System.getProperties()).getOs().equals(OS.WINDOWS);
 	}
-
+	
 	public void setDisplay(UIDisplay display) {
 		this.display = display;
 	}
 
-	public void setPreferences(UserPreferences preferences) {
-
-		if (preferences == null) {
-			throw new NullPointerException("preferences cannot be null");
+	public void init(final ProxyConfigurer proxyConfigurer) {
+		if(isWindows) {
+			useSystemProxy.setSelected(proxyConfigurer.isUseSystemProxy());
+		} else {
+			useSystemProxy.setVisible(false);
+			useSystemProxy.setManaged(false);
+			useSystemProxyLabel.setVisible(false);
+			useSystemProxyLabel.setManaged(false);
 		}
-
-		this.preferences = preferences;
-
-		this.authenticationRequired.setSelected(preferences.getProxyAuthentification());
-		this.proxyUsername.setText(preferences.getProxyUsername());
-		this.proxyPassword.setText(preferences.getProxyPassword());
-		this.proxyPort.setText(preferences.getProxyPort());
-		this.proxyHost.setText(preferences.getProxyServer());
+		
+		useHttps.setSelected(proxyConfigurer.isProxyUseHttps());
+		proxyServer.setText(proxyConfigurer.getProxyServer());
+		final Integer proxyPortInt = proxyConfigurer.getProxyPort();
+		proxyPort.setText((proxyPortInt != null) ? proxyPortInt.toString() : "");
+		proxyAuthentication.setSelected(proxyConfigurer.isProxyAuthentication());
+		proxyUsername.setText(proxyConfigurer.getProxyUsername());
+		proxyPassword.setText(proxyConfigurer.getProxyPassword());
+	}
+	
+	public void setUserPreferences(final UserPreferences userPreferences) {
+		this.userPreferences = userPreferences;
+	}
+	
+	public void setReadOnly(boolean readOnly) {
+		this.readOnly.set(readOnly);
 	}
 
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		readOnly = new SimpleBooleanProperty(false);
+		ok.disableProperty().bind(readOnly);
+		reset.disableProperty().bind(readOnly);
+		useSystemProxy.disableProperty().bind(readOnly);
+		
+		proxyServer.disableProperty().bind(
+				readOnly.or(
+						useSystemProxy.selectedProperty()));
+		
+		proxyPort.disableProperty().bind(
+				proxyServer.textProperty().length().lessThanOrEqualTo(0).or(
+						proxyServer.disabledProperty()));
+		
+		proxyAuthentication.disableProperty().bind(
+				readOnly.or(
+						proxyServer.textProperty().length().lessThanOrEqualTo(0).and(
+								useSystemProxy.selectedProperty().not())));
+		
+		useHttps.disableProperty().bind(
+				readOnly.or(
+						proxyServer.textProperty().length().lessThanOrEqualTo(0).and(
+								useSystemProxy.selectedProperty().not())));
+		
+		proxyUsername.disableProperty().bind(proxyAuthentication.disabledProperty().or(
+						proxyAuthentication.selectedProperty().not()));
+		
+		proxyPassword.disableProperty().bind(proxyAuthentication.disabledProperty().or(
+				proxyAuthentication.selectedProperty().not()));
+		
+		ok.setOnAction((evt) -> {
+			final Integer port;
+			try {
+				if(proxyPort.isDisabled()) {
+					port = null;
+				} else {
+					port = Integer.parseInt(proxyPort.getText());
+				}
+			} catch(NumberFormatException e) {
+				proxyPort.setTooltip(new Tooltip(resources.getString("preferences.controller.invalid.port")));
+				proxyPort.setStyle("-fx-text-box-border: red; -fx-focus-color: red;");
+	    		return;
+			}
+			
+			userPreferences.setUseSystemProxy(useSystemProxy.isDisabled() ? null : useSystemProxy.isSelected());
+			userPreferences.setProxyServer(proxyServer.isDisabled() ? null : proxyServer.getText());
+			userPreferences.setProxyPort(port);
+			userPreferences.setProxyAuthentication(proxyAuthentication.isDisabled() ? null : proxyAuthentication.isSelected());
+			userPreferences.setProxyUsername(proxyUsername.isDisabled() ? null : proxyUsername.getText());
+			userPreferences.setProxyPassword(proxyPassword.isDisabled() ? null : proxyPassword.getText());
+			userPreferences.setProxyUseHttps(useHttps.isDisabled() ? null : useHttps.isSelected());
+			
+			NexuLauncher.getProxyConfigurer().updateValues(NexuLauncher.getConfig(), userPreferences);
+
+			display.close();
+		});
+		cancel.setOnAction((e) -> {
+			display.close();
+		});
+		reset.setOnAction((e) -> {
+			userPreferences.clear();
+			NexuLauncher.getProxyConfigurer().updateValues(NexuLauncher.getConfig(), userPreferences);
+			display.close();
+		});
+	}
 }

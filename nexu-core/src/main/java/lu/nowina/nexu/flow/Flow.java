@@ -51,9 +51,12 @@ public abstract class Flow<I, O> {
 	}
 
 	public final Execution<O> execute(NexuAPI api, I input) throws Exception {
-		final Execution<O> out = process(api, input);
-		display.close();
-		return out;
+		try {
+			final Execution<O> out = process(api, input);
+			return out;
+		} finally {
+			display.close();
+		}
 	}
 
 	protected abstract Execution<O> process(NexuAPI api, I input) throws Exception;
@@ -68,7 +71,7 @@ public abstract class Flow<I, O> {
 			final Feedback feedback = new Feedback(e);
 			getOperationFactory().getOperation(
 					UIOperation.class, getDisplay(), "/fxml/provide-feedback.fxml",
-					new Object[]{feedback}).perform();
+					new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion()}).perform();
 			getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
 					new Object[]{"Failure"}).perform();
 		}

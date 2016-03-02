@@ -14,6 +14,7 @@
 package lu.nowina.nexu.api;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 /**
  * Holds data for a response for a get identity info request.
@@ -42,8 +43,10 @@ public class GetIdentityInfoResponse {
 	private String postalCode;
 	private String city;
 	
-	private String photo; // Encoded in base 64
+	private byte[] photo;
 	private String photoMimeType;
+	
+	private Map<String, IdentityInfoSignatureData> signatureData;
 	
 	public GetIdentityInfoResponse() {
 		super();
@@ -193,11 +196,11 @@ public class GetIdentityInfoResponse {
 		this.city = city;
 	}
 
-	public String getPhoto() {
+	public byte[] getPhoto() {
 		return photo;
 	}
 
-	public void setPhoto(String photo) {
+	public void setPhoto(byte[] photo) {
 		this.photo = photo;
 	}
 
@@ -207,6 +210,14 @@ public class GetIdentityInfoResponse {
 
 	public void setPhotoMimeType(String photoMimeType) {
 		this.photoMimeType = photoMimeType;
+	}
+	
+	public Map<String, IdentityInfoSignatureData> getSignatureData() {
+		return signatureData;
+	}
+	
+	public void setSignatureData(Map<String, IdentityInfoSignatureData> signatureData) {
+		this.signatureData = signatureData;
 	}
 
 	public enum Gender {

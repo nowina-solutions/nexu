@@ -42,7 +42,7 @@ public class SCDatabaseManager {
 	private static final Logger logger = LoggerFactory.getLogger(SCDatabaseManager.class.getName());
 
 	@Value("${nexuDatabase}")
-	Resource nexuDatabaseFile;
+	private Resource nexuDatabaseFile;
 
 	private byte[] data;
 

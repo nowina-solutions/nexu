@@ -54,7 +54,7 @@ public class Pkcs11ParamsController extends AbstractUIOperationController<Pkcs11
 		});
 		selectFile.setOnAction((e) -> {
 			FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle("Open Resource File");
+			fileChooser.setTitle(resources.getString("fileChooser.title.openResourceFile"));
 			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("DLL", "*.dll"));
 			pkcs11File = fileChooser.showOpenDialog(null);
 		});

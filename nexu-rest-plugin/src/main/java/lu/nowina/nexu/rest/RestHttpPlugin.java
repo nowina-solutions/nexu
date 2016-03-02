@@ -13,8 +13,6 @@
  */
 package lu.nowina.nexu.rest;
 
-import java.util.logging.Logger;
-
 import javax.xml.bind.DatatypeConverter;
 
 import lu.nowina.nexu.api.AuthenticateRequest;
@@ -37,6 +35,8 @@ import lu.nowina.nexu.json.GsonHelper;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.ToBeSigned;
@@ -48,7 +48,7 @@ import eu.europa.esig.dss.ToBeSigned;
  */
 public class RestHttpPlugin implements HttpPlugin {
 
-	private static final Logger logger = Logger.getLogger(RestHttpPlugin.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(RestHttpPlugin.class.getName());
 
 	@Override
 	public void init(String pluginId, NexuAPI api) {
@@ -115,17 +115,6 @@ public class RestHttpPlugin implements HttpPlugin {
 			r = GsonHelper.fromJson(payload, SignatureRequest.class);
 		}
 
-		if(r.isOnlyEncryptionRequired()) {
-			final Execution<?> execution =
-					new Execution<Object>(RestPluginOperationStatus.NOT_SUPPORTED_ONLY_ENCRYPTION_REQUIRED);
-			final Feedback feedback = new Feedback();
-			execution.setFeedback(feedback);
-			feedback.setFeedbackStatus(FeedbackStatus.FAILED);
-			feedback.setInfo(api.getEnvironmentInfo());
-			feedback.setNexuVersion(api.getAppConfig().getApplicationVersion());
-			return toHttpResponse(execution);
-		}
-		
 		final HttpResponse invalidRequestHttpResponse = checkRequestValidity(api, r);
 		if(invalidRequestHttpResponse != null) {
 			return invalidRequestHttpResponse;

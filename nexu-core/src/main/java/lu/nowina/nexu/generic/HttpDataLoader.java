@@ -14,62 +14,77 @@
 package lu.nowina.nexu.generic;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import javax.xml.bind.JAXBException;
-
-import lu.nowina.nexu.api.EnvironmentInfo;
-import lu.nowina.nexu.api.plugin.HttpStatus;
-
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.NameValuePair;
-import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import lu.nowina.nexu.ProxyConfigurer;
+import lu.nowina.nexu.api.EnvironmentInfo;
+import lu.nowina.nexu.api.plugin.HttpStatus;
+import lu.nowina.nexu.stats.PlatformStatistic;
 
 public class HttpDataLoader {
 
 	private static final Logger logger = LoggerFactory.getLogger(HttpDataLoader.class.getName());
 	
-	private HttpClient client = new HttpClient();
+	private final ProxyConfigurer proxyConfigurer;
+	private final String applicationVersion;
+	private final boolean sendAnonymousInfoToProxy;
 
+	public HttpDataLoader(final ProxyConfigurer proxyConfigurer, final String applicationVersion, final boolean sendAnonymousInfoToProxy) {
+		this.proxyConfigurer = proxyConfigurer;
+		this.applicationVersion = applicationVersion;
+		this.sendAnonymousInfoToProxy = sendAnonymousInfoToProxy;
+	}
+	
 	public byte[] fetchDatabase(String databaseUrl) throws IOException {
-
-		GetMethod get = new GetMethod(databaseUrl);
-
-		EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
-
-		get.setQueryString(new NameValuePair[] { new NameValuePair("os.name", info.getOsName()), new NameValuePair("os.arch", info.getOsArch()),
-				new NameValuePair("os.version", info.getOsVersion()) });
-
-		client.executeMethod(get);
-
-		if(!HttpStatus.OK.equals(get.getStatusCode())) {
-			logger.info("Cannot retrieve database from " + databaseUrl + ", status code = " + get.getStatusCode());
-			return null;
-		}
-		
-		return get.getResponseBody();
-
+		return performGetRequest(databaseUrl);
 	}
 
-	public byte[] fetchNexuInfo(String infoUrl) throws IOException, JAXBException {
-
-		GetMethod get = new GetMethod(infoUrl);
-
-		EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
-
-		get.setQueryString(new NameValuePair[] { new NameValuePair("os.name", info.getOsName()), new NameValuePair("os.arch", info.getOsArch()),
-				new NameValuePair("os.version", info.getOsVersion()) });
-
-		client.executeMethod(get);
-
-		if(!HttpStatus.OK.equals(get.getStatusCode())) {
-			logger.info("Cannot retrieve NexU info from " + infoUrl + ", status code = " + get.getStatusCode());
-			return null;
-		}
-		
-		return get.getResponseBody();
-
+	public byte[] fetchNexuInfo(String infoUrl) throws IOException {
+		return performGetRequest(infoUrl);
 	}
 
+	private byte[] performGetRequest(String requestUrl) throws IOException {
+		final HttpGet get = new HttpGet(requestUrl);
+		
+		if(sendAnonymousInfoToProxy) {
+			final EnvironmentInfo info = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
+			URI uri = null;
+			try {
+				uri = new URIBuilder(get.getURI())
+						.addParameter(PlatformStatistic.APPLICATION_VERSION, applicationVersion)
+						.addParameter(PlatformStatistic.JRE_VENDOR, info.getJreVendor().toString())
+						.addParameter(PlatformStatistic.OS_NAME, info.getOsName())
+						.addParameter(PlatformStatistic.OS_ARCH, info.getOsArch())
+						.addParameter(PlatformStatistic.OS_VERSION, info.getOsVersion())
+						.build();
+			} catch (URISyntaxException e) {
+				throw new RuntimeException(e);
+			}
+			get.setURI(uri);
+		}
+		proxyConfigurer.setupProxy(get);
+		HttpClient client = HttpClients.custom().setDefaultCredentialsProvider(
+				proxyConfigurer.getProxyCredentialsProvider(get.getConfig().getProxy())).build();
+
+		HttpResponse response = client.execute(get);
+		if(HttpStatus.OK.getHttpCode() != response.getStatusLine().getStatusCode()) {
+			logger.warn("Cannot perform GET request at " + requestUrl + ", status code = " + response.getStatusLine().getStatusCode());
+			return null;
+		}
+		ResponseHandler<String> responseHandler = new BasicResponseHandler();
+		return responseHandler.handleResponse(response).getBytes();
+	}
 }

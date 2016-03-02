@@ -65,26 +65,20 @@ public class NexUApp extends Application implements UIDisplay {
 	}
 
 	@Override
-	public void start(Stage primaryStage) {
+	public void start(Stage primaryStage) throws Exception {
 		Platform.setImplicitExit(false);
 
 		this.stage = new Stage();
 
-		try {
+		InternalAPI api = buildAPI();
 
-			InternalAPI api = buildAPI();
+		logger.info("Start Jetty");
 
-			new SystrayMenu(this, api.getWebDatabase(), api);
+		startHttpServer(api);
 
-			logger.info("Start Jetty");
+		new SystrayMenu(this, api.getWebDatabase(), api);
 
-			startHttpServer(api.getPrefs(), api);
-
-			logger.info("Start finished");
-
-		} catch (Exception e) {
-			logger.error("Cannot start", e);
-		}
+		logger.info("Start finished");
 	}
 
 	protected InternalAPI buildAPI() throws IOException {
@@ -98,15 +92,16 @@ public class NexUApp extends Application implements UIDisplay {
 			db = new SCDatabase();
 		}
 
-		UserPreferences prefs = new UserPreferences();
 		CardDetector detector = new CardDetector(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
 
-		DatabaseWebLoader loader = new DatabaseWebLoader(getConfig(), new HttpDataLoader());
+		DatabaseWebLoader loader = new DatabaseWebLoader(NexuLauncher.getConfig(),
+				new HttpDataLoader(NexuLauncher.getProxyConfigurer(), getConfig().getApplicationVersion(), getConfig().isSendAnonymousInfoToProxy()));
 		loader.start();
 
 		this.operationFactory = new BasicOperationFactory();
 		this.operationFactory.setDisplay(this);
-		InternalAPI api = new InternalAPI(this, prefs, db, detector, loader, getFlowRegistry(), this.operationFactory, getConfig());
+		InternalAPI api = new InternalAPI(this, new UserPreferences(getConfig().getApplicationName()), db, detector, loader,
+				getFlowRegistry(), this.operationFactory, getConfig());
 
 		for (String key : getProperties().stringPropertyNames()) {
 			if (key.startsWith("plugin_")) {
@@ -130,16 +125,31 @@ public class NexUApp extends Application implements UIDisplay {
 		return new BasicFlowRegistry();
 	}
 	
-	private void startHttpServer(UserPreferences prefs, InternalAPI api) {
-		new Thread(() -> {
-			HttpServer server = buildHttpServer();
-			server.setConfig(api, prefs, getConfig());
+	private void startHttpServer(InternalAPI api) throws Exception {
+		final HttpServer server = buildHttpServer();
+		server.setConfig(api);
+		try {
+			server.start();
+		} catch(Exception e) {
 			try {
-				server.start();
+				server.stop();
+			} catch(Exception e1) {}
+			throw e;
+		}
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			try {
+				server.stop();
 			} catch (Exception e) {
-				logger.error("Cannot Jetty", e);
+				logger.error("Cannot stop server", e);
 			}
-		}).start();
+		}));
+		new Thread(() -> {
+			try {
+				server.join();
+			} catch(Exception e) {
+				logger.error("Exception on join", e);
+			}
+		});
 	}
 
 	/**
@@ -199,7 +209,7 @@ public class NexUApp extends Application implements UIDisplay {
 			} else {
 				logger.info("Stage still showing, display " + panel);
 			}
-			stage.setScene(new Scene(panel, 300, 250));
+			stage.setScene(new Scene(panel));
 			stage.show();
 		});
 	}
@@ -237,7 +247,7 @@ public class NexUApp extends Application implements UIDisplay {
 
 	@Override
 	public void stop() throws Exception {
-		logger.warn("Can only happen with explicite user request");
+		// Can only happen with explicit user request
 	}
 
 	public <T> void displayAndWaitUIOperation(final UIOperation<T> operation) {

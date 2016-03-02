@@ -20,7 +20,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.APISelectionController">
+<BorderPane prefHeight="200.0" prefWidth="250.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.APISelectionController">
 
 	<stylesheets>
 		<URL value="@/styles/nexu.css" />
@@ -29,7 +29,7 @@
         <top>
 		<VBox BorderPane.alignment="CENTER">
 			<children>
-				<Label styleClass="message" text="NexU support some API for connexion to SmartCard." wrapText="true" />
+				<Label styleClass="message" text="%api.selection.header" wrapText="true" />
 			</children>
 		</VBox>
         </top>
@@ -37,20 +37,21 @@
 	<bottom>
 		<HBox styleClass="btn-container" BorderPane.alignment="CENTER">
 			<children>
-				<Button fx:id="cancel" mnemonicParsing="false" styleClass="btn-default" text="Cancel" />
-				<Button fx:id="select" mnemonicParsing="false" styleClass="btn-primary" text="Next" />
+				<Button fx:id="cancel" mnemonicParsing="false" styleClass="btn-default" text="%button.cancel" />
+				<Button fx:id="select" mnemonicParsing="false" styleClass="btn-primary" text="%button.next" />
 			</children>
 		</HBox>
 	</bottom>
 	<center>
 		<VBox BorderPane.alignment="CENTER" styleClass="form-container">
 			<children>
-				<RadioButton fx:id="pkcs11" mnemonicParsing="false" text="PKCS#11">
-               <toggleGroup>
-                  <ToggleGroup fx:id="api" />
-               </toggleGroup></RadioButton>
-				<RadioButton fx:id="mscapi" mnemonicParsing="false" text="MSCAPI" toggleGroup="$api" />
-				<RadioButton fx:id="pkcs12" mnemonicParsing="false" text="KeyStore file" toggleGroup="$api" />
+				<RadioButton fx:id="pkcs11" mnemonicParsing="false" text="%api.pkcs11">
+	               	<toggleGroup>
+	        			<ToggleGroup fx:id="api" />
+	               	</toggleGroup>
+       			</RadioButton>
+				<RadioButton fx:id="mscapi" mnemonicParsing="false" text="%api.mscapi" toggleGroup="$api" />
+				<RadioButton fx:id="pkcs12" mnemonicParsing="false" text="%api.keystore" toggleGroup="$api" />
 			</children>
 		</VBox>
 	</center>

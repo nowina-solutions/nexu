@@ -39,7 +39,7 @@ public class FeedbackManager {
 
 	private static final Pattern UUID_PATTERN = Pattern.compile("........-....-....-....-............");
 
-	@Value("${repository}")
+	@Value("${feedback.repository}")
 	private String repository;
 
 	private JAXBContext ctx;
@@ -64,7 +64,7 @@ public class FeedbackManager {
 
 		repositoryDir = new File(repository);
 		if (!repositoryDir.exists()) {
-			if(!repositoryDir.mkdir()) {
+			if(!repositoryDir.mkdirs()) {
 				throw new ConfigurationException("Cannot create repository " + repositoryDir.getAbsolutePath());
 			}
 		}

@@ -13,25 +13,31 @@
  */
 package lu.nowina.nexu.server.controller;
 
+import lu.nowina.nexu.server.config.OverrideConfig;
+import lu.nowina.nexu.server.config.ServiceConfig;
+
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.core.io.FileSystemResource;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
-import lu.nowina.nexu.server.manager.SCDatabaseManager;
-
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(loader=AnnotationConfigContextLoader.class,
+  classes={ServiceConfig.class, OverrideConfig.class})
 public class SCDatabaseControllerTest {
 
+	@Autowired
+	private SCDatabaseController controller;
+	
 	@Test
 	public void test1() throws Exception {
-
-		SCDatabaseController controller = new SCDatabaseController();
-		SCDatabaseManager manager = new SCDatabaseManager();
-		manager.setNexuDatabaseFile(new FileSystemResource("src/test/resources/db.xml"));
-		controller.databaseManager = manager;
-
-		ResponseEntity<byte[]> resp = controller.getDatabase();
+		final ResponseEntity<byte[]> resp = controller.getDatabase(new MockHttpServletRequest());
 
 		Assert.assertEquals(MediaType.parseMediaType("application/xml"), resp.getHeaders().getContentType());
 		Assert.assertTrue(resp.getBody() != null);

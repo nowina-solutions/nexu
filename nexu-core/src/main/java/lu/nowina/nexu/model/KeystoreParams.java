@@ -19,22 +19,26 @@ public class KeystoreParams {
 
 	private File pkcs12File;
 
-	private char[] password;
+	private String password;
+
+	private KeystoreType type;
+
+	public KeystoreParams(File pkcs12File, String password, KeystoreType type) {
+		super();
+		this.pkcs12File = pkcs12File;
+		this.password = password;
+		this.type = type;
+	}
 
 	public File getPkcs12File() {
 		return pkcs12File;
 	}
 
-	public void setPkcs12File(File pkcs12File) {
-		this.pkcs12File = pkcs12File;
-	}
-
-	public char[] getPassword() {
+	public String getPassword() {
 		return password;
 	}
 
-	public void setPassword(char[] password) {
-		this.password = password;
+	public KeystoreType getType() {
+		return type;
 	}
-
 }

@@ -20,11 +20,11 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import lu.nowina.nexu.model.KeystoreParams;
+import lu.nowina.nexu.model.KeystoreType;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 public class KeystoreParamsController extends AbstractUIOperationController<KeystoreParams> implements Initializable {
@@ -41,18 +41,14 @@ public class KeystoreParamsController extends AbstractUIOperationController<Keys
 	@FXML
 	private PasswordField password;
 
-	@FXML
-	private Label filename;
-
 	private File keyStoreFile;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		ok.setOnAction((event) -> {
-			KeystoreParams result = new KeystoreParams();
-			if (password.getText() != null)
-				result.setPassword(password.getText().toCharArray());
-			result.setPkcs12File(keyStoreFile);
+			final KeystoreParams result = new KeystoreParams(keyStoreFile, password.getText(),
+					(keyStoreFile.getName().toLowerCase().endsWith(".jks") ? KeystoreType.JKS : KeystoreType.PKCS12)
+			);
 			signalEnd(result);
 		});
 		cancel.setOnAction((e) -> {
@@ -60,8 +56,11 @@ public class KeystoreParamsController extends AbstractUIOperationController<Keys
 		});
 		selectFile.setOnAction((e) -> {
 			FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle("Open Resource File");
-			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PKCS12", "*.p12", "*.pfx"));
+			fileChooser.setTitle(resources.getString("fileChooser.title.openResourceFile"));
+			fileChooser.getExtensionFilters().addAll(
+					new ExtensionFilter("PKCS12", "*.p12", "*.pfx", "*.P12", "*.PFX"),
+					new ExtensionFilter("JKS", "*.jks", "*.JKS")
+			);
 			keyStoreFile = fileChooser.showOpenDialog(null);
 		});
 	}

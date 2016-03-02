@@ -21,7 +21,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.KeySelectionController">
+<BorderPane prefWidth="375.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.KeySelectionController">
 
     <stylesheets>
         <URL value="@/styles/nexu.css" />
@@ -30,14 +30,33 @@
     <bottom>
         <HBox styleClass="btn-container" BorderPane.alignment="CENTER">
             <children>
-                <Button fx:id="cancel" mnemonicParsing="false" styleClass="btn-default" text="Cancel" />
-                <Button fx:id="select" mnemonicParsing="false" styleClass="btn-primary" text="Select" />
+                <Button fx:id="cancel" mnemonicParsing="false" styleClass="btn-default" text="%button.cancel" />
+                <Button fx:id="select" mnemonicParsing="false" styleClass="btn-primary" text="%button.select" />
             </children>
         </HBox>
     </bottom>
 	
     <center>
-        <ListView fx:id="listView" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+    	<BorderPane>
+    		<center>
+        		<ListView fx:id="listView" prefHeight="120.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+        	</center>
+        	<bottom>
+        		<GridPane vgap="5" hgap="5">
+					<TextArea fx:id="taX500Principal" prefHeight="130" 
+						GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2" />
+						
+					<Label text="%key.selection.startDate" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+					<Label fx:id="startDate" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+					
+					<Label text="%key.selection.endDate" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+					<Label fx:id="endDate" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+					
+					<Label text="%key.selection.usage" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+					<Label fx:id="usage" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+				</GridPane>
+        	</bottom>
+        </BorderPane>
     </center>
 
 </BorderPane>

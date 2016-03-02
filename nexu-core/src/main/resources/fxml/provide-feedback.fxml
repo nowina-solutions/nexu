@@ -20,7 +20,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="200.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.ProvideFeedbackController">
+<BorderPane prefHeight="200.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.ProvideFeedbackController">
 
 	<stylesheets>
 		<URL value="@/styles/nexu.css" />
@@ -29,7 +29,7 @@
         <top>
 		<VBox BorderPane.alignment="CENTER">
 			<children>
-				<Label styleClass="message" text="Help us improve NexU by providing some information about your Signature Product. " wrapText="true" />
+				<Label styleClass="message" text="%feedback.header" wrapText="true" />
 			</children>
 		</VBox>
         </top>
@@ -37,18 +37,18 @@
 	<bottom>
 		<HBox styleClass="btn-container" BorderPane.alignment="CENTER">
 			<children>
-				<Button fx:id="cancel" mnemonicParsing="false" styleClass="btn-default" text="Cancel" />
-				<Button fx:id="ok" mnemonicParsing="false" styleClass="btn-primary" text="Send" />
+				<Button fx:id="cancel" mnemonicParsing="false" styleClass="btn-default" text="%button.cancel" />
+				<Button fx:id="ok" mnemonicParsing="false" styleClass="btn-primary" text="%button.send" />
 			</children>
 		</HBox>
 	</bottom>
 	<center>
 		<VBox BorderPane.alignment="CENTER" styleClass="form-container">
          <children>
-            <Label fx:id="label" text="Feedback" />
+            <Label fx:id="label" />
             <VBox prefHeight="200.0" prefWidth="100.0">
                <children>
-                  <Label fx:id="what" text="What happened ?" />
+                  <Label fx:id="what" text="%feedback.cause" />
                   <TextArea fx:id="userComment" prefHeight="200.0" prefWidth="200.0" />
                </children>
             </VBox>

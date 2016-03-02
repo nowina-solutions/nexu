@@ -45,6 +45,11 @@ RadioButton {
 		
 }
 
+.aboutTitle {
+	-fx-margin: 5px;
+	-fx-font-weight: bold;
+}
+
 .form-container {
 	
     -fx-padding: 10 30 10 30;
@@ -85,3 +90,7 @@ RadioButton {
     -fx-border-color:yellow;
 
 }
+
+.text-area .content{
+    -fx-background-color: #C0C0C0;
+ }

@@ -1,9 +1,18 @@
+/**
+ * © Nowina Solutions, 2015-2015
+ *
+ * Concédée sous licence EUPL, version 1.1 ou – dès leur approbation par la Commission européenne - versions ultérieures de l’EUPL (la «Licence»).
+ * Vous ne pouvez utiliser la présente œuvre que conformément à la Licence.
+ * Vous pouvez obtenir une copie de la Licence à l’adresse suivante:
+ *
+ * http://ec.europa.eu/idabc/eupl5
+ *
+ * Sauf obligation légale ou contractuelle écrite, le logiciel distribué sous la Licence est distribué «en l’état»,
+ * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
+ * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
+ */
 package lu.nowina.nexu.server.config;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.jaxws.EndpointImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -11,18 +20,13 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.web.multipart.MultipartResolver;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.ws.config.annotation.EnableWs;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 import org.thymeleaf.spring4.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ServletContextTemplateResolver;
-
-import lu.nowina.nexu.server.api.ws.FeedbackEndpoint;
 
 @Configuration
 @ComponentScan(basePackages = { "lu.nowina.nexu.server" })
@@ -33,8 +37,6 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 
 	@Autowired
 	private ApplicationContext applicationContext;
-	
-	private boolean debug = false;
 	
 	@Bean
 	public ReloadableResourceBundleMessageSource messageSource() {
@@ -69,27 +71,7 @@ public class WebConfig extends WebMvcConfigurerAdapter {
 	}
 	
 	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/public/**").addResourceLocations("/webjars/");
-		registry.addResourceHandler("/script/**").addResourceLocations("/script/");
-		registry.addResourceHandler("/style/**").addResourceLocations("/style/");
-		registry.addResourceHandler("/controllers/**").addResourceLocations("/controllers/");
-	}
-
-	@Override
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
 	}
-
-	@Bean
-	public EndpointImpl endpoint1() {
-		final Bus bus = (Bus) this.applicationContext.getBean(Bus.DEFAULT_BUS_ID);
-		final Object implementor = this.applicationContext.getBean(FeedbackEndpoint.class);
-		final EndpointImpl endpoint = new EndpointImpl(bus, implementor);
-		endpoint.publish("/feedback");
-		endpoint.getServer().getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-		endpoint.getServer().getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
-		return endpoint;
-	}
-
 }

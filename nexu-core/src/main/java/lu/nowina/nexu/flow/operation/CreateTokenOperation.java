@@ -13,10 +13,13 @@
  */
 package lu.nowina.nexu.flow.operation;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Feedback;
@@ -34,6 +37,7 @@ import lu.nowina.nexu.view.core.UIOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.europa.esig.dss.token.JKSSignatureToken;
 import eu.europa.esig.dss.token.MSCAPISignatureToken;
 import eu.europa.esig.dss.token.Pkcs11SignatureToken;
 import eu.europa.esig.dss.token.Pkcs12SignatureToken;
@@ -100,7 +104,8 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 				if(api.getAppConfig().isEnablePopUps()) {
 					final Feedback feedback = new Feedback();
 					feedback.setFeedbackStatus(FeedbackStatus.PRODUCT_NOT_SUPPORTED);
-					operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml", new Object[]{feedback}).perform();
+					operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml",
+							new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion()}).perform();
 				}
 				return new OperationResult<Map<TokenOperationResultKey, Object>>(CoreOperationStatus.UNSUPPORTED_PRODUCT);
 			}
@@ -141,7 +146,8 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		final Map<TokenOperationResultKey, Object> map = new HashMap<TokenOperationResultKey, Object>();
 		map.put(TokenOperationResultKey.ADVANCED_CREATION, true);
 		map.put(TokenOperationResultKey.SELECTED_API, result.getResult());
-		map.put(TokenOperationResultKey.SELECTED_CARD, api.detectCards().get(0));
+		final DetectedCard selectedCard = api.detectCards().get(0);
+		map.put(TokenOperationResultKey.SELECTED_CARD, selectedCard);
 		final TokenId tokenId;
 		switch (result.getResult()) {
 		case MOCCA:
@@ -160,7 +166,8 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 			final Pkcs11Params pkcs11Params = op2.getResult();
 			final String absolutePath = pkcs11Params.getPkcs11Lib().getAbsolutePath();
 			map.put(TokenOperationResultKey.SELECTED_API_PARAMS, absolutePath);
-			tokenId = api.registerTokenConnection(new Pkcs11SignatureToken(absolutePath, display.getPasswordInputCallback()));
+			tokenId = api.registerTokenConnection(new Pkcs11SignatureToken(absolutePath, display.getPasswordInputCallback(),
+					selectedCard.getTerminalIndex()));
 			break;
 		case PKCS_12:
 			@SuppressWarnings("unchecked")
@@ -169,9 +176,22 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 			if(op3.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
 				return new OperationResult<Map<TokenOperationResultKey, Object>>(BasicOperationStatus.USER_CANCEL);
 			}
-			final KeystoreParams keysToreParams = op3.getResult();
-			map.put(TokenOperationResultKey.SELECTED_API_PARAMS, keysToreParams.getPkcs12File().getAbsolutePath());
-			tokenId = api.registerTokenConnection(new Pkcs12SignatureToken(keysToreParams.getPassword(), keysToreParams.getPkcs12File()));
+			final KeystoreParams keystoreParams = op3.getResult();
+			map.put(TokenOperationResultKey.SELECTED_API_PARAMS, keystoreParams.getPkcs12File().getAbsolutePath());
+			switch(keystoreParams.getType()) {
+			case PKCS12:
+				tokenId = api.registerTokenConnection(new Pkcs12SignatureToken(keystoreParams.getPassword(), keystoreParams.getPkcs12File()));
+				break;
+			case JKS:
+				try {
+					tokenId = api.registerTokenConnection(new JKSSignatureToken(new FileInputStream(keystoreParams.getPkcs12File()), keystoreParams.getPassword()));
+				} catch (FileNotFoundException e) {
+					throw new NexuException(e);
+				}
+				break;
+			default:
+				throw new IllegalStateException("Unhandled keystore type: " + keystoreParams.getType());
+			}
 			break;
 		default:
 			return new OperationResult<Map<TokenOperationResultKey, Object>>(CoreOperationStatus.UNSUPPORTED_PRODUCT);

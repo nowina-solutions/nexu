@@ -14,6 +14,7 @@
 package lu.nowina.nexu.flow;
 
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.CardAdapter;
@@ -96,24 +97,24 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 							
 							if(api.getAppConfig().isEnablePopUps()) {
 								getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
-									new Object[]{"Signature performed"}).perform();
+									new Object[]{ResourceBundle.getBundle("bundles/nexu").getString("operation.signaturePerformed")}).perform();
 							}
 							
-							return new Execution<SignatureResponse>(new SignatureResponse(value));
+							return new Execution<SignatureResponse>(new SignatureResponse(value, key.getCertificate(), key.getCertificateChain()));
 						} else {
 							return handleErrorOperationResult(signOperationResult);
 						}
 					} else {
 						if(api.getAppConfig().isEnablePopUps()) {
 							getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
-								new Object[]{"Error - No keys"}).perform();
+								new Object[]{ResourceBundle.getBundle("bundles/nexu").getString("operation.error.noKeys")}).perform();
 						}
 						return handleErrorOperationResult(selectPrivateKeyOperationResult);
 					}
 				} else {
 					if(api.getAppConfig().isEnablePopUps()) {
 						getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
-							new Object[]{"Error - Token not recognized"}).perform();
+							new Object[]{ResourceBundle.getBundle("bundles/nexu").getString("operation.error.token")}).perform();
 					}
 					return handleErrorOperationResult(getTokenConnectionOperationResult);
 				}

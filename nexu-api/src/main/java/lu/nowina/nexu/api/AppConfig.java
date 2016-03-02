@@ -15,6 +15,8 @@ package lu.nowina.nexu.api;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -32,13 +34,13 @@ public class AppConfig {
 
 	private String bindingIP;
 
-	private int bindingPort;
+	private List<Integer> bindingPorts;
 
 	private String serverUrl;
 
 	private String installUrl;
 
-	private String nexuUrl;
+	private String nexuHostname;
 
 	private String httpServerClass;
 
@@ -53,6 +55,20 @@ public class AppConfig {
 	private int connectionsCacheMaxSize;
 	
 	private boolean enablePopUps;
+	
+	private boolean sendAnonymousInfoToProxy;
+	
+	private boolean useSystemProxy;
+	private String proxyServer;
+	private Integer proxyPort;
+	private boolean proxyUseHttps;
+	private boolean proxyAuthentication;
+	private String proxyUsername;
+	private String proxyPassword;
+	
+	private boolean userPreferencesEditable;
+	
+	private String requestProcessorClass;
 	
 	public AppConfig() {
 		try {
@@ -76,12 +92,12 @@ public class AppConfig {
 		this.bindingIP = bindingIP;
 	}
 
-	public int getBindingPort() {
-		return bindingPort;
+	public List<Integer> getBindingPorts() {
+		return bindingPorts;
 	}
 
-	public void setBindingPort(int bindingPort) {
-		this.bindingPort = bindingPort;
+	public void setBindingPorts(List<Integer> bindingPorts) {
+		this.bindingPorts = Collections.unmodifiableList(bindingPorts);
 	}
 
 	public String getServerUrl() {
@@ -100,12 +116,12 @@ public class AppConfig {
 		this.installUrl = installUrl;
 	}
 
-	public String getNexuUrl() {
-		return nexuUrl;
+	public String getNexuHostname() {
+		return nexuHostname;
 	}
 
-	public void setNexuUrl(String nexuUrl) {
-		this.nexuUrl = nexuUrl;
+	public void setNexuHostname(String nexuHostname) {
+		this.nexuHostname = nexuHostname;
 	}
 
 	public String getHttpServerClass() {
@@ -158,5 +174,85 @@ public class AppConfig {
 
 	public void setEnablePopUps(boolean enablePopUps) {
 		this.enablePopUps = enablePopUps;
+	}
+
+	public boolean isSendAnonymousInfoToProxy() {
+		return sendAnonymousInfoToProxy;
+	}
+
+	public void setSendAnonymousInfoToProxy(boolean sendAnonymousInfoToProxy) {
+		this.sendAnonymousInfoToProxy = sendAnonymousInfoToProxy;
+	}
+
+	public boolean isUseSystemProxy() {
+		return useSystemProxy;
+	}
+
+	public void setUseSystemProxy(boolean useSystemProxy) {
+		this.useSystemProxy = useSystemProxy;
+	}
+
+	public String getProxyServer() {
+		return proxyServer;
+	}
+
+	public void setProxyServer(String proxyServer) {
+		this.proxyServer = proxyServer;
+	}
+
+	public Integer getProxyPort() {
+		return proxyPort;
+	}
+
+	public void setProxyPort(Integer proxyPort) {
+		this.proxyPort = proxyPort;
+	}
+
+	public boolean isProxyUseHttps() {
+		return proxyUseHttps;
+	}
+
+	public void setProxyUseHttps(boolean proxyUseHttps) {
+		this.proxyUseHttps = proxyUseHttps;
+	}
+
+	public boolean isProxyAuthentication() {
+		return proxyAuthentication;
+	}
+
+	public void setProxyAuthentication(boolean proxyAuthentication) {
+		this.proxyAuthentication = proxyAuthentication;
+	}
+
+	public String getProxyUsername() {
+		return proxyUsername;
+	}
+
+	public void setProxyUsername(String proxyUsername) {
+		this.proxyUsername = proxyUsername;
+	}
+
+	public String getProxyPassword() {
+		return proxyPassword;
+	}
+
+	public void setProxyPassword(String proxyPassword) {
+		this.proxyPassword = proxyPassword;
+	}
+
+	public boolean isUserPreferencesEditable() {
+		return userPreferencesEditable;
+	}
+
+	public void setUserPreferencesEditable(boolean userPreferencesEditable) {
+		this.userPreferencesEditable = userPreferencesEditable;
+	}
+
+	public String getRequestProcessorClass() {
+		return requestProcessorClass;
+	}
+
+	public void setRequestProcessorClass(String requestProcessorClass) {
+		this.requestProcessorClass = requestProcessorClass;
 	}
 }
