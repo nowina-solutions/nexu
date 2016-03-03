@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>lu.nowina.apps</groupId>
 		<artifactId>nexu</artifactId>
-		<version>1.4-SNAPSHOT</version>
+		<version>1.3</version>
 	</parent>
 
 	<artifactId>nexu-proxy</artifactId>
@@ -63,6 +63,11 @@
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
+				<configuration>
+					<update>true</update>
+					<url>http://extranet.nowina.lu:8080/manager/text</url>
+					<server>extranet.nowina.lu</server>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -182,22 +187,4 @@
         </dependency>
 	</dependencies>
 
-	<profiles>
-
-		<profile>
-			<id>no_package</id>
-			<properties>
-				<skip.package>true</skip.package>
-			</properties>
-		</profile>
-
-		<profile>
-			<id>rebel</id>
-			<properties>
-				<run.jvmArguments>-javaagent:${jrebel.home}/jrebel.jar -Xms256m
-					-Xmx1024m</run.jvmArguments>
-			</properties>
-		</profile>
-
-	</profiles>
 </project>
