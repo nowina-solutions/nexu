@@ -26,6 +26,9 @@ import lu.nowina.nexu.view.core.UIDisplay;
 public class AboutController implements Initializable {
 
 	@FXML
+	private Label aboutTitle;
+	
+	@FXML
 	private Button ok;
 
 	@FXML
@@ -58,5 +61,9 @@ public class AboutController implements Initializable {
 
 	public void setApplicationVersion(String applicationVersion) {
 		this.applicationVersion.setText(applicationVersion);
+	}
+	
+	public void setApplicationName(String applicationName) {
+		this.aboutTitle.setText(aboutTitle.getText() + " " + applicationName);
 	}
 }

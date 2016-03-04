@@ -29,7 +29,7 @@
 		<GridPane hgap="5" vgap="5" alignment="CENTER">
 			<children>
 				<Label styleClass="aboutTitle" text="%about.header" wrapText="true"
-					GridPane.columnIndex="0" GridPane.rowIndex="0" />
+					GridPane.columnIndex="0" GridPane.rowIndex="0" fx:id="aboutTitle"/>
 					
                 <Label text="%about.appVersion" 
                 	GridPane.columnIndex="0" GridPane.rowIndex="1"/>
