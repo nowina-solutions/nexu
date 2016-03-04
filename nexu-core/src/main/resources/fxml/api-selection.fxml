@@ -29,7 +29,7 @@
         <top>
 		<VBox BorderPane.alignment="CENTER">
 			<children>
-				<Label styleClass="message" text="%api.selection.header" wrapText="true" />
+				<Label styleClass="message" fx:id="message" wrapText="true" />
 			</children>
 		</VBox>
         </top>

@@ -141,7 +141,8 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		LOG.info("Advanced mode selected");
 		@SuppressWarnings("unchecked")
 		final OperationResult<ScAPI> result =
-				operationFactory.getOperation(UIOperation.class, display, "/fxml/api-selection.fxml").perform();
+				operationFactory.getOperation(UIOperation.class, display, "/fxml/api-selection.fxml",
+						new Object[]{api.getAppConfig().getApplicationName()}).perform();
 		if(result.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
 			return new OperationResult<Map<TokenOperationResultKey, Object>>(BasicOperationStatus.USER_CANCEL);
 		}
