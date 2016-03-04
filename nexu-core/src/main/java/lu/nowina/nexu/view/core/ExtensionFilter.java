@@ -14,16 +14,28 @@
 package lu.nowina.nexu.view.core;
 
 /**
- * GUI Controller for an {@link UIOperation}.
- *
+ * Extension filter that can be used when displaying a file chooser.
+ * 
+ * @see {@link UIDisplay#displayFileChooser(ExtensionFilter...))}
+ * 
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public interface UIOperationController<R> {
+public class ExtensionFilter {
 
-	void setUIOperation(UIOperation<R> uiOperation);
-
-	void init(Object... params);
+	private String description;
+	private String[] extensions;
 	
-	void setDisplay(UIDisplay display);
+	public ExtensionFilter(String description, String... extensions) {
+		super();
+		this.description = description;
+		this.extensions = extensions;
+	}
 
+	public String getDescription() {
+		return description;
+	}
+
+	public String[] getExtensions() {
+		return extensions;
+	}
 }

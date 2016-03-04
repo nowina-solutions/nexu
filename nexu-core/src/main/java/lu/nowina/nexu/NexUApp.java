@@ -17,11 +17,13 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.Properties;
+import java.util.ResourceBundle;
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.EnvironmentInfo;
@@ -37,6 +39,7 @@ import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.generic.HttpDataLoader;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCDatabaseLoader;
+import lu.nowina.nexu.view.core.ExtensionFilter;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
 
@@ -282,4 +285,20 @@ public class NexUApp extends Application implements UIDisplay {
 		return new FlowPasswordCallback();
 	}
 
+	@Override
+	public File displayFileChooser(ExtensionFilter... extensionFilters) {
+		final FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle(ResourceBundle.getBundle("bundles/nexu").getString("fileChooser.title.openResourceFile"));
+		fileChooser.getExtensionFilters().addAll(toJavaFXExtensionFilters(extensionFilters));
+		return fileChooser.showOpenDialog(stage);
+	}
+	
+	private javafx.stage.FileChooser.ExtensionFilter[] toJavaFXExtensionFilters(ExtensionFilter... extensionFilters) {
+		final javafx.stage.FileChooser.ExtensionFilter[] result = new javafx.stage.FileChooser.ExtensionFilter[extensionFilters.length];
+		int i = 0;
+		for(final ExtensionFilter extensionFilter : extensionFilters) {
+			result[i++] = new javafx.stage.FileChooser.ExtensionFilter(extensionFilter.getDescription(), extensionFilter.getExtensions());
+		}
+		return result;
+	}
 }
