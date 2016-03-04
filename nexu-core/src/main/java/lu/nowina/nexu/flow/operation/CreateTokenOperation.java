@@ -89,7 +89,8 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 			if (api.getAppConfig().isAdvancedModeAvailable() && api.getAppConfig().isEnablePopUps()) {
 				LOG.info("Advanced mode available");
 				final OperationResult<Boolean> result =
-						operationFactory.getOperation(UIOperation.class, display, "/fxml/unsupported-product.fxml").perform();
+						operationFactory.getOperation(UIOperation.class, display, "/fxml/unsupported-product.fxml",
+								new Object[]{api.getAppConfig().getApplicationName()}).perform();
 				if(result.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
 					return new OperationResult<Map<TokenOperationResultKey, Object>>(BasicOperationStatus.USER_CANCEL);
 				}
