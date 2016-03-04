@@ -54,8 +54,7 @@ public class ProvideFeedbackController extends AbstractFeedbackUIOperationContro
 		Platform.runLater(() -> {
 			message.setText(MessageFormat.format(
 					ResourceBundle.getBundle("bundles/nexu").getString("feedback.message"),
-					getApplicationName())
-			);
+					getApplicationName()));
 		});
 	}
 

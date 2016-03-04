@@ -14,7 +14,12 @@
 package lu.nowina.nexu.view.ui;
 
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ResourceBundle;
+
+import org.apache.commons.lang.StringEscapeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -22,9 +27,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class StoreResultController extends AbstractFeedbackUIOperationController implements Initializable {
 
@@ -37,10 +39,10 @@ public class StoreResultController extends AbstractFeedbackUIOperationController
 	private Button forget;
 
 	@FXML
-	private Label label;
-
-	@FXML
 	private CheckBox publish;
+	
+	@FXML
+	private Label message;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -67,7 +69,9 @@ public class StoreResultController extends AbstractFeedbackUIOperationController
 		}
 
 		Platform.runLater(() -> {
-			label.setText(getFeedback().getFeedbackStatus().toString());
+			message.setText(StringEscapeUtils.unescapeJava(MessageFormat.format(
+					ResourceBundle.getBundle("bundles/nexu").getString("store.configuration.header"),
+					getApplicationName())));
 		});
 	}
 }
