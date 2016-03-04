@@ -14,6 +14,7 @@
 package lu.nowina.nexu.view.ui;
 
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
@@ -22,7 +23,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import lu.nowina.nexu.api.FeedbackStatus;
 
 public class ProvideFeedbackController extends AbstractFeedbackUIOperationController implements Initializable {
 
@@ -33,10 +33,7 @@ public class ProvideFeedbackController extends AbstractFeedbackUIOperationContro
 	private Button cancel;
 
 	@FXML
-	private Label label;
-
-	@FXML
-	private Label what;
+	private Label message;
 
 	@FXML
 	private TextArea userComment;
@@ -44,10 +41,8 @@ public class ProvideFeedbackController extends AbstractFeedbackUIOperationContro
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		ok.setOnAction((e) -> {
-			if (getFeedback().getFeedbackStatus() != FeedbackStatus.SUCCESS) {
-				getFeedback().setUserComment(userComment.getText());
-				sendFeedback();
-			}
+			getFeedback().setUserComment(userComment.getText());
+			sendFeedback();
 		});
 		cancel.setOnAction((e) -> {
 			signalUserCancel();
@@ -57,12 +52,10 @@ public class ProvideFeedbackController extends AbstractFeedbackUIOperationContro
 	@Override
 	protected void doInit(Object... params) {
 		Platform.runLater(() -> {
-			label.setText(getFeedback().getFeedbackStatus().toString());
-			if (getFeedback().getFeedbackStatus() == FeedbackStatus.SUCCESS) {
-				cancel.setVisible(false);
-				userComment.setVisible(false);
-				what.setVisible(false);
-			}
+			message.setText(MessageFormat.format(
+					ResourceBundle.getBundle("bundles/nexu").getString("feedback.message"),
+					getApplicationName())
+			);
 		});
 	}
 

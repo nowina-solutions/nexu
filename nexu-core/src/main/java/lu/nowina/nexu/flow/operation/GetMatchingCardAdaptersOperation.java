@@ -64,7 +64,8 @@ public class GetMatchingCardAdaptersOperation extends AbstractCompositeOperation
 				final Feedback feedback = new Feedback();
 				feedback.setFeedbackStatus(FeedbackStatus.NO_PRODUCT_FOUND);
 				operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml",
-						new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion()}).perform();
+						new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
+								api.getAppConfig().getApplicationName()}).perform();
 			}
 			return new OperationResult<List<Match>>(CoreOperationStatus.NO_PRODUCT_FOUND);
 		} else {

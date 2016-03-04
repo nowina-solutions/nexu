@@ -38,6 +38,7 @@ public abstract class AbstractFeedbackUIOperationController extends AbstractUIOp
 	private Feedback feedback;
 	private String serverUrl;
 	private String applicationVersion;
+	private String applicationName;
 	
 	@Override
 	public final void init(Object... params) {
@@ -45,16 +46,17 @@ public abstract class AbstractFeedbackUIOperationController extends AbstractUIOp
 			feedback = (Feedback) params[0];
 			serverUrl = (String) params[1];
 			applicationVersion = (String) params[2];
+			applicationName = (String) params[3];
 		} catch(final ClassCastException | ArrayIndexOutOfBoundsException e) {
-			throw new IllegalArgumentException("Expected parameters: Feedback, serverUrl (String) and application version (String)");
+			throw new IllegalArgumentException("Expected parameters: Feedback, serverUrl (String), application version (String) and  application name (String)");
 		}
 		
-		if((feedback == null) || (serverUrl == null) || (applicationVersion == null)) {
-			throw new IllegalArgumentException("Expected parameters: Feedback, serverUrl (String) and application version (String)");
+		if((feedback == null) || (serverUrl == null) || (applicationVersion == null) || (applicationName == null)) {
+			throw new IllegalArgumentException("Expected parameters: Feedback, serverUrl (String), application version (String) and  application name (String)");
 		}
 
-		if(params.length > 3) {
-			doInit(Arrays.copyOfRange(params, 3, params.length));
+		if(params.length > 4) {
+			doInit(Arrays.copyOfRange(params, 4, params.length));
 		} else {
 			doInit((Object) null); 
 		}
@@ -90,5 +92,9 @@ public abstract class AbstractFeedbackUIOperationController extends AbstractUIOp
 	
 	protected Feedback getFeedback() {
 		return feedback;
+	}
+	
+	protected String getApplicationName() {
+		return applicationName;
 	}
 }

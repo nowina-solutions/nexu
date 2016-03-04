@@ -13,6 +13,9 @@
  */
 package lu.nowina.nexu.flow;
 
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
+
 import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.NexuAPI;
@@ -71,9 +74,13 @@ public abstract class Flow<I, O> {
 			final Feedback feedback = new Feedback(e);
 			getOperationFactory().getOperation(
 					UIOperation.class, getDisplay(), "/fxml/provide-feedback.fxml",
-					new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion()}).perform();
+					new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
+							api.getAppConfig().getApplicationName()}).perform();
 			getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
-					new Object[]{"Failure"}).perform();
+					new Object[]{MessageFormat.format(
+							ResourceBundle.getBundle("bundles/nexu").getString("exception.failure.message"),
+							api.getAppConfig().getApplicationName())
+					}).perform();
 		}
 		return e;
 	}

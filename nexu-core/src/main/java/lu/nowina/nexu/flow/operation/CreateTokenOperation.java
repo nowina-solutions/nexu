@@ -105,7 +105,8 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 					final Feedback feedback = new Feedback();
 					feedback.setFeedbackStatus(FeedbackStatus.PRODUCT_NOT_SUPPORTED);
 					operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml",
-							new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion()}).perform();
+							new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
+									api.getAppConfig().getApplicationName()}).perform();
 				}
 				return new OperationResult<Map<TokenOperationResultKey, Object>>(CoreOperationStatus.UNSUPPORTED_PRODUCT);
 			}
