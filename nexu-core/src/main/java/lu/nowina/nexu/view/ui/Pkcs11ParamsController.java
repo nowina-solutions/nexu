@@ -22,11 +22,15 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import lu.nowina.nexu.api.EnvironmentInfo;
+import lu.nowina.nexu.api.OS;
 import lu.nowina.nexu.model.Pkcs11Params;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 public class Pkcs11ParamsController extends AbstractUIOperationController<Pkcs11Params> implements Initializable {
 
+	private static final OS OS = EnvironmentInfo.buildFromSystemProperties(System.getProperties()).getOs();
+	
 	@FXML
 	private Button ok;
 
@@ -51,7 +55,8 @@ public class Pkcs11ParamsController extends AbstractUIOperationController<Pkcs11
 		selectFile.setOnAction((e) -> {
 			FileChooser fileChooser = new FileChooser();
 			fileChooser.setTitle(resources.getString("fileChooser.title.openResourceFile"));
-			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("DLL", "*.dll"));
+			fileChooser.getExtensionFilters().addAll(new ExtensionFilter(OS.getNativeLibraryFileExtensionDescription(),
+					OS.getNativeLibraryFileExtension()));
 			pkcs11File = fileChooser.showOpenDialog(null);
 		});
 	}

@@ -24,11 +24,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
+import lu.nowina.nexu.api.EnvironmentInfo;
+import lu.nowina.nexu.api.OS;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 public class APISelectionController extends AbstractUIOperationController<ScAPI> implements Initializable {
 
+	private static final boolean IS_WINDOWS =
+			EnvironmentInfo.buildFromSystemProperties(System.getProperties()).getOs().equals(OS.WINDOWS);
+	
 	@FXML
 	private Button select;
 
@@ -60,10 +65,18 @@ public class APISelectionController extends AbstractUIOperationController<ScAPI>
 		});
 		
 		select.disableProperty().bind(api.selectedToggleProperty().isNull());
+		
+		if(!IS_WINDOWS) {
+			mscapi.setVisible(false);
+			mscapi.setManaged(false);
+		}
 	}
 
 	public ScAPI getSelectedAPI() {
 		if (mscapi.isSelected()) {
+			if(!IS_WINDOWS) {
+				throw new IllegalStateException("MSCAPI not supported on platforms other than Windows!");
+			}
 			return ScAPI.MSCAPI;
 		} else if (pkcs11.isSelected()) {
 			return ScAPI.PKCS_11;
