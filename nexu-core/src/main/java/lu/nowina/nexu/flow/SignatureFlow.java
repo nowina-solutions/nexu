@@ -13,6 +13,7 @@
  */
 package lu.nowina.nexu.flow;
 
+import java.text.MessageFormat;
 import java.util.Map;
 import java.util.ResourceBundle;
 
@@ -107,7 +108,10 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 					} else {
 						if(api.getAppConfig().isEnablePopUps()) {
 							getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
-								new Object[]{ResourceBundle.getBundle("bundles/nexu").getString("operation.error.noKeys")}).perform();
+								new Object[]{MessageFormat.format(
+										ResourceBundle.getBundle("bundles/nexu").getString("signature.flow.no.key.selected"),
+										api.getAppConfig().getApplicationName())
+								}).perform();
 						}
 						return handleErrorOperationResult(selectPrivateKeyOperationResult);
 					}
