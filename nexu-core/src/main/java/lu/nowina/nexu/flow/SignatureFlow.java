@@ -97,7 +97,7 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 							
 							if(api.getAppConfig().isEnablePopUps()) {
 								getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
-									new Object[]{ResourceBundle.getBundle("bundles/nexu").getString("operation.signaturePerformed")}).perform();
+									new Object[]{ResourceBundle.getBundle("bundles/nexu").getString("signature.flow.finished")}).perform();
 							}
 							
 							return new Execution<SignatureResponse>(new SignatureResponse(value, key.getCertificate(), key.getCertificateChain()));
