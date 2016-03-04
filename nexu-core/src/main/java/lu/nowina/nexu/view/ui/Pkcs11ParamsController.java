@@ -20,7 +20,6 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import lu.nowina.nexu.model.Pkcs11Params;
@@ -36,9 +35,6 @@ public class Pkcs11ParamsController extends AbstractUIOperationController<Pkcs11
 
 	@FXML
 	private Button selectFile;
-
-	@FXML
-	private Label filename;
 
 	private File pkcs11File;
 
