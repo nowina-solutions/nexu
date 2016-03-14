@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Properties;
 
 import javafx.application.Application;
-import lu.nowina.nexu.NexUPreLoader.PreLoaderMessage;
 import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.jetty.JettyServer;
 import lu.nowina.nexu.jetty.RequestProcessor;
@@ -68,8 +67,6 @@ public class NexuLauncher {
 
 	private static Properties props;
 
-	private static List<PreLoaderMessage> preLoaderMessages;
-	
 	private static ProxyConfigurer proxyConfigurer;
 	
 	public static void main(String[] args) throws Exception {
@@ -78,7 +75,6 @@ public class NexuLauncher {
 	}
 
 	public void launch(String[] args) throws IOException {
-		preLoaderMessages = new ArrayList<NexUPreLoader.PreLoaderMessage>();
 		props = loadProperties();
 		loadAppConfig(props);
 
@@ -137,10 +133,6 @@ public class NexuLauncher {
 		return config;
 	}
 
-	static List<PreLoaderMessage> getPreLoaderMessages() {
-		return preLoaderMessages;
-	}
-	
 	public static Properties getProperties() {
 		return props;
 	}

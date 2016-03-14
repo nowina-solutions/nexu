@@ -13,6 +13,8 @@
  */
 package lu.nowina.nexu.api.plugin;
 
+import java.util.List;
+
 import lu.nowina.nexu.api.NexuAPI;
 
 /**
@@ -29,6 +31,6 @@ public interface NexuPlugin {
 	 * @param pluginId
 	 * @param api
 	 */
-	void init(String pluginId, NexuAPI api);
+	List<InitializationMessage> init(String pluginId, NexuAPI api);
 
 }

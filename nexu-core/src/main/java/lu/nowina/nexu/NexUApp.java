@@ -16,20 +16,29 @@ package lu.nowina.nexu;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.List;
 import java.util.Properties;
 import java.util.ResourceBundle;
 
+import org.apache.commons.lang.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.europa.esig.dss.token.PasswordInputCallback;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert.AlertType;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import lu.nowina.nexu.NexUPreLoader.PreloaderMessage;
 import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
-import lu.nowina.nexu.api.plugin.SignaturePlugin;
+import lu.nowina.nexu.api.plugin.InitializationMessage;
+import lu.nowina.nexu.api.plugin.NexuPlugin;
 import lu.nowina.nexu.flow.BasicFlowRegistry;
 import lu.nowina.nexu.flow.Flow;
 import lu.nowina.nexu.flow.FlowRegistry;
@@ -42,12 +51,6 @@ import lu.nowina.nexu.generic.SCDatabaseLoader;
 import lu.nowina.nexu.view.core.ExtensionFilter;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
-
-import org.apache.commons.lang.ClassUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import eu.europa.esig.dss.token.PasswordInputCallback;
 
 public class NexUApp extends Application implements UIDisplay {
 
@@ -176,8 +179,9 @@ public class NexUApp extends Application implements UIDisplay {
 	private void buildAndRegisterPlugin(InternalAPI api, String pluginClassName, String pluginId, boolean exceptionOnFailure) {
 
 		try {
-			Class<?> clazz = Class.forName(pluginClassName);
-			Object plugin = clazz.newInstance();
+			final Class<? extends NexuPlugin> clazz = Class.forName(pluginClassName).asSubclass(NexuPlugin.class);
+			final NexuPlugin plugin = clazz.newInstance();
+			notifyPreloader(plugin.init(pluginId, api));
 			for (Object o : ClassUtils.getAllInterfaces(clazz)) {
 				registerPlugin(api, pluginId, (Class<?>) o, plugin);
 			}
@@ -191,17 +195,31 @@ public class NexUApp extends Application implements UIDisplay {
 	}
 
 	private void registerPlugin(InternalAPI api, String pluginId, Class<?> i, Object plugin) {
-		if (SignaturePlugin.class.equals(i)) {
-			SignaturePlugin p = (SignaturePlugin) plugin;
-			p.init(pluginId, api);
-		}
 		if (HttpPlugin.class.equals(i)) {
-			HttpPlugin p = (HttpPlugin) plugin;
-			p.init(pluginId, api);
+			final HttpPlugin p = (HttpPlugin) plugin;
 			api.registerHttpContext(pluginId, p);
 		}
 	}
 
+	private void notifyPreloader(final List<InitializationMessage> messages) {
+		for(final InitializationMessage message : messages) {
+			final AlertType alertType;
+			switch(message.getMessageType()) {
+			case CONFIRMATION:
+				alertType = AlertType.CONFIRMATION;
+				break;
+			case WARNING:
+				alertType = AlertType.WARNING;
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown message type: " + message.getMessageType());	
+			}
+			final PreloaderMessage preloaderMessage = new PreloaderMessage(alertType, message.getTitle(),
+					message.getHeaderText(), message.getContentText(), message.isSendFeedback(), message.getException());
+			notifyPreloader(preloaderMessage);
+		}
+	}
+	
 	void display(Parent panel) {
 		logger.info("Display " + panel + " in display " + this + " from Thread " + Thread.currentThread().getName());
 		Platform.runLater(() -> {

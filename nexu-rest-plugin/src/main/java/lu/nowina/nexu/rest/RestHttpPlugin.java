@@ -13,6 +13,9 @@
  */
 package lu.nowina.nexu.rest;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.xml.bind.DatatypeConverter;
 
 import lu.nowina.nexu.api.AuthenticateRequest;
@@ -31,6 +34,7 @@ import lu.nowina.nexu.api.plugin.HttpPlugin;
 import lu.nowina.nexu.api.plugin.HttpRequest;
 import lu.nowina.nexu.api.plugin.HttpResponse;
 import lu.nowina.nexu.api.plugin.HttpStatus;
+import lu.nowina.nexu.api.plugin.InitializationMessage;
 import lu.nowina.nexu.json.GsonHelper;
 
 import org.apache.commons.io.IOUtils;
@@ -51,7 +55,8 @@ public class RestHttpPlugin implements HttpPlugin {
 	private static final Logger logger = LoggerFactory.getLogger(RestHttpPlugin.class.getName());
 
 	@Override
-	public void init(String pluginId, NexuAPI api) {
+	public List<InitializationMessage> init(String pluginId, NexuAPI api) {
+		return Collections.emptyList();
 	}
 
 	@Override
