@@ -88,7 +88,8 @@ public class PlatformStatisticManagerTest {
 		final Instant nextInstant = Instant.parse("1900-01-01T00:00:00.00Z");
 		synchronized(CLOCK) {
 			CLOCK.setNextInstant(nextInstant);
-			manager.addNewStatistic(Collections.emptyMap());
+			Map<String, String[]> emptyMap = Collections.emptyMap();
+			manager.addNewStatistic(emptyMap);
 		}
 		final File file = getFile(1900, 01, 01, 00, 00, 00);
 		Assert.assertNull(file);

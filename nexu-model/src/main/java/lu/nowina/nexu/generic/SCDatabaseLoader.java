@@ -33,7 +33,7 @@ public class SCDatabaseLoader {
 
 	private static final Logger logger = LoggerFactory.getLogger(SCDatabaseLoader.class.getName());
 
-	public static SCDatabase load(File f) {
+	public static SCDatabase load(final File f) {
 		SCDatabase db = null;
 		if (!f.exists()) {
 			db = new SCDatabase();
@@ -47,8 +47,11 @@ public class SCDatabaseLoader {
 				throw new TechnicalException("Cannot load database");
 			}
 		}
-		db.setOnAddAction((data) -> {
-			saveAs(data, f);
+		db.setOnAddAction(new DatabaseEventHandler() {
+			@Override
+			public void execute(SCDatabase data) {
+				saveAs(data, f);
+			}
 		});
 		return db;
 	}
