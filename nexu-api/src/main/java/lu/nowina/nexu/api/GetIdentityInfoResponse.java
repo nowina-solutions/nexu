@@ -13,9 +13,9 @@
  */
 package lu.nowina.nexu.api;
 
+import java.time.LocalDate;
 import java.util.Map;
 
-import org.joda.time.LocalDate;
 
 /**
  * Holds data for a response for a get identity info request.
