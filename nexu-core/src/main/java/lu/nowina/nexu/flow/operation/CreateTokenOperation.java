@@ -89,7 +89,8 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 			if (api.getAppConfig().isAdvancedModeAvailable() && api.getAppConfig().isEnablePopUps()) {
 				LOG.info("Advanced mode available");
 				final OperationResult<Boolean> result =
-						operationFactory.getOperation(UIOperation.class, display, "/fxml/unsupported-product.fxml").perform();
+						operationFactory.getOperation(UIOperation.class, display, "/fxml/unsupported-product.fxml",
+								new Object[]{api.getAppConfig().getApplicationName()}).perform();
 				if(result.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
 					return new OperationResult<Map<TokenOperationResultKey, Object>>(BasicOperationStatus.USER_CANCEL);
 				}
@@ -105,7 +106,8 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 					final Feedback feedback = new Feedback();
 					feedback.setFeedbackStatus(FeedbackStatus.PRODUCT_NOT_SUPPORTED);
 					operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml",
-							new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion()}).perform();
+							new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
+									api.getAppConfig().getApplicationName()}).perform();
 				}
 				return new OperationResult<Map<TokenOperationResultKey, Object>>(CoreOperationStatus.UNSUPPORTED_PRODUCT);
 			}
@@ -139,7 +141,8 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		LOG.info("Advanced mode selected");
 		@SuppressWarnings("unchecked")
 		final OperationResult<ScAPI> result =
-				operationFactory.getOperation(UIOperation.class, display, "/fxml/api-selection.fxml").perform();
+				operationFactory.getOperation(UIOperation.class, display, "/fxml/api-selection.fxml",
+						new Object[]{api.getAppConfig().getApplicationName()}).perform();
 		if(result.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
 			return new OperationResult<Map<TokenOperationResultKey, Object>>(BasicOperationStatus.USER_CANCEL);
 		}

@@ -17,17 +17,22 @@ import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
+import lu.nowina.nexu.api.EnvironmentInfo;
+import lu.nowina.nexu.api.OS;
 import lu.nowina.nexu.model.Pkcs11Params;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
+import lu.nowina.nexu.view.core.ExtensionFilter;
 
 public class Pkcs11ParamsController extends AbstractUIOperationController<Pkcs11Params> implements Initializable {
 
+	private static final OS OS = EnvironmentInfo.buildFromSystemProperties(System.getProperties()).getOs();
+	
 	@FXML
 	private Button ok;
 
@@ -37,10 +42,12 @@ public class Pkcs11ParamsController extends AbstractUIOperationController<Pkcs11
 	@FXML
 	private Button selectFile;
 
-	@FXML
-	private Label filename;
-
 	private File pkcs11File;
+	private BooleanProperty pkcs11FileSpecified;
+	
+	public Pkcs11ParamsController() {
+		pkcs11FileSpecified = new SimpleBooleanProperty(false);
+	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -49,14 +56,14 @@ public class Pkcs11ParamsController extends AbstractUIOperationController<Pkcs11
 			result.setPkcs11Lib(pkcs11File);
 			signalEnd(result);
 		});
+		ok.disableProperty().bind(Bindings.not(pkcs11FileSpecified));
 		cancel.setOnAction((e) -> {
 			signalUserCancel();
 		});
 		selectFile.setOnAction((e) -> {
-			FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle(resources.getString("fileChooser.title.openResourceFile"));
-			fileChooser.getExtensionFilters().addAll(new ExtensionFilter("DLL", "*.dll"));
-			pkcs11File = fileChooser.showOpenDialog(null);
+			pkcs11File = getDisplay().displayFileChooser(new ExtensionFilter(OS.getNativeLibraryFileExtensionDescription(),
+					OS.getNativeLibraryFileExtension()));
+			pkcs11FileSpecified.set(pkcs11File != null);
 		});
 	}
 

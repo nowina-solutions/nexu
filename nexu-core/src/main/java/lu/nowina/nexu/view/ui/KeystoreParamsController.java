@@ -17,15 +17,17 @@ import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
-import javafx.stage.FileChooser;
-import javafx.stage.FileChooser.ExtensionFilter;
 import lu.nowina.nexu.model.KeystoreParams;
 import lu.nowina.nexu.model.KeystoreType;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
+import lu.nowina.nexu.view.core.ExtensionFilter;
 
 public class KeystoreParamsController extends AbstractUIOperationController<KeystoreParams> implements Initializable {
 
@@ -41,27 +43,31 @@ public class KeystoreParamsController extends AbstractUIOperationController<Keys
 	@FXML
 	private PasswordField password;
 
-	private File keyStoreFile;
+	private File keystoreFile;
+	private BooleanProperty keystoreFileSpecified;
 
+	public KeystoreParamsController() {
+		keystoreFileSpecified = new SimpleBooleanProperty(false);
+	}
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		ok.setOnAction((event) -> {
-			final KeystoreParams result = new KeystoreParams(keyStoreFile, password.getText(),
-					(keyStoreFile.getName().toLowerCase().endsWith(".jks") ? KeystoreType.JKS : KeystoreType.PKCS12)
+			final KeystoreParams result = new KeystoreParams(keystoreFile, password.getText(),
+					(keystoreFile.getName().toLowerCase().endsWith(".jks") ? KeystoreType.JKS : KeystoreType.PKCS12)
 			);
 			signalEnd(result);
 		});
+		ok.disableProperty().bind(Bindings.not(keystoreFileSpecified));
 		cancel.setOnAction((e) -> {
 			signalUserCancel();
 		});
 		selectFile.setOnAction((e) -> {
-			FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle(resources.getString("fileChooser.title.openResourceFile"));
-			fileChooser.getExtensionFilters().addAll(
+			keystoreFile = getDisplay().displayFileChooser(
 					new ExtensionFilter("PKCS12", "*.p12", "*.pfx", "*.P12", "*.PFX"),
 					new ExtensionFilter("JKS", "*.jks", "*.JKS")
 			);
-			keyStoreFile = fileChooser.showOpenDialog(null);
+			keystoreFileSpecified.set(keystoreFile != null);
 		});
 	}
 

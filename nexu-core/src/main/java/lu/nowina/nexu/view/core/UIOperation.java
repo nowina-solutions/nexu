@@ -96,6 +96,7 @@ public class UIOperation<R> implements Operation<R> {
 		controller = loader.getController();
 		controller.init(params);
 		controller.setUIOperation(this);
+		controller.setDisplay(display);
 
 		display.displayAndWaitUIOperation(this);
 		return result;

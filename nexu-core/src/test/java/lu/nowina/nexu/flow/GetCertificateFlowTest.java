@@ -118,14 +118,12 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		final Operation<Object> returnFalseOperation = mock(Operation.class);
 		when(returnFalseOperation.perform()).thenReturn(new OperationResult<Object>(false));
 		when(operationFactory.getOperation(
-				UIOperation.class, display, "/fxml/unsupported-product.fxml")).thenReturn(returnFalseOperation);
+				eq(UIOperation.class), eq(display), eq("/fxml/unsupported-product.fxml"), any(Object[].class))).thenReturn(returnFalseOperation);
 
 		final Operation<Object> successOperation = mock(Operation.class);
 		when(successOperation.perform()).thenReturn(new OperationResult<Object>(BasicOperationStatus.SUCCESS));
 		when(operationFactory.getOperation(
 				eq(UIOperation.class), eq(display), eq("/fxml/provide-feedback.fxml"), any(Object[].class))).thenReturn(successOperation);
-		when(operationFactory.getOperation(
-				UIOperation.class, display, "/fxml/message.fxml", new Object[]{"Finished"})).thenReturn(successOperation);
 		
 		final GetCertificateFlow flow = new GetCertificateFlow(display, api);
 		flow.setOperationFactory(operationFactory);

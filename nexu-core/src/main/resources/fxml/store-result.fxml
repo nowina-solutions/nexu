@@ -30,7 +30,7 @@
         <top>
 		<VBox BorderPane.alignment="CENTER">
 			<children>
-				<Label styleClass="message" text="%store.configuration.header" wrapText="true" />
+				<Label styleClass="message" fx:id="message" wrapText="true" />
 			</children>
 		</VBox>
         </top>
@@ -46,7 +46,6 @@
 	<center>
 		<VBox styleClass="form-container" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="label" />
             <VBox prefHeight="200.0" prefWidth="100.0">
                <children>
                   <CheckBox fx:id="publish" mnemonicParsing="false" text="%store.configuration.commonServer" />

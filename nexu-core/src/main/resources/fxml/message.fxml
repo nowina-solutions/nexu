@@ -37,7 +37,7 @@
 	<center>
 		<VBox BorderPane.alignment="CENTER">
          <children>
-            <Label text="NexU has finished" fx:id="message" styleClass="message"/>
+            <Label text="NexU has finished" fx:id="message" styleClass="message" wrapText="true"/>
          </children>
 		</VBox>
 	</center>
