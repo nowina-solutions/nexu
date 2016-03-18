@@ -1,5 +1,5 @@
 /**
- * © Nowina Solutions, 2015-2015
+ * © Nowina Solutions, 2015-2016
  *
  * Concédée sous licence EUPL, version 1.1 ou – dès leur approbation par la Commission européenne - versions ultérieures de l’EUPL (la «Licence»).
  * Vous ne pouvez utiliser la présente œuvre que conformément à la Licence.
@@ -11,25 +11,24 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.view.core;
+package lu.nowina.nexu.flow.operation;
 
-import java.io.File;
-
-import eu.europa.esig.dss.token.PasswordInputCallback;
+import lu.nowina.nexu.api.flow.Operation;
+import lu.nowina.nexu.view.core.UIDisplay;
+import lu.nowina.nexu.view.core.UIOperation;
 
 /**
- * Représente une interface graphique visible par l'utilisateur. On peut demander l'affichage d'un panel spécifique ou montrer des panels pré-définis.
- * 
+ * An <code>UIDisplayAwareOperation</code> needs an implementation of {@link UIDisplay}
+ * as parameter.
+ *
+ * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public interface UIDisplay {
+public interface UIDisplayAwareOperation<R> extends Operation<R> {
 
-	<T> void displayAndWaitUIOperation(UIOperation<T> operation);
-
-	PasswordInputCallback getPasswordInputCallback();
-
-	File displayFileChooser(ExtensionFilter...extensionFilters);
+	/**
+	 * Sets the {@link UIDisplay} for {@link UIOperation}.
+	 * @param display The {@link UIDisplay} for {@link UIOperation}.
+	 */
+	void setDisplay(UIDisplay display);
 	
-	void display(NonBlockingUIOperation operation);
-	
-	void close(boolean blockingOperation);
 }

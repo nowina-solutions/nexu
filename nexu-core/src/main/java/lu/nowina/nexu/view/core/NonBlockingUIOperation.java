@@ -1,5 +1,5 @@
 /**
- * © Nowina Solutions, 2015-2015
+ * © Nowina Solutions, 2015-2016
  *
  * Concédée sous licence EUPL, version 1.1 ou – dès leur approbation par la Commission européenne - versions ultérieures de l’EUPL (la «Licence»).
  * Vous ne pouvez utiliser la présente œuvre que conformément à la Licence.
@@ -13,23 +13,24 @@
  */
 package lu.nowina.nexu.view.core;
 
-import java.io.File;
-
-import eu.europa.esig.dss.token.PasswordInputCallback;
-
 /**
- * Représente une interface graphique visible par l'utilisateur. On peut demander l'affichage d'un panel spécifique ou montrer des panels pré-définis.
- * 
+ * {@link UIOperation} that does not block and returns nothing.
+ *
+ * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public interface UIDisplay {
+public class NonBlockingUIOperation extends UIOperation<Void> {
 
-	<T> void displayAndWaitUIOperation(UIOperation<T> operation);
+	public NonBlockingUIOperation() {
+		super();
+	}
 
-	PasswordInputCallback getPasswordInputCallback();
+	@Override
+	protected void display() {
+		getDisplay().display(this);
+	}
 
-	File displayFileChooser(ExtensionFilter...extensionFilters);
-	
-	void display(NonBlockingUIOperation operation);
-	
-	void close(boolean blockingOperation);
+	@Override
+	protected void hide() {
+		getDisplay().close(false);
+	}
 }

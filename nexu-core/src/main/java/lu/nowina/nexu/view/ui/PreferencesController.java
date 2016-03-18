@@ -16,29 +16,24 @@ package lu.nowina.nexu.view.ui;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
-import lu.nowina.nexu.NexUApp;
 import lu.nowina.nexu.NexuLauncher;
 import lu.nowina.nexu.ProxyConfigurer;
 import lu.nowina.nexu.UserPreferences;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.OS;
-import lu.nowina.nexu.view.core.UIDisplay;
+import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
-public class PreferencesController implements Initializable {
+public class PreferencesController extends AbstractUIOperationController<Void> implements Initializable {
 
 	@FXML
 	private Button ok;
@@ -75,8 +70,6 @@ public class PreferencesController implements Initializable {
 	
 	private UserPreferences userPreferences;
 	
-	private UIDisplay display;
-
 	private BooleanProperty readOnly;
 	
 	private static final boolean isWindows;
@@ -85,11 +78,7 @@ public class PreferencesController implements Initializable {
 		isWindows = EnvironmentInfo.buildFromSystemProperties(System.getProperties()).getOs().equals(OS.WINDOWS);
 	}
 	
-	public void setDisplay(UIDisplay display) {
-		this.display = display;
-	}
-
-	public void init(final ProxyConfigurer proxyConfigurer) {
+	private void init(final ProxyConfigurer proxyConfigurer) {
 		if(isWindows) {
 			useSystemProxy.setSelected(proxyConfigurer.isUseSystemProxy());
 		} else {
@@ -108,14 +97,6 @@ public class PreferencesController implements Initializable {
 		proxyPassword.setText(proxyConfigurer.getProxyPassword());
 	}
 	
-	public void setUserPreferences(final UserPreferences userPreferences) {
-		this.userPreferences = userPreferences;
-	}
-	
-	public void setReadOnly(boolean readOnly) {
-		this.readOnly.set(readOnly);
-	}
-
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		readOnly = new SimpleBooleanProperty(false);
@@ -171,15 +152,23 @@ public class PreferencesController implements Initializable {
 			
 			NexuLauncher.getProxyConfigurer().updateValues(NexuLauncher.getConfig(), userPreferences);
 
-			display.close();
+			signalEnd(null);
 		});
 		cancel.setOnAction((e) -> {
-			display.close();
+			signalEnd(null);
 		});
 		reset.setOnAction((e) -> {
 			userPreferences.clear();
 			NexuLauncher.getProxyConfigurer().updateValues(NexuLauncher.getConfig(), userPreferences);
-			display.close();
+			signalEnd(null);
 		});
+	}
+
+	@Override
+	public void init(Object... params) {
+		final ProxyConfigurer proxyConfigurer = (ProxyConfigurer) params[0];
+		init(proxyConfigurer);
+		this.userPreferences = (UserPreferences) params[1];
+		this.readOnly.set((boolean) params[2]);
 	}
 }

@@ -98,7 +98,7 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 							}
 
 							if(api.getAppConfig().isEnablePopUps()) {
-								getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml", 
+								getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml", 
 										new Object[]{ ResourceBundle.getBundle("bundles/nexu").getString("certificates.flow.finished") }).perform();
 							}
 							return new Execution<GetCertificateResponse>(resp);

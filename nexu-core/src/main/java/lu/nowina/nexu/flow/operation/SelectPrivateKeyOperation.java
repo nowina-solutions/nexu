@@ -119,7 +119,7 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 			} else if(api.getAppConfig().isEnablePopUps()) {
 				@SuppressWarnings("unchecked")
 				final OperationResult<DSSPrivateKeyEntry> op =
-						operationFactory.getOperation(UIOperation.class, display, "/fxml/key-selection.fxml", new Object[]{keys}).perform();
+						operationFactory.getOperation(UIOperation.class, "/fxml/key-selection.fxml", new Object[]{keys}).perform();
 				if(op.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
 					return new OperationResult<DSSPrivateKeyEntry>(BasicOperationStatus.USER_CANCEL);
 				}

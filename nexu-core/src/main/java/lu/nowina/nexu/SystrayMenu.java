@@ -20,115 +20,65 @@ import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.util.ResourceBundle;
-
-import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import lu.nowina.nexu.api.NexuAPI;
-import lu.nowina.nexu.generic.DatabaseWebLoader;
-import lu.nowina.nexu.view.ui.AboutController;
-import lu.nowina.nexu.view.ui.PreferencesController;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.flow.operation.OperationFactory;
+import lu.nowina.nexu.generic.DatabaseWebLoader;
+import lu.nowina.nexu.view.core.NonBlockingUIOperation;
+
 public class SystrayMenu {
 
-	private static final Logger logger = LoggerFactory.getLogger(SystrayMenu.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(SystrayMenu.class.getName());
 
-	private TrayIcon trayIcon;
-
-	private MenuItem exitItem;
-
-	private MenuItem aboutItem;
-
-	private MenuItem preferencesItem;
-
-	public SystrayMenu(NexUApp display, DatabaseWebLoader webLoader, NexuAPI api) {
-
+	public SystrayMenu(OperationFactory operationFactory, DatabaseWebLoader webLoader, NexuAPI api) {
 		if (SystemTray.isSupported()) {
-
-			SystemTray tray = SystemTray.getSystemTray();
-			Image image = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/tray-icon.png"));
-
-			ActionListener actionListener = new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					if (e.getSource() == exitItem) {
-						System.out.println("Exiting...");
-						System.exit(0);
-					} else if (e.getSource() == aboutItem) {
-
-						FXMLLoader loader = new FXMLLoader();
-						try {
-							loader.setResources(ResourceBundle.getBundle("bundles/nexu"));
-							loader.load(getClass().getResourceAsStream("/fxml/about.fxml"));
-
-							Parent root = loader.getRoot();
-							AboutController controller = loader.getController();
-							controller.setApplicationName(api.getAppConfig().getApplicationName());
-							controller.setApplicationVersion(api.getAppConfig().getApplicationVersion());
-							controller.setDisplay(display);
-							controller.setDataLoader(webLoader);
-
-							Platform.runLater(() -> {
-								display.display(root);
-							});
-
-						} catch (IOException ex) {
-							throw new RuntimeException(ex);
-						}
-					} else if (e.getSource() == preferencesItem) {
-
-						FXMLLoader loader = new FXMLLoader();
-						try {
-							loader.setResources(ResourceBundle.getBundle("bundles/nexu"));
-							loader.load(getClass().getResourceAsStream("/fxml/preferences.fxml"));
-
-							Parent root = loader.getRoot();
-							PreferencesController controller = loader.getController();
-							controller.setDisplay(display);
-							final UserPreferences prefs = ((InternalAPI) api).getPrefs();
-							controller.init(new ProxyConfigurer(api.getAppConfig(), prefs));
-							controller.setUserPreferences(prefs);
-							controller.setReadOnly(!api.getAppConfig().isUserPreferencesEditable());
-
-							Platform.runLater(() -> {
-								display.display(root);
-							});
-
-						} catch (IOException ex) {
-							throw new RuntimeException(ex);
-						}
-					}
-				}
-			};
-
-			PopupMenu popup = new PopupMenu();
-			aboutItem = new MenuItem("About");
-			aboutItem.addActionListener(actionListener);
+			final ResourceBundle resources = ResourceBundle.getBundle("bundles/nexu");
+			final PopupMenu popup = new PopupMenu();
+			
+			final MenuItem aboutItem = new MenuItem(resources.getString("systray.menu.about"));
+			aboutItem.addActionListener((l) -> about(operationFactory, api, webLoader));
 			popup.add(aboutItem);
-			preferencesItem = new MenuItem("Preferences");
-			preferencesItem.addActionListener(actionListener);
+			
+			final MenuItem preferencesItem = new MenuItem(resources.getString("systray.menu.preferences"));
+			preferencesItem.addActionListener((l) -> preferences(operationFactory, api));
 			popup.add(preferencesItem);
-			exitItem = new MenuItem("Exit");
-			exitItem.addActionListener(actionListener);
+			
+			final MenuItem exitItem = new MenuItem(resources.getString("systray.menu.exit"));
+			exitItem.addActionListener((l) -> exit());
 			popup.add(exitItem);
 
-			trayIcon = new TrayIcon(image, api.getAppConfig().getApplicationName(), popup);
-
+			final Image image = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/tray-icon.png"));
+			final TrayIcon trayIcon = new TrayIcon(image, api.getAppConfig().getApplicationName(), popup);
 			trayIcon.setImageAutoSize(true);
-
 			try {
-				tray.add(trayIcon);
+				SystemTray.getSystemTray().add(trayIcon);
 			} catch (AWTException e) {
-				logger.error("Cannot add TrayIcon", e);
+				LOGGER.error("Cannot add TrayIcon", e);
 			}
 		} else {
-			logger.error("System tray is currently not supported.");
+			LOGGER.error("System tray is currently not supported.");
 		}
+	}
+	
+	private void about(final OperationFactory operationFactory, final NexuAPI api, final DatabaseWebLoader webLoader) {
+		operationFactory.getOperation(NonBlockingUIOperation.class, "/fxml/about.fxml",
+				api.getAppConfig().getApplicationName(), api.getAppConfig().getApplicationVersion(), webLoader).perform();
+	}
+	
+	private void preferences(final OperationFactory operationFactory, final NexuAPI api) {
+		final UserPreferences prefs = ((InternalAPI) api).getPrefs();
+		final ProxyConfigurer proxyConfigurer = new ProxyConfigurer(api.getAppConfig(), prefs);
+		
+		operationFactory.getOperation(NonBlockingUIOperation.class, "/fxml/preferences.fxml",
+				proxyConfigurer, prefs, !api.getAppConfig().isUserPreferencesEditable()).perform();
+	}
+	
+	private void exit() {
+		LOGGER.info("Exiting...");
+		System.exit(0);
 	}
 }

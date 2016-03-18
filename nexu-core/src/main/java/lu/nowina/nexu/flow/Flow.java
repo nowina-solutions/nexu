@@ -58,7 +58,7 @@ public abstract class Flow<I, O> {
 			final Execution<O> out = process(api, input);
 			return out;
 		} finally {
-			display.close();
+			display.close(true);
 		}
 	}
 
@@ -73,10 +73,10 @@ public abstract class Flow<I, O> {
 		if(api.getAppConfig().isEnablePopUps()) {
 			final Feedback feedback = new Feedback(e);
 			getOperationFactory().getOperation(
-					UIOperation.class, getDisplay(), "/fxml/provide-feedback.fxml",
+					UIOperation.class, "/fxml/provide-feedback.fxml",
 					new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
 							api.getAppConfig().getApplicationName()}).perform();
-			getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+			getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
 					new Object[]{MessageFormat.format(
 							ResourceBundle.getBundle("bundles/nexu").getString("exception.failure.message"),
 							api.getAppConfig().getApplicationName())

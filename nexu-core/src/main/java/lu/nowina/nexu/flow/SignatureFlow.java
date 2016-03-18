@@ -97,7 +97,7 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 							}
 							
 							if(api.getAppConfig().isEnablePopUps()) {
-								getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+								getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
 									new Object[]{ResourceBundle.getBundle("bundles/nexu").getString("signature.flow.finished")}).perform();
 							}
 							
@@ -107,7 +107,7 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 						}
 					} else {
 						if(api.getAppConfig().isEnablePopUps()) {
-							getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+							getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
 								new Object[]{MessageFormat.format(
 										ResourceBundle.getBundle("bundles/nexu").getString("signature.flow.no.key.selected"),
 										api.getAppConfig().getApplicationName())
@@ -117,7 +117,7 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 					}
 				} else {
 					if(api.getAppConfig().isEnablePopUps()) {
-						getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
+						getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
 							new Object[]{MessageFormat.format(
 									ResourceBundle.getBundle("bundles/nexu").getString("signature.flow.bad.token"),
 									api.getAppConfig().getApplicationName())									

@@ -37,6 +37,9 @@ public class BasicOperationFactory implements OperationFactory {
 				final CompositeOperation<R> compositeOperation = (CompositeOperation<R>) operation;
 				compositeOperation.setOperationFactory(this);
 				compositeOperation.setDisplay(display);
+			} else if(operation instanceof UIDisplayAwareOperation) {
+				final UIDisplayAwareOperation<R> uiDisplayAwareOperation = (UIDisplayAwareOperation<R>) operation;
+				uiDisplayAwareOperation.setDisplay(display);
 			}
 			operation.setParams(params);
 			return operation;

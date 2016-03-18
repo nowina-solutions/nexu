@@ -63,7 +63,7 @@ public class GetMatchingCardAdaptersOperation extends AbstractCompositeOperation
 			if(api.getAppConfig().isEnablePopUps()) {
 				final Feedback feedback = new Feedback();
 				feedback.setFeedbackStatus(FeedbackStatus.NO_PRODUCT_FOUND);
-				operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml",
+				operationFactory.getOperation(UIOperation.class, "/fxml/provide-feedback.fxml",
 						new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
 								api.getAppConfig().getApplicationName()}).perform();
 			}

@@ -18,24 +18,18 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Properties;
-import java.util.ResourceBundle;
 
 import org.apache.commons.lang.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.europa.esig.dss.token.PasswordInputCallback;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert.AlertType;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lu.nowina.nexu.NexUPreLoader.PreloaderMessage;
 import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.EnvironmentInfo;
-import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
 import lu.nowina.nexu.api.plugin.InitializationMessage;
 import lu.nowina.nexu.api.plugin.NexuPlugin;
@@ -48,19 +42,11 @@ import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.generic.HttpDataLoader;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCDatabaseLoader;
-import lu.nowina.nexu.view.core.ExtensionFilter;
 import lu.nowina.nexu.view.core.UIDisplay;
-import lu.nowina.nexu.view.core.UIOperation;
 
-public class NexUApp extends Application implements UIDisplay {
+public class NexUApp extends Application {
 
 	private static final Logger logger = LoggerFactory.getLogger(NexUApp.class.getName());
-
-	private Stage stage;
-
-	private OperationFactory operationFactory;
-	
-	private UIOperation<?> currentOperation;
 
 	private AppConfig getConfig() {
 		return NexuLauncher.getConfig();
@@ -74,20 +60,23 @@ public class NexUApp extends Application implements UIDisplay {
 	public void start(Stage primaryStage) throws Exception {
 		Platform.setImplicitExit(false);
 
-		this.stage = new Stage();
-
-		InternalAPI api = buildAPI();
+		final StandaloneUIDisplay uiDisplay = new StandaloneUIDisplay();
+		final OperationFactory operationFactory = new BasicOperationFactory();
+		operationFactory.setDisplay(uiDisplay);
+		uiDisplay.setOperationFactory(operationFactory);
+		
+		final InternalAPI api = buildAPI(uiDisplay, operationFactory);
 
 		logger.info("Start Jetty");
 
 		startHttpServer(api);
 
-		new SystrayMenu(this, api.getWebDatabase(), api);
+		new SystrayMenu(operationFactory, api.getWebDatabase(), api);
 
 		logger.info("Start finished");
 	}
 
-	protected InternalAPI buildAPI() throws IOException {
+	protected InternalAPI buildAPI(final UIDisplay uiDisplay, final OperationFactory operationFactory) throws IOException {
 		File nexuHome = NexuLauncher.getNexuHome();
 		SCDatabase db = null;
 		if (nexuHome != null) {
@@ -104,10 +93,8 @@ public class NexUApp extends Application implements UIDisplay {
 				new HttpDataLoader(NexuLauncher.getProxyConfigurer(), getConfig().getApplicationVersion(), getConfig().isSendAnonymousInfoToProxy()));
 		loader.start();
 
-		this.operationFactory = new BasicOperationFactory();
-		this.operationFactory.setDisplay(this);
-		InternalAPI api = new InternalAPI(this, new UserPreferences(getConfig().getApplicationName()), db, detector, loader,
-				getFlowRegistry(), this.operationFactory, getConfig());
+		InternalAPI api = new InternalAPI(uiDisplay, new UserPreferences(getConfig().getApplicationName()), db, detector, loader,
+				getFlowRegistry(), operationFactory, getConfig());
 
 		for (String key : getProperties().stringPropertyNames()) {
 			if (key.startsWith("plugin_")) {
@@ -220,103 +207,8 @@ public class NexUApp extends Application implements UIDisplay {
 		}
 	}
 	
-	void display(Parent panel) {
-		logger.info("Display " + panel + " in display " + this + " from Thread " + Thread.currentThread().getName());
-		Platform.runLater(() -> {
-			logger.info("Display " + panel + " in display " + this + " from Thread " + Thread.currentThread().getName());
-			if (!stage.isShowing()) {
-				stage = createStage();
-				logger.info("Loading ui " + panel + " is a new Stage " + stage);
-			} else {
-				logger.info("Stage still showing, display " + panel);
-			}
-			stage.setScene(new Scene(panel));
-			stage.show();
-		});
-	}
-
-	private Stage createStage() {
-		Stage newStage = new Stage();
-		newStage.setAlwaysOnTop(true);
-		newStage.setOnCloseRequest((e) -> {
-			logger.info("Closing stage " + stage + " from " + Thread.currentThread().getName());
-			stage.hide();
-			e.consume();
-
-			if (currentOperation != null) {
-				currentOperation.signalUserCancel();
-			}
-
-		});
-		return newStage;
-	}
-
-	public void displayWaitingPane() {
-	}
-
-	@Override
-	public void close() {
-
-		Platform.runLater(() -> {
-			Stage oldStage = stage;
-			logger.info("Hide stage " + stage + " and create new stage");
-			stage = createStage();
-			oldStage.hide();
-		});
-
-	}
-
 	@Override
 	public void stop() throws Exception {
 		// Can only happen with explicit user request
-	}
-
-	public <T> void displayAndWaitUIOperation(final UIOperation<T> operation) {
-		display(operation.getRoot());
-		waitForUser(operation);
-	}
-
-	private <T> void waitForUser(UIOperation<T> operation) {
-		try {
-			logger.info("Wait on Thread " + Thread.currentThread().getName());
-			currentOperation = operation;
-			operation.waitEnd();
-			currentOperation = null;
-			displayWaitingPane();
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private final class FlowPasswordCallback implements PasswordInputCallback {
-		@Override
-		public char[] getPassword() {
-			logger.info("Request password");
-			@SuppressWarnings("unchecked")
-			final OperationResult<char[]> passwordResult = NexUApp.this.operationFactory.getOperation(
-					UIOperation.class, NexUApp.this, "/fxml/password-input.fxml").perform();
-			return passwordResult.getResult();
-		}
-	}
-
-	public PasswordInputCallback getPasswordInputCallback() {
-		return new FlowPasswordCallback();
-	}
-
-	@Override
-	public File displayFileChooser(ExtensionFilter... extensionFilters) {
-		final FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle(ResourceBundle.getBundle("bundles/nexu").getString("fileChooser.title.openResourceFile"));
-		fileChooser.getExtensionFilters().addAll(toJavaFXExtensionFilters(extensionFilters));
-		return fileChooser.showOpenDialog(stage);
-	}
-	
-	private javafx.stage.FileChooser.ExtensionFilter[] toJavaFXExtensionFilters(ExtensionFilter... extensionFilters) {
-		final javafx.stage.FileChooser.ExtensionFilter[] result = new javafx.stage.FileChooser.ExtensionFilter[extensionFilters.length];
-		int i = 0;
-		for(final ExtensionFilter extensionFilter : extensionFilters) {
-			result[i++] = new javafx.stage.FileChooser.ExtensionFilter(extensionFilter.getDescription(), extensionFilter.getExtensions());
-		}
-		return result;
 	}
 }

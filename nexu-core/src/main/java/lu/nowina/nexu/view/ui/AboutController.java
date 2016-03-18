@@ -21,9 +21,9 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
-import lu.nowina.nexu.view.core.UIDisplay;
+import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
-public class AboutController implements Initializable {
+public class AboutController extends AbstractUIOperationController<Void> implements Initializable {
 
 	@FXML
 	private Label aboutTitle;
@@ -40,30 +40,24 @@ public class AboutController implements Initializable {
 	@FXML
 	private Label dbFile;
 
-	private UIDisplay display;
-
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		ok.setOnAction((e) -> {
-			display.close();
+			signalEnd(null);
 		});
 	}
 
-	public void setDataLoader(DatabaseWebLoader loader) {
-		String digest = loader.digestDatabase();
+	@Override
+	public void init(Object... params) {
+		final String applicationName = (String) params[0];
+		this.aboutTitle.setText(aboutTitle.getText() + " " + applicationName);
+		
+		final String applicationVersion = (String) params[1];
+		this.applicationVersion.setText(applicationVersion);
+		
+		final DatabaseWebLoader loader = (DatabaseWebLoader) params[2];
+		final String digest = loader.digestDatabase();
 		dbVersion.setText(digest != null ? digest : "no_database");
 		dbFile.setText(loader.getDatabaseFile().getAbsolutePath());
-	}
-
-	public void setDisplay(UIDisplay display) {
-		this.display = display;
-	}
-
-	public void setApplicationVersion(String applicationVersion) {
-		this.applicationVersion.setText(applicationVersion);
-	}
-	
-	public void setApplicationName(String applicationName) {
-		this.aboutTitle.setText(aboutTitle.getText() + " " + applicationName);
 	}
 }

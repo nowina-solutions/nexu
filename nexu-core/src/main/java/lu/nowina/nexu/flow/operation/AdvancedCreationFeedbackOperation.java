@@ -70,8 +70,7 @@ public class AdvancedCreationFeedbackOperation extends AbstractCompositeOperatio
 					((feedback.getSelectedAPI() == ScAPI.MOCCA) || (feedback.getSelectedAPI() == ScAPI.MSCAPI) ||
 							(feedback.getApiParameter() != null))) {
 				final OperationResult<Feedback> result =
-						operationFactory.getOperation(UIOperation.class, display,
-								"/fxml/store-result.fxml",
+						operationFactory.getOperation(UIOperation.class, "/fxml/store-result.fxml",
 								new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
 										api.getAppConfig().getApplicationName()}).perform();
 				if(result.getStatus().equals(BasicOperationStatus.SUCCESS)) {
@@ -82,7 +81,7 @@ public class AdvancedCreationFeedbackOperation extends AbstractCompositeOperatio
 					}
 				}
 			} else {
-				operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml",
+				operationFactory.getOperation(UIOperation.class, "/fxml/provide-feedback.fxml",
 						new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
 								api.getAppConfig().getApplicationName()}).perform();
 			}
