@@ -22,17 +22,13 @@
 
 <BorderPane prefHeight="200.0" prefWidth="250.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.APISelectionController">
 
-	<stylesheets>
-		<URL value="@/styles/nexu.css" />
-	</stylesheets>
-
-        <top>
+    <top>
 		<VBox BorderPane.alignment="CENTER">
 			<children>
 				<Label styleClass="message" fx:id="message" wrapText="true" />
 			</children>
 		</VBox>
-        </top>
+    </top>
 
 	<bottom>
 		<HBox styleClass="btn-container" BorderPane.alignment="CENTER">

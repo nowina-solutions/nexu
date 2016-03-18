@@ -66,7 +66,9 @@ public class StandaloneUIDisplay implements UIDisplay {
 			} else {
 				LOGGER.info("Stage still showing, display " + panel);
 			}
-			stage.setScene(new Scene(panel));
+			final Scene scene = new Scene(panel);
+			scene.getStylesheets().add(this.getClass().getResource("/styles/nexu.css").toString());
+			stage.setScene(scene);
 			stage.show();
 		});
 	}

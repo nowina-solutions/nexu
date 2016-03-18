@@ -23,10 +23,6 @@
 
 <BorderPane minHeight="350.0" minWidth="300" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.PreferencesController">
 
-	<stylesheets>
-		<URL value="@/styles/nexu.css" />
-	</stylesheets>
-
 	<top>
 		<GridPane alignment="CENTER" styleClass="form-container" vgap="5" hgap="10">
 			<children>

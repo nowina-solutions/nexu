@@ -21,10 +21,6 @@
 
 <BorderPane prefHeight="170.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.AboutController">
 
-	<stylesheets>
-		<URL value="@/styles/nexu.css" />
-	</stylesheets>
-
 	<top>
 		<GridPane hgap="5" vgap="5" alignment="CENTER">
 			<children>
