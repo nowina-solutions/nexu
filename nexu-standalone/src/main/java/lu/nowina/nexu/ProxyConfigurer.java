@@ -24,8 +24,8 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.OS;
-import lu.nowina.nexu.generic.WebUtilities;
-import lu.nowina.nexu.generic.WindowsRegistry;
+import lu.nowina.nexu.web.WebUtilities;
+import lu.nowina.nexu.windows.WindowsRegistry;
 
 /**
  * Configurer for the HTTP proxy that takes into account properties and user preferences.

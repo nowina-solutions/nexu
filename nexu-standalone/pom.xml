@@ -5,50 +5,60 @@
 		<artifactId>nexu</artifactId>
 		<version>1.5-SNAPSHOT</version>
 	</parent>
-	<artifactId>nexu-core</artifactId>
+	<artifactId>nexu-standalone</artifactId>
 
 	<dependencies>
-        <dependency>
-            <groupId>lu.nowina.apps</groupId>
-            <artifactId>nexu-util</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
-			<artifactId>nexu-api</artifactId>
+			<artifactId>nexu-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-			<artifactId>sscd-mocca-adapter</artifactId>
-			<version>${dss.version}</version>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.1</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>lu.nowina.apps</groupId>
-			<artifactId>nexu-model</artifactId>
-			<version>${project.version}</version>
+		    <groupId>org.slf4j</groupId>
+		    <artifactId>jcl-over-slf4j</artifactId>
+		    <version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>${slf4j.version}</version>
-			<scope>test</scope>
 		</dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jul-to-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
-			<artifactId>dss-token</artifactId>
-			<version>${dss.version}</version>
+		    <groupId>org.eclipse.jetty</groupId>
+		    <artifactId>jetty-server</artifactId>
+		    <version>9.3.3.v20150827</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 			<version>1.10.19</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>2.3.22</version>
 		</dependency>
 	</dependencies>
 

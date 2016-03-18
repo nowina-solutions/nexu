@@ -34,7 +34,7 @@ public class SystrayMenu {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SystrayMenu.class.getName());
 
-	public SystrayMenu(OperationFactory operationFactory, DatabaseWebLoader webLoader, NexuAPI api) {
+	public SystrayMenu(OperationFactory operationFactory, DatabaseWebLoader webLoader, NexuAPI api, UserPreferences prefs) {
 		if (SystemTray.isSupported()) {
 			final ResourceBundle resources = ResourceBundle.getBundle("bundles/nexu");
 			final PopupMenu popup = new PopupMenu();
@@ -44,7 +44,7 @@ public class SystrayMenu {
 			popup.add(aboutItem);
 			
 			final MenuItem preferencesItem = new MenuItem(resources.getString("systray.menu.preferences"));
-			preferencesItem.addActionListener((l) -> preferences(operationFactory, api));
+			preferencesItem.addActionListener((l) -> preferences(operationFactory, api, prefs));
 			popup.add(preferencesItem);
 			
 			final MenuItem exitItem = new MenuItem(resources.getString("systray.menu.exit"));
@@ -69,8 +69,7 @@ public class SystrayMenu {
 				api.getAppConfig().getApplicationName(), api.getAppConfig().getApplicationVersion(), webLoader).perform();
 	}
 	
-	private void preferences(final OperationFactory operationFactory, final NexuAPI api) {
-		final UserPreferences prefs = ((InternalAPI) api).getPrefs();
+	private void preferences(final OperationFactory operationFactory, final NexuAPI api, final UserPreferences prefs) {
 		final ProxyConfigurer proxyConfigurer = new ProxyConfigurer(api.getAppConfig(), prefs);
 		
 		operationFactory.getOperation(NonBlockingUIOperation.class, "/fxml/preferences.fxml",

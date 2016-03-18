@@ -10,7 +10,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
-			<artifactId>nexu-core</artifactId>
+			<artifactId>nexu-standalone</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

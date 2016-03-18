@@ -49,7 +49,6 @@ import lu.nowina.nexu.flow.FlowRegistry;
 import lu.nowina.nexu.flow.operation.CoreOperationStatus;
 import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.generic.ConnectionInfo;
-import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.generic.GenericCardAdapter;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCInfo;
@@ -72,8 +71,6 @@ public class InternalAPI implements NexuAPI {
 	
 	private Logger logger = LoggerFactory.getLogger(InternalAPI.class.getName());
 
-	private UserPreferences prefs;
-
 	private CardDetector detector;
 
 	private List<CardAdapter> adapters = new ArrayList<>();
@@ -86,7 +83,7 @@ public class InternalAPI implements NexuAPI {
 
 	private SCDatabase myDatabase;
 
-	private DatabaseWebLoader webDatabase;
+	private SCDatabase webDatabase;
 
 	private FlowRegistry flowRegistry;
 
@@ -98,13 +95,12 @@ public class InternalAPI implements NexuAPI {
 
 	private Future<?> currentTask;
 	
-	public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store, CardDetector detector, DatabaseWebLoader webLoader,
+	public InternalAPI(UIDisplay display, SCDatabase myDatabase, CardDetector detector, SCDatabase webDatabase,
 			FlowRegistry flowRegistry, OperationFactory operationFactory, AppConfig appConfig) {
 		this.display = display;
-		this.prefs = prefs;
-		this.myDatabase = store;
+		this.myDatabase = myDatabase;
 		this.detector = detector;
-		this.webDatabase = webLoader;
+		this.webDatabase = webDatabase;
 		this.flowRegistry = flowRegistry;
 		this.operationFactory = operationFactory;
 		this.appConfig = appConfig;
@@ -138,8 +134,8 @@ public class InternalAPI implements NexuAPI {
 		}
 		if (cards.isEmpty()) {
 			SCInfo info = null;
-			if (webDatabase != null && webDatabase.getDatabase() != null) {
-				info = webDatabase.getDatabase().getInfo(d.getAtr());
+			if (webDatabase != null) {
+				info = webDatabase.getInfo(d.getAtr());
 				if (info == null) {
 					logger.warn("Card " + d.getAtr() + " is not in the web database");
 				} else {
@@ -282,14 +278,6 @@ public class InternalAPI implements NexuAPI {
 		}
 	}
 
-	public DatabaseWebLoader getWebDatabase() {
-		return webDatabase;
-	}
-
-	public UserPreferences getPrefs() {
-		return prefs;
-	}
-	
 	@Override
 	public AppConfig getAppConfig() {
 		return appConfig;

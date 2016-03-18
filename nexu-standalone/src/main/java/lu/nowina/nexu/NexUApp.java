@@ -65,18 +65,22 @@ public class NexUApp extends Application {
 		operationFactory.setDisplay(uiDisplay);
 		uiDisplay.setOperationFactory(operationFactory);
 		
-		final InternalAPI api = buildAPI(uiDisplay, operationFactory);
+		DatabaseWebLoader loader = new DatabaseWebLoader(NexuLauncher.getConfig(),
+				new HttpDataLoader(NexuLauncher.getProxyConfigurer(), getConfig().getApplicationVersion(), getConfig().isSendAnonymousInfoToProxy()));
+		loader.start();
+		
+		final InternalAPI api = buildAPI(uiDisplay, operationFactory, loader);
 
 		logger.info("Start Jetty");
 
 		startHttpServer(api);
 
-		new SystrayMenu(operationFactory, api.getWebDatabase(), api);
+		new SystrayMenu(operationFactory, loader, api, new UserPreferences(getConfig().getApplicationName()));
 
 		logger.info("Start finished");
 	}
 
-	protected InternalAPI buildAPI(final UIDisplay uiDisplay, final OperationFactory operationFactory) throws IOException {
+	protected InternalAPI buildAPI(final UIDisplay uiDisplay, final OperationFactory operationFactory, final DatabaseWebLoader loader) throws IOException {
 		File nexuHome = NexuLauncher.getNexuHome();
 		SCDatabase db = null;
 		if (nexuHome != null) {
@@ -89,12 +93,7 @@ public class NexUApp extends Application {
 
 		CardDetector detector = new CardDetector(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
 
-		DatabaseWebLoader loader = new DatabaseWebLoader(NexuLauncher.getConfig(),
-				new HttpDataLoader(NexuLauncher.getProxyConfigurer(), getConfig().getApplicationVersion(), getConfig().isSendAnonymousInfoToProxy()));
-		loader.start();
-
-		InternalAPI api = new InternalAPI(uiDisplay, new UserPreferences(getConfig().getApplicationName()), db, detector, loader,
-				getFlowRegistry(), operationFactory, getConfig());
+		InternalAPI api = new InternalAPI(uiDisplay, db, detector, loader.getDatabase(), getFlowRegistry(), operationFactory, getConfig());
 
 		for (String key : getProperties().stringPropertyNames()) {
 			if (key.startsWith("plugin_")) {
