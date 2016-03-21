@@ -15,6 +15,7 @@ package lu.nowina.nexu.api;
 
 import java.util.List;
 
+import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.PasswordInputCallback;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
@@ -71,4 +72,18 @@ public interface CardAdapter {
 	 * @return The keys of <code>token</code> matching the <code>certificateFilter</code>.
 	 */
 	List<DSSPrivateKeyEntry> getKeys(SignatureTokenConnection token, CertificateFilter certificateFilter);
+	
+	/**
+	 * Returns <code>true</code> if this card adapter can return supported digest algorithms for the given <code>card</code>.
+	 * @param card The card for which one would like to retrieve the supported digest algorithms.
+	 * @return <code>true</code> if this card adapter can return supported digest algorithms for the given <code>card</code>.
+	 */
+	boolean canReturnSuportedDigestAlgorithms(DetectedCard card);
+	
+	/**
+	 * Returns the list of supported digest algorithms for the given <code>card</code>.
+	 * @param card The card for which one would like to retrieve the supported digest algorithms.
+	 * @return The list of supported digest algorithms for the given <code>card</code>.
+	 */
+	List<DigestAlgorithm> getSupportedDigestAlgorithms(DetectedCard card);
 }

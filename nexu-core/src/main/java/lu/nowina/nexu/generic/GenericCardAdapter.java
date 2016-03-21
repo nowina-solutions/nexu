@@ -15,6 +15,7 @@ package lu.nowina.nexu.generic;
 
 import java.util.List;
 
+import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.MSCAPISignatureToken;
 import eu.europa.esig.dss.token.PasswordInputCallback;
@@ -77,5 +78,15 @@ public class GenericCardAdapter implements CardAdapter {
 	@Override
 	public List<DSSPrivateKeyEntry> getKeys(SignatureTokenConnection token, CertificateFilter certificateFilter) {
 		throw new IllegalStateException("This card adapter does not support certificate filter.");
+	}
+
+	@Override
+	public boolean canReturnSuportedDigestAlgorithms(DetectedCard card) {
+		return false;
+	}
+
+	@Override
+	public List<DigestAlgorithm> getSupportedDigestAlgorithms(DetectedCard card) {
+		throw new IllegalStateException("This card adapter cannot return list of supported digest algorithms.");
 	}
 }
