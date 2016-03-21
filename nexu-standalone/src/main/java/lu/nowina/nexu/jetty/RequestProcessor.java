@@ -25,17 +25,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import lu.nowina.nexu.ConfigurationException;
-import lu.nowina.nexu.InternalAPI;
-import lu.nowina.nexu.TechnicalException;
-import lu.nowina.nexu.api.Execution;
-import lu.nowina.nexu.api.Feedback;
-import lu.nowina.nexu.api.flow.BasicOperationStatus;
-import lu.nowina.nexu.api.plugin.HttpPlugin;
-import lu.nowina.nexu.api.plugin.HttpResponse;
-import lu.nowina.nexu.api.plugin.HttpStatus;
-import lu.nowina.nexu.json.GsonHelper;
-
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
@@ -44,6 +33,16 @@ import org.slf4j.LoggerFactory;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import lu.nowina.nexu.ConfigurationException;
+import lu.nowina.nexu.TechnicalException;
+import lu.nowina.nexu.api.Execution;
+import lu.nowina.nexu.api.Feedback;
+import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
+import lu.nowina.nexu.api.plugin.HttpPlugin;
+import lu.nowina.nexu.api.plugin.HttpResponse;
+import lu.nowina.nexu.api.plugin.HttpStatus;
+import lu.nowina.nexu.json.GsonHelper;
 
 public class RequestProcessor extends AbstractHandler {
 
@@ -58,7 +57,7 @@ public class RequestProcessor extends AbstractHandler {
 	
 	private static final String NEXUJS_TEMPLATE = "nexu.ftl.js";
 
-	private InternalAPI api;
+	private NexuAPI api;
 
 	private String nexuHostname;
 
@@ -75,7 +74,7 @@ public class RequestProcessor extends AbstractHandler {
 		}
 	}
 
-	public void setConfig(InternalAPI api) {
+	public void setConfig(NexuAPI api) {
 		this.api = api;
 	}
 	
@@ -168,7 +167,7 @@ public class RequestProcessor extends AbstractHandler {
 		String pluginId = target.substring(target.charAt(0) == '/' ? 1 : 0, index);
 
 		logger.info("Process request " + target + " pluginId: " + pluginId);
-		HttpPlugin httpPlugin = api.getPlugin(pluginId);
+		HttpPlugin httpPlugin = api.getHttpPlugin(pluginId);
 
 		HttpResponse resp = httpPlugin.process(api, new DelegatedHttpServerRequest(request, '/' + pluginId));
 		if (resp == null || resp.getContent() == null) {

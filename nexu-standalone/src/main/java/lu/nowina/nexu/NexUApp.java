@@ -15,11 +15,9 @@ package lu.nowina.nexu;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.commons.lang.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,10 +27,8 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.stage.Stage;
 import lu.nowina.nexu.NexUPreLoader.PreloaderMessage;
 import lu.nowina.nexu.api.AppConfig;
-import lu.nowina.nexu.api.EnvironmentInfo;
-import lu.nowina.nexu.api.plugin.HttpPlugin;
+import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.plugin.InitializationMessage;
-import lu.nowina.nexu.api.plugin.NexuPlugin;
 import lu.nowina.nexu.flow.BasicFlowRegistry;
 import lu.nowina.nexu.flow.Flow;
 import lu.nowina.nexu.flow.FlowRegistry;
@@ -69,7 +65,7 @@ public class NexUApp extends Application {
 				new HttpDataLoader(NexuLauncher.getProxyConfigurer(), getConfig().getApplicationVersion(), getConfig().isSendAnonymousInfoToProxy()));
 		loader.start();
 		
-		final InternalAPI api = buildAPI(uiDisplay, operationFactory, loader);
+		final NexuAPI api = buildAPI(uiDisplay, operationFactory, loader);
 
 		logger.info("Start Jetty");
 
@@ -80,7 +76,7 @@ public class NexUApp extends Application {
 		logger.info("Start finished");
 	}
 
-	protected InternalAPI buildAPI(final UIDisplay uiDisplay, final OperationFactory operationFactory, final DatabaseWebLoader loader) throws IOException {
+	private NexuAPI buildAPI(final UIDisplay uiDisplay, final OperationFactory operationFactory, final DatabaseWebLoader loader) throws IOException {
 		File nexuHome = NexuLauncher.getNexuHome();
 		SCDatabase db = null;
 		if (nexuHome != null) {
@@ -90,22 +86,9 @@ public class NexUApp extends Application {
 		} else {
 			db = new SCDatabase();
 		}
-
-		CardDetector detector = new CardDetector(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
-
-		InternalAPI api = new InternalAPI(uiDisplay, db, detector, loader, getFlowRegistry(), operationFactory, getConfig());
-
-		for (String key : getProperties().stringPropertyNames()) {
-			if (key.startsWith("plugin_")) {
-
-				String pluginClassName = getProperties().getProperty(key);
-				String pluginId = key.substring("plugin_".length());
-
-				logger.info(" + Plugin " + pluginClassName);
-				buildAndRegisterPlugin(api, pluginClassName, pluginId, false);
-
-			}
-		}
+		final APIBuilder builder = new APIBuilder();
+		final NexuAPI api = builder.build(uiDisplay, getConfig(), getFlowRegistry(), db, loader, operationFactory);
+		notifyPreloader(builder.initPlugins(api, getProperties()));
 		return api;
 	}
 
@@ -117,7 +100,7 @@ public class NexUApp extends Application {
 		return new BasicFlowRegistry();
 	}
 	
-	private void startHttpServer(InternalAPI api) throws Exception {
+	private void startHttpServer(NexuAPI api) throws Exception {
 		final HttpServer server = buildHttpServer();
 		server.setConfig(api);
 		try {
@@ -162,29 +145,9 @@ public class NexUApp extends Application {
 		}
 	}
 
-	private void buildAndRegisterPlugin(InternalAPI api, String pluginClassName, String pluginId, boolean exceptionOnFailure) {
-
-		try {
-			final Class<? extends NexuPlugin> clazz = Class.forName(pluginClassName).asSubclass(NexuPlugin.class);
-			final NexuPlugin plugin = clazz.newInstance();
-			notifyPreloader(plugin.init(pluginId, api));
-			for (Object o : ClassUtils.getAllInterfaces(clazz)) {
-				registerPlugin(api, pluginId, (Class<?>) o, plugin);
-			}
-		} catch (Exception e) {
-			logger.error(MessageFormat.format("Cannot register plugin {0} (id: {1})", pluginClassName, pluginId), e);
-			if (exceptionOnFailure) {
-				throw new RuntimeException(e);
-			}
-		}
-
-	}
-
-	private void registerPlugin(InternalAPI api, String pluginId, Class<?> i, Object plugin) {
-		if (HttpPlugin.class.equals(i)) {
-			final HttpPlugin p = (HttpPlugin) plugin;
-			api.registerHttpContext(pluginId, p);
-		}
+	@Override
+	public void stop() throws Exception {
+		// Can only happen with explicit user request
 	}
 
 	private void notifyPreloader(final List<InitializationMessage> messages) {
@@ -204,10 +167,5 @@ public class NexUApp extends Application {
 					message.getHeaderText(), message.getContentText(), message.isSendFeedback(), message.getException());
 			notifyPreloader(preloaderMessage);
 		}
-	}
-	
-	@Override
-	public void stop() throws Exception {
-		// Can only happen with explicit user request
 	}
 }

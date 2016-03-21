@@ -16,6 +16,7 @@ package lu.nowina.nexu.api;
 import java.util.List;
 
 import eu.europa.esig.dss.token.SignatureTokenConnection;
+import lu.nowina.nexu.api.plugin.HttpPlugin;
 
 /**
  * The API exposes the functionalities to the developer of Plugin.
@@ -45,4 +46,6 @@ public interface NexuAPI {
 	Execution<AuthenticateResponse> authenticate(AuthenticateRequest request);
 	
 	AppConfig getAppConfig();
+	
+	HttpPlugin getHttpPlugin(String pluginId);
 }

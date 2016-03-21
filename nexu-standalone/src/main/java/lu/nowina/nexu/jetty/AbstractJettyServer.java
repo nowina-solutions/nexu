@@ -13,12 +13,11 @@
  */
 package lu.nowina.nexu.jetty;
 
-import lu.nowina.nexu.HttpServer;
-import lu.nowina.nexu.InternalAPI;
-import lu.nowina.nexu.api.NexuAPI;
-
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
+
+import lu.nowina.nexu.HttpServer;
+import lu.nowina.nexu.api.NexuAPI;
 
 /**
  * Abstract base implementation of {@link HttpServer} for <code>Jetty</code>.
@@ -27,7 +26,7 @@ import org.eclipse.jetty.server.Server;
  */
 public abstract class AbstractJettyServer implements HttpServer {
 
-	private InternalAPI api;
+	private NexuAPI api;
 	
 	private Server server;
 	
@@ -36,7 +35,7 @@ public abstract class AbstractJettyServer implements HttpServer {
 	}
 
 	@Override
-	public void setConfig(InternalAPI api) {
+	public void setConfig(NexuAPI api) {
 		this.api = api;
 	}
 

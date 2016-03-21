@@ -13,6 +13,7 @@
  */
 package lu.nowina.nexu;
 
+import lu.nowina.nexu.api.NexuAPI;
 
 /**
  * Interface for the local HTTP Server.
@@ -22,7 +23,7 @@ package lu.nowina.nexu;
  */
 public interface HttpServer {
 
-	void setConfig(InternalAPI api);
+	void setConfig(NexuAPI api);
 
 	void start() throws Exception;
 

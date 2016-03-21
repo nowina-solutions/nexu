@@ -257,8 +257,8 @@ public class InternalAPI implements NexuAPI {
 		return executeRequest(flow, request);
 	}
 	
-
-	public HttpPlugin getPlugin(String context) {
+	@Override
+	public HttpPlugin getHttpPlugin(String context) {
 		return httpPlugins.get(context);
 	}
 
