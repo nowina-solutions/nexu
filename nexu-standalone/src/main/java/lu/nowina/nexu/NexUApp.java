@@ -93,7 +93,7 @@ public class NexUApp extends Application {
 
 		CardDetector detector = new CardDetector(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
 
-		InternalAPI api = new InternalAPI(uiDisplay, db, detector, loader.getDatabase(), getFlowRegistry(), operationFactory, getConfig());
+		InternalAPI api = new InternalAPI(uiDisplay, db, detector, loader, getFlowRegistry(), operationFactory, getConfig());
 
 		for (String key : getProperties().stringPropertyNames()) {
 			if (key.startsWith("plugin_")) {

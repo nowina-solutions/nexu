@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 import lu.nowina.nexu.NexuLauncher;
 import lu.nowina.nexu.api.AppConfig;
 
-public class DatabaseWebLoader {
+public class DatabaseWebLoader implements SCDatabaseRefresher {
 
 	private static final Logger logger = LoggerFactory.getLogger(DatabaseWebLoader.class.getName());
 
@@ -194,6 +194,7 @@ public class DatabaseWebLoader {
 		updateHandle = scheduler.scheduleAtFixedRate(updateTask, 1, UPDATE_RATE, TimeUnit.MINUTES);
 	}
 
+	@Override
 	public SCDatabase getDatabase() {
 		if (database == null) {
 			database = new SCDatabase();

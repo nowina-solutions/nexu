@@ -13,17 +13,15 @@
  */
 package lu.nowina.nexu.generic;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.net.URL;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,13 +36,12 @@ public class SCDatabaseLoader {
 		if (!f.exists()) {
 			db = new SCDatabase();
 		} else {
-			try (FileInputStream in = new FileInputStream(f)) {
-				byte[] data = IOUtils.toByteArray(in);
-				JAXBContext ctx = createJaxbContext();
-				Unmarshaller u = ctx.createUnmarshaller();
-				db = (SCDatabase) u.unmarshal(new ByteArrayInputStream(data));
-			} catch (Exception e) {
-				throw new TechnicalException("Cannot load database");
+			try {
+				final JAXBContext ctx = createJaxbContext();
+				final Unmarshaller u = ctx.createUnmarshaller();
+				db = (SCDatabase) u.unmarshal(f);
+			} catch (final Exception e) {
+				throw new TechnicalException("Cannot load database", e);
 			}
 		}
 		db.setOnAddAction(new DatabaseEventHandler() {
@@ -56,13 +53,23 @@ public class SCDatabaseLoader {
 		return db;
 	}
 
+	public static SCDatabase load(final URL url) {
+		try {
+			final JAXBContext ctx = createJaxbContext();
+			final Unmarshaller u = ctx.createUnmarshaller();
+			return (SCDatabase) u.unmarshal(url);
+		} catch (final Exception e) {
+			throw new TechnicalException("Cannot load database", e);
+		}
+	}
+	
 	private static JAXBContext createJaxbContext() {
 		try {
 			JAXBContext ctx = JAXBContext.newInstance(SCDatabase.class);
 			return ctx;
 		} catch (JAXBException e) {
 			logger.error("Cannot instanciate JAXBContext", e);
-			throw new TechnicalException("Cannot instanciate JAXBContext");
+			throw new TechnicalException("Cannot instanciate JAXBContext", e);
 		}
 	}
 
@@ -75,8 +82,7 @@ public class SCDatabaseLoader {
 			}
 		} catch (Exception e) {
 			logger.error("Cannot save database", e);
-			throw new TechnicalException("Cannot save database");
+			throw new TechnicalException("Cannot save database", e);
 		}
 	}
-
 }

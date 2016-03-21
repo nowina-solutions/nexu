@@ -51,6 +51,7 @@ import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.generic.ConnectionInfo;
 import lu.nowina.nexu.generic.GenericCardAdapter;
 import lu.nowina.nexu.generic.SCDatabase;
+import lu.nowina.nexu.generic.SCDatabaseRefresher;
 import lu.nowina.nexu.generic.SCInfo;
 import lu.nowina.nexu.view.core.UIDisplay;
 
@@ -83,7 +84,7 @@ public class InternalAPI implements NexuAPI {
 
 	private SCDatabase myDatabase;
 
-	private SCDatabase webDatabase;
+	private SCDatabaseRefresher webDatabase;
 
 	private FlowRegistry flowRegistry;
 
@@ -95,7 +96,7 @@ public class InternalAPI implements NexuAPI {
 
 	private Future<?> currentTask;
 	
-	public InternalAPI(UIDisplay display, SCDatabase myDatabase, CardDetector detector, SCDatabase webDatabase,
+	public InternalAPI(UIDisplay display, SCDatabase myDatabase, CardDetector detector, SCDatabaseRefresher webDatabase,
 			FlowRegistry flowRegistry, OperationFactory operationFactory, AppConfig appConfig) {
 		this.display = display;
 		this.myDatabase = myDatabase;
@@ -134,8 +135,8 @@ public class InternalAPI implements NexuAPI {
 		}
 		if (cards.isEmpty()) {
 			SCInfo info = null;
-			if (webDatabase != null) {
-				info = webDatabase.getInfo(d.getAtr());
+			if (webDatabase != null && webDatabase.getDatabase() != null) {
+				info = webDatabase.getDatabase().getInfo(d.getAtr());
 				if (info == null) {
 					logger.warn("Card " + d.getAtr() + " is not in the web database");
 				} else {
