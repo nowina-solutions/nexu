@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -282,7 +283,12 @@ public class AppConfig {
 	
 	public void loadFromProperties(final Properties props) {
 		setApplicationName(props.getProperty(APPLICATION_NAME, "NexU"));
-		setBindingPorts(toListOfInt(props.getProperty(BINDING_PORTS, "9876, 9877, 9878")));
+		
+		final String bindingPortsStr = props.getProperty(BINDING_PORTS, "9876, 9877, 9878");
+		if(StringUtils.isNotEmpty(bindingPortsStr)) {
+			setBindingPorts(toListOfInt(bindingPortsStr));
+		}
+		
 		setBindingIP(props.getProperty(BINDING_IP, "127.0.0.1"));
 		setServerUrl(props.getProperty(SERVER_URL, "http://lab.nowina.solutions/nexu"));
 		setInstallUrl(props.getProperty(INSTALL_URL, "http://nowina.lu/nexu/"));
