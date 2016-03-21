@@ -109,7 +109,9 @@ public class InternalAPI implements NexuAPI {
 		this.executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
 			@Override
 			public Thread newThread(Runnable r) {
-				return new Thread(EXECUTOR_THREAD_GROUP, r);
+				final Thread t = new Thread(EXECUTOR_THREAD_GROUP, r);
+				t.setDaemon(true);
+				return t;
 			}
 		});
 		this.currentTask = null;
