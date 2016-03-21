@@ -19,14 +19,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
-
-import javafx.application.Application;
-import lu.nowina.nexu.api.AppConfig;
-import lu.nowina.nexu.jetty.JettyServer;
-import lu.nowina.nexu.jetty.RequestProcessor;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.ConsoleAppender;
@@ -37,30 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
-public class NexuLauncher {
+import javafx.application.Application;
+import lu.nowina.nexu.api.AppConfig;
 
-	private static final String ADVANCED_MODE_AVAILABLE = "advanced_mode_available";
-	private static final String APPLICATION_NAME = "application_name";
-	private static final String DEBUG = "debug";
-	private static final String HTTP_SERVER_CLASS = "http_server_class";
-	private static final String NEXU_HOSTNAME = "nexu_hostname";
-	private static final String INSTALL_URL = "install_url";
-	private static final String SERVER_URL = "server_url";
-	private static final String BINDING_IP = "binding_ip";
-	private static final String BINDING_PORTS = "binding_ports";
-	private static final String CONNECTIONS_CACHE_MAX_SIZE = "connections_cache_max_size";
-	private static final String ENABLE_POP_UPS = "enable_pop_ups";
-	private static final String SEND_ANONYMOUS_INFO_TO_PROXY = "send_anonymous_info_to_proxy";
-	private static final String USE_SYSTEM_PROXY = "use_system_proxy";
-	private static final String PROXY_SERVER = "proxy_server";
-	private static final String PROXY_PORT = "proxy_port";
-	private static final String PROXY_PROTOCOLE = "proxy_use_https";
-	private static final String PROXY_AUTHENTICATION = "proxy_authentication";
-	private static final String PROXY_USERNAME = "proxy_username";
-	private static final String PROXY_PASSWORD = "proxy_password";
-	private static final String USER_PREFERENCES_EDITABLE = "user_preferences_editable";
-	private static final String REQUEST_PROCESSOR_CLASS = "request_processor_class";
-	
+public class NexuLauncher {
 	private static final Logger logger = LoggerFactory.getLogger(NexuLauncher.class.getName());
 
 	private static AppConfig config;
@@ -74,7 +47,7 @@ public class NexuLauncher {
 		launcher.launch(args);
 	}
 
-	public void launch(String[] args) throws IOException {
+	protected void launch(String[] args) throws IOException {
 		props = loadProperties();
 		loadAppConfig(props);
 
@@ -125,8 +98,8 @@ public class NexuLauncher {
 		org.apache.log4j.Logger.getLogger("java.util.prefs").setLevel(Level.ERROR);
 	}
 
-	public void beforeLaunch() {
-
+	protected void beforeLaunch() {
+		// Do nothing by contract
 	}
 
 	public static AppConfig getConfig() {
@@ -183,7 +156,7 @@ public class NexuLauncher {
 		return false;
 	}
 
-	public final Properties loadProperties() throws IOException {
+	private final Properties loadProperties() throws IOException {
 
 		Properties props = new Properties();
 		loadPropertiesFromClasspath(props);
@@ -204,32 +177,9 @@ public class NexuLauncher {
 	 * @param props
 	 * @return
 	 */
-	public void loadAppConfig(Properties props) {
+	public final void loadAppConfig(Properties props) {
 		config = createAppConfig();
-
-		config.setApplicationName(props.getProperty(APPLICATION_NAME, "NexU"));
-		config.setBindingPorts(toListOfInt(props.getProperty(BINDING_PORTS, "9876, 9877, 9878")));
-		config.setBindingIP(props.getProperty(BINDING_IP, "127.0.0.1"));
-		config.setServerUrl(props.getProperty(SERVER_URL, "http://lab.nowina.solutions/nexu"));
-		config.setInstallUrl(props.getProperty(INSTALL_URL, "http://nowina.lu/nexu/"));
-		config.setNexuHostname(props.getProperty(NEXU_HOSTNAME, "localhost"));
-		config.setHttpServerClass(props.getProperty(HTTP_SERVER_CLASS, JettyServer.class.getName()));
-		config.setDebug(Boolean.parseBoolean(props.getProperty(DEBUG, "false")));
-		config.setAdvancedModeAvailable(Boolean.parseBoolean(props.getProperty(ADVANCED_MODE_AVAILABLE, "true")));
-		config.setConnectionsCacheMaxSize(Integer.parseInt(props.getProperty(CONNECTIONS_CACHE_MAX_SIZE, "50")));
-		config.setEnablePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_POP_UPS, "true")));
-		config.setSendAnonymousInfoToProxy(Boolean.parseBoolean(props.getProperty(SEND_ANONYMOUS_INFO_TO_PROXY, "true")));
-
-		config.setUseSystemProxy(Boolean.parseBoolean(props.getProperty(USE_SYSTEM_PROXY, "false")));
-		config.setProxyServer(props.getProperty(PROXY_SERVER, ""));
-		final String proxyPortStr = props.getProperty(PROXY_PORT, null);
-		config.setProxyPort((proxyPortStr != null) ? Integer.valueOf(proxyPortStr) : null);
-		config.setProxyUseHttps(Boolean.parseBoolean(props.getProperty(PROXY_PROTOCOLE, "false")));
-		config.setProxyAuthentication(Boolean.parseBoolean(props.getProperty(PROXY_AUTHENTICATION, "false")));
-		config.setProxyUsername(props.getProperty(PROXY_USERNAME, ""));
-		config.setProxyPassword(props.getProperty(PROXY_PASSWORD, ""));
-		config.setUserPreferencesEditable(Boolean.parseBoolean(props.getProperty(USER_PREFERENCES_EDITABLE, "true")));
-		config.setRequestProcessorClass(props.getProperty(REQUEST_PROCESSOR_CLASS, RequestProcessor.class.getName()));
+		config.loadFromProperties(props);
 	}
 
 	protected AppConfig createAppConfig() {
@@ -242,19 +192,5 @@ public class NexuLauncher {
 	 */
 	protected Class<? extends Application> getApplicationClass() {
 		return NexUApp.class;
-	}
-	
-	/**
-	 * Returns a list of {@link Integer} from <code>portsStr</code> which should be
-	 * tokenized by commas.
-	 * @param portsStr A list of ports tokenized by commas.
-	 * @return A list of {@link Integer}.
-	 */
-	protected List<Integer> toListOfInt(String portsStr) {
-		final List<Integer> ports = new ArrayList<Integer>();
-		for(final String port: portsStr.split(",")) {
-			ports.add(Integer.parseInt(port.trim()));
-		}
-		return ports;
 	}
 }
