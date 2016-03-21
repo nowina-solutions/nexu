@@ -86,4 +86,11 @@ public interface CardAdapter {
 	 * @return The list of supported digest algorithms for the given <code>card</code>.
 	 */
 	List<DigestAlgorithm> getSupportedDigestAlgorithms(DetectedCard card);
+	
+	/**
+	 * Returns the preferred digest algorithm for the given <code>card</code>.
+	 * @param card The card for which one would like to retrieve the preferred digest algorithm.
+	 * @return The preferred digest algorithm for the given <code>card</code>.
+	 */
+	DigestAlgorithm getPreferredDigestAlgorithm(DetectedCard card);
 }

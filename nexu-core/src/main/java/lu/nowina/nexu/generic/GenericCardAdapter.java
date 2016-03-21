@@ -89,4 +89,9 @@ public class GenericCardAdapter implements CardAdapter {
 	public List<DigestAlgorithm> getSupportedDigestAlgorithms(DetectedCard card) {
 		throw new IllegalStateException("This card adapter cannot return list of supported digest algorithms.");
 	}
+
+	@Override
+	public DigestAlgorithm getPreferredDigestAlgorithm(DetectedCard card) {
+		throw new IllegalStateException("This card adapter cannot return list of supported digest algorithms.");
+	}
 }

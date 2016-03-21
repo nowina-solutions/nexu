@@ -99,6 +99,7 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 
 							if(cardAdapter.canReturnSuportedDigestAlgorithms(card)) {
 								resp.setSupportedDigests(cardAdapter.getSupportedDigestAlgorithms(card));
+								resp.setPreferredDigest(cardAdapter.getPreferredDigestAlgorithm(card));
 							}
 							
 							if(api.getAppConfig().isEnablePopUps()) {
