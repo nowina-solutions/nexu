@@ -30,6 +30,9 @@ import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationResult;
+import lu.nowina.nexu.generic.ConnectionInfo;
+import lu.nowina.nexu.generic.GenericCardAdapter;
+import lu.nowina.nexu.generic.SCInfo;
 import lu.nowina.nexu.model.KeystoreParams;
 import lu.nowina.nexu.model.Pkcs11Params;
 import lu.nowina.nexu.view.core.UIOperation;
@@ -200,6 +203,17 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 			return new OperationResult<Map<TokenOperationResultKey, Object>>(CoreOperationStatus.UNSUPPORTED_PRODUCT);
 		}
 		map.put(TokenOperationResultKey.TOKEN_ID, tokenId);
+
+		final ConnectionInfo connectionInfo = new ConnectionInfo();
+		connectionInfo.setApiParam((String) map.get(TokenOperationResultKey.SELECTED_API_PARAMS));
+		connectionInfo.setSelectedApi((ScAPI) map.get(TokenOperationResultKey.SELECTED_API));
+		connectionInfo.setEnv(api.getEnvironmentInfo());
+		final SCInfo info = new SCInfo();
+		info.setAtr(selectedCard.getAtr());
+		info.getInfos().add(connectionInfo);
+		final GenericCardAdapter cardAdapter = new GenericCardAdapter(info);
+		map.put(TokenOperationResultKey.SELECTED_CARD_ADAPTER, cardAdapter);
+		
 		return new OperationResult<Map<TokenOperationResultKey,Object>>(map);
 	}
 }

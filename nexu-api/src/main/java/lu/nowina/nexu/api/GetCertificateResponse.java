@@ -33,6 +33,10 @@ public class GetCertificateResponse {
 
 	private List<DigestAlgorithm> supportedDigests;
 
+	public GetCertificateResponse() {
+		super();
+	}
+	
 	public TokenId getTokenId() {
 		return tokenId;
 	}

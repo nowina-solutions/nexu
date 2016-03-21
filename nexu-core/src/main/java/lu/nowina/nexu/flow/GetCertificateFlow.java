@@ -97,6 +97,10 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 								resp.setCertificateChain(certificateChain);
 							}
 
+							if(cardAdapter.canReturnSuportedDigestAlgorithms(card)) {
+								resp.setSupportedDigests(cardAdapter.getSupportedDigestAlgorithms(card));
+							}
+							
 							if(api.getAppConfig().isEnablePopUps()) {
 								getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml", 
 										new Object[]{ ResourceBundle.getBundle("bundles/nexu").getString("certificates.flow.finished") }).perform();
