@@ -25,6 +25,7 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.application.Platform;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
@@ -34,6 +35,8 @@ public class SystrayMenu {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SystrayMenu.class.getName());
 
+	private final TrayIcon trayIcon;
+	
 	public SystrayMenu(OperationFactory operationFactory, DatabaseWebLoader webLoader, NexuAPI api, UserPreferences prefs) {
 		if (SystemTray.isSupported()) {
 			final ResourceBundle resources = ResourceBundle.getBundle("bundles/nexu");
@@ -52,7 +55,7 @@ public class SystrayMenu {
 			popup.add(exitItem);
 
 			final Image image = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/tray-icon.png"));
-			final TrayIcon trayIcon = new TrayIcon(image, api.getAppConfig().getApplicationName(), popup);
+			trayIcon = new TrayIcon(image, api.getAppConfig().getApplicationName(), popup);
 			trayIcon.setImageAutoSize(true);
 			try {
 				SystemTray.getSystemTray().add(trayIcon);
@@ -60,6 +63,7 @@ public class SystrayMenu {
 				LOGGER.error("Cannot add TrayIcon", e);
 			}
 		} else {
+			trayIcon = null;
 			LOGGER.error("System tray is currently not supported.");
 		}
 	}
@@ -78,6 +82,9 @@ public class SystrayMenu {
 	
 	private void exit() {
 		LOGGER.info("Exiting...");
-		System.exit(0);
+		if(trayIcon != null) {
+			SystemTray.getSystemTray().remove(trayIcon);
+		}
+		Platform.exit();
 	}
 }

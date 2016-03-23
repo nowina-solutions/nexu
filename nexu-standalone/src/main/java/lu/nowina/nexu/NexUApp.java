@@ -44,6 +44,9 @@ public class NexUApp extends Application {
 
 	private static final Logger logger = LoggerFactory.getLogger(NexUApp.class.getName());
 
+	private HttpServer server;
+	private DatabaseWebLoader loader;
+	
 	private AppConfig getConfig() {
 		return NexuLauncher.getConfig();
 	}
@@ -61,7 +64,7 @@ public class NexUApp extends Application {
 		operationFactory.setDisplay(uiDisplay);
 		uiDisplay.setOperationFactory(operationFactory);
 		
-		DatabaseWebLoader loader = new DatabaseWebLoader(NexuLauncher.getConfig(),
+		loader = new DatabaseWebLoader(NexuLauncher.getConfig(),
 				new HttpDataLoader(NexuLauncher.getProxyConfigurer(), getConfig().getApplicationVersion(), getConfig().isSendAnonymousInfoToProxy()));
 		loader.start();
 		
@@ -69,7 +72,7 @@ public class NexUApp extends Application {
 
 		logger.info("Start Jetty");
 
-		startHttpServer(api);
+		server = startHttpServer(api);
 
 		new SystrayMenu(operationFactory, loader, api, new UserPreferences(getConfig().getApplicationName()));
 
@@ -100,7 +103,7 @@ public class NexUApp extends Application {
 		return new BasicFlowRegistry();
 	}
 	
-	private void startHttpServer(NexuAPI api) throws Exception {
+	private HttpServer startHttpServer(NexuAPI api) throws Exception {
 		final HttpServer server = buildHttpServer();
 		server.setConfig(api);
 		try {
@@ -111,13 +114,6 @@ public class NexUApp extends Application {
 			} catch(Exception e1) {}
 			throw e;
 		}
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-			try {
-				server.stop();
-			} catch (Exception e) {
-				logger.error("Cannot stop server", e);
-			}
-		}));
 		new Thread(() -> {
 			try {
 				server.join();
@@ -125,6 +121,7 @@ public class NexUApp extends Application {
 				logger.error("Exception on join", e);
 			}
 		});
+		return server;
 	}
 
 	/**
@@ -147,7 +144,22 @@ public class NexUApp extends Application {
 
 	@Override
 	public void stop() throws Exception {
-		// Can only happen with explicit user request
+		try {
+			if(server != null) {
+				server.stop();
+				server = null;
+			}
+		} catch (final Exception e) {
+			logger.error("Cannot stop server", e);
+		}
+		try {
+			if(loader != null) {
+				loader.stop();
+				loader = null;
+			}
+		} catch (final Exception e) {
+			logger.error("Cannot stop DatabaseLoader", e);
+		}
 	}
 
 	private void notifyPreloader(final List<InitializationMessage> messages) {
