@@ -23,7 +23,7 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<encoding>UTF-8</encoding>
 		<skip.package>false</skip.package>
-		<dss.version>4.6.RC1</dss.version>
+		<dss.version>4.6.0</dss.version>
         <maven.release.plugin.version>2.5.3</maven.release.plugin.version>
         <slf4j.version>1.7.12</slf4j.version>
 	</properties>
