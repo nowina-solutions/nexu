@@ -45,7 +45,7 @@ public class DatabaseWebLoader implements SCDatabaseRefresher {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseWebLoader.class.getName());
 
 	private byte[] databaseData;
-	private SCDatabase database;
+	private transient SCDatabase database;
 
 	private final String serverUrl;
 
@@ -94,7 +94,10 @@ public class DatabaseWebLoader implements SCDatabaseRefresher {
 		this.dataLoader = dataLoader;
 
 		try {
-			loadDatabaseFromCache();
+			databaseData = loadDatabaseFromCache();
+			if(databaseData != null) {
+				database = parseDatabase(databaseData);
+			}
 		} catch (IOException | JAXBException e) {
 			LOGGER.error("Cannot load database from cache", e);
 		}
@@ -107,13 +110,14 @@ public class DatabaseWebLoader implements SCDatabaseRefresher {
 
 	}
 
-	private void loadDatabaseFromCache() throws IOException, JAXBException {
+	private byte[] loadDatabaseFromCache() throws IOException, JAXBException {
 		final File databaseWeb = getDatabaseFile();
 		if (databaseWeb.exists() && databaseWeb.length() > 0) {
 			try (FileInputStream in = new FileInputStream(databaseWeb)) {
-				databaseData = IOUtils.toByteArray(in);
-				parseDatabase();
+				return IOUtils.toByteArray(in);
 			}
+		} else {
+			return null;
 		}
 	}
 
@@ -122,13 +126,13 @@ public class DatabaseWebLoader implements SCDatabaseRefresher {
 		return new File(nexuHome, "database-web.xml");
 	}
 
-	private SCDatabase parseDatabase() throws JAXBException {
+	private SCDatabase parseDatabase(final byte[] databaseData) throws JAXBException {
 		final JAXBContext ctx = JAXBContext.newInstance(SCDatabase.class);
 		final Unmarshaller u = ctx.createUnmarshaller();
 		return (SCDatabase) u.unmarshal(new ByteArrayInputStream(databaseData));
 	}
 
-	public String digestDatabase() {
+	public synchronized String digestDatabase() {
 		if (databaseData == null) {
 			return null;
 		} else {
@@ -141,19 +145,25 @@ public class DatabaseWebLoader implements SCDatabaseRefresher {
 		}
 	}
 
-	private void updateDatabase() throws JAXBException, IOException {
+	private synchronized void updateDatabase() throws JAXBException, IOException {
 		final NexuInfo info = fetchNexuInfo();
 		if (info != null && !info.getDatabaseVersion().equals(digestDatabase())) {
-			fetchDatabase();
+			databaseData = fetchDatabase();
+			if(databaseData != null) {
+				database = parseDatabase(databaseData);
+			}
 		}
 	}
 
-	private void fetchDatabase() throws IOException {
-		databaseData = dataLoader.fetchDatabase(serverUrl + "/database.xml");
-		if(databaseData != null) {
+	private byte[] fetchDatabase() throws IOException {
+		final byte[] databaseData = dataLoader.fetchDatabase(serverUrl + "/database.xml");
+		if((databaseData != null) && (databaseData.length > 0)) {
 			try (FileOutputStream out = new FileOutputStream(getDatabaseFile())) {
 				out.write(databaseData);
 			}
+			return databaseData;
+		} else {
+			return null;
 		}
 	}
 
@@ -175,7 +185,7 @@ public class DatabaseWebLoader implements SCDatabaseRefresher {
 	}
 
 	public void start() {
-		if (database == null) {
+		if (databaseData == null) {
 			scheduleUpdate();
 		} else {
 			scheduleTimer();
@@ -200,10 +210,7 @@ public class DatabaseWebLoader implements SCDatabaseRefresher {
 	}
 
 	@Override
-	public SCDatabase getDatabase() {
-		if (database == null) {
-			database = new SCDatabase();
-		}
-		return database;
+	public synchronized SCDatabase getDatabase() {
+		return (database != null) ? database : new SCDatabase();
 	}
 }
