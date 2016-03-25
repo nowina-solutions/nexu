@@ -117,8 +117,11 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 	}
 	
 	private String createKeyUsageString(CertificateToken token, ResourceBundle resources) {
-		StringBuilder builder = new StringBuilder();
-		boolean[] keyUsages = token.getCertificate().getKeyUsage();
+		final boolean[] keyUsages = token.getCertificate().getKeyUsage();
+		if(keyUsages == null) {
+			return "";
+		}
+		final StringBuilder builder = new StringBuilder();
 		if(keyUsages[0]) {
 			builder.append(resources.getString("keyUsage.digitalSignature") + "\n");
 		}
