@@ -14,6 +14,7 @@
 package lu.nowina.nexu;
 
 import java.io.File;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +35,7 @@ import lu.nowina.nexu.api.OS;
  * Detects smartcard.
  *
  */
+@SuppressWarnings("restriction")
 public class CardDetector {
 
 	private static final Logger logger = LoggerFactory.getLogger(CardDetector.class.getSimpleName());
@@ -86,10 +88,10 @@ public class CardDetector {
 				cardDetection.setAtr(DetectedCard.atrToString(atr.getBytes()));
 				cardDetection.setTerminalIndex(terminalIndex);
 				listCardDetect.add(cardDetection);
-				logger.info("Found card in terminal {0} with ATR {1}.", new Object[] { terminalIndex, cardDetection.getAtr() });
+				logger.info(MessageFormat.format("Found card in terminal {0} with ATR {1}.", terminalIndex, cardDetection.getAtr()));
 			} catch (CardException e) {
 				// Card not present or unreadable
-				logger.warn("No card present in terminal {0}, or not readable.", Integer.toString(terminalIndex));
+				logger.warn(MessageFormat.format("No card present in terminal {0}, or not readable.", Integer.toString(terminalIndex)));
 			}
 			terminalIndex++;
 		}
