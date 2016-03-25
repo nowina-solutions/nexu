@@ -14,6 +14,8 @@
 package lu.nowina.nexu.view.ui;
 
 import java.net.URL;
+import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
@@ -32,20 +34,23 @@ public class MessageController extends AbstractUIOperationController<Void> imple
 	
 	private String defaultErrorText;
 
+	private ResourceBundle resources;
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		ok.setOnAction((e) -> {
 			signalEnd(null);
 		}); 
 		defaultErrorText = resources.getString("error");
+		this.resources = resources;
 	}
 
 	@Override
 	public void init(Object... params) {
 		if (params.length > 0) {
-			String value = (String) params[0];
+			final String value = (String) params[0];
 			if (value != null) {
-				message.setText(value);
+				message.setText(MessageFormat.format(resources.getString(value), Arrays.copyOfRange(params, 1, params.length)));
 			}
 		} else {
 			message.setText(defaultErrorText);

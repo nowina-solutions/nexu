@@ -13,10 +13,14 @@
  */
 package lu.nowina.nexu.flow;
 
-import java.text.MessageFormat;
 import java.util.Map;
-import java.util.ResourceBundle;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.europa.esig.dss.SignatureValue;
+import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
+import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
@@ -35,13 +39,6 @@ import lu.nowina.nexu.flow.operation.SignOperation;
 import lu.nowina.nexu.flow.operation.TokenOperationResultKey;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import eu.europa.esig.dss.SignatureValue;
-import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
-import eu.europa.esig.dss.token.SignatureTokenConnection;
 
 class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse> {
 
@@ -98,7 +95,7 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 							
 							if(api.getAppConfig().isEnablePopUps()) {
 								getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
-									new Object[]{ResourceBundle.getBundle("bundles/nexu").getString("signature.flow.finished")}).perform();
+									new Object[]{"signature.flow.finished"}).perform();
 							}
 							
 							return new Execution<SignatureResponse>(new SignatureResponse(value, key.getCertificate(), key.getCertificateChain()));
@@ -108,20 +105,14 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 					} else {
 						if(api.getAppConfig().isEnablePopUps()) {
 							getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
-								new Object[]{MessageFormat.format(
-										ResourceBundle.getBundle("bundles/nexu").getString("signature.flow.no.key.selected"),
-										api.getAppConfig().getApplicationName())
-								}).perform();
+								new Object[]{"signature.flow.no.key.selected", api.getAppConfig().getApplicationName()}).perform();
 						}
 						return handleErrorOperationResult(selectPrivateKeyOperationResult);
 					}
 				} else {
 					if(api.getAppConfig().isEnablePopUps()) {
 						getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
-							new Object[]{MessageFormat.format(
-									ResourceBundle.getBundle("bundles/nexu").getString("signature.flow.bad.token"),
-									api.getAppConfig().getApplicationName())									
-							}).perform();
+							new Object[]{"signature.flow.bad.token", api.getAppConfig().getApplicationName()}).perform();
 					}
 					return handleErrorOperationResult(getTokenConnectionOperationResult);
 				}

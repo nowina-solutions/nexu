@@ -77,9 +77,6 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		when(operationFactory.getOperation(
 				eq(UIOperation.class), eq("/fxml/provide-feedback.fxml"), any(Object[].class))).thenReturn(successOperation);
 
-		when(operationFactory.getOperation(
-				UIOperation.class, "/fxml/message.fxml", new Object[]{"Finished"})).thenReturn(successOperation);
-		
 		final GetCertificateFlow flow = new GetCertificateFlow(display, api);
 		flow.setOperationFactory(operationFactory);
 		

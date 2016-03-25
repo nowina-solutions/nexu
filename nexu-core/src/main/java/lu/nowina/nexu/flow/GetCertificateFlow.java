@@ -15,8 +15,13 @@ package lu.nowina.nexu.flow;
 
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
+import eu.europa.esig.dss.token.SignatureTokenConnection;
+import eu.europa.esig.dss.x509.CertificateToken;
 import lu.nowina.nexu.api.CardAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Execution;
@@ -35,13 +40,6 @@ import lu.nowina.nexu.flow.operation.SelectPrivateKeyOperation;
 import lu.nowina.nexu.flow.operation.TokenOperationResultKey;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
-import eu.europa.esig.dss.token.SignatureTokenConnection;
-import eu.europa.esig.dss.x509.CertificateToken;
 
 class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCertificateResponse> {
 
@@ -104,7 +102,7 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 							
 							if(api.getAppConfig().isEnablePopUps()) {
 								getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml", 
-										new Object[]{ ResourceBundle.getBundle("bundles/nexu").getString("certificates.flow.finished") }).perform();
+										new Object[]{ "certificates.flow.finished" }).perform();
 							}
 							return new Execution<GetCertificateResponse>(resp);
 						} else {

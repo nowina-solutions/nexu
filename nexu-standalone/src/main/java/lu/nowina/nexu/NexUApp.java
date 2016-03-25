@@ -114,13 +114,6 @@ public class NexUApp extends Application {
 			} catch(Exception e1) {}
 			throw e;
 		}
-		new Thread(() -> {
-			try {
-				server.join();
-			} catch(Exception e) {
-				logger.error("Exception on join", e);
-			}
-		});
 		return server;
 	}
 
