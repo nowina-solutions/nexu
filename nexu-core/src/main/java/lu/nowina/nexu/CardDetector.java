@@ -87,6 +87,7 @@ public class CardDetector {
 				final ATR atr = card.getATR();
 				cardDetection.setAtr(DetectedCard.atrToString(atr.getBytes()));
 				cardDetection.setTerminalIndex(terminalIndex);
+				cardDetection.setTerminalLabel(cardTerminal.getName());
 				listCardDetect.add(cardDetection);
 				logger.info(MessageFormat.format("Found card in terminal {0} with ATR {1}.", terminalIndex, cardDetection.getAtr()));
 			} catch (CardException e) {

@@ -15,6 +15,7 @@ package lu.nowina.nexu.api;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -31,12 +32,25 @@ public class DetectedCard {
 	 */
 	private int terminalIndex;
 
+	/**
+	 * The terminal label.
+	 */
+	@XmlTransient
+	private String terminalLabel;
+	
 	public DetectedCard() {
 	}
 
 	public DetectedCard(String atr, int terminalIndex) {
 		this.atr = atr;
 		this.terminalIndex = terminalIndex;
+	}
+	
+	public DetectedCard(String atr, int terminalIndex, String terminalLabel) {
+		super();
+		this.atr = atr;
+		this.terminalIndex = terminalIndex;
+		this.terminalLabel = terminalLabel;
 	}
 
 	/**
@@ -99,4 +113,19 @@ public class DetectedCard {
 		this.terminalIndex = terminalIndex;
 	}
 
+	/**
+	 * Returns the label of the terminal from which the card info was read.
+	 * @return The label of the terminal from which the card info was read.
+	 */
+	public String getTerminalLabel() {
+		return terminalLabel;
+	}
+
+	/**
+	 * Sets the label of the terminal from which the card info was read.
+	 * @param terminalLabel The label of the terminal from which the card info was read.
+	 */
+	public void setTerminalLabel(String terminalLabel) {
+		this.terminalLabel = terminalLabel;
+	}
 }

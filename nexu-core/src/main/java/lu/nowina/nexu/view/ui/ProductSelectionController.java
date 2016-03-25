@@ -1,5 +1,5 @@
 /**
- * © Nowina Solutions, 2015-2015
+ * © Nowina Solutions, 2015-2016
  *
  * Concédée sous licence EUPL, version 1.1 ou – dès leur approbation par la Commission européenne - versions ultérieures de l’EUPL (la «Licence»).
  * Vous ne pouvez utiliser la présente œuvre que conformément à la Licence.
@@ -15,24 +15,36 @@ package lu.nowina.nexu.view.ui;
 
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
-import lu.nowina.nexu.api.EnvironmentInfo;
-import lu.nowina.nexu.api.OS;
-import lu.nowina.nexu.api.ScAPI;
+import javafx.scene.layout.Pane;
+import lu.nowina.nexu.api.DetectedCard;
+import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
-public class APISelectionController extends AbstractUIOperationController<ScAPI> implements Initializable {
+public class ProductSelectionController extends AbstractUIOperationController<Product> implements Initializable {
 
-	private static final boolean IS_WINDOWS =
-			EnvironmentInfo.buildFromSystemProperties(System.getProperties()).getOs().equals(OS.WINDOWS);
+	@FXML
+	private Label message;
+
+	@FXML
+	private Pane productsContainer;
+	
+	@FXML
+	private RadioButton addNewKeystore;
+
+	@FXML
+	private ToggleGroup product;
 	
 	@FXML
 	private Button select;
@@ -40,49 +52,20 @@ public class APISelectionController extends AbstractUIOperationController<ScAPI>
 	@FXML
 	private Button cancel;
 
-	@FXML
-	private RadioButton mscapi;
-
-	@FXML
-	private RadioButton pkcs11;
-
-	@FXML
-	private RadioButton pkcs12;
-	
-	@FXML
-	private ToggleGroup api;
-
-	@FXML
-	private Label message;
-	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		select.setOnAction((e) -> {
-			signalEnd(getSelectedAPI());
+			signalEnd(getSelectedProduct());
 		});
 		cancel.setOnAction((e) -> {
 			signalUserCancel();
 		});
 		
-		select.disableProperty().bind(api.selectedToggleProperty().isNull());
-		
-		if(!IS_WINDOWS) {
-			mscapi.setVisible(false);
-			mscapi.setManaged(false);
-		}
+		select.disableProperty().bind(product.selectedToggleProperty().isNull());
 	}
 
-	private ScAPI getSelectedAPI() {
-		if (mscapi.isSelected()) {
-			if(!IS_WINDOWS) {
-				throw new IllegalStateException("MSCAPI not supported on platforms other than Windows!");
-			}
-			return ScAPI.MSCAPI;
-		} else if (pkcs11.isSelected()) {
-			return ScAPI.PKCS_11;
-		} else if (pkcs12.isSelected()) {
-			return ScAPI.PKCS_12;
-		}
+	private Product getSelectedProduct() {
+		//TODO
 		return null;
 	}
 
@@ -90,8 +73,25 @@ public class APISelectionController extends AbstractUIOperationController<ScAPI>
 	public final void init(Object... params) {
 		Platform.runLater(() -> {
 			message.setText(MessageFormat.format(
-					ResourceBundle.getBundle("bundles/nexu").getString("api.selection.header"),
+					ResourceBundle.getBundle("bundles/nexu").getString("product.selection.header"),
 					params[0]));
+			@SuppressWarnings("unchecked")
+			final List<DetectedCard> cards = (List<DetectedCard>) params[1];
+			final List<RadioButton> cardRadioButtons = new ArrayList<>(cards.size());
+			for(final DetectedCard card : cards) {
+				final RadioButton button = new RadioButton(getRadioButtonLabel(card));
+				button.setToggleGroup(product);
+				// TODO return value for button?
+				cardRadioButtons.add(button);
+			}
+			productsContainer.getChildren().addAll(0, cardRadioButtons);
+			@SuppressWarnings("unchecked")
+			final List<Product> configuredKeystores = (List<Product>) params[2];
 		});
+	}
+	
+	private String getRadioButtonLabel(final DetectedCard card) {
+		//TODO
+		return null;
 	}
 }
