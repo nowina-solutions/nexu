@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "detectedCard", propOrder = { "atr", "terminalIndex" })
-public class DetectedCard {
+public class DetectedCard implements Product {
 
 	/**
 	 * The atr.

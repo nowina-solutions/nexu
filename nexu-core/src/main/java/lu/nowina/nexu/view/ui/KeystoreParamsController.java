@@ -24,8 +24,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
+import lu.nowina.nexu.api.KeystoreType;
 import lu.nowina.nexu.model.KeystoreParams;
-import lu.nowina.nexu.model.KeystoreType;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 import lu.nowina.nexu.view.core.ExtensionFilter;
 

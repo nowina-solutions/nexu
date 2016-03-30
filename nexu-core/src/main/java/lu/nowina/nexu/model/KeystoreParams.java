@@ -15,6 +15,8 @@ package lu.nowina.nexu.model;
 
 import java.io.File;
 
+import lu.nowina.nexu.api.KeystoreType;
+
 public class KeystoreParams {
 
 	private File pkcs12File;

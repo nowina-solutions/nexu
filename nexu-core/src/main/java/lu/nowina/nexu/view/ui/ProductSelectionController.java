@@ -19,16 +19,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.Pane;
+import lu.nowina.nexu.api.ConfiguredKeystore;
 import lu.nowina.nexu.api.DetectedCard;
+import lu.nowina.nexu.api.NewKeystore;
 import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
@@ -62,11 +65,12 @@ public class ProductSelectionController extends AbstractUIOperationController<Pr
 		});
 		
 		select.disableProperty().bind(product.selectedToggleProperty().isNull());
+		
+		addNewKeystore.setUserData(new NewKeystore());
 	}
 
 	private Product getSelectedProduct() {
-		//TODO
-		return null;
+		return (Product) product.getSelectedToggle().getUserData();
 	}
 
 	@Override
@@ -77,21 +81,37 @@ public class ProductSelectionController extends AbstractUIOperationController<Pr
 					params[0]));
 			@SuppressWarnings("unchecked")
 			final List<DetectedCard> cards = (List<DetectedCard>) params[1];
-			final List<RadioButton> cardRadioButtons = new ArrayList<>(cards.size());
+			@SuppressWarnings("unchecked")
+			final List<ConfiguredKeystore> configuredKeystores = (List<ConfiguredKeystore>) params[2];
+			final List<RadioButton> radioButtons = new ArrayList<>(cards.size() + configuredKeystores.size());
+			
 			for(final DetectedCard card : cards) {
 				final RadioButton button = new RadioButton(getRadioButtonLabel(card));
 				button.setToggleGroup(product);
-				// TODO return value for button?
-				cardRadioButtons.add(button);
+				button.setUserData(card);
+				radioButtons.add(button);
 			}
-			productsContainer.getChildren().addAll(0, cardRadioButtons);
-			@SuppressWarnings("unchecked")
-			final List<Product> configuredKeystores = (List<Product>) params[2];
+
+			for(final ConfiguredKeystore configuredKeystore : configuredKeystores) {
+				final RadioButton button = new RadioButton(getRadioButtonLabel(configuredKeystore));
+				button.setToggleGroup(product);
+				button.setUserData(configuredKeystore);
+				radioButtons.add(button);
+			}
+
+			productsContainer.getChildren().addAll(0, radioButtons);
 		});
 	}
 	
 	private String getRadioButtonLabel(final DetectedCard card) {
-		//TODO
-		return null;
+		return StringEscapeUtils.unescapeJava(MessageFormat.format(
+				ResourceBundle.getBundle("bundles/nexu").getString("product.selection.detected.card.button.label"),
+				card.getTerminalIndex(), card.getTerminalLabel(), card.getAtr()));
+	}
+	
+	private String getRadioButtonLabel(final ConfiguredKeystore configuredKeystore) {
+		return StringEscapeUtils.unescapeJava(MessageFormat.format(
+				ResourceBundle.getBundle("bundles/nexu").getString("product.selection.configured.keystore.button.label"),
+				configuredKeystore.getType().getLabel(), configuredKeystore.getUrl()));
 	}
 }

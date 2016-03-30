@@ -1,5 +1,5 @@
 /**
- * © Nowina Solutions, 2015-2015
+ * © Nowina Solutions, 2015-2016
  *
  * Concédée sous licence EUPL, version 1.1 ou – dès leur approbation par la Commission européenne - versions ultérieures de l’EUPL (la «Licence»).
  * Vous ne pouvez utiliser la présente œuvre que conformément à la Licence.
@@ -11,16 +11,17 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.model;
+package lu.nowina.nexu.api;
 
 /**
- * This enum gathers various keystore types supported by NexU.
+ * Placeholder for new keystore.
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public enum KeystoreType {
+public class NewKeystore implements Product {
 
-	JKS,
-	PKCS12;
-	
+	public NewKeystore() {
+		super();
+	}
+
 }
