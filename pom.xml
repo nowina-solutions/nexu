@@ -16,6 +16,7 @@
 		<module>nexu-util</module>
 		<module>nexu-bundle</module>
 		<module>nexu-standalone</module>
+		<module>nexu-public-object-model</module>
 	</modules>
 
 	<properties>

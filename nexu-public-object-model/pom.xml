@@ -1,0 +1,60 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>lu.nowina.apps</groupId>
+		<artifactId>nexu</artifactId>
+		<version>1.5-SNAPSHOT</version>
+	</parent>
+	<artifactId>nexu-public-object-model</artifactId>
+
+	<properties>
+	    <!-- We MUST use last beta version because of https://github.com/mapstruct/mapstruct/issues/634. -->
+		<org.mapstruct.version>1.1.0.Beta1</org.mapstruct.version>
+	</properties>
+
+	<dependencies>
+	    <dependency>
+	        <groupId>lu.nowina.apps</groupId>
+	        <artifactId>nexu-api</artifactId>
+	        <version>${project.version}</version>
+	        <scope>test</scope>
+	    </dependency>
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct-jdk8</artifactId>
+			<version>${org.mapstruct.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${org.mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <compilerArgs>
+                        <compilerArg>
+                            -Amapstruct.unmappedTargetPolicy=ERROR
+                        </compilerArg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+		</plugins>
+	</build>
+</project>
