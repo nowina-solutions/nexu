@@ -56,6 +56,7 @@ public interface FromPublicObjectModelToAPITestMapper {
 	@Mapping(target="detected", ignore=true)
 	@Mapping(target="selectedAPI", ignore=true)
 	@Mapping(target="selectedCard", ignore=true)
+	@Mapping(target="exception", ignore=true)
 	lu.nowina.nexu.api.Feedback mapFeedback(Feedback feedback);
 	lu.nowina.nexu.api.TokenId mapTokenId(TokenId tokenId);
 	eu.europa.esig.dss.ToBeSigned mapToBeSigned(ToBeSigned toBeSigned);

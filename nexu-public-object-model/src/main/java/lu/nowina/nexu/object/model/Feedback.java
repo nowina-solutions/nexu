@@ -21,7 +21,6 @@ package lu.nowina.nexu.object.model;
 public class Feedback {
 
 	private FeedbackStatus feedbackStatus;
-	private Exception exception;
 	private String stacktrace;
 	private String userComment;
 	private EnvironmentInfo info;
@@ -37,14 +36,6 @@ public class Feedback {
 
 	public void setFeedbackStatus(FeedbackStatus feedbackStatus) {
 		this.feedbackStatus = feedbackStatus;
-	}
-
-	public Exception getException() {
-		return exception;
-	}
-
-	public void setException(Exception exception) {
-		this.exception = exception;
 	}
 
 	public String getStacktrace() {
