@@ -15,11 +15,22 @@ package lu.nowina.nexu.object.model;
 
 import org.junit.Test;
 
+import com.google.common.reflect.TypeParameter;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import eu.europa.esig.dss.DigestAlgorithm;
+import eu.europa.esig.dss.EncryptionAlgorithm;
+import eu.europa.esig.dss.token.JKSSignatureToken;
+import eu.europa.esig.dss.x509.CertificateToken;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
+import org.apache.commons.codec.binary.Base64;
 import org.junit.Assert;
+
 import lu.nowina.nexu.json.GsonHelper;
 
 /**
@@ -28,6 +39,14 @@ import lu.nowina.nexu.json.GsonHelper;
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
 public class TestMarshallUnmarshallJSON {
+
+	private static final Gson customGson = new GsonBuilder().create();
+
+	@SuppressWarnings("serial")
+	private static <T> TypeToken<Execution<T>> buildTokenType(Class<T> clas) {
+		TypeToken<Execution<T>> where = new TypeToken<Execution<T>>() {}.where(new TypeParameter<T>() {}, clas);
+		return where;
+	}
 
 	public TestMarshallUnmarshallJSON() {
 		super();
@@ -45,6 +64,49 @@ public class TestMarshallUnmarshallJSON {
 		Assert.assertEquals("nonce", request.getNonce());
 		Assert.assertEquals("requestSeal", request.getRequestSeal());
 		Assert.assertEquals("userLocale", request.getUserLocale());
+	}
+	
+	private void setFeedback(final lu.nowina.nexu.api.Execution<?> execution) {
+		final lu.nowina.nexu.api.Feedback feedback = new lu.nowina.nexu.api.Feedback();
+		
+		feedback.setNexuVersion("nexuVersion");
+		
+		final lu.nowina.nexu.api.EnvironmentInfo environmentInfo = new lu.nowina.nexu.api.EnvironmentInfo();
+		environmentInfo.setArch(lu.nowina.nexu.api.Arch.AMD64);
+		environmentInfo.setJreVendor(lu.nowina.nexu.api.JREVendor.ORACLE);
+		environmentInfo.setOs(lu.nowina.nexu.api.OS.LINUX);
+		environmentInfo.setOsArch("osArch");
+		environmentInfo.setOsName("osName");
+		environmentInfo.setOsVersion("osVersion");
+		feedback.setInfo(environmentInfo);
+		
+		feedback.setFeedbackStatus(lu.nowina.nexu.api.FeedbackStatus.SUCCESS);
+		
+		feedback.setStacktrace("stackTrace");
+	
+		feedback.setUserComment("userComment");
+		
+		execution.setFeedback(feedback);
+	}
+	
+	private void assertFeedback(final Execution<?> execution) {
+		Assert.assertNotNull(execution.getFeedback());
+		
+		Assert.assertEquals("nexuVersion", execution.getFeedback().getNexuVersion());
+		
+		Assert.assertNotNull(execution.getFeedback().getInfo());
+		Assert.assertEquals(Arch.AMD64, execution.getFeedback().getInfo().getArch());
+		Assert.assertEquals(JREVendor.ORACLE, execution.getFeedback().getInfo().getJreVendor());
+		Assert.assertEquals(OS.LINUX, execution.getFeedback().getInfo().getOs());
+		Assert.assertEquals("osArch", execution.getFeedback().getInfo().getOsArch());
+		Assert.assertEquals("osName", execution.getFeedback().getInfo().getOsName());
+		Assert.assertEquals("osVersion", execution.getFeedback().getInfo().getOsVersion());
+		
+		Assert.assertEquals(FeedbackStatus.SUCCESS, execution.getFeedback().getFeedbackStatus());
+		
+		Assert.assertEquals("stackTrace", execution.getFeedback().getStacktrace());
+		
+		Assert.assertEquals("userComment", execution.getFeedback().getUserComment());
 	}
 	
 	@Test
@@ -65,7 +127,33 @@ public class TestMarshallUnmarshallJSON {
 
 	@Test
 	public void testGetCertificateResponse() {
-		//TODO
+		final CertificateToken certificate = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password").getKeys().get(0).getCertificate();
+		final lu.nowina.nexu.api.TokenId tokenId = new lu.nowina.nexu.api.TokenId();
+		tokenId.setId("tokenId");
+		final lu.nowina.nexu.api.GetCertificateResponse getCertificateResponse = new lu.nowina.nexu.api.GetCertificateResponse();
+		getCertificateResponse.setCertificate(certificate);
+		getCertificateResponse.setCertificateChain(new CertificateToken[]{certificate, certificate, certificate});
+		getCertificateResponse.setEncryptionAlgorithm(EncryptionAlgorithm.RSA);
+		getCertificateResponse.setKeyId("keyId");
+		getCertificateResponse.setPreferredDigest(DigestAlgorithm.SHA256);
+		getCertificateResponse.setSupportedDigests(Arrays.asList(DigestAlgorithm.SHA1, DigestAlgorithm.SHA256, DigestAlgorithm.SHA512));
+		getCertificateResponse.setTokenId(tokenId);
+		final lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.GetCertificateResponse> respAPI = new lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.GetCertificateResponse>(getCertificateResponse);
+		setFeedback(respAPI);
+		final String json = GsonHelper.toJson(respAPI);
+		
+		final Execution<GetCertificateResponse> resp = customGson.fromJson(json, buildTokenType(GetCertificateResponse.class).getType());
+		assertFeedback(resp);
+		Assert.assertNotNull(resp.getResponse());
+		final String certificateInBase64 = Base64.encodeBase64String(certificate.getEncoded());
+		Assert.assertEquals(certificateInBase64, resp.getResponse().getCertificate());
+		Assert.assertArrayEquals(new String[]{certificateInBase64, certificateInBase64, certificateInBase64}, resp.getResponse().getCertificateChain());
+		Assert.assertEquals("RSA", resp.getResponse().getEncryptionAlgorithm());
+		Assert.assertEquals("keyId", resp.getResponse().getKeyId());
+		Assert.assertEquals("SHA256", resp.getResponse().getPreferredDigest());
+		Assert.assertEquals(Arrays.asList("SHA1", "SHA256", "SHA512"), resp.getResponse().getSupportedDigests());
+		Assert.assertNotNull(resp.getResponse().getTokenId());
+		Assert.assertEquals("tokenId", resp.getResponse().getTokenId().getId());
 	}
 
 	@Test
@@ -132,6 +220,11 @@ public class TestMarshallUnmarshallJSON {
 
 	@Test
 	public void testAuthenticateResponse() {
+		//TODO
+	}
+	
+	@Test
+	public void testException() {
 		//TODO
 	}
 }
