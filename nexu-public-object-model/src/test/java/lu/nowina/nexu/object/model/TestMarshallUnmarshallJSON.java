@@ -22,6 +22,8 @@ import com.google.gson.GsonBuilder;
 
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.EncryptionAlgorithm;
+import eu.europa.esig.dss.SignatureAlgorithm;
+import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.token.JKSSignatureToken;
 import eu.europa.esig.dss.x509.CertificateToken;
 
@@ -161,7 +163,7 @@ public class TestMarshallUnmarshallJSON {
 		final TokenId tokenId = new TokenId();
 		tokenId.setId("tokenId");
 		final ToBeSigned tbs = new ToBeSigned();
-		tbs.setBytes("dG90bw==");
+		tbs.setBytes("dG8gYmUgc2lnbmVk");
 		final SignatureRequest signatureRequest = new SignatureRequest();
 		setCommonRequestFields(signatureRequest);
 		signatureRequest.setDigestAlgorithm("SHA1");
@@ -176,14 +178,31 @@ public class TestMarshallUnmarshallJSON {
 		Assert.assertEquals(DigestAlgorithm.SHA1, signatureRequestAPI.getDigestAlgorithm());
 		Assert.assertEquals("keyId", signatureRequestAPI.getKeyId());
 		Assert.assertNotNull(signatureRequestAPI.getToBeSigned());
-		Assert.assertEquals("toto", new String(signatureRequestAPI.getToBeSigned().getBytes(), StandardCharsets.UTF_8));
+		Assert.assertEquals("to be signed", new String(signatureRequestAPI.getToBeSigned().getBytes(), StandardCharsets.UTF_8));
 		Assert.assertNotNull(signatureRequestAPI.getTokenId());
 		Assert.assertEquals("tokenId", signatureRequestAPI.getTokenId().getId());
 	}
 
 	@Test
 	public void testSignatureResponse() {
-		//TODO
+		final CertificateToken certificate = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password").getKeys().get(0).getCertificate();
+		final lu.nowina.nexu.api.SignatureResponse signatureResponse = new lu.nowina.nexu.api.SignatureResponse(
+				new SignatureValue(SignatureAlgorithm.RSA_SHA256, "to be signed".getBytes(StandardCharsets.UTF_8)),
+				certificate,
+				new CertificateToken[]{certificate, certificate, certificate}
+		);
+		final lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.SignatureResponse> respAPI = new lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.SignatureResponse>(signatureResponse);
+		setFeedback(respAPI);
+		final String json = GsonHelper.toJson(respAPI);
+		
+		final Execution<SignatureResponse> resp = customGson.fromJson(json, buildTokenType(SignatureResponse.class).getType());
+		assertFeedback(resp);
+		Assert.assertNotNull(resp.getResponse());
+		final String certificateInBase64 = Base64.encodeBase64String(certificate.getEncoded());
+		Assert.assertEquals(certificateInBase64, resp.getResponse().getCertificate());
+		Assert.assertArrayEquals(new String[]{certificateInBase64, certificateInBase64, certificateInBase64}, resp.getResponse().getCertificateChain());
+		Assert.assertEquals("RSA_SHA256", resp.getResponse().getSignatureAlgorithm());
+		Assert.assertEquals("dG8gYmUgc2lnbmVk", resp.getResponse().getSignatureValue());
 	}
 
 	@Test
@@ -205,7 +224,7 @@ public class TestMarshallUnmarshallJSON {
 	@Test
 	public void testAuthenticateRequest() {
 		final ToBeSigned tbs = new ToBeSigned();
-		tbs.setBytes("dG90bw==");
+		tbs.setBytes("dG8gYmUgc2lnbmVk");
 		final AuthenticateRequest authenticateRequest = new AuthenticateRequest();
 		setCommonRequestFields(authenticateRequest);
 		authenticateRequest.setChallenge(tbs);
@@ -215,7 +234,7 @@ public class TestMarshallUnmarshallJSON {
 		Assert.assertNotNull(authenticateRequestAPI);
 		assertCommonRequestFields(authenticateRequestAPI);
 		Assert.assertNotNull(authenticateRequestAPI.getChallenge());
-		Assert.assertEquals("toto", new String(authenticateRequestAPI.getChallenge().getBytes(), StandardCharsets.UTF_8));
+		Assert.assertEquals("to be signed", new String(authenticateRequestAPI.getChallenge().getBytes(), StandardCharsets.UTF_8));
 	}
 
 	@Test
