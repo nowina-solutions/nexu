@@ -45,7 +45,7 @@ public interface FromAPIToPublicObjectModelTestMapper {
 
 	// Authenticate
 	AuthenticateRequest mapAuthenticateRequest(lu.nowina.nexu.api.AuthenticateRequest req);
-	AuthenticateResponse mapGetIdentityInfoResponse(lu.nowina.nexu.api.AuthenticateResponse resp);
+	AuthenticateResponse mapAuthenticateResponse(lu.nowina.nexu.api.AuthenticateResponse resp);
 	Execution<AuthenticateResponse> mapAuthenticateResponse(lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.AuthenticateResponse> resp);
 	
 	// Util

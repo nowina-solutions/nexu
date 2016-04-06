@@ -19,6 +19,7 @@ import lu.nowina.nexu.object.model.GetIdentityInfoResponse.Gender;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 /**
  * This test <code>MapStruct</code> mapper is used only to ease the maintenance
@@ -29,27 +30,25 @@ import org.mapstruct.Mapping;
 @Mapper(uses={UtilMappers.class})
 public interface FromPublicObjectModelToAPITestMapper {
 
-	/* TODO
 	// Get certificate
 	lu.nowina.nexu.api.GetCertificateRequest mapGetCertificateRequest(GetCertificateRequest req);
 	lu.nowina.nexu.api.GetCertificateResponse mapGetCertificateResponse(GetCertificateResponse resp);
-	lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.GetCertificateResponse> mapGetCertificateResponse(Execution<GetCertificateResponse> resp);
+	lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.GetCertificateResponse> mapGetCertificateResponse(Execution<GetCertificateResponse> resp, @MappingTarget lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.GetCertificateResponse> to);
 
 	// Sign
 	lu.nowina.nexu.api.SignatureRequest mapSignatureRequest(SignatureRequest req);
-	lu.nowina.nexu.api.SignatureResponse mapSignatureResponse(SignatureResponse resp);
-	lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.SignatureResponse> mapSignatureResponse(Execution<SignatureResponse> resp);
+	lu.nowina.nexu.api.SignatureResponse mapSignatureResponse(SignatureResponse resp, @MappingTarget lu.nowina.nexu.api.SignatureResponse to);
+	lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.SignatureResponse> mapSignatureResponse(Execution<SignatureResponse> resp, @MappingTarget lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.SignatureResponse> to);
 
 	// Get Identity Info
 	lu.nowina.nexu.api.GetIdentityInfoRequest mapGetIdentityInfoRequest(GetIdentityInfoRequest req);
 	lu.nowina.nexu.api.GetIdentityInfoResponse mapGetIdentityInfoResponse(GetIdentityInfoResponse resp);
-	lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.GetIdentityInfoResponse> mapGetIdentityInfoResponse(Execution<GetIdentityInfoResponse> resp);
+	lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.GetIdentityInfoResponse> mapGetIdentityInfoResponse(Execution<GetIdentityInfoResponse> resp, @MappingTarget lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.GetIdentityInfoResponse> to);
 
 	// Authenticate
 	lu.nowina.nexu.api.AuthenticateRequest mapAuthenticateRequest(AuthenticateRequest req);
-	lu.nowina.nexu.api.AuthenticateResponse mapGetIdentityInfoResponse(AuthenticateResponse resp);
-	lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.AuthenticateResponse> mapAuthenticateResponse(Execution<AuthenticateResponse> resp);
-	*/
+	lu.nowina.nexu.api.AuthenticateResponse mapAuthenticateResponse(AuthenticateResponse resp, @MappingTarget lu.nowina.nexu.api.AuthenticateResponse to);
+	lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.AuthenticateResponse> mapAuthenticateResponse(Execution<AuthenticateResponse> resp, @MappingTarget lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.AuthenticateResponse> to);
 	
 	// Util
 	lu.nowina.nexu.api.CertificateFilter mapCertificateFilter(CertificateFilter certificateFilter);
