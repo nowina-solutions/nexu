@@ -239,7 +239,27 @@ public class TestMarshallUnmarshallJSON {
 
 	@Test
 	public void testAuthenticateResponse() {
-		//TODO
+		final CertificateToken certificate = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password").getKeys().get(0).getCertificate();
+		final lu.nowina.nexu.api.AuthenticateResponse authenticateResponse = new lu.nowina.nexu.api.AuthenticateResponse(
+				"keyId",
+				certificate,
+				new CertificateToken[]{certificate, certificate, certificate},
+				new SignatureValue(SignatureAlgorithm.RSA_SHA256, "to be signed".getBytes(StandardCharsets.UTF_8))
+		);
+		final lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.AuthenticateResponse> respAPI = new lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.AuthenticateResponse>(authenticateResponse);
+		setFeedback(respAPI);
+		final String json = GsonHelper.toJson(respAPI);
+		
+		final Execution<AuthenticateResponse> resp = customGson.fromJson(json, buildTokenType(AuthenticateResponse.class).getType());
+		assertFeedback(resp);
+		Assert.assertNotNull(resp.getResponse());
+		final String certificateInBase64 = Base64.encodeBase64String(certificate.getEncoded());
+		Assert.assertEquals("keyId", resp.getResponse().getKeyId());
+		Assert.assertEquals(certificateInBase64, resp.getResponse().getCertificate());
+		Assert.assertArrayEquals(new String[]{certificateInBase64, certificateInBase64, certificateInBase64}, resp.getResponse().getCertificateChain());
+		Assert.assertNotNull(resp.getResponse().getSignatureValue());
+		Assert.assertEquals("RSA_SHA256", resp.getResponse().getSignatureValue().getAlgorithm());
+		Assert.assertEquals("dG8gYmUgc2lnbmVk", resp.getResponse().getSignatureValue().getValue());
 	}
 	
 	@Test
