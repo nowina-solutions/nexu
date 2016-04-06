@@ -39,4 +39,16 @@ public class UtilMappers {
 	public String[] mapCertificateTokens(CertificateToken[] certificateTokens) {
 		return null;
 	}
+	
+	public byte[] mapByteArray(String bytesInBase64) {
+		return null;
+	}
+	
+	public CertificateToken mapCertificateToken(String certificateTokenInBase64) {
+		return null;
+	}
+	
+	public CertificateToken[] mapCertificateTokens(String[] certificateTokensInBase64) {
+		return null;
+	}
 }
