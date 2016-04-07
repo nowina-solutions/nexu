@@ -36,6 +36,7 @@ import java.util.Map;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Assert;
 
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.json.GsonHelper;
 
 /**
@@ -94,6 +95,12 @@ public class TestMarshallUnmarshallJSON {
 		execution.setFeedback(feedback);
 	}
 	
+	private void assertSuccessExecution(final Execution<?> execution) {
+		Assert.assertNull(execution.getError());
+		Assert.assertNull(execution.getErrorMessage());
+		Assert.assertTrue(execution.isSuccess());
+	}
+	
 	private void assertFeedback(final Execution<?> execution) {
 		Assert.assertNotNull(execution.getFeedback());
 		
@@ -148,6 +155,7 @@ public class TestMarshallUnmarshallJSON {
 		final String json = GsonHelper.toJson(respAPI);
 		
 		final Execution<GetCertificateResponse> resp = customGson.fromJson(json, buildTokenType(GetCertificateResponse.class).getType());
+		assertSuccessExecution(resp);
 		assertFeedback(resp);
 		Assert.assertNotNull(resp.getResponse());
 		final String certificateInBase64 = Base64.encodeBase64String(certificate.getEncoded());
@@ -199,6 +207,7 @@ public class TestMarshallUnmarshallJSON {
 		final String json = GsonHelper.toJson(respAPI);
 		
 		final Execution<SignatureResponse> resp = customGson.fromJson(json, buildTokenType(SignatureResponse.class).getType());
+		assertSuccessExecution(resp);
 		assertFeedback(resp);
 		Assert.assertNotNull(resp.getResponse());
 		final String certificateInBase64 = Base64.encodeBase64String(certificate.getEncoded());
@@ -258,6 +267,7 @@ public class TestMarshallUnmarshallJSON {
 		final String json = GsonHelper.toJson(respAPI);
 		
 		final Execution<GetIdentityInfoResponse> resp = customGson.fromJson(json, buildTokenType(GetIdentityInfoResponse.class).getType());
+		assertSuccessExecution(resp);
 		assertFeedback(resp);
 		Assert.assertNotNull(resp.getResponse());
 		final String certificateInBase64 = Base64.encodeBase64String(certificate.getEncoded());
@@ -321,6 +331,7 @@ public class TestMarshallUnmarshallJSON {
 		final String json = GsonHelper.toJson(respAPI);
 		
 		final Execution<AuthenticateResponse> resp = customGson.fromJson(json, buildTokenType(AuthenticateResponse.class).getType());
+		assertSuccessExecution(resp);
 		assertFeedback(resp);
 		Assert.assertNotNull(resp.getResponse());
 		final String certificateInBase64 = Base64.encodeBase64String(certificate.getEncoded());
@@ -334,6 +345,15 @@ public class TestMarshallUnmarshallJSON {
 	
 	@Test
 	public void testException() {
-		//TODO
+		final lu.nowina.nexu.api.Execution<?> respAPI = new lu.nowina.nexu.api.Execution<Void>(BasicOperationStatus.EXCEPTION);
+		setFeedback(respAPI);
+		final String json = GsonHelper.toJson(respAPI);
+		
+		final Execution<Void> resp = customGson.fromJson(json, buildTokenType(Void.class).getType());
+		Assert.assertFalse(resp.isSuccess());
+		Assert.assertNull(resp.getResponse());
+		Assert.assertEquals(BasicOperationStatus.EXCEPTION.getCode(), resp.getError());
+		Assert.assertEquals(BasicOperationStatus.EXCEPTION.getLabel(), resp.getErrorMessage());
+		assertFeedback(resp);
 	}
 }
