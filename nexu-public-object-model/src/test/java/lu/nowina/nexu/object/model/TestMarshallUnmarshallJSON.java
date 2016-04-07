@@ -28,7 +28,10 @@ import eu.europa.esig.dss.token.JKSSignatureToken;
 import eu.europa.esig.dss.x509.CertificateToken;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Assert;
@@ -218,7 +221,74 @@ public class TestMarshallUnmarshallJSON {
 
 	@Test
 	public void testGetIdentityInfoResponse() {
-		//TODO
+		final CertificateToken certificate = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password").getKeys().get(0).getCertificate();
+		final lu.nowina.nexu.api.GetIdentityInfoResponse getIdentityInfoResponse = new lu.nowina.nexu.api.GetIdentityInfoResponse();
+		getIdentityInfoResponse.setAddress("address");
+		getIdentityInfoResponse.setCardDeliveryAuthority("cardDeliveryAuthority");
+		getIdentityInfoResponse.setCardNumber("cardNumber");
+		getIdentityInfoResponse.setCardValidityDateBegin(LocalDate.now());
+		getIdentityInfoResponse.setCardValidityDateEnd(LocalDate.now().plusDays(1));
+		getIdentityInfoResponse.setChipNumber("chipNumber");
+		getIdentityInfoResponse.setCity("city");
+		getIdentityInfoResponse.setDateOfBirth(LocalDate.now().minusDays(1));
+		getIdentityInfoResponse.setFirstName("firstName");
+		getIdentityInfoResponse.setGender(lu.nowina.nexu.api.GetIdentityInfoResponse.Gender.MALE);
+		getIdentityInfoResponse.setLastName("lastName");
+		getIdentityInfoResponse.setMiddleName("middleName");
+		getIdentityInfoResponse.setNationality("nationality");
+		getIdentityInfoResponse.setNationalNumber("nationalNumber");
+		getIdentityInfoResponse.setNobleCondition("nobleCondition");
+		getIdentityInfoResponse.setPhoto("photo".getBytes(StandardCharsets.UTF_8));
+		getIdentityInfoResponse.setPhotoMimeType("photoMimeType");
+		getIdentityInfoResponse.setPlaceOfBirth("placeOfBirth");
+		getIdentityInfoResponse.setPostalCode("postalCode");
+		final Map<String, lu.nowina.nexu.api.IdentityInfoSignatureData> signatureData =
+				new HashMap<String, lu.nowina.nexu.api.IdentityInfoSignatureData>();
+		final SignatureValue signatureValue = new SignatureValue(SignatureAlgorithm.RSA_SHA512,
+				"signatureValue".getBytes(StandardCharsets.UTF_8));
+		final lu.nowina.nexu.api.IdentityInfoSignatureData identityInfoSignatureData =
+				new lu.nowina.nexu.api.IdentityInfoSignatureData(
+						"rawData".getBytes(StandardCharsets.UTF_8), signatureValue,
+						new CertificateToken[]{certificate, certificate, certificate});
+		signatureData.put("key", identityInfoSignatureData);
+		getIdentityInfoResponse.setSignatureData(signatureData);
+		getIdentityInfoResponse.setSpecialStatus("specialStatus");
+		final lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.GetIdentityInfoResponse> respAPI = new lu.nowina.nexu.api.Execution<lu.nowina.nexu.api.GetIdentityInfoResponse>(getIdentityInfoResponse);
+		setFeedback(respAPI);
+		final String json = GsonHelper.toJson(respAPI);
+		
+		final Execution<GetIdentityInfoResponse> resp = customGson.fromJson(json, buildTokenType(GetIdentityInfoResponse.class).getType());
+		assertFeedback(resp);
+		Assert.assertNotNull(resp.getResponse());
+		final String certificateInBase64 = Base64.encodeBase64String(certificate.getEncoded());
+		Assert.assertEquals("address", resp.getResponse().getAddress());
+		Assert.assertEquals("cardDeliveryAuthority", resp.getResponse().getCardDeliveryAuthority());
+		Assert.assertEquals("cardNumber", resp.getResponse().getCardNumber());
+		Assert.assertEquals(LocalDate.now(), resp.getResponse().getCardValidityDateBegin());
+		Assert.assertEquals(LocalDate.now().plusDays(1), resp.getResponse().getCardValidityDateEnd());
+		Assert.assertEquals("chipNumber", resp.getResponse().getChipNumber());
+		Assert.assertEquals("city", resp.getResponse().getCity());
+		Assert.assertEquals(LocalDate.now().minusDays(1), resp.getResponse().getDateOfBirth());
+		Assert.assertEquals("firstName", resp.getResponse().getFirstName());
+		Assert.assertEquals(GetIdentityInfoResponse.Gender.MALE, resp.getResponse().getGender());
+		Assert.assertEquals("lastName", resp.getResponse().getLastName());
+		Assert.assertEquals("middleName", resp.getResponse().getMiddleName());
+		Assert.assertEquals("nationality", resp.getResponse().getNationality());
+		Assert.assertEquals("nationalNumber", resp.getResponse().getNationalNumber());
+		Assert.assertEquals("nobleCondition", resp.getResponse().getNobleCondition());
+		Assert.assertEquals("cGhvdG8=", resp.getResponse().getPhoto());
+		Assert.assertEquals("photoMimeType", resp.getResponse().getPhotoMimeType());
+		Assert.assertEquals("placeOfBirth", resp.getResponse().getPlaceOfBirth());
+		Assert.assertEquals("postalCode", resp.getResponse().getPostalCode());
+		Assert.assertNotNull(resp.getResponse().getSignatureData());
+		Assert.assertEquals(1, resp.getResponse().getSignatureData().size());
+		Assert.assertEquals("key", resp.getResponse().getSignatureData().keySet().iterator().next());
+		Assert.assertNotNull(resp.getResponse().getSignatureData().get("key"));
+		Assert.assertEquals("cmF3RGF0YQ==", resp.getResponse().getSignatureData().get("key").getRawData());
+		Assert.assertArrayEquals(new String[]{certificateInBase64, certificateInBase64, certificateInBase64}, resp.getResponse().getSignatureData().get("key").getCertificateChain());
+		Assert.assertEquals("RSA_SHA512", resp.getResponse().getSignatureData().get("key").getSignatureValue().getAlgorithm());
+		Assert.assertEquals("c2lnbmF0dXJlVmFsdWU=", resp.getResponse().getSignatureData().get("key").getSignatureValue().getValue());
+		Assert.assertEquals("specialStatus", resp.getResponse().getSpecialStatus());
 	}
 
 	@Test
