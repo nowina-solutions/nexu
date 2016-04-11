@@ -22,28 +22,29 @@ import eu.europa.esig.dss.token.PasswordInputCallback;
 import eu.europa.esig.dss.token.Pkcs11SignatureToken;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 import eu.europa.esig.dss.token.mocca.MOCCASignatureTokenConnection;
-import lu.nowina.nexu.api.CardAdapter;
+import lu.nowina.nexu.api.AbstractCardProductAdapter;
 import lu.nowina.nexu.api.CertificateFilter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.GetIdentityInfoResponse;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.ScAPI;
 
-public class GenericCardAdapter implements CardAdapter {
+public class GenericCardAdapter extends AbstractCardProductAdapter {
 
 	private SCInfo info;
 
 	public GenericCardAdapter(SCInfo info) {
+		super();
 		this.info = info;
 	}
 
 	@Override
-	public boolean accept(DetectedCard card) {
+	protected boolean accept(DetectedCard card) {
 		return info.getAtr().equals(card.getAtr());
 	}
 
 	@Override
-	public SignatureTokenConnection connect(NexuAPI api, DetectedCard card, PasswordInputCallback callback) {
+	protected SignatureTokenConnection connect(NexuAPI api, DetectedCard card, PasswordInputCallback callback) {
 		ConnectionInfo cInfo = info.getConnectionInfo(api.getEnvironmentInfo());
 		ScAPI scApi = cInfo.getSelectedApi();
 		switch (scApi) {
@@ -61,7 +62,7 @@ public class GenericCardAdapter implements CardAdapter {
 	}
 
 	@Override
-	public boolean canReturnIdentityInfo(DetectedCard card) {
+	protected boolean canReturnIdentityInfo(DetectedCard card) {
 		return false;
 	}
 
@@ -71,7 +72,7 @@ public class GenericCardAdapter implements CardAdapter {
 	}
 	
 	@Override
-	public boolean supportCertificateFilter(DetectedCard card) {
+	protected boolean supportCertificateFilter(DetectedCard card) {
 		return false;
 	}
 
@@ -81,17 +82,17 @@ public class GenericCardAdapter implements CardAdapter {
 	}
 
 	@Override
-	public boolean canReturnSuportedDigestAlgorithms(DetectedCard card) {
+	protected boolean canReturnSuportedDigestAlgorithms(DetectedCard card) {
 		return false;
 	}
 
 	@Override
-	public List<DigestAlgorithm> getSupportedDigestAlgorithms(DetectedCard card) {
+	protected List<DigestAlgorithm> getSupportedDigestAlgorithms(DetectedCard card) {
 		throw new IllegalStateException("This card adapter cannot return list of supported digest algorithms.");
 	}
 
 	@Override
-	public DigestAlgorithm getPreferredDigestAlgorithm(DetectedCard card) {
+	protected DigestAlgorithm getPreferredDigestAlgorithm(DetectedCard card) {
 		throw new IllegalStateException("This card adapter cannot return list of supported digest algorithms.");
 	}
 }

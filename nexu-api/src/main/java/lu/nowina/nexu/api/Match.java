@@ -15,16 +15,16 @@ package lu.nowina.nexu.api;
 
 public class Match {
 
-	private CardAdapter adapter;
+	private ProductAdapter adapter;
 
 	private DetectedCard card;
 
-	public Match(CardAdapter adapter, DetectedCard card) {
+	public Match(ProductAdapter adapter, DetectedCard card) {
 		this.adapter = adapter;
 		this.card = card;
 	}
 
-	public CardAdapter getAdapter() {
+	public ProductAdapter getAdapter() {
 		return adapter;
 	}
 

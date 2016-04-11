@@ -16,7 +16,7 @@ package lu.nowina.nexu.flow.operation;
 import java.util.Iterator;
 import java.util.List;
 
-import lu.nowina.nexu.api.CardAdapter;
+import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.CertificateFilter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.NexuAPI;
@@ -35,7 +35,7 @@ import eu.europa.esig.dss.token.SignatureTokenConnection;
  * <li>{@link SignatureTokenConnection}</li>
  * <li>{@link NexuAPI}</li>
  * <li>{@link DetectedCard} (optional)</li>
- * <li>{@link CardAdapter} (optional)</li>
+ * <li>{@link ProductAdapter} (optional)</li>
  * <li>{@link CertificateFilter} (optional)</li>
  * <li>Key filter (optional): {@link String}</li>
  * </ol>
@@ -47,7 +47,7 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 	private SignatureTokenConnection token;
 	private NexuAPI api;
 	private DetectedCard card;
-	private CardAdapter cardAdapter;
+	private ProductAdapter productAdapter;
 	private CertificateFilter certificateFilter;
 	private String keyFilter;
 	
@@ -64,7 +64,7 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 				this.card = (DetectedCard) params[2];
 			}
 			if(params.length > 3) {
-				this.cardAdapter = (CardAdapter) params[3];
+				this.productAdapter = (ProductAdapter) params[3];
 			}
 			if(params.length > 4) {
 				certificateFilter = (CertificateFilter) params[4];
@@ -73,15 +73,15 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 				keyFilter = (String) params[5];
 			}
 		} catch(final ClassCastException | ArrayIndexOutOfBoundsException e) {
-			throw new IllegalArgumentException("Expected parameters: SignatureTokenConnection, NexuAPI, DetectedCard (optional), CardAdapter (optional), CertificateFilter (optional), key filter (optional)");
+			throw new IllegalArgumentException("Expected parameters: SignatureTokenConnection, NexuAPI, DetectedCard (optional), ProductAdapter (optional), CertificateFilter (optional), key filter (optional)");
 		}
 	}
 	
 	@Override
 	public OperationResult<DSSPrivateKeyEntry> perform() {
 		final List<DSSPrivateKeyEntry> keys;
-		if((cardAdapter != null) && (card != null) && cardAdapter.supportCertificateFilter(card) && (certificateFilter != null)) {
-			keys = cardAdapter.getKeys(token, certificateFilter);
+		if((productAdapter != null) && (card != null) && productAdapter.supportCertificateFilter(card) && (certificateFilter != null)) {
+			keys = productAdapter.getKeys(token, certificateFilter);
 		} else {
 			keys = token.getKeys();
 		}

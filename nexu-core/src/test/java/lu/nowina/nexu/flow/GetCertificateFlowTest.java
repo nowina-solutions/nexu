@@ -24,7 +24,7 @@ import java.util.List;
 
 import lu.nowina.nexu.AbstractConfigureLoggerTest;
 import lu.nowina.nexu.api.AppConfig;
-import lu.nowina.nexu.api.CardAdapter;
+import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.GetCertificateRequest;
@@ -137,7 +137,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 
 		UIDisplay display = mock(UIDisplay.class);
 
-		CardAdapter adapter = mock(CardAdapter.class);
+		ProductAdapter adapter = mock(ProductAdapter.class);
 
 		SignatureTokenConnection token = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password");
 

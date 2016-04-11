@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import lu.nowina.nexu.api.AppConfig;
-import lu.nowina.nexu.api.CardAdapter;
+import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Match;
@@ -102,7 +102,7 @@ public class InternalAPITest {
 		SignatureTokenConnection c = new MockSignatureTokenConnection((DSSPrivateKeyEntry[])null);
 		api.registerTokenConnection(c);
 
-		CardAdapter adapter1 = Mockito.mock(CardAdapter.class);
+		ProductAdapter adapter1 = Mockito.mock(ProductAdapter.class);
 		Mockito.when(adapter1.accept(card)).thenReturn(Boolean.TRUE);
 		Mockito.when(adapter1.connect(api, card, display.getPasswordInputCallback())).thenReturn(c);
 

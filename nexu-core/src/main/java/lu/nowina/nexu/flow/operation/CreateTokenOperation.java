@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import lu.nowina.nexu.NexuException;
-import lu.nowina.nexu.api.CardAdapter;
+import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackStatus;
@@ -120,7 +120,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 	private OperationResult<Map<TokenOperationResultKey, Object>> createTokenAuto() {
 		final Match match = matchingCardAdapters.get(0);
 		final DetectedCard supportedCard = match.getCard();
-		final CardAdapter adapter = match.getAdapter();
+		final ProductAdapter adapter = match.getAdapter();
 
 		final SignatureTokenConnection connect = adapter.connect(api, supportedCard, display.getPasswordInputCallback());
 		if (connect == null) {

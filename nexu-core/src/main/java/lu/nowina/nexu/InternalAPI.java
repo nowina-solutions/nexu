@@ -26,7 +26,7 @@ import java.util.concurrent.ThreadFactory;
 import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.AuthenticateRequest;
 import lu.nowina.nexu.api.AuthenticateResponse;
-import lu.nowina.nexu.api.CardAdapter;
+import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Execution;
@@ -74,7 +74,7 @@ public class InternalAPI implements NexuAPI {
 
 	private CardDetector detector;
 
-	private List<CardAdapter> adapters = new ArrayList<>();
+	private List<ProductAdapter> adapters = new ArrayList<>();
 
 	private Map<TokenId, SignatureTokenConnection> connections;
 
@@ -129,7 +129,7 @@ public class InternalAPI implements NexuAPI {
 			return Collections.emptyList();
 		}
 		List<Match> cards = new ArrayList<>();
-		for (CardAdapter card : adapters) {
+		for (ProductAdapter card : adapters) {
 			if (card.accept(d)) {
 				logger.info("Card is instance of " + card.getClass().getSimpleName());
 				cards.add(new Match(card, d));
@@ -159,7 +159,7 @@ public class InternalAPI implements NexuAPI {
 	}
 
 	@Override
-	public void registerCardAdapter(CardAdapter adapter) {
+	public void registerCardAdapter(ProductAdapter adapter) {
 		adapters.add(adapter);
 	}
 

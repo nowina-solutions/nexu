@@ -31,7 +31,7 @@ public interface NexuAPI {
 
 	EnvironmentInfo getEnvironmentInfo();
 
-	void registerCardAdapter(CardAdapter adapter);
+	void registerCardAdapter(ProductAdapter adapter);
 
 	TokenId registerTokenConnection(SignatureTokenConnection connection);
 
