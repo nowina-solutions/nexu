@@ -26,6 +26,7 @@ import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackStatus;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
@@ -119,10 +120,10 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 
 	private OperationResult<Map<TokenOperationResultKey, Object>> createTokenAuto() {
 		final Match match = matchingCardAdapters.get(0);
-		final DetectedCard supportedCard = match.getCard();
+		final Product supportedProduct = match.getProduct();
 		final ProductAdapter adapter = match.getAdapter();
 
-		final SignatureTokenConnection connect = adapter.connect(api, supportedCard, display.getPasswordInputCallback());
+		final SignatureTokenConnection connect = adapter.connect(api, supportedProduct, display.getPasswordInputCallback());
 		if (connect == null) {
 			LOG.error("No connect returned");
 			return new OperationResult<Map<TokenOperationResultKey, Object>>(CoreOperationStatus.NO_TOKEN);
@@ -135,7 +136,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		final Map<TokenOperationResultKey, Object> map = new HashMap<TokenOperationResultKey, Object>();
 		map.put(TokenOperationResultKey.TOKEN_ID, tokenId);
 		map.put(TokenOperationResultKey.ADVANCED_CREATION, false);
-		map.put(TokenOperationResultKey.SELECTED_CARD, supportedCard);
+		map.put(TokenOperationResultKey.SELECTED_CARD, supportedProduct);
 		map.put(TokenOperationResultKey.SELECTED_CARD_ADAPTER, adapter);
 		return new OperationResult<Map<TokenOperationResultKey, Object>>(map);
 	}
