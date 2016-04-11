@@ -60,7 +60,7 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 		NexuAPI api = mock(NexuAPI.class);
 		DetectedCard detectedCard = new DetectedCard("atr", 0);
 		when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
-		when(api.matchingCardAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
+		when(api.matchingProductAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
 		when(api.registerTokenConnection(token)).thenReturn(new TokenId("id"));
 		when(api.getTokenConnection(new TokenId("id"))).thenReturn(token);
 		final AppConfig appConfig = new AppConfig();

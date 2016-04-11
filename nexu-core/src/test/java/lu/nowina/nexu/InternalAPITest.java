@@ -106,13 +106,13 @@ public class InternalAPITest {
 		Mockito.when(adapter1.accept(card)).thenReturn(Boolean.TRUE);
 		Mockito.when(adapter1.connect(api, card, display.getPasswordInputCallback())).thenReturn(c);
 
-		List<Match> matches = api.matchingCardAdapters(card);
+		List<Match> matches = api.matchingProductAdapters(card);
 
 		Assert.assertEquals(0, matches.size());
 
-		api.registerCardAdapter(adapter1);
+		api.registerProductAdapter(adapter1);
 
-		matches = api.matchingCardAdapters(card);
+		matches = api.matchingProductAdapters(card);
 
 		Assert.assertEquals(1, matches.size());
 

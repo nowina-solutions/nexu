@@ -148,7 +148,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		DetectedCard detectedCard = new DetectedCard("atr", 0);
 
 		when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
-		when(api.matchingCardAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
+		when(api.matchingProductAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
 		when(api.registerTokenConnection(token)).thenReturn(new TokenId("id"));
 		when(api.getTokenConnection(new TokenId("id"))).thenReturn(token);
 		when(adapter.connect(eq(api), eq(detectedCard), any())).thenReturn(token);

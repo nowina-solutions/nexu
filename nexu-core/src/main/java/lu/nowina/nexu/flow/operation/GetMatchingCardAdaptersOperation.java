@@ -79,7 +79,7 @@ public class GetMatchingCardAdaptersOperation extends AbstractCompositeOperation
 	private OperationResult<List<Match>> getMatchingCardAdapters(final List<DetectedCard> detectedCards) {
 		final List<Match> matchingCardAdapters = new ArrayList<Match>();
 		for (final DetectedCard d : detectedCards) {
-			matchingCardAdapters.addAll(api.matchingCardAdapters(d));
+			matchingCardAdapters.addAll(api.matchingProductAdapters(d));
 		}
 		return new OperationResult<List<Match>>(matchingCardAdapters);
 	}

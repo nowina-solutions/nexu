@@ -37,6 +37,7 @@ import lu.nowina.nexu.api.GetIdentityInfoRequest;
 import lu.nowina.nexu.api.GetIdentityInfoResponse;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
@@ -123,26 +124,27 @@ public class InternalAPI implements NexuAPI {
 	}
 
 	@Override
-	public List<Match> matchingCardAdapters(DetectedCard d) {
-		if (d == null) {
-			logger.warn("DetectedCard argument should not be null");
+	public List<Match> matchingProductAdapters(Product p) {
+		if (p == null) {
+			logger.warn("Product argument should not be null");
 			return Collections.emptyList();
 		}
-		List<Match> cards = new ArrayList<>();
-		for (ProductAdapter card : adapters) {
-			if (card.accept(d)) {
-				logger.info("Card is instance of " + card.getClass().getSimpleName());
-				cards.add(new Match(card, d));
+		List<Match> matches = new ArrayList<>();
+		for (ProductAdapter adapter : adapters) {
+			if (adapter.accept(p)) {
+				logger.info("Product is instance of " + adapter.getClass().getSimpleName());
+				matches.add(new Match(adapter, p));
 			}
 		}
-		if (cards.isEmpty()) {
+		if (matches.isEmpty() && (p instanceof DetectedCard)) {
+			final DetectedCard d = (DetectedCard) p;
 			SCInfo info = null;
 			if (webDatabase != null && webDatabase.getDatabase() != null) {
 				info = webDatabase.getDatabase().getInfo(d.getAtr());
 				if (info == null) {
 					logger.warn("Card " + d.getAtr() + " is not in the web database");
 				} else {
-					cards.add(new Match(new GenericCardAdapter(info), d));
+					matches.add(new Match(new GenericCardAdapter(info), d));
 				}
 
 			}
@@ -151,15 +153,15 @@ public class InternalAPI implements NexuAPI {
 				if (info == null) {
 					logger.warn("Card " + d.getAtr() + " is not in the personal database");
 				} else {
-					cards.add(new Match(new GenericCardAdapter(info), d));
+					matches.add(new Match(new GenericCardAdapter(info), d));
 				}
 			}
 		}
-		return cards;
+		return matches;
 	}
 
 	@Override
-	public void registerCardAdapter(ProductAdapter adapter) {
+	public void registerProductAdapter(ProductAdapter adapter) {
 		adapters.add(adapter);
 	}
 

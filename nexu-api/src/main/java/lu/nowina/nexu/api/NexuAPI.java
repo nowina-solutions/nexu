@@ -27,11 +27,11 @@ public interface NexuAPI {
 
 	List<DetectedCard> detectCards();
 
-	List<Match> matchingCardAdapters(DetectedCard d);
+	List<Match> matchingProductAdapters(Product p);
 
 	EnvironmentInfo getEnvironmentInfo();
 
-	void registerCardAdapter(ProductAdapter adapter);
+	void registerProductAdapter(ProductAdapter adapter);
 
 	TokenId registerTokenConnection(SignatureTokenConnection connection);
 
