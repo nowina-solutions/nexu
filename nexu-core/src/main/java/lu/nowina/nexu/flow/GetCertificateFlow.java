@@ -22,12 +22,12 @@ import org.slf4j.LoggerFactory;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 import eu.europa.esig.dss.x509.CertificateToken;
-import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetCertificateResponse;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
@@ -70,10 +70,10 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 					if (getTokenConnectionOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 						token = getTokenConnectionOperationResult.getResult();
 
-						final DetectedCard card = (DetectedCard) map.get(TokenOperationResultKey.SELECTED_CARD);
-						final ProductAdapter productAdapter = (ProductAdapter) map.get(TokenOperationResultKey.SELECTED_CARD_ADAPTER);
+						final Product product = (Product) map.get(TokenOperationResultKey.SELECTED_PRODUCT);
+						final ProductAdapter productAdapter = (ProductAdapter) map.get(TokenOperationResultKey.SELECTED_PRODUCT_ADAPTER);
 						final OperationResult<DSSPrivateKeyEntry> selectPrivateKeyOperationResult =
-								getOperationFactory().getOperation(SelectPrivateKeyOperation.class, token, api, card, productAdapter, req.getCertificateFilter()).perform();
+								getOperationFactory().getOperation(SelectPrivateKeyOperation.class, token, api, product, productAdapter, req.getCertificateFilter()).perform();
 						if (selectPrivateKeyOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 							final DSSPrivateKeyEntry key = selectPrivateKeyOperationResult.getResult();
 
@@ -95,9 +95,9 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 								resp.setCertificateChain(certificateChain);
 							}
 
-							if(productAdapter.canReturnSuportedDigestAlgorithms(card)) {
-								resp.setSupportedDigests(productAdapter.getSupportedDigestAlgorithms(card));
-								resp.setPreferredDigest(productAdapter.getPreferredDigestAlgorithm(card));
+							if(productAdapter.canReturnSuportedDigestAlgorithms(product)) {
+								resp.setSupportedDigests(productAdapter.getSupportedDigestAlgorithms(product));
+								resp.setPreferredDigest(productAdapter.getPreferredDigestAlgorithm(product));
 							}
 							
 							if(api.getAppConfig().isEnablePopUps()) {

@@ -22,10 +22,10 @@ import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.NexuException;
-import lu.nowina.nexu.api.ProductAdapter;
-import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.Product;
+import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
@@ -73,11 +73,11 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 					token = getTokenConnectionOperationResult.getResult();
 					logger.info("Token " + token);
 					
-					final DetectedCard card = (DetectedCard) map.get(TokenOperationResultKey.SELECTED_CARD);
-					final ProductAdapter productAdapter = (ProductAdapter) map.get(TokenOperationResultKey.SELECTED_CARD_ADAPTER);
+					final Product product = (Product) map.get(TokenOperationResultKey.SELECTED_PRODUCT);
+					final ProductAdapter productAdapter = (ProductAdapter) map.get(TokenOperationResultKey.SELECTED_PRODUCT_ADAPTER);
 					final OperationResult<DSSPrivateKeyEntry> selectPrivateKeyOperationResult =
 							getOperationFactory().getOperation(
-									SelectPrivateKeyOperation.class, token, api, card, productAdapter, null, req.getKeyId()).perform();
+									SelectPrivateKeyOperation.class, token, api, product, productAdapter, null, req.getKeyId()).perform();
 					if (selectPrivateKeyOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 						final DSSPrivateKeyEntry key = selectPrivateKeyOperationResult.getResult();
 

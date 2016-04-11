@@ -14,7 +14,6 @@
 package lu.nowina.nexu.flow.operation;
 
 import lu.nowina.nexu.api.ProductAdapter;
-import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.TokenId;
 
@@ -35,14 +34,14 @@ public enum TokenOperationResultKey {
 	ADVANCED_CREATION,
 	
 	/**
-	 * {@link DetectedCard}
+	 * {@link Product}
 	 */
-	SELECTED_CARD,
+	SELECTED_PRODUCT,
 	
 	/**
 	 * {@link ProductAdapter}
 	 */
-	SELECTED_CARD_ADAPTER,
+	SELECTED_PRODUCT_ADAPTER,
 	
 	/**
 	 * {@link ScAPI}

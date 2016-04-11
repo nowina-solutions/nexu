@@ -64,7 +64,7 @@ public class AdvancedCreationFeedbackOperation extends AbstractCompositeOperatio
 			feedback.setFeedbackStatus(FeedbackStatus.SUCCESS);
 			feedback.setApiParameter((String) map.get(TokenOperationResultKey.SELECTED_API_PARAMS));
 			feedback.setSelectedAPI((ScAPI) map.get(TokenOperationResultKey.SELECTED_API));
-			feedback.setSelectedCard((DetectedCard) map.get(TokenOperationResultKey.SELECTED_CARD));
+			feedback.setSelectedCard((DetectedCard) map.get(TokenOperationResultKey.SELECTED_PRODUCT));
 
 			if ((feedback.getSelectedCard() != null) && (feedback.getSelectedAPI() != null) &&
 					((feedback.getSelectedAPI() == ScAPI.MOCCA) || (feedback.getSelectedAPI() == ScAPI.MSCAPI) ||

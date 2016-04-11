@@ -136,8 +136,8 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		final Map<TokenOperationResultKey, Object> map = new HashMap<TokenOperationResultKey, Object>();
 		map.put(TokenOperationResultKey.TOKEN_ID, tokenId);
 		map.put(TokenOperationResultKey.ADVANCED_CREATION, false);
-		map.put(TokenOperationResultKey.SELECTED_CARD, supportedProduct);
-		map.put(TokenOperationResultKey.SELECTED_CARD_ADAPTER, adapter);
+		map.put(TokenOperationResultKey.SELECTED_PRODUCT, supportedProduct);
+		map.put(TokenOperationResultKey.SELECTED_PRODUCT_ADAPTER, adapter);
 		return new OperationResult<Map<TokenOperationResultKey, Object>>(map);
 	}
 
@@ -154,7 +154,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		map.put(TokenOperationResultKey.ADVANCED_CREATION, true);
 		map.put(TokenOperationResultKey.SELECTED_API, result.getResult());
 		final DetectedCard selectedCard = api.detectCards().get(0);
-		map.put(TokenOperationResultKey.SELECTED_CARD, selectedCard);
+		map.put(TokenOperationResultKey.SELECTED_PRODUCT, selectedCard);
 		final TokenId tokenId;
 		switch (result.getResult()) {
 		case MOCCA:
@@ -213,7 +213,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		info.setAtr(selectedCard.getAtr());
 		info.getInfos().add(connectionInfo);
 		final GenericCardAdapter cardAdapter = new GenericCardAdapter(info);
-		map.put(TokenOperationResultKey.SELECTED_CARD_ADAPTER, cardAdapter);
+		map.put(TokenOperationResultKey.SELECTED_PRODUCT_ADAPTER, cardAdapter);
 		
 		return new OperationResult<Map<TokenOperationResultKey,Object>>(map);
 	}
