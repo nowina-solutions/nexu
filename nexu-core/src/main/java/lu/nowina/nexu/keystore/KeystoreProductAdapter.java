@@ -28,6 +28,7 @@ import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.CertificateFilter;
 import lu.nowina.nexu.api.ConfiguredKeystore;
 import lu.nowina.nexu.api.GetIdentityInfoResponse;
+import lu.nowina.nexu.api.NewKeystore;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.api.ProductAdapter;
@@ -45,11 +46,14 @@ public class KeystoreProductAdapter implements ProductAdapter {
 
 	@Override
 	public boolean accept(Product product) {
-		return (product instanceof ConfiguredKeystore);
+		return (product instanceof ConfiguredKeystore) || (product instanceof NewKeystore);
 	}
 
 	@Override
 	public SignatureTokenConnection connect(NexuAPI api, Product product, PasswordInputCallback callback) {
+		if (product instanceof NewKeystore) {
+			throw new IllegalArgumentException("Given product was not configured!");
+		}
 		final ConfiguredKeystore configuredKeystore = (ConfiguredKeystore) product;
 		try {
 			switch(configuredKeystore.getType()) {
@@ -104,4 +108,17 @@ public class KeystoreProductAdapter implements ProductAdapter {
 		throw new IllegalStateException("This product adapter cannot return list of supported digest algorithms.");
 	}
 
+	@Override
+	public URL getFXMLConfigurationURL(Product product) {
+		if (product instanceof NewKeystore) {
+			return this.getClass().getResource("/fxml/configure-keystore.fxml");
+		} else {
+			throw new IllegalArgumentException("Given product was already configured!");
+		}
+	}
+
+	@Override
+	public void saveProductConfiguration(NexuAPI api, Product product) {
+		// TODO Auto-generated method stub
+	}
 }

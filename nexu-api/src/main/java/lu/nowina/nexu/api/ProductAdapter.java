@@ -13,6 +13,7 @@
  */
 package lu.nowina.nexu.api;
 
+import java.net.URL;
 import java.util.List;
 
 import eu.europa.esig.dss.DigestAlgorithm;
@@ -90,4 +91,20 @@ public interface ProductAdapter {
 	 * @return The preferred digest algorithm for the given <code>product</code>.
 	 */
 	DigestAlgorithm getPreferredDigestAlgorithm(Product product);
+	
+	/**
+	 * Returns the URL to the FXML that can be used to configure the given <code>product</code>, or <code>null</code>
+	 * if none.
+	 * @param product The product for which one would like to retrieve the FXML configuration URL.
+	 * @return The URL to the FXML that can be used to configure the given <code>product</code>, or <code>null</code>
+	 * if none.
+	 */
+	URL getFXMLConfigurationURL(Product product);
+	
+	/**
+	 * Saves the product configuration.
+	 * @param api The unique instance of {@link NexuAPI}.
+	 * @param product The target product.
+	 */
+	void saveProductConfiguration(NexuAPI api, Product product);
 }

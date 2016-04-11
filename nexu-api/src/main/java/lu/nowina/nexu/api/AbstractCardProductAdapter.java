@@ -13,6 +13,7 @@
  */
 package lu.nowina.nexu.api;
 
+import java.net.URL;
 import java.util.List;
 
 import eu.europa.esig.dss.DigestAlgorithm;
@@ -78,4 +79,14 @@ public abstract class AbstractCardProductAdapter implements ProductAdapter {
 	}
 
 	protected abstract DigestAlgorithm getPreferredDigestAlgorithm(DetectedCard card);
+
+	@Override
+	public URL getFXMLConfigurationURL(Product product) {
+		return null;
+	}
+
+	@Override
+	public void saveProductConfiguration(NexuAPI api, Product product) {
+		// Do nothing by contract
+	}
 }
