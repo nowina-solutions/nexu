@@ -92,7 +92,7 @@ public class InternalAPITest {
 	}
 
 	@Test
-	public void testMatchingCardAdapter1() throws Exception {
+	public void testMatchingProductAdapter1() throws Exception {
 
 		DetectedCard card = new DetectedCard("ATR", 0);
 
