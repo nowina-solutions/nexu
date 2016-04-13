@@ -14,41 +14,57 @@
 package lu.nowina.nexu.flow.operation;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
+import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.api.ProductAdapter;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.view.core.UIOperation;
 
 /**
  * This {@link CompositeOperation} allows a {@link ProductAdapter} to configure a {@link Product}.
  *
- * <p>Expected parameters:
- * <ol>
- * <li>{@link Product}</li>
- * <li>{@link ProductAdapter}</li>
- * </ol>
+ * <p>Expected parameter: list of {@link Match}.
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public class ConfigureProductOperation extends AbstractCompositeOperation<Product> {
+public class ConfigureProductOperation extends AbstractCompositeOperation<List<Match>> {
 
-	private Product product;
-	private ProductAdapter productAdapter;
+	private List<Match> matches;
 	
 	@Override
+	@SuppressWarnings("unchecked")
 	public void setParams(Object... params) {
 		try {
-			this.product = (Product) params[0];
-			this.productAdapter = (ProductAdapter) params[1];
+			this.matches = (List<Match>) params[0];
 		} catch(final ArrayIndexOutOfBoundsException | ClassCastException e) {
-			throw new IllegalArgumentException("Expected parameters: Product, ProductAdapter");
+			throw new IllegalArgumentException("Expected parameter: list of Match");
 		}
 	}
 
 	@Override
+	public OperationResult<List<Match>> perform() {
+		final List<Match> result = new ArrayList<>(matches.size());
+		for(final Match match : matches) {
+			final OperationResult<Product> op = handleMatch(match.getAdapter(), match.getProduct());
+			if(op.getStatus().equals(BasicOperationStatus.SUCCESS)) {
+				result.add(new Match(match.getAdapter(), op.getResult()));
+			} else {
+				if(op.getStatus().equals(BasicOperationStatus.EXCEPTION)) {
+					return new OperationResult<List<Match>>(op.getException());
+				} else {
+					return new OperationResult<List<Match>>(op.getStatus());
+				}
+			}
+		}
+		return new OperationResult<List<Match>>(result);
+	}
+	
 	@SuppressWarnings("unchecked")
-	public OperationResult<Product> perform() {
+	private OperationResult<Product> handleMatch(final ProductAdapter productAdapter, final Product product) {
 		final URL url = productAdapter.getFXMLConfigurationURL(product);
 		if(url != null) {
 			return operationFactory.getOperation(UIOperation.class, url.toString(), product).perform();
