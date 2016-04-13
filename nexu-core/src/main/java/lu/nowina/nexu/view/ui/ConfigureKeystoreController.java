@@ -84,6 +84,8 @@ public class ConfigureKeystoreController extends AbstractUIOperationController<C
 			keystoreFileSpecified.set(keystoreFile != null);
 		});
 		selectFile.disableProperty().bind(keystoreType.valueProperty().isNull());
+		
+		keystoreType.getItems().setAll(KeystoreType.values());
 	}
 
 }
