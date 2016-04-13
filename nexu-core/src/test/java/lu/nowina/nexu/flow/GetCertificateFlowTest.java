@@ -18,22 +18,31 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import eu.europa.esig.dss.token.JKSSignatureToken;
+import eu.europa.esig.dss.token.PrefilledPasswordCallback;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.AbstractConfigureLoggerTest;
 import lu.nowina.nexu.api.AppConfig;
+import lu.nowina.nexu.api.ConfiguredKeystore;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.GetCertificateRequest;
 import lu.nowina.nexu.api.GetCertificateResponse;
+import lu.nowina.nexu.api.KeystoreType;
 import lu.nowina.nexu.api.Match;
+import lu.nowina.nexu.api.NewKeystore;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.api.ProductAdapter;
@@ -47,45 +56,62 @@ import lu.nowina.nexu.flow.operation.CoreOperationStatus;
 import lu.nowina.nexu.flow.operation.CreateTokenOperation;
 import lu.nowina.nexu.flow.operation.GetMatchingProductAdaptersOperation;
 import lu.nowina.nexu.flow.operation.OperationFactory;
+import lu.nowina.nexu.keystore.KeystoreProductAdapter;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
 
 public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 
-	//@Test
-	@SuppressWarnings("unchecked")
-	public void testNoProduct() throws Exception {
-
+	@Test
+	public void testNewKeystore() throws Exception {
 		final UIDisplay display = mock(UIDisplay.class);
+		when(display.getPasswordInputCallback()).thenReturn(new PrefilledPasswordCallback("password".toCharArray()));
 
 		final NexuAPI api = mock(NexuAPI.class);
 		final AppConfig appConfig = new AppConfig();
 		appConfig.setEnablePopUps(true);
 		when(api.getAppConfig()).thenReturn(appConfig);
+
+		final Product selectedProduct = new NewKeystore();
 		when(api.detectCards()).thenReturn(Collections.emptyList());
+		when(api.matchingProductAdapters(selectedProduct)).thenReturn(
+				Arrays.asList(new Match(new KeystoreProductAdapter(), selectedProduct)));
+		final Collection<SignatureTokenConnection> coll = new ArrayList<>();
+		when(api.registerTokenConnection(any())).then(new Answer<TokenId>() {
+			@Override
+			public TokenId answer(InvocationOnMock invocation) throws Throwable {
+				coll.add(invocation.getArgumentAt(0, SignatureTokenConnection.class));
+				return new TokenId("id");
+			}
+		});
+		when(api.getTokenConnection(new TokenId("id"))).then(new Answer<SignatureTokenConnection>() {
+			@Override
+			public SignatureTokenConnection answer(InvocationOnMock invocation) throws Throwable {
+				return coll.iterator().next();
+			}
+		});
 
-		final OperationFactory operationFactory = mock(OperationFactory.class);
-
-		final GetMatchingProductAdaptersOperation operation = new GetMatchingProductAdaptersOperation();
-		operation.setParams(api);
-		operation.setDisplay(display);
-		operation.setOperationFactory(operationFactory);
-		when(operationFactory.getOperation(GetMatchingProductAdaptersOperation.class, api)).thenReturn(operation);
-
-		final Operation<Object> successOperation = mock(Operation.class);
-		when(successOperation.perform()).thenReturn(new OperationResult<Object>(BasicOperationStatus.SUCCESS));
+		final ConfiguredKeystore configuredProduct = new ConfiguredKeystore();
+		configuredProduct.setType(KeystoreType.JKS);
+		configuredProduct.setUrl(this.getClass().getResource("/keystore.jks").toString());
+		final OperationFactory operationFactory = new NoUIOperationFactory(selectedProduct, configuredProduct);
+		operationFactory.setDisplay(display);
 		
-		when(operationFactory.getOperation(
-				eq(UIOperation.class), eq("/fxml/provide-feedback.fxml"), any(Object[].class))).thenReturn(successOperation);
-
 		final GetCertificateFlow flow = new GetCertificateFlow(display, api);
 		flow.setOperationFactory(operationFactory);
+		final Execution<GetCertificateResponse> resp = flow.process(api, new GetCertificateRequest());
 		
-		final GetCertificateRequest req = new GetCertificateRequest();
-		final Execution<GetCertificateResponse> resp = flow.process(api, req);
+		final SignatureTokenConnection token = 
+				new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password");
 		Assert.assertNotNull(resp);
-		Assert.assertFalse(resp.isSuccess());
-		Assert.assertEquals(CoreOperationStatus.NO_PRODUCT_FOUND.getCode(), resp.getError());
+		Assert.assertTrue(resp.isSuccess());
+		Assert.assertNotNull(resp.getResponse());
+		Assert.assertEquals(token.getKeys().get(0).getCertificate(), resp.getResponse().getCertificate());
+		Assert.assertEquals(token.getKeys().get(0).getEncryptionAlgorithm(), resp.getResponse().getEncryptionAlgorithm());
+		Assert.assertEquals(new TokenId("id"), resp.getResponse().getTokenId());
+		Assert.assertEquals(token.getKeys().get(0).getCertificate().getDSSIdAsString(), resp.getResponse().getKeyId());
+		Assert.assertNull(resp.getResponse().getPreferredDigest());
+		Assert.assertNull(resp.getResponse().getSupportedDigests());
 	}
 
 	@Test
@@ -144,18 +170,16 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 
 	@Test
 	public void testCardRecognized() throws Exception {
+		final UIDisplay display = mock(UIDisplay.class);
+		final ProductAdapter adapter = mock(ProductAdapter.class);
 
-		UIDisplay display = mock(UIDisplay.class);
+		final SignatureTokenConnection token = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password");
 
-		ProductAdapter adapter = mock(ProductAdapter.class);
-
-		SignatureTokenConnection token = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password");
-
-		NexuAPI api = mock(NexuAPI.class);
+		final NexuAPI api = mock(NexuAPI.class);
 		final AppConfig appConfig = new AppConfig();
 		appConfig.setEnablePopUps(true);
 		when(api.getAppConfig()).thenReturn(appConfig);
-		DetectedCard detectedCard = new DetectedCard("atr", 0);
+		final DetectedCard detectedCard = new DetectedCard("atr", 0);
 
 		when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
 		when(api.matchingProductAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
@@ -163,20 +187,23 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		when(api.getTokenConnection(new TokenId("id"))).thenReturn(token);
 		when(adapter.connect(eq(api), eq(detectedCard), any())).thenReturn(token);
 
-		final OperationFactory operationFactory = new NoUIOperationFactory(detectedCard);
+		final OperationFactory operationFactory = new NoUIOperationFactory(detectedCard, null);
 		operationFactory.setDisplay(display);
 		
 		GetCertificateFlow flow = new GetCertificateFlow(display, api);
 		flow.setOperationFactory(operationFactory);
 		Execution<GetCertificateResponse> resp = flow.process(api, new GetCertificateRequest());
+		final SignatureTokenConnection testToken =
+				new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password");
 		Assert.assertNotNull(resp);
 		Assert.assertTrue(resp.isSuccess());
 		Assert.assertNotNull(resp.getResponse());
-		Assert.assertNotNull(resp.getResponse().getEncryptionAlgorithm());
-		Assert.assertNotNull(resp.getResponse().getTokenId());
+		Assert.assertEquals(testToken.getKeys().get(0).getCertificate(), resp.getResponse().getCertificate());
+		Assert.assertEquals(testToken.getKeys().get(0).getEncryptionAlgorithm(), resp.getResponse().getEncryptionAlgorithm());
 		Assert.assertEquals(new TokenId("id"), resp.getResponse().getTokenId());
-		Assert.assertNotNull(resp.getResponse().getKeyId());
-
+		Assert.assertEquals(testToken.getKeys().get(0).getCertificate().getDSSIdAsString(), resp.getResponse().getKeyId());
+		Assert.assertNull(resp.getResponse().getPreferredDigest());
+		Assert.assertNull(resp.getResponse().getSupportedDigests());
 	}
 
 	private static class NoUIOperationFactory extends BasicOperationFactory {
@@ -185,21 +212,35 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		private final Operation successOperation;
 		@SuppressWarnings("rawtypes")
 		private final Operation selectedProductOperation;
+		@SuppressWarnings("rawtypes")
+		private final Operation configureProductOperation;
 		
-		public NoUIOperationFactory(final Product selectedProduct) {
+		public NoUIOperationFactory(final Product selectedProduct, final Product configuredProduct) {
 			this.successOperation = mock(Operation.class);
 			when(successOperation.perform()).thenReturn(new OperationResult<Void>(BasicOperationStatus.SUCCESS));
 			this.selectedProductOperation = mock(Operation.class);
 			when(selectedProductOperation.perform()).thenReturn(new OperationResult<Product>(selectedProduct));
+
+			if(configuredProduct != null) {
+				this.configureProductOperation = mock(Operation.class);
+				when(configureProductOperation.perform()).thenReturn(new OperationResult<Product>(configuredProduct));
+			} else {
+				this.configureProductOperation = null;
+			}
 		}
 		
 		@Override
 		@SuppressWarnings("unchecked")
 		public <R, T extends Operation<R>> Operation<R> getOperation(Class<T> clazz, Object... params) {
 			if(UIOperation.class.isAssignableFrom(clazz)) {
-				if((params.length > 0) && params[0].equals("/fxml/product-selection.fxml")) {
+				final String fxmlPath = (params[0] instanceof String) ? (String) params[0] : ((URL) params[0]).toString();
+				final String fxml = fxmlPath.substring(fxmlPath.indexOf("/fxml"));
+				switch(fxml) {
+				case "/fxml/product-selection.fxml":
 					return selectedProductOperation;
-				} else {
+				case "/fxml/configure-keystore.fxml":
+					return configureProductOperation;
+				default:
 					return successOperation;
 				}
 			} else {
