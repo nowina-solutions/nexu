@@ -14,6 +14,7 @@
 package lu.nowina.nexu.flow;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -55,69 +56,78 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 	protected Execution<GetCertificateResponse> process(NexuAPI api, GetCertificateRequest req) throws Exception {
 		SignatureTokenConnection token = null;
 		try {
-			final Product selectedProduct = null; //TODO
-			final OperationResult<List<Match>> getMatchingCardAdaptersOperationResult =
-					getOperationFactory().getOperation(GetMatchingProductAdaptersOperation.class, Arrays.asList(selectedProduct), api).perform();
-			if(getMatchingCardAdaptersOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
-				final List<Match> matchingCardAdapters = getMatchingCardAdaptersOperationResult.getResult();
-				
-				final OperationResult<Map<TokenOperationResultKey, Object>> createTokenOperationResult =
-						getOperationFactory().getOperation(CreateTokenOperation.class, api, matchingCardAdapters).perform();
-				if (createTokenOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
-					final Map<TokenOperationResultKey, Object> map = createTokenOperationResult.getResult();
-					final TokenId tokenId = (TokenId) map.get(TokenOperationResultKey.TOKEN_ID);
+			final OperationResult<Product> selectProductOperationResult =
+					getOperationFactory().getOperation(UIOperation.class, "/fxml/product-selection.fxml",
+							new Object[]{api.getAppConfig().getApplicationName(),
+									api.detectCards(), Collections.emptyList()}).perform();
+			if(selectProductOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
+				final Product selectedProduct = selectProductOperationResult.getResult();
 
-					final OperationResult<SignatureTokenConnection> getTokenConnectionOperationResult =
-							getOperationFactory().getOperation(GetTokenConnectionOperation.class, api, tokenId).perform();
-					if (getTokenConnectionOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
-						token = getTokenConnectionOperationResult.getResult();
+				final OperationResult<List<Match>> getMatchingCardAdaptersOperationResult =
+						getOperationFactory().getOperation(GetMatchingProductAdaptersOperation.class, Arrays.asList(selectedProduct), api).perform();
+				if(getMatchingCardAdaptersOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
+					final List<Match> matchingCardAdapters = getMatchingCardAdaptersOperationResult.getResult();
 
-						final Product product = (Product) map.get(TokenOperationResultKey.SELECTED_PRODUCT);
-						final ProductAdapter productAdapter = (ProductAdapter) map.get(TokenOperationResultKey.SELECTED_PRODUCT_ADAPTER);
-						final OperationResult<DSSPrivateKeyEntry> selectPrivateKeyOperationResult =
-								getOperationFactory().getOperation(SelectPrivateKeyOperation.class, token, api, product, productAdapter, req.getCertificateFilter()).perform();
-						if (selectPrivateKeyOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
-							final DSSPrivateKeyEntry key = selectPrivateKeyOperationResult.getResult();
+					final OperationResult<Map<TokenOperationResultKey, Object>> createTokenOperationResult =
+							getOperationFactory().getOperation(CreateTokenOperation.class, api, matchingCardAdapters).perform();
+					if (createTokenOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
+						final Map<TokenOperationResultKey, Object> map = createTokenOperationResult.getResult();
+						final TokenId tokenId = (TokenId) map.get(TokenOperationResultKey.TOKEN_ID);
 
-							if ((Boolean) map.get(TokenOperationResultKey.ADVANCED_CREATION)) {
-								getOperationFactory().getOperation(AdvancedCreationFeedbackOperation.class,
-										api, map).perform();
+						final OperationResult<SignatureTokenConnection> getTokenConnectionOperationResult =
+								getOperationFactory().getOperation(GetTokenConnectionOperation.class, api, tokenId).perform();
+						if (getTokenConnectionOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
+							token = getTokenConnectionOperationResult.getResult();
+
+							final Product product = (Product) map.get(TokenOperationResultKey.SELECTED_PRODUCT);
+							final ProductAdapter productAdapter = (ProductAdapter) map.get(TokenOperationResultKey.SELECTED_PRODUCT_ADAPTER);
+							final OperationResult<DSSPrivateKeyEntry> selectPrivateKeyOperationResult =
+									getOperationFactory().getOperation(SelectPrivateKeyOperation.class, token, api, product, productAdapter, req.getCertificateFilter()).perform();
+							if (selectPrivateKeyOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
+								final DSSPrivateKeyEntry key = selectPrivateKeyOperationResult.getResult();
+
+								if ((Boolean) map.get(TokenOperationResultKey.ADVANCED_CREATION)) {
+									getOperationFactory().getOperation(AdvancedCreationFeedbackOperation.class,
+											api, map).perform();
+								}
+
+								final GetCertificateResponse resp = new GetCertificateResponse();
+								resp.setTokenId(tokenId);
+
+								final CertificateToken certificate = key.getCertificate();
+								resp.setCertificate(certificate);
+								resp.setKeyId(certificate.getDSSIdAsString());
+								resp.setEncryptionAlgorithm(certificate.getEncryptionAlgorithm());
+
+								final CertificateToken[] certificateChain = key.getCertificateChain();
+								if (certificateChain != null) {
+									resp.setCertificateChain(certificateChain);
+								}
+
+								if(productAdapter.canReturnSuportedDigestAlgorithms(product)) {
+									resp.setSupportedDigests(productAdapter.getSupportedDigestAlgorithms(product));
+									resp.setPreferredDigest(productAdapter.getPreferredDigestAlgorithm(product));
+								}
+
+								if(api.getAppConfig().isEnablePopUps()) {
+									getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml", 
+											new Object[]{ "certificates.flow.finished" }).perform();
+								}
+								return new Execution<GetCertificateResponse>(resp);
+							} else {
+								return handleErrorOperationResult(selectPrivateKeyOperationResult);
 							}
-
-							final GetCertificateResponse resp = new GetCertificateResponse();
-							resp.setTokenId(tokenId);
-
-							final CertificateToken certificate = key.getCertificate();
-							resp.setCertificate(certificate);
-							resp.setKeyId(certificate.getDSSIdAsString());
-							resp.setEncryptionAlgorithm(certificate.getEncryptionAlgorithm());
-
-							final CertificateToken[] certificateChain = key.getCertificateChain();
-							if (certificateChain != null) {
-								resp.setCertificateChain(certificateChain);
-							}
-
-							if(productAdapter.canReturnSuportedDigestAlgorithms(product)) {
-								resp.setSupportedDigests(productAdapter.getSupportedDigestAlgorithms(product));
-								resp.setPreferredDigest(productAdapter.getPreferredDigestAlgorithm(product));
-							}
-							
-							if(api.getAppConfig().isEnablePopUps()) {
-								getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml", 
-										new Object[]{ "certificates.flow.finished" }).perform();
-							}
-							return new Execution<GetCertificateResponse>(resp);
 						} else {
-							return handleErrorOperationResult(selectPrivateKeyOperationResult);
+							return handleErrorOperationResult(getTokenConnectionOperationResult);
 						}
 					} else {
-						return handleErrorOperationResult(getTokenConnectionOperationResult);
+						return handleErrorOperationResult(createTokenOperationResult);
 					}
 				} else {
-					return handleErrorOperationResult(createTokenOperationResult);
+					return handleErrorOperationResult(getMatchingCardAdaptersOperationResult);
 				}
 			} else {
-				return handleErrorOperationResult(getMatchingCardAdaptersOperationResult);
+				return handleErrorOperationResult(selectProductOperationResult);				
 			}
 		} catch (final Exception e) {
 			logger.error("Flow error", e);
