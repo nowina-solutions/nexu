@@ -23,13 +23,14 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
+import javafx.scene.control.ComboBox;
+import lu.nowina.nexu.NexuException;
+import lu.nowina.nexu.api.ConfiguredKeystore;
 import lu.nowina.nexu.api.KeystoreType;
-import lu.nowina.nexu.model.KeystoreParams;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 import lu.nowina.nexu.view.core.ExtensionFilter;
 
-public class KeystoreParamsController extends AbstractUIOperationController<KeystoreParams> implements Initializable {
+public class ConfigureKeystoreController extends AbstractUIOperationController<ConfiguredKeystore> implements Initializable {
 
 	@FXML
 	private Button ok;
@@ -41,21 +42,25 @@ public class KeystoreParamsController extends AbstractUIOperationController<Keys
 	private Button selectFile;
 
 	@FXML
-	private PasswordField password;
-
+	private ComboBox<KeystoreType> keystoreType;
+	
 	private File keystoreFile;
-	private BooleanProperty keystoreFileSpecified;
+	private final BooleanProperty keystoreFileSpecified;
 
-	public KeystoreParamsController() {
+	public ConfigureKeystoreController() {
 		keystoreFileSpecified = new SimpleBooleanProperty(false);
 	}
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		ok.setOnAction((event) -> {
-			final KeystoreParams result = new KeystoreParams(keystoreFile, password.getText(),
-					(keystoreFile.getName().toLowerCase().endsWith(".jks") ? KeystoreType.JKS : KeystoreType.PKCS12)
-			);
+			final ConfiguredKeystore result = new ConfiguredKeystore();
+			try {
+				result.setUrl(keystoreFile.toURI().toURL().toString());
+			} catch (Exception e1) {
+				throw new NexuException(e1);
+			}
+			result.setType(keystoreType.getValue());
 			signalEnd(result);
 		});
 		ok.disableProperty().bind(Bindings.not(keystoreFileSpecified));
@@ -63,12 +68,22 @@ public class KeystoreParamsController extends AbstractUIOperationController<Keys
 			signalUserCancel();
 		});
 		selectFile.setOnAction((e) -> {
-			keystoreFile = getDisplay().displayFileChooser(
-					new ExtensionFilter("PKCS12", "*.p12", "*.pfx", "*.P12", "*.PFX"),
-					new ExtensionFilter("JKS", "*.jks", "*.JKS")
-			);
+			final ExtensionFilter extensionFilter;
+			switch(keystoreType.getValue()) {
+			case JKS:
+				extensionFilter = new ExtensionFilter("JKS", "*.jks", "*.JKS");
+				break;
+			case PKCS12:
+				extensionFilter = new ExtensionFilter("PKCS12", "*.p12", "*.pfx", "*.P12", "*.PFX");
+				break;
+			default:
+				throw new IllegalArgumentException("Unknown keystore type: " +
+						keystoreType.getValue());
+			}
+			keystoreFile = getDisplay().displayFileChooser(extensionFilter);
 			keystoreFileSpecified.set(keystoreFile != null);
 		});
+		selectFile.disableProperty().bind(keystoreType.valueProperty().isNull());
 	}
 
 }
