@@ -13,6 +13,7 @@
  */
 package lu.nowina.nexu.flow;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.flow.operation.AdvancedCreationFeedbackOperation;
 import lu.nowina.nexu.flow.operation.CreateTokenOperation;
-import lu.nowina.nexu.flow.operation.GetMatchingCardAdaptersOperation;
+import lu.nowina.nexu.flow.operation.GetMatchingProductAdaptersOperation;
 import lu.nowina.nexu.flow.operation.GetTokenConnectionOperation;
 import lu.nowina.nexu.flow.operation.SelectPrivateKeyOperation;
 import lu.nowina.nexu.flow.operation.TokenOperationResultKey;
@@ -54,8 +55,9 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 	protected Execution<GetCertificateResponse> process(NexuAPI api, GetCertificateRequest req) throws Exception {
 		SignatureTokenConnection token = null;
 		try {
+			final Product selectedProduct = null; //TODO
 			final OperationResult<List<Match>> getMatchingCardAdaptersOperationResult =
-					getOperationFactory().getOperation(GetMatchingCardAdaptersOperation.class, api).perform();
+					getOperationFactory().getOperation(GetMatchingProductAdaptersOperation.class, Arrays.asList(selectedProduct), api).perform();
 			if(getMatchingCardAdaptersOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 				final List<Match> matchingCardAdapters = getMatchingCardAdaptersOperationResult.getResult();
 				

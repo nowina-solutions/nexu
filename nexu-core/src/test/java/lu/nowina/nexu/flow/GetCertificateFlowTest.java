@@ -38,7 +38,7 @@ import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.flow.operation.BasicOperationFactory;
 import lu.nowina.nexu.flow.operation.CoreOperationStatus;
 import lu.nowina.nexu.flow.operation.CreateTokenOperation;
-import lu.nowina.nexu.flow.operation.GetMatchingCardAdaptersOperation;
+import lu.nowina.nexu.flow.operation.GetMatchingProductAdaptersOperation;
 import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
@@ -65,11 +65,11 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 
 		final OperationFactory operationFactory = mock(OperationFactory.class);
 
-		final GetMatchingCardAdaptersOperation operation = new GetMatchingCardAdaptersOperation();
+		final GetMatchingProductAdaptersOperation operation = new GetMatchingProductAdaptersOperation();
 		operation.setParams(api);
 		operation.setDisplay(display);
 		operation.setOperationFactory(operationFactory);
-		when(operationFactory.getOperation(GetMatchingCardAdaptersOperation.class, api)).thenReturn(operation);
+		when(operationFactory.getOperation(GetMatchingProductAdaptersOperation.class, api)).thenReturn(operation);
 
 		final Operation<Object> successOperation = mock(Operation.class);
 		when(successOperation.perform()).thenReturn(new OperationResult<Object>(BasicOperationStatus.SUCCESS));
@@ -104,7 +104,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		
 		final Operation<List<Match>> getMatchingCardAdaptersOperation = mock(Operation.class);
 		when(getMatchingCardAdaptersOperation.perform()).thenReturn(new OperationResult<List<Match>>(Collections.emptyList()));
-		when(operationFactory.getOperation(GetMatchingCardAdaptersOperation.class, api)).thenReturn(getMatchingCardAdaptersOperation);
+		when(operationFactory.getOperation(GetMatchingProductAdaptersOperation.class, api)).thenReturn(getMatchingCardAdaptersOperation);
 		
 		final CreateTokenOperation createTokenOperation = new CreateTokenOperation();
 		createTokenOperation.setParams(api, Collections.emptyList());

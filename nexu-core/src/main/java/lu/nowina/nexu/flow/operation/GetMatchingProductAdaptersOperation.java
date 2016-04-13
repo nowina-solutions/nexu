@@ -16,50 +16,49 @@ package lu.nowina.nexu.flow.operation;
 import java.util.ArrayList;
 import java.util.List;
 
-import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackStatus;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.view.core.UIOperation;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This {@link CompositeOperation} allows to get a list of {@link Match}.
  *
- * <p>Expected parameter: {@link NexuAPI}.
+ * <p>Expected parameters:
+ * <ol>
+ * <li>List of {@link Product}.</li>
+ * <li>{@link NexuAPI}</li>
+ * </ol>
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public class GetMatchingCardAdaptersOperation extends AbstractCompositeOperation<List<Match>> {
+public class GetMatchingProductAdaptersOperation extends AbstractCompositeOperation<List<Match>> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(GetMatchingCardAdaptersOperation.class.getName());
-
+	private List<Product> products;
 	private NexuAPI api;
 	
-	public GetMatchingCardAdaptersOperation() {
+	public GetMatchingProductAdaptersOperation() {
 		super();
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public void setParams(Object... params) {
 		try {
-			this.api = (NexuAPI) params[0];
+			this.products = (List<Product>) params[0];
+			this.api = (NexuAPI) params[1];
 		} catch(final ArrayIndexOutOfBoundsException | ClassCastException e) {
-			throw new IllegalArgumentException("Expected parameter: NexuAPI");
+			throw new IllegalArgumentException("Expected parameters: list of Product, NexuAPI");
 		}
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public OperationResult<List<Match>> perform() {
-		final List<DetectedCard> detectedCards = api.detectCards();
-		LOG.info(detectedCards.size() + " card detected");
-
-		if (detectedCards.size() == 0) {
+		if (products.size() == 0) {
 			if(api.getAppConfig().isEnablePopUps()) {
 				final Feedback feedback = new Feedback();
 				feedback.setFeedbackStatus(FeedbackStatus.NO_PRODUCT_FOUND);
@@ -69,17 +68,14 @@ public class GetMatchingCardAdaptersOperation extends AbstractCompositeOperation
 			}
 			return new OperationResult<List<Match>>(CoreOperationStatus.NO_PRODUCT_FOUND);
 		} else {
-			if(detectedCards.size() > 1) {
-				LOG.warn("More than one card. Not supported yet. We will take the first one having a matching adapter.");
-			}
-			return getMatchingCardAdapters(detectedCards);
+			return getMatchingCardAdapters(products);
 		}
 	}
 	
-	private OperationResult<List<Match>> getMatchingCardAdapters(final List<DetectedCard> detectedCards) {
+	private OperationResult<List<Match>> getMatchingCardAdapters(final List<Product> products) {
 		final List<Match> matchingCardAdapters = new ArrayList<Match>();
-		for (final DetectedCard d : detectedCards) {
-			matchingCardAdapters.addAll(api.matchingProductAdapters(d));
+		for (final Product p : products) {
+			matchingCardAdapters.addAll(api.matchingProductAdapters(p));
 		}
 		return new OperationResult<List<Match>>(matchingCardAdapters);
 	}
