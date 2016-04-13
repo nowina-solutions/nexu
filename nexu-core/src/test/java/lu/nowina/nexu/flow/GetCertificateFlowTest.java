@@ -18,7 +18,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -48,6 +47,7 @@ import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
+import lu.nowina.nexu.api.flow.NoOpFutureOperationInvocation;
 import lu.nowina.nexu.api.flow.Operation;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.flow.operation.BasicOperationFactory;
@@ -180,6 +180,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		appConfig.setEnablePopUps(true);
 		when(api.getAppConfig()).thenReturn(appConfig);
 		final DetectedCard detectedCard = new DetectedCard("atr", 0);
+		when(adapter.getConfigurationOperation(detectedCard)).thenReturn(new NoOpFutureOperationInvocation<Product>(detectedCard));
 
 		when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
 		when(api.matchingProductAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
@@ -233,9 +234,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		@SuppressWarnings("unchecked")
 		public <R, T extends Operation<R>> Operation<R> getOperation(Class<T> clazz, Object... params) {
 			if(UIOperation.class.isAssignableFrom(clazz)) {
-				final String fxmlPath = (params[0] instanceof String) ? (String) params[0] : ((URL) params[0]).toString();
-				final String fxml = fxmlPath.substring(fxmlPath.indexOf("/fxml"));
-				switch(fxml) {
+				switch((String) params[0]) {
 				case "/fxml/product-selection.fxml":
 					return selectedProductOperation;
 				case "/fxml/configure-keystore.fxml":

@@ -14,6 +14,7 @@
 package lu.nowina.nexu.flow.operation;
 
 import lu.nowina.nexu.api.flow.Operation;
+import lu.nowina.nexu.api.flow.OperationCaller;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
 
@@ -22,7 +23,7 @@ import lu.nowina.nexu.view.core.UIOperation;
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public interface OperationFactory {
+public interface OperationFactory extends OperationCaller {
 
 	/**
 	 * Returns an instance of {@link Operation} initialized with <code>params</code>.

@@ -13,13 +13,14 @@
  */
 package lu.nowina.nexu.api;
 
-import java.net.URL;
 import java.util.List;
 
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.PasswordInputCallback;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
+import lu.nowina.nexu.api.flow.Operation;
+import lu.nowina.nexu.api.flow.FutureOperationInvocation;
 
 /**
  * A <code>ProductAdapter</code> can manage some specific {@link Product}s.
@@ -93,13 +94,12 @@ public interface ProductAdapter {
 	DigestAlgorithm getPreferredDigestAlgorithm(Product product);
 	
 	/**
-	 * Returns the URL to the FXML that can be used to configure the given <code>product</code>, or <code>null</code>
-	 * if none.
-	 * @param product The product for which one would like to retrieve the FXML configuration URL.
-	 * @return The URL to the FXML that can be used to configure the given <code>product</code>, or <code>null</code>
-	 * if none.
+	 * Returns the specification of the operation to call to configure <code>product</code>.
+	 * <p>Returned operation must return a configured product.
+	 * @param product The product for which one would like to retrieve the configuration {@link Operation}.
+	 * @return The specification of the operation to call to configure <code>product</code>.
 	 */
-	URL getFXMLConfigurationURL(Product product);
+	FutureOperationInvocation<Product> getConfigurationOperation(Product product);
 	
 	/**
 	 * Saves the product configuration.

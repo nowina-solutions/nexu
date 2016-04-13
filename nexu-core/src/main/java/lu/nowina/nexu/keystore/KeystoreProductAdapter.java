@@ -32,6 +32,9 @@ import lu.nowina.nexu.api.NewKeystore;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.api.ProductAdapter;
+import lu.nowina.nexu.api.flow.FutureOperationInvocation;
+import lu.nowina.nexu.api.flow.NoOpFutureOperationInvocation;
+import lu.nowina.nexu.view.core.UIOperation;
 
 /**
  * Product adapter for {@link ConfiguredKeystore}.
@@ -109,11 +112,11 @@ public class KeystoreProductAdapter implements ProductAdapter {
 	}
 
 	@Override
-	public URL getFXMLConfigurationURL(Product product) {
+	public FutureOperationInvocation<Product> getConfigurationOperation(Product product) {
 		if (product instanceof NewKeystore) {
-			return this.getClass().getResource("/fxml/configure-keystore.fxml");
+			return UIOperation.getFutureOperationInvocation("/fxml/configure-keystore.fxml");
 		} else {
-			return null;
+			return new NoOpFutureOperationInvocation<Product>(product);
 		}
 	}
 

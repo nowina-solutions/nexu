@@ -13,12 +13,13 @@
  */
 package lu.nowina.nexu.api;
 
-import java.net.URL;
 import java.util.List;
 
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.token.PasswordInputCallback;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
+import lu.nowina.nexu.api.flow.FutureOperationInvocation;
+import lu.nowina.nexu.api.flow.NoOpFutureOperationInvocation;
 
 /**
  * Convenient base class for {@link ProductAdapter}s supporting {@link DetectedCard}s.
@@ -81,8 +82,8 @@ public abstract class AbstractCardProductAdapter implements ProductAdapter {
 	protected abstract DigestAlgorithm getPreferredDigestAlgorithm(DetectedCard card);
 
 	@Override
-	public URL getFXMLConfigurationURL(Product product) {
-		return null;
+	public FutureOperationInvocation<Product> getConfigurationOperation(Product product) {
+		return new NoOpFutureOperationInvocation<Product>(product);
 	}
 
 	@Override

@@ -13,7 +13,6 @@
  */
 package lu.nowina.nexu.flow.operation;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,8 +20,8 @@ import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
+import lu.nowina.nexu.api.flow.FutureOperationInvocation;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.view.core.UIOperation;
 
 /**
  * This {@link CompositeOperation} allows a {@link ProductAdapter} to configure a {@link Product}.
@@ -63,13 +62,8 @@ public class ConfigureProductOperation extends AbstractCompositeOperation<List<M
 		return new OperationResult<List<Match>>(result);
 	}
 	
-	@SuppressWarnings("unchecked")
 	private OperationResult<Product> handleMatch(final ProductAdapter productAdapter, final Product product) {
-		final URL url = productAdapter.getFXMLConfigurationURL(product);
-		if(url != null) {
-			return operationFactory.getOperation(UIOperation.class, url, product).perform();
-		} else {
-			return new OperationResult<Product>(product);
-		}
+		final FutureOperationInvocation<Product> futureOperationInvocation = productAdapter.getConfigurationOperation(product);
+		return futureOperationInvocation.call(operationFactory);
 	}
 }

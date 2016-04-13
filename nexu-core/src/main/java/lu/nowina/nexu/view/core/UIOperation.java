@@ -14,7 +14,6 @@
 package lu.nowina.nexu.view.core;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 
@@ -24,8 +23,10 @@ import org.slf4j.LoggerFactory;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
+import lu.nowina.nexu.api.flow.FutureOperationInvocation;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.flow.Flow;
+import lu.nowina.nexu.flow.operation.AbstractFutureOperationInvocation;
 import lu.nowina.nexu.flow.operation.UIDisplayAwareOperation;
 
 /**
@@ -53,7 +54,6 @@ public class UIOperation<R> implements UIDisplayAwareOperation<R> {
 
 	private UIDisplay display;
 	private String fxml;
-	private URL fxmlURL;
 	private Object[] params;
 	
 	private transient Parent root;
@@ -68,11 +68,7 @@ public class UIOperation<R> implements UIDisplayAwareOperation<R> {
 			throw new IllegalArgumentException("An UIOperation needs at least the fxml.");
 		}
 		try {
-			if(params[0] instanceof String) {
-				this.fxml = (String) params[0];
-			} else {
-				this.fxmlURL = (URL) params[0];
-			}
+			this.fxml = (String) params[0];
 			if(params.length > 1) {
 				if(params[1] instanceof Object[]) {
 					this.params = (Object[]) params[1];
@@ -87,15 +83,11 @@ public class UIOperation<R> implements UIDisplayAwareOperation<R> {
 	
 	@Override
 	public final OperationResult<R> perform() {
-		if(fxml != null) {
-			LOGGER.info("Loading " + fxml + " view");
-		} else {
-			LOGGER.info("Loading " + fxmlURL + " view");
-		}
+		LOGGER.info("Loading " + fxml + " view");
 		final FXMLLoader loader = new FXMLLoader();
 		try {
 			loader.setResources(ResourceBundle.getBundle("bundles/nexu"));
-			loader.load((fxml != null) ? getClass().getResourceAsStream(fxml) : fxmlURL.openStream());
+			loader.load(getClass().getResourceAsStream(fxml));
 		} catch(final IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -157,7 +149,6 @@ public class UIOperation<R> implements UIDisplayAwareOperation<R> {
 		int result = 1;
 		result = prime * result + ((display == null) ? 0 : display.hashCode());
 		result = prime * result + ((fxml == null) ? 0 : fxml.hashCode());
-		result = prime * result + ((fxmlURL == null) ? 0 : fxmlURL.hashCode());
 		result = prime * result + Arrays.hashCode(params);
 		return result;
 	}
@@ -181,11 +172,6 @@ public class UIOperation<R> implements UIDisplayAwareOperation<R> {
 				return false;
 		} else if (!fxml.equals(other.fxml))
 			return false;
-		if (fxmlURL == null) {
-			if (other.fxmlURL != null)
-				return false;
-		} else if (!fxmlURL.equals(other.fxmlURL))
-			return false;
 		if (!Arrays.equals(params, other.params))
 			return false;
 		return true;
@@ -206,5 +192,31 @@ public class UIOperation<R> implements UIDisplayAwareOperation<R> {
 	
 	protected void hide() {
 		display.close(true);
+	}
+	
+	public static <R> FutureOperationInvocation<R> getFutureOperationInvocation(final String fxml,
+			final Object... controllerParams) {
+		return new UIFutureOperationInvocation<R>(fxml, controllerParams);
+	}
+	
+	private static class UIFutureOperationInvocation<R> extends AbstractFutureOperationInvocation<R> {
+		private final String fxml;
+		private final Object[] controllerParams;
+		
+		public UIFutureOperationInvocation(final String fxml, final Object... controllerParams) {
+			this.fxml = fxml;
+			this.controllerParams = controllerParams;
+		}
+
+		@Override
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		protected Class<UIOperation> getOperationClass() {
+			return UIOperation.class;
+		}
+
+		@Override
+		protected Object[] getOperationParams() {
+			return (controllerParams != null) ? new Object[]{fxml, controllerParams} : new Object[]{fxml};
+		}
 	}
 }
