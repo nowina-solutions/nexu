@@ -113,7 +113,7 @@ public class KeystoreProductAdapter implements ProductAdapter {
 		if (product instanceof NewKeystore) {
 			return this.getClass().getResource("/fxml/configure-keystore.fxml");
 		} else {
-			throw new IllegalArgumentException("Given product was already configured!");
+			return null;
 		}
 	}
 
