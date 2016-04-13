@@ -47,7 +47,7 @@
 	               	</toggleGroup>
        			</RadioButton>
 				<RadioButton fx:id="mscapi" mnemonicParsing="false" text="%api.mscapi" toggleGroup="$api" />
-				<RadioButton fx:id="pkcs12" mnemonicParsing="false" text="%api.keystore" toggleGroup="$api" />
+				<RadioButton fx:id="mocca" mnemonicParsing="false" text="%api.mocca" toggleGroup="$api" />
 			</children>
 		</VBox>
 	</center>

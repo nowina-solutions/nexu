@@ -13,20 +13,24 @@
  */
 package lu.nowina.nexu.flow.operation;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lu.nowina.nexu.NexuException;
-import lu.nowina.nexu.api.ProductAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.europa.esig.dss.token.MSCAPISignatureToken;
+import eu.europa.esig.dss.token.Pkcs11SignatureToken;
+import eu.europa.esig.dss.token.SignatureTokenConnection;
+import eu.europa.esig.dss.token.mocca.MOCCASignatureTokenConnection;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackStatus;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.Product;
+import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
@@ -34,19 +38,8 @@ import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.generic.ConnectionInfo;
 import lu.nowina.nexu.generic.GenericCardAdapter;
 import lu.nowina.nexu.generic.SCInfo;
-import lu.nowina.nexu.model.KeystoreParams;
 import lu.nowina.nexu.model.Pkcs11Params;
 import lu.nowina.nexu.view.core.UIOperation;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import eu.europa.esig.dss.token.JKSSignatureToken;
-import eu.europa.esig.dss.token.MSCAPISignatureToken;
-import eu.europa.esig.dss.token.Pkcs11SignatureToken;
-import eu.europa.esig.dss.token.Pkcs12SignatureToken;
-import eu.europa.esig.dss.token.SignatureTokenConnection;
-import eu.europa.esig.dss.token.mocca.MOCCASignatureTokenConnection;
 
 /**
  * This {@link CompositeOperation} allows to create a {@link TokenId}.
@@ -64,7 +57,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 	private static final Logger LOG = LoggerFactory.getLogger(CreateTokenOperation.class.getName());
 
 	private NexuAPI api;
-	private List<Match> matchingCardAdapters;
+	private List<Match> matchingProductAdapters;
 	
 	public CreateTokenOperation() {
 		super();
@@ -75,7 +68,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 	public void setParams(Object... params) {
 		try {
 			this.api = (NexuAPI) params[0];
-			this.matchingCardAdapters = (List<Match>) params[1];
+			this.matchingProductAdapters = (List<Match>) params[1];
 		} catch(final ArrayIndexOutOfBoundsException | ClassCastException e) {
 			throw new IllegalArgumentException("Expected parameters: NexuAPI, List of Match");
 		}
@@ -84,9 +77,9 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 	@Override
 	@SuppressWarnings("unchecked")
 	public OperationResult<Map<TokenOperationResultKey, Object>> perform() {
-		LOG.info(matchingCardAdapters.size() + " matching card adapters");
+		LOG.info(matchingProductAdapters.size() + " matching product adapters");
 
-		if (!matchingCardAdapters.isEmpty()) {
+		if (!matchingProductAdapters.isEmpty()) {
 			return createTokenAuto();
 		} else {
 			boolean advanced = false;
@@ -119,7 +112,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 	}
 
 	private OperationResult<Map<TokenOperationResultKey, Object>> createTokenAuto() {
-		final Match match = matchingCardAdapters.get(0);
+		final Match match = matchingProductAdapters.get(0);
 		final Product supportedProduct = match.getProduct();
 		final ProductAdapter adapter = match.getAdapter();
 
@@ -175,30 +168,6 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 			map.put(TokenOperationResultKey.SELECTED_API_PARAMS, absolutePath);
 			tokenId = api.registerTokenConnection(new Pkcs11SignatureToken(absolutePath, display.getPasswordInputCallback(),
 					selectedCard.getTerminalIndex()));
-			break;
-		case PKCS_12:
-			@SuppressWarnings("unchecked")
-			final OperationResult<KeystoreParams> op3 =
-				operationFactory.getOperation(UIOperation.class, "/fxml/keystore-params.fxml").perform();
-			if(op3.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
-				return new OperationResult<Map<TokenOperationResultKey, Object>>(BasicOperationStatus.USER_CANCEL);
-			}
-			final KeystoreParams keystoreParams = op3.getResult();
-			map.put(TokenOperationResultKey.SELECTED_API_PARAMS, keystoreParams.getPkcs12File().getAbsolutePath());
-			switch(keystoreParams.getType()) {
-			case PKCS12:
-				tokenId = api.registerTokenConnection(new Pkcs12SignatureToken(keystoreParams.getPassword(), keystoreParams.getPkcs12File()));
-				break;
-			case JKS:
-				try {
-					tokenId = api.registerTokenConnection(new JKSSignatureToken(new FileInputStream(keystoreParams.getPkcs12File()), keystoreParams.getPassword()));
-				} catch (FileNotFoundException e) {
-					throw new NexuException(e);
-				}
-				break;
-			default:
-				throw new IllegalStateException("Unhandled keystore type: " + keystoreParams.getType());
-			}
 			break;
 		default:
 			return new OperationResult<Map<TokenOperationResultKey, Object>>(CoreOperationStatus.UNSUPPORTED_PRODUCT);
