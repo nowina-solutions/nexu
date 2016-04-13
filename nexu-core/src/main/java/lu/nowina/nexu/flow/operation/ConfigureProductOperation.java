@@ -67,7 +67,7 @@ public class ConfigureProductOperation extends AbstractCompositeOperation<List<M
 	private OperationResult<Product> handleMatch(final ProductAdapter productAdapter, final Product product) {
 		final URL url = productAdapter.getFXMLConfigurationURL(product);
 		if(url != null) {
-			return operationFactory.getOperation(UIOperation.class, url.toString(), product).perform();
+			return operationFactory.getOperation(UIOperation.class, url, product).perform();
 		} else {
 			return new OperationResult<Product>(product);
 		}

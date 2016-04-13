@@ -14,6 +14,7 @@
 package lu.nowina.nexu.view.core;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 
@@ -52,6 +53,7 @@ public class UIOperation<R> implements UIDisplayAwareOperation<R> {
 
 	private UIDisplay display;
 	private String fxml;
+	private URL fxmlURL;
 	private Object[] params;
 	
 	private transient Parent root;
@@ -66,7 +68,11 @@ public class UIOperation<R> implements UIDisplayAwareOperation<R> {
 			throw new IllegalArgumentException("An UIOperation needs at least the fxml.");
 		}
 		try {
-			this.fxml = (String) params[0];
+			if(params[0] instanceof String) {
+				this.fxml = (String) params[0];
+			} else {
+				this.fxmlURL = (URL) params[0];
+			}
 			if(params.length > 1) {
 				if(params[1] instanceof Object[]) {
 					this.params = (Object[]) params[1];
@@ -80,12 +86,16 @@ public class UIOperation<R> implements UIDisplayAwareOperation<R> {
 	}
 	
 	@Override
-	public final OperationResult<R> perform() {		
-		LOGGER.info("Loading " + fxml + " view");
+	public final OperationResult<R> perform() {
+		if(fxml != null) {
+			LOGGER.info("Loading " + fxml + " view");
+		} else {
+			LOGGER.info("Loading " + fxmlURL + " view");
+		}
 		final FXMLLoader loader = new FXMLLoader();
 		try {
 			loader.setResources(ResourceBundle.getBundle("bundles/nexu"));
-			loader.load(getClass().getResourceAsStream(fxml));
+			loader.load((fxml != null) ? getClass().getResourceAsStream(fxml) : fxmlURL.openStream());
 		} catch(final IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -147,6 +157,7 @@ public class UIOperation<R> implements UIDisplayAwareOperation<R> {
 		int result = 1;
 		result = prime * result + ((display == null) ? 0 : display.hashCode());
 		result = prime * result + ((fxml == null) ? 0 : fxml.hashCode());
+		result = prime * result + ((fxmlURL == null) ? 0 : fxmlURL.hashCode());
 		result = prime * result + Arrays.hashCode(params);
 		return result;
 	}
@@ -169,6 +180,11 @@ public class UIOperation<R> implements UIDisplayAwareOperation<R> {
 			if (other.fxml != null)
 				return false;
 		} else if (!fxml.equals(other.fxml))
+			return false;
+		if (fxmlURL == null) {
+			if (other.fxmlURL != null)
+				return false;
+		} else if (!fxmlURL.equals(other.fxmlURL))
 			return false;
 		if (!Arrays.equals(params, other.params))
 			return false;
