@@ -11,34 +11,23 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.flow.operation;
-
-import lu.nowina.nexu.api.flow.Operation;
-import lu.nowina.nexu.api.flow.OperationCaller;
-import lu.nowina.nexu.view.core.UIDisplay;
-import lu.nowina.nexu.view.core.UIOperation;
+package lu.nowina.nexu.api.flow;
 
 /**
  * Allows to get instances of {@link Operation}.
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public interface OperationFactory extends OperationCaller {
+public interface OperationFactory {
 
 	/**
 	 * Returns an instance of {@link Operation} initialized with <code>params</code>.
 	 * <p>The type of the returned instance is guaranteed to implement {@link Operation}
-	 * or {@link CompositeOperation} but its concrete type could be different from <code>clazz</code>.
+	 * or one of its sub-interface but its concrete type could be different from <code>clazz</code>.
 	 * @param clazz The target operation type.
 	 * @param params The parameters to use to initialize the operation.
 	 * @return An instance of {@link Operation} initialized with <code>params</code>.
 	 */
 	<R, T extends Operation<R>> Operation<R> getOperation(Class<T> clazz, Object... params);
-	
-	/**
-	 * Sets the {@link UIDisplay} for {@link UIOperation}.
-	 * @param display The {@link UIDisplay} for {@link UIOperation}.
-	 */
-	void setDisplay(UIDisplay display);
 	
 }

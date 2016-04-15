@@ -17,15 +17,15 @@ package lu.nowina.nexu.api.flow;
  * Represents the future invocation of an {@link Operation}.
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
- * @param <R> The result type returned by this FutureOperationInvocation's {@link #call(OperationCaller)} method.
+ * @param <R> The result type returned by this FutureOperationInvocation's {@link #call(OperationFactory)} method.
  */
 public interface FutureOperationInvocation<R> {
 
 	/**
 	 * Calls the operation corresponding to this object and returns its result.
-	 * @param operationCaller The object that will be responsible to call the {@link Operation}.
+	 * @param operationFactory The object that will be responsible to call the {@link Operation}.
 	 * @return The result of the operation corresponding to this object.
 	 */
-	OperationResult<R> call(OperationCaller operationCaller);
+	OperationResult<R> call(OperationFactory operationFactory);
 	
 }

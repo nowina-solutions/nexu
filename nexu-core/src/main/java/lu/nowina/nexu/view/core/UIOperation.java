@@ -22,11 +22,11 @@ import org.slf4j.LoggerFactory;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import lu.nowina.nexu.api.flow.AbstractFutureOperationInvocation;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.FutureOperationInvocation;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.flow.Flow;
-import lu.nowina.nexu.flow.operation.AbstractFutureOperationInvocation;
 import lu.nowina.nexu.flow.operation.UIDisplayAwareOperation;
 
 /**

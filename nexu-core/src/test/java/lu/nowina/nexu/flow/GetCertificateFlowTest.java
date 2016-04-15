@@ -49,13 +49,13 @@ import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.NoOpFutureOperationInvocation;
 import lu.nowina.nexu.api.flow.Operation;
+import lu.nowina.nexu.api.flow.OperationFactory;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.flow.operation.BasicOperationFactory;
 import lu.nowina.nexu.flow.operation.ConfigureProductOperation;
 import lu.nowina.nexu.flow.operation.CoreOperationStatus;
 import lu.nowina.nexu.flow.operation.CreateTokenOperation;
 import lu.nowina.nexu.flow.operation.GetMatchingProductAdaptersOperation;
-import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.keystore.KeystoreProductAdapter;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
@@ -95,7 +95,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		configuredProduct.setType(KeystoreType.JKS);
 		configuredProduct.setUrl(this.getClass().getResource("/keystore.jks").toString());
 		final OperationFactory operationFactory = new NoUIOperationFactory(selectedProduct, configuredProduct);
-		operationFactory.setDisplay(display);
+		((NoUIOperationFactory)operationFactory).setDisplay(display);
 		
 		final GetCertificateFlow flow = new GetCertificateFlow(display, api);
 		flow.setOperationFactory(operationFactory);
@@ -189,7 +189,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		when(adapter.connect(eq(api), eq(detectedCard), any())).thenReturn(token);
 
 		final OperationFactory operationFactory = new NoUIOperationFactory(detectedCard, null);
-		operationFactory.setDisplay(display);
+		((NoUIOperationFactory)operationFactory).setDisplay(display);
 		
 		GetCertificateFlow flow = new GetCertificateFlow(display, api);
 		flow.setOperationFactory(operationFactory);

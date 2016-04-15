@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 import lu.nowina.nexu.api.NexuAPI;
-import lu.nowina.nexu.flow.operation.OperationFactory;
+import lu.nowina.nexu.api.flow.OperationFactory;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.view.core.NonBlockingUIOperation;
 

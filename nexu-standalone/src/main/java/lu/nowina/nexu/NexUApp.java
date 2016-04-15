@@ -28,12 +28,12 @@ import javafx.stage.Stage;
 import lu.nowina.nexu.NexUPreLoader.PreloaderMessage;
 import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.flow.OperationFactory;
 import lu.nowina.nexu.api.plugin.InitializationMessage;
 import lu.nowina.nexu.flow.BasicFlowRegistry;
 import lu.nowina.nexu.flow.Flow;
 import lu.nowina.nexu.flow.FlowRegistry;
 import lu.nowina.nexu.flow.operation.BasicOperationFactory;
-import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.generic.HttpDataLoader;
 import lu.nowina.nexu.generic.SCDatabase;
@@ -61,7 +61,7 @@ public class NexUApp extends Application {
 
 		final StandaloneUIDisplay uiDisplay = new StandaloneUIDisplay();
 		final OperationFactory operationFactory = new BasicOperationFactory();
-		operationFactory.setDisplay(uiDisplay);
+		((BasicOperationFactory)operationFactory).setDisplay(uiDisplay);
 		uiDisplay.setOperationFactory(operationFactory);
 		
 		loader = new DatabaseWebLoader(NexuLauncher.getConfig(),

@@ -17,7 +17,7 @@ package lu.nowina.nexu.api.flow;
  * Represents the future invocation of an {@link Operation} that does nothing but return a result previously given.
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
- * @param <R> The result type returned by this FutureOperationInvocation's {@link #call(OperationCaller)} method.
+ * @param <R> The result type returned by this FutureOperationInvocation's {@link #call(OperationFactory)} method.
  */
 public class NoOpFutureOperationInvocation<R> implements FutureOperationInvocation<R> {
 
@@ -29,7 +29,7 @@ public class NoOpFutureOperationInvocation<R> implements FutureOperationInvocati
 	}
 
 	@Override
-	public OperationResult<R> call(OperationCaller operationCaller) {
+	public OperationResult<R> call(OperationFactory operationFactory) {
 		return new OperationResult<R>(result);
 	}
 }

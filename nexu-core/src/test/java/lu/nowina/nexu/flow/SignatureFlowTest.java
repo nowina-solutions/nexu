@@ -33,9 +33,9 @@ import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.Operation;
+import lu.nowina.nexu.api.flow.OperationFactory;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.flow.operation.BasicOperationFactory;
-import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
 
@@ -74,7 +74,7 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 		req.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
 		final OperationFactory noUIOperationFactory = new NoUIOperationFactory();
-		noUIOperationFactory.setDisplay(display);
+		((NoUIOperationFactory)noUIOperationFactory).setDisplay(display);
 
 		SignatureFlow flow = new SignatureFlow(display, api);
 		flow.setOperationFactory(noUIOperationFactory);

@@ -14,12 +14,22 @@
 package lu.nowina.nexu.api.flow;
 
 /**
- * An <code>OperationCaller</code> is able to call {@link Operation}.
- * 
- * <p>This is a marker interface.
+ * Convenient base class for {@link FutureOperationInvocation} that uses an {@link OperationFactory}.
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public interface OperationCaller {
+public abstract class AbstractFutureOperationInvocation<R> implements FutureOperationInvocation<R> {
 
+	public AbstractFutureOperationInvocation() {
+		super();
+	}
+
+	@Override
+	public final OperationResult<R> call(final OperationFactory operationFactory) {
+		return operationFactory.getOperation(getOperationClass(), getOperationParams()).perform();
+	}
+
+	protected abstract <T extends Operation<R>> Class<T> getOperationClass();
+	
+	protected abstract Object[] getOperationParams();
 }
