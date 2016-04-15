@@ -140,7 +140,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 
 		final Operation<List<Match>> configureProductOperation = mock(Operation.class);
 		when(configureProductOperation.perform()).thenReturn(new OperationResult<List<Match>>(Collections.emptyList()));
-		when(operationFactory.getOperation(ConfigureProductOperation.class, Collections.emptyList())).thenReturn(configureProductOperation);
+		when(operationFactory.getOperation(ConfigureProductOperation.class, Collections.emptyList(), api)).thenReturn(configureProductOperation);
 
 		final CreateTokenOperation createTokenOperation = new CreateTokenOperation();
 		createTokenOperation.setParams(api, Collections.emptyList());
@@ -180,7 +180,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		appConfig.setEnablePopUps(true);
 		when(api.getAppConfig()).thenReturn(appConfig);
 		final DetectedCard detectedCard = new DetectedCard("atr", 0);
-		when(adapter.getConfigurationOperation(detectedCard)).thenReturn(new NoOpFutureOperationInvocation<Product>(detectedCard));
+		when(adapter.getConfigurationOperation(api, detectedCard)).thenReturn(new NoOpFutureOperationInvocation<Product>(detectedCard));
 
 		when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
 		when(api.matchingProductAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));

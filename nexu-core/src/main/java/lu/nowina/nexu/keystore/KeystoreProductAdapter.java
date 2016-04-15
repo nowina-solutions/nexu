@@ -112,7 +112,7 @@ public class KeystoreProductAdapter implements ProductAdapter {
 	}
 
 	@Override
-	public FutureOperationInvocation<Product> getConfigurationOperation(Product product) {
+	public FutureOperationInvocation<Product> getConfigurationOperation(NexuAPI api, Product product) {
 		if (product instanceof NewKeystore) {
 			return UIOperation.getFutureOperationInvocation("/fxml/configure-keystore.fxml");
 		} else {
@@ -121,7 +121,16 @@ public class KeystoreProductAdapter implements ProductAdapter {
 	}
 
 	@Override
-	public void saveProductConfiguration(NexuAPI api, Product product) {
-		// TODO Auto-generated method stub
+	public FutureOperationInvocation<Boolean> getSaveOperation(NexuAPI api, Product product) {
+		if (product instanceof NewKeystore) {
+			throw new IllegalArgumentException("Given product was not configured!");
+		} else {
+			return UIOperation.getFutureOperationInvocation("/fxml/save-keystore.fxml",
+					api.getAppConfig().getApplicationName(), this, product);
+		}
+	}
+	
+	public void saveKeystore(final ConfiguredKeystore keystore) {
+		//TODO
 	}
 }

@@ -28,6 +28,7 @@ import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.GetIdentityInfoResponse;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.ScAPI;
+import lu.nowina.nexu.api.flow.FutureOperationInvocation;
 
 public class GenericCardAdapter extends AbstractCardProductAdapter {
 
@@ -94,5 +95,11 @@ public class GenericCardAdapter extends AbstractCardProductAdapter {
 	@Override
 	protected DigestAlgorithm getPreferredDigestAlgorithm(DetectedCard card) {
 		throw new IllegalStateException("This card adapter cannot return list of supported digest algorithms.");
+	}
+
+	@Override
+	protected FutureOperationInvocation<Boolean> getSaveOperation(NexuAPI api, DetectedCard card) {
+		// TODO Auto-generated method stub
+		return super.getSaveOperation(api, card);
 	}
 }

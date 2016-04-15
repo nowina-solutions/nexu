@@ -1,5 +1,5 @@
 /**
- * © Nowina Solutions, 2015-2015
+ * © Nowina Solutions, 2015-2016
  *
  * Concédée sous licence EUPL, version 1.1 ou – dès leur approbation par la Commission européenne - versions ultérieures de l’EUPL (la «Licence»).
  * Vous ne pouvez utiliser la présente œuvre que conformément à la Licence.
@@ -11,26 +11,16 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.generic;
+package lu.nowina.nexu;
 
-import java.io.File;
+/**
+ * Interface that must be implemented by classes able to provide a {@link ProductDatabase} that
+ * may be refreshed during runtime.
+ *
+ * @author Jean Lepropre (jean.lepropre@nowina.lu)
+ */
+public interface ProductDatabaseRefresher<T extends ProductDatabase> {
 
-import javax.xml.bind.JAXBContext;
-
-import org.junit.Test;
-
-public class SCDatabaseLoaderTest {
-
-	@Test
-	public void test1() throws Exception {
-
-		SCDatabase db = SCDatabaseLoader.load(new File("src/test/resources/db.xml"));
-
-		JAXBContext ctx = JAXBContext.newInstance(SCDatabase.class);
-		ctx.createMarshaller().marshal(db, System.out);
-
-		SCDatabaseLoader.saveAs(db, new File("target/db.xml"));
-
-	}
-
+	T getDatabase();
+	
 }

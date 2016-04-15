@@ -82,12 +82,20 @@ public abstract class AbstractCardProductAdapter implements ProductAdapter {
 	protected abstract DigestAlgorithm getPreferredDigestAlgorithm(DetectedCard card);
 
 	@Override
-	public FutureOperationInvocation<Product> getConfigurationOperation(Product product) {
-		return new NoOpFutureOperationInvocation<Product>(product);
+	public final FutureOperationInvocation<Product> getConfigurationOperation(NexuAPI api, Product product) {
+		return getConfigurationOperation(api, (DetectedCard) product);
 	}
 
+	protected FutureOperationInvocation<Product> getConfigurationOperation(NexuAPI api, DetectedCard card) {
+		return new NoOpFutureOperationInvocation<Product>(card);
+	}
+	
 	@Override
-	public void saveProductConfiguration(NexuAPI api, Product product) {
-		// Do nothing by contract
+	public final FutureOperationInvocation<Boolean> getSaveOperation(NexuAPI api, Product product) {
+		return getSaveOperation(api, (DetectedCard) product);
+	}
+	
+	protected FutureOperationInvocation<Boolean> getSaveOperation(NexuAPI api, DetectedCard card) {
+		return new NoOpFutureOperationInvocation<Boolean>(true);
 	}
 }

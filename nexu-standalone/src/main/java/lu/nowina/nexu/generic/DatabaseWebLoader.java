@@ -36,9 +36,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import lu.nowina.nexu.NexuLauncher;
+import lu.nowina.nexu.ProductDatabaseRefresher;
 import lu.nowina.nexu.api.AppConfig;
 
-public class DatabaseWebLoader implements SCDatabaseRefresher {
+public class DatabaseWebLoader implements ProductDatabaseRefresher<SCDatabase> {
 
 	private static final int TIMER_RATE = 1;
 	private static final int UPDATE_RATE = 10;

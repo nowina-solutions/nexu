@@ -11,16 +11,20 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.generic;
+package lu.nowina.nexu;
 
 /**
- * Interface that must be implemented by classes able to provide a {@link SCDatabase} that
- * may be refreshed during runtime.
+ * Handler when an event occurs on a database. 
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
-public interface SCDatabaseRefresher {
+public interface DatabaseEventHandler {
 
-	SCDatabase getDatabase();
-	
+	/**
+	 * Executes the action associated to this handler on the given database.
+	 * @param db The database on which the action associated to this handler must be performed.
+	 * @param <T> The type of the database on which the action must be performed.
+	 */
+	<T extends ProductDatabase> void execute(T db);
+
 }

@@ -37,7 +37,6 @@ import lu.nowina.nexu.flow.operation.BasicOperationFactory;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.generic.HttpDataLoader;
 import lu.nowina.nexu.generic.SCDatabase;
-import lu.nowina.nexu.generic.SCDatabaseLoader;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 public class NexUApp extends Application {
@@ -85,7 +84,7 @@ public class NexUApp extends Application {
 		if (nexuHome != null) {
 			File store = new File(nexuHome, "store.xml");
 			logger.info("Load database from " + store.getAbsolutePath());
-			db = SCDatabaseLoader.load(store);
+			db = ProductDatabaseLoader.load(SCDatabase.class, store);
 		} else {
 			db = new SCDatabase();
 		}

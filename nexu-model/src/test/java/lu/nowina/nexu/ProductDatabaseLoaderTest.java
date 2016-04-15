@@ -11,10 +11,29 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.generic;
+package lu.nowina.nexu;
 
-public interface DatabaseEventHandler {
+import java.io.File;
 
-	void execute(SCDatabase db);
+import javax.xml.bind.JAXBContext;
+
+import org.junit.Test;
+
+import lu.nowina.nexu.ProductDatabaseLoader;
+import lu.nowina.nexu.generic.SCDatabase;
+
+public class ProductDatabaseLoaderTest {
+
+	@Test
+	public void test1() throws Exception {
+
+		SCDatabase db = ProductDatabaseLoader.load(SCDatabase.class, new File("src/test/resources/db.xml"));
+
+		JAXBContext ctx = JAXBContext.newInstance(SCDatabase.class);
+		ctx.createMarshaller().marshal(db, System.out);
+
+		ProductDatabaseLoader.saveAs(db, new File("target/db.xml"));
+
+	}
 
 }

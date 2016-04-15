@@ -70,7 +70,7 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 					List<Match> matchingProductAdapters = getMatchingCardAdaptersOperationResult.getResult();
 
 					final OperationResult<List<Match>> configureProductOperationResult =
-							getOperationFactory().getOperation(ConfigureProductOperation.class, matchingProductAdapters).perform();
+							getOperationFactory().getOperation(ConfigureProductOperation.class, matchingProductAdapters, api).perform();
 					if(configureProductOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 						matchingProductAdapters = configureProductOperationResult.getResult();
 

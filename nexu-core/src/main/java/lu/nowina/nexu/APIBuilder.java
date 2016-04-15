@@ -31,7 +31,6 @@ import lu.nowina.nexu.api.plugin.InitializationMessage;
 import lu.nowina.nexu.api.plugin.NexuPlugin;
 import lu.nowina.nexu.flow.FlowRegistry;
 import lu.nowina.nexu.generic.SCDatabase;
-import lu.nowina.nexu.generic.SCDatabaseRefresher;
 import lu.nowina.nexu.keystore.KeystoreProductAdapter;
 import lu.nowina.nexu.view.core.UIDisplay;
 
@@ -59,7 +58,8 @@ public class APIBuilder {
 	 * @return The built instance of {@link NexuAPI}.
 	 */
 	public NexuAPI build(final UIDisplay display, final AppConfig appConfig, final FlowRegistry flowRegistry,
-			final SCDatabase localDatabase, final SCDatabaseRefresher remoteDatabaseLoader, final OperationFactory operationFactory) {
+			final SCDatabase localDatabase, final ProductDatabaseRefresher<SCDatabase> remoteDatabaseLoader,
+			final OperationFactory operationFactory) {
 		final CardDetector detector = new CardDetector(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
 
 		final InternalAPI api = new InternalAPI(display, localDatabase, detector, remoteDatabaseLoader, flowRegistry,
@@ -71,7 +71,7 @@ public class APIBuilder {
 	/**
 	 * Init plugins on the given {@link NexuAPI} instance.
 	 * @param api The {@link NexuAPI} instance on which plugins must be initialized. It <strong>MUST</strong> be
-	 * an instance previously returned by {@link APIBuilder#build(UIDisplay, AppConfig, FlowRegistry, SCDatabase, SCDatabaseRefresher, OperationFactory)}.
+	 * an instance previously returned by {@link APIBuilder#build(UIDisplay, AppConfig, FlowRegistry, SCDatabase, ProductDatabaseRefresher, OperationFactory)}.
 	 * @param properties Configuration properties of the plugin to initialize.
 	 * @return Messages about events that occurred during plugins initialization.
 	 */

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lu.nowina.nexu.api.Match;
+import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
@@ -26,21 +27,27 @@ import lu.nowina.nexu.api.flow.OperationResult;
 /**
  * This {@link CompositeOperation} allows a {@link ProductAdapter} to configure a {@link Product}.
  *
- * <p>Expected parameter: list of {@link Match}.
+ * <p>Expected parameters:
+ * <ol>
+ * <li>List of {@link Match}.</li>
+ * <li>{@link NexuAPI}</li>
+ * </ol>
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
 public class ConfigureProductOperation extends AbstractCompositeOperation<List<Match>> {
 
 	private List<Match> matches;
+	private NexuAPI api;
 	
 	@Override
 	@SuppressWarnings("unchecked")
 	public void setParams(Object... params) {
 		try {
 			this.matches = (List<Match>) params[0];
+			this.api = (NexuAPI) params[1];
 		} catch(final ArrayIndexOutOfBoundsException | ClassCastException e) {
-			throw new IllegalArgumentException("Expected parameter: list of Match");
+			throw new IllegalArgumentException("Expected parameters: list of Match, NexuAPI");
 		}
 	}
 
@@ -63,7 +70,7 @@ public class ConfigureProductOperation extends AbstractCompositeOperation<List<M
 	}
 	
 	private OperationResult<Product> handleMatch(final ProductAdapter productAdapter, final Product product) {
-		final FutureOperationInvocation<Product> futureOperationInvocation = productAdapter.getConfigurationOperation(product);
+		final FutureOperationInvocation<Product> futureOperationInvocation = productAdapter.getConfigurationOperation(api, product);
 		return futureOperationInvocation.call(operationFactory);
 	}
 }

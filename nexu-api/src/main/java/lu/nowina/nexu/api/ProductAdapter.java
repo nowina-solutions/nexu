@@ -96,15 +96,18 @@ public interface ProductAdapter {
 	/**
 	 * Returns the specification of the operation to call to configure <code>product</code>.
 	 * <p>Returned operation must return a configured product.
+	 * @param api The unique instance of {@link NexuAPI}.
 	 * @param product The product for which one would like to retrieve the configuration {@link Operation}.
 	 * @return The specification of the operation to call to configure <code>product</code>.
 	 */
-	FutureOperationInvocation<Product> getConfigurationOperation(Product product);
+	FutureOperationInvocation<Product> getConfigurationOperation(NexuAPI api, Product product);
 	
 	/**
-	 * Saves the product configuration.
+	 * Returns the specification of the operation to call to save the configured <code>product</code>.
+	 * <p>Returned operation must return a boolean indicating whether save operation was successful or not.
 	 * @param api The unique instance of {@link NexuAPI}.
-	 * @param product The target product.
+	 * @param product The product for which one would like to retrieve the save {@link Operation}.
+	 * @return The specification of the operation to call to save the configured <code>product</code>.
 	 */
-	void saveProductConfiguration(NexuAPI api, Product product);
+	FutureOperationInvocation<Boolean> getSaveOperation(NexuAPI api, Product product);
 }
