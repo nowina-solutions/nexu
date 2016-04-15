@@ -21,10 +21,10 @@ package lu.nowina.nexu;
 public interface ProductDatabase {
 
 	/**
-	 * Sets the event handler that must be triggered when an item is added to this
-	 * database.
+	 * Sets the event handler that must be triggered when an item is added or removed
+	 * to this database.
 	 * @param eventHandler The event handler to set.
 	 */
-	void setOnAddAction(DatabaseEventHandler eventHandler);
+	void setOnAddRemoveAction(DatabaseEventHandler eventHandler);
 	
 }

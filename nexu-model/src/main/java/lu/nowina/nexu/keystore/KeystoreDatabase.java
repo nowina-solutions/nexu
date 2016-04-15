@@ -70,7 +70,7 @@ public class KeystoreDatabase implements ProductDatabase {
 	}
 
 	@Override
-	public void setOnAddAction(DatabaseEventHandler eventHandler) {
+	public void setOnAddRemoveAction(DatabaseEventHandler eventHandler) {
 		this.onAddAction = eventHandler;
 	}
 }

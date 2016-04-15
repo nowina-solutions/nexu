@@ -92,7 +92,7 @@ public class SCDatabase implements ProductDatabase {
 	}
 
 	@Override
-	public void setOnAddAction(DatabaseEventHandler onAddAction) {
+	public void setOnAddRemoveAction(DatabaseEventHandler onAddAction) {
 		this.onAddAction = onAddAction;
 	}
 

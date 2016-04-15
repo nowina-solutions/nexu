@@ -47,7 +47,7 @@ public class ProductDatabaseLoader {
 				throw new TechnicalException("Cannot load database", e);
 			}
 		}
-		db.setOnAddAction(new DatabaseEventHandler() {
+		db.setOnAddRemoveAction(new DatabaseEventHandler() {
 			@Override
 			public <P extends ProductDatabase> void execute(P db) {
 				saveAs(db, f);
