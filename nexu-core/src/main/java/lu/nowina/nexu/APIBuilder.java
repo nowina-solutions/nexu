@@ -31,7 +31,6 @@ import lu.nowina.nexu.api.plugin.InitializationMessage;
 import lu.nowina.nexu.api.plugin.NexuPlugin;
 import lu.nowina.nexu.flow.FlowRegistry;
 import lu.nowina.nexu.generic.SCDatabase;
-import lu.nowina.nexu.keystore.KeystoreProductAdapter;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 /**
@@ -62,10 +61,8 @@ public class APIBuilder {
 			final OperationFactory operationFactory) {
 		final CardDetector detector = new CardDetector(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
 
-		final InternalAPI api = new InternalAPI(display, localDatabase, detector, remoteDatabaseLoader, flowRegistry,
+		return new InternalAPI(display, localDatabase, detector, remoteDatabaseLoader, flowRegistry,
 				operationFactory, appConfig);
-		api.registerProductAdapter(new KeystoreProductAdapter());
-		return api;
 	}
 
 	/**
