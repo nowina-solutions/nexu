@@ -39,6 +39,7 @@ import lu.nowina.nexu.flow.operation.ConfigureProductOperation;
 import lu.nowina.nexu.flow.operation.CreateTokenOperation;
 import lu.nowina.nexu.flow.operation.GetMatchingProductAdaptersOperation;
 import lu.nowina.nexu.flow.operation.GetTokenConnectionOperation;
+import lu.nowina.nexu.flow.operation.SaveProductOperation;
 import lu.nowina.nexu.flow.operation.SelectPrivateKeyOperation;
 import lu.nowina.nexu.flow.operation.TokenOperationResultKey;
 import lu.nowina.nexu.view.core.UIDisplay;
@@ -96,6 +97,8 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 										getOperationFactory().getOperation(AdvancedCreationFeedbackOperation.class,
 												api, map).perform();
 									}
+									
+									getOperationFactory().getOperation(SaveProductOperation.class, productAdapter, product, api).perform();
 
 									final GetCertificateResponse resp = new GetCertificateResponse();
 									resp.setTokenId(tokenId);

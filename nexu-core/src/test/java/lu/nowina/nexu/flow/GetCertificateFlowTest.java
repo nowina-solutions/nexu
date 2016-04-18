@@ -65,7 +65,7 @@ import lu.nowina.nexu.view.core.UIOperation;
 public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 
 	@Rule
-	private TemporaryFolder tempFolder = new TemporaryFolder();
+	public TemporaryFolder tempFolder = new TemporaryFolder();
 	
 	@Test
 	public void testNewKeystore() throws Exception {
@@ -186,6 +186,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		when(api.getAppConfig()).thenReturn(appConfig);
 		final DetectedCard detectedCard = new DetectedCard("atr", 0);
 		when(adapter.getConfigurationOperation(api, detectedCard)).thenReturn(new NoOpFutureOperationInvocation<Product>(detectedCard));
+		when(adapter.getSaveOperation(api, detectedCard)).thenReturn(new NoOpFutureOperationInvocation<Boolean>(true));
 
 		when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
 		when(api.matchingProductAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
