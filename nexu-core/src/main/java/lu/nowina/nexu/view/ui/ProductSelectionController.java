@@ -80,6 +80,7 @@ public class ProductSelectionController extends AbstractUIOperationController<Pr
 				final RadioButton button = new RadioButton(card.getLabel());
 				button.setToggleGroup(product);
 				button.setUserData(card);
+				button.setMnemonicParsing(false);
 				radioButtons.add(button);
 			}
 
@@ -87,6 +88,7 @@ public class ProductSelectionController extends AbstractUIOperationController<Pr
 				final RadioButton button = new RadioButton(p.getLabel());
 				button.setToggleGroup(product);
 				button.setUserData(p);
+				button.setMnemonicParsing(false);
 				radioButtons.add(button);
 			}
 

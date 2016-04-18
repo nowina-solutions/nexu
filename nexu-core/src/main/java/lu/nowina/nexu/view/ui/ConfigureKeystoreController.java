@@ -61,6 +61,7 @@ public class ConfigureKeystoreController extends AbstractUIOperationController<C
 				throw new NexuException(e1);
 			}
 			result.setType(keystoreType.getValue());
+			result.setToBeSaved(true);
 			signalEnd(result);
 		});
 		ok.disableProperty().bind(Bindings.not(keystoreFileSpecified));

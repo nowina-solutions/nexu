@@ -14,6 +14,7 @@
 package lu.nowina.nexu.keystore;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -39,38 +40,47 @@ public class KeystoreDatabase implements ProductDatabase {
 	private List<ConfiguredKeystore> keystores;
 
 	@XmlTransient
-	private DatabaseEventHandler onAddAction;
+	private DatabaseEventHandler onAddRemoveAction;
 
 	/**
 	 * Adds a new {@link ConfiguredKeystore} to the database.
 	 * @param keystore The keystore to add.
 	 */
 	public final void add(final ConfiguredKeystore keystore) {
-		getKeystores().add(keystore);
-		onAdd();
+		getKeystores0().add(keystore);
+		onAddRemove();
 	}
 
-	protected void onAdd() {
-		if(onAddAction != null) {
-			onAddAction.execute(this);
+	/**
+	 * Removes the given {@link ConfiguredKeystore} from the database.
+	 * @param keystore The keystore to remove.
+	 */
+	public final void remove(final ConfiguredKeystore keystore) {
+		getKeystores0().remove(keystore);
+		onAddRemove();
+	}
+	
+	private void onAddRemove() {
+		if(onAddRemoveAction != null) {
+			onAddRemoveAction.execute(this);
 		} else {
 			LOGGER.warn("No DatabaseEventHandler define, the database cannot be stored");
 		}
 	}
 
-	public List<ConfiguredKeystore> getKeystores() {
+	private List<ConfiguredKeystore> getKeystores0() {
 		if (keystores == null) {
 			this.keystores = new ArrayList<>();
 		}
 		return keystores;
 	}
-
-	public void setKeystores(List<ConfiguredKeystore> keystores) {
-		this.keystores = keystores;
+	
+	public List<ConfiguredKeystore> getKeystores() {
+		return Collections.unmodifiableList(getKeystores0());
 	}
 
 	@Override
 	public void setOnAddRemoveAction(DatabaseEventHandler eventHandler) {
-		this.onAddAction = eventHandler;
+		this.onAddRemoveAction = eventHandler;
 	}
 }

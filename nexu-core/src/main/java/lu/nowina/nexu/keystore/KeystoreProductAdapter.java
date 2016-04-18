@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
@@ -38,6 +39,7 @@ import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.SystrayMenuItem;
 import lu.nowina.nexu.api.flow.FutureOperationInvocation;
 import lu.nowina.nexu.api.flow.NoOpFutureOperationInvocation;
+import lu.nowina.nexu.view.core.NonBlockingUIOperation;
 import lu.nowina.nexu.view.core.UIOperation;
 
 /**
@@ -119,28 +121,45 @@ public class KeystoreProductAdapter implements ProductAdapter {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public FutureOperationInvocation<Product> getConfigurationOperation(NexuAPI api, Product product) {
 		if (product instanceof NewKeystore) {
-			return UIOperation.getFutureOperationInvocation("/fxml/configure-keystore.fxml");
+			return UIOperation.getFutureOperationInvocation(UIOperation.class, "/fxml/configure-keystore.fxml");
 		} else {
 			return new NoOpFutureOperationInvocation<Product>(product);
 		}
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public FutureOperationInvocation<Boolean> getSaveOperation(NexuAPI api, Product product) {
 		if (product instanceof NewKeystore) {
 			throw new IllegalArgumentException("Given product was not configured!");
 		} else {
-			return UIOperation.getFutureOperationInvocation("/fxml/save-keystore.fxml",
-					api.getAppConfig().getApplicationName(), this, product);
+			final ConfiguredKeystore keystore = (ConfiguredKeystore) product;
+			if(keystore.isToBeSaved()) {
+				return UIOperation.getFutureOperationInvocation(UIOperation.class, "/fxml/save-keystore.fxml",
+					api.getAppConfig().getApplicationName(), this, keystore);
+			} else {
+				return new NoOpFutureOperationInvocation<Boolean>(true);
+			}
 		}
 	}
 
 	@Override
 	public SystrayMenuItem getExtensionSystrayMenuItem() {
-		// TODO Auto-generated method stub
-		return null;
+		return new SystrayMenuItem() {
+			@Override
+			public String getLabel() {
+				return ResourceBundle.getBundle("bundles/nexu").getString("systray.menu.manage.keystores");
+			}
+			
+			@Override
+			public FutureOperationInvocation<Void> getFutureOperationInvocation() {
+				return UIOperation.getFutureOperationInvocation(NonBlockingUIOperation.class, "/fxml/manage-keystores.fxml",
+						getDatabase());
+			}
+		};
 	}
 	
 	@Override

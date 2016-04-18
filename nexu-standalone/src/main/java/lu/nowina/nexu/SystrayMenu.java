@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import javafx.application.Platform;
 import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.SystrayMenuItem;
 import lu.nowina.nexu.api.flow.OperationFactory;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.view.core.NonBlockingUIOperation;
@@ -49,6 +50,12 @@ public class SystrayMenu {
 			final MenuItem preferencesItem = new MenuItem(resources.getString("systray.menu.preferences"));
 			preferencesItem.addActionListener((l) -> preferences(operationFactory, api, prefs));
 			popup.add(preferencesItem);
+			
+			for(final SystrayMenuItem menuItem : api.getExtensionSystrayMenuItems()) {
+				final MenuItem mi = new MenuItem(menuItem.getLabel());
+				mi.addActionListener((l) -> menuItem.getFutureOperationInvocation().call(operationFactory));
+				popup.add(mi);
+			}
 			
 			final MenuItem exitItem = new MenuItem(resources.getString("systray.menu.exit"));
 			exitItem.addActionListener((l) -> exit());

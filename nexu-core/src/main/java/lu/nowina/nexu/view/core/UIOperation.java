@@ -194,24 +194,26 @@ public class UIOperation<R> implements UIDisplayAwareOperation<R> {
 		display.close(true);
 	}
 	
-	public static <R> FutureOperationInvocation<R> getFutureOperationInvocation(final String fxml,
-			final Object... controllerParams) {
-		return new UIFutureOperationInvocation<R>(fxml, controllerParams);
+	public static <R, T extends UIOperation<R>> FutureOperationInvocation<R> getFutureOperationInvocation(
+			final Class<T> operationClass, final String fxml, final Object... controllerParams) {
+		return new UIFutureOperationInvocation<>(operationClass, fxml, controllerParams);
 	}
 	
-	private static class UIFutureOperationInvocation<R> extends AbstractFutureOperationInvocation<R> {
+	private static class UIFutureOperationInvocation<R, T extends UIOperation<R>> extends AbstractFutureOperationInvocation<R> {
+		private final Class<T> operationClass;
 		private final String fxml;
 		private final Object[] controllerParams;
 		
-		public UIFutureOperationInvocation(final String fxml, final Object... controllerParams) {
+		public UIFutureOperationInvocation(final Class<T> operationClass, final String fxml, final Object... controllerParams) {
+			this.operationClass = operationClass;
 			this.fxml = fxml;
 			this.controllerParams = controllerParams;
 		}
 
 		@Override
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		protected Class<UIOperation> getOperationClass() {
-			return UIOperation.class;
+		@SuppressWarnings({"unchecked"})
+		protected Class<T> getOperationClass() {
+			return operationClass;
 		}
 
 		@Override

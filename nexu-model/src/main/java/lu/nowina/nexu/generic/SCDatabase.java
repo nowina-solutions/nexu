@@ -14,6 +14,7 @@
 package lu.nowina.nexu.generic;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -51,13 +52,13 @@ public class SCDatabase implements ProductDatabase {
 		if (info == null) {
 			info = new SCInfo();
 			info.setAtr(detectedAtr);
-			getSmartcards().add(info);
+			getSmartcards0().add(info);
 		}
 		info.getInfos().add(cInfo);
 		onAdd();
 	}
 
-	protected void onAdd() {
+	private void onAdd() {
 		if(onAddAction != null) {
 			onAddAction.execute(this);
 		} else {
@@ -80,16 +81,16 @@ public class SCDatabase implements ProductDatabase {
 		return null;
 	}
 
-	public List<SCInfo> getSmartcards() {
+	private List<SCInfo> getSmartcards0() {
 		if (smartcards == null) {
 			this.smartcards = new ArrayList<>();
 		}
 		return smartcards;
 	}
-
-	public void setSmartcards(List<SCInfo> smartcards) {
-		this.smartcards = smartcards;
-	}
+	
+	public List<SCInfo> getSmartcards() {
+		return Collections.unmodifiableList(getSmartcards0());
+	};
 
 	@Override
 	public void setOnAddRemoveAction(DatabaseEventHandler onAddAction) {

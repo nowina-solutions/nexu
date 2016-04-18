@@ -18,6 +18,7 @@ import java.util.ResourceBundle;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -33,9 +34,12 @@ public class ConfiguredKeystore implements Product {
 
 	private String url;
 	private KeystoreType type;
+	@XmlTransient
+	private boolean toBeSaved;
 	
 	public ConfiguredKeystore() {
 		super();
+		this.toBeSaved = false;
 	}
 
 	/**
@@ -70,10 +74,28 @@ public class ConfiguredKeystore implements Product {
 		this.type = type;
 	}
 
+	/**
+	 * Returns <code>true</code> if the <code>ConfiguredKeystore</code> must be saved and
+	 * <code>false</code> otherwise.
+	 * @return <code>true</code> if the <code>ConfiguredKeystore</code> must be saved and
+	 * <code>false</code> otherwise.
+	 */
+	public boolean isToBeSaved() {
+		return toBeSaved;
+	}
+
+	/**
+	 * Sets the value of the <code>toBeSaved</code> property.
+	 * @param toBeSaved The new value for the <code>toBeSaved</code> property.
+	 */
+	public void setToBeSaved(boolean toBeSaved) {
+		this.toBeSaved = toBeSaved;
+	}
+
 	@Override
 	public String getLabel() {
 		return StringEscapeUtils.unescapeJava(MessageFormat.format(
 				ResourceBundle.getBundle("bundles/nexu").getString("product.selection.configured.keystore.button.label"),
-				this.getType().getLabel(), this.getUrl()));
+				this.getType().getLabel(), this.getUrl().substring(this.getUrl().lastIndexOf('/') + 1)));
 	}
 }

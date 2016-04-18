@@ -23,7 +23,7 @@ import lu.nowina.nexu.api.flow.FutureOperationInvocation;
  */
 public interface SystrayMenuItem {
 
-	String getI18nKey();
+	String getLabel();
 	
 	FutureOperationInvocation<Void> getFutureOperationInvocation();
 	

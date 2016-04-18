@@ -99,6 +99,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		final ConfiguredKeystore configuredProduct = new ConfiguredKeystore();
 		configuredProduct.setType(KeystoreType.JKS);
 		configuredProduct.setUrl(this.getClass().getResource("/keystore.jks").toString());
+		configuredProduct.setToBeSaved(true);
 		final OperationFactory operationFactory = new NoUIOperationFactory(selectedProduct, configuredProduct);
 		((NoUIOperationFactory)operationFactory).setDisplay(display);
 		
