@@ -98,3 +98,8 @@ RadioButton {
 .label-left-align {
     -fx-padding: 0 0 0 10;
 }
+
+.label-left-align-bold {
+    -fx-padding: 0 0 0 10;
+	-fx-font-weight: bold;
+}
