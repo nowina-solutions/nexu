@@ -13,6 +13,7 @@
  */
 package lu.nowina.nexu.api;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -94,6 +95,8 @@ public class AppConfig {
 	private boolean userPreferencesEditable;
 	
 	private String requestProcessorClass;
+	
+	private File nexuHome;
 	
 	public AppConfig() {
 		try {
@@ -279,6 +282,22 @@ public class AppConfig {
 
 	public void setRequestProcessorClass(String requestProcessorClass) {
 		this.requestProcessorClass = requestProcessorClass;
+	}
+	
+	public File getNexuHome() {
+		if(nexuHome != null) {
+			return nexuHome;
+		}
+		final File userHome = new File(System.getProperty("user.home"));
+		if (!userHome.exists()) {
+			return null;
+		}
+		final File file = new File(userHome, "." + getApplicationName());
+		if (file.exists()) {
+			return file.canWrite() ? nexuHome = file : null;
+		} else {
+			return file.mkdir() && file.canWrite() ? nexuHome = file : null;
+		}
 	}
 	
 	public void loadFromProperties(final Properties props) {

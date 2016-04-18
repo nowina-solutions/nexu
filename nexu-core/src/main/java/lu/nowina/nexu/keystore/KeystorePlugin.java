@@ -33,7 +33,7 @@ public class KeystorePlugin implements SignaturePlugin {
 
 	@Override
 	public List<InitializationMessage> init(String pluginId, NexuAPI api) {
-		api.registerProductAdapter(new KeystoreProductAdapter());
+		api.registerProductAdapter(new KeystoreProductAdapter(api.getAppConfig().getNexuHome()));
 		return Collections.emptyList();
 	}
 

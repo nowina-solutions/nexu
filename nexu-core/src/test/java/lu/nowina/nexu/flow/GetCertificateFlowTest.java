@@ -25,7 +25,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -62,6 +64,9 @@ import lu.nowina.nexu.view.core.UIOperation;
 
 public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 
+	@Rule
+	private TemporaryFolder tempFolder = new TemporaryFolder();
+	
 	@Test
 	public void testNewKeystore() throws Exception {
 		final UIDisplay display = mock(UIDisplay.class);
@@ -75,7 +80,7 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		final Product selectedProduct = new NewKeystore();
 		when(api.detectCards()).thenReturn(Collections.emptyList());
 		when(api.matchingProductAdapters(selectedProduct)).thenReturn(
-				Arrays.asList(new Match(new KeystoreProductAdapter(), selectedProduct)));
+				Arrays.asList(new Match(new KeystoreProductAdapter(tempFolder.getRoot()), selectedProduct)));
 		final Collection<SignatureTokenConnection> coll = new ArrayList<>();
 		when(api.registerTokenConnection(any())).then(new Answer<TokenId>() {
 			@Override

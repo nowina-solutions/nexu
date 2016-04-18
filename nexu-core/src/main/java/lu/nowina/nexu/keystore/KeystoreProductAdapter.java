@@ -13,6 +13,7 @@
  */
 package lu.nowina.nexu.keystore;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,6 +26,7 @@ import eu.europa.esig.dss.token.PasswordInputCallback;
 import eu.europa.esig.dss.token.Pkcs12SignatureToken;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.NexuException;
+import lu.nowina.nexu.ProductDatabaseLoader;
 import lu.nowina.nexu.api.CertificateFilter;
 import lu.nowina.nexu.api.ConfiguredKeystore;
 import lu.nowina.nexu.api.GetIdentityInfoResponse;
@@ -44,8 +46,11 @@ import lu.nowina.nexu.view.core.UIOperation;
  */
 public class KeystoreProductAdapter implements ProductAdapter {
 
-	public KeystoreProductAdapter() {
+	private final File nexuHome;
+	
+	public KeystoreProductAdapter(final File nexuHome) {
 		super();
+		this.nexuHome = nexuHome;
 	}
 
 	@Override
@@ -130,14 +135,18 @@ public class KeystoreProductAdapter implements ProductAdapter {
 					api.getAppConfig().getApplicationName(), this, product);
 		}
 	}
-	
-	public void saveKeystore(final ConfiguredKeystore keystore) {
-		//TODO
-	}
 
 	@Override
 	public SystrayMenuItem getExtensionSystrayMenuItem() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	private File getDatabaseFile() {
+		return new File(nexuHome, "keystore-database.xml");
+	}
+	
+	public void saveKeystore(final ConfiguredKeystore keystore) {
+		ProductDatabaseLoader.load(KeystoreDatabase.class, getDatabaseFile()).add(keystore);
 	}
 }

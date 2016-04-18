@@ -63,7 +63,7 @@ public class NexUApp extends Application {
 		((BasicOperationFactory)operationFactory).setDisplay(uiDisplay);
 		uiDisplay.setOperationFactory(operationFactory);
 		
-		loader = new DatabaseWebLoader(NexuLauncher.getConfig(),
+		loader = new DatabaseWebLoader(getConfig(),
 				new HttpDataLoader(NexuLauncher.getProxyConfigurer(), getConfig().getApplicationVersion(), getConfig().isSendAnonymousInfoToProxy()));
 		loader.start();
 		
@@ -79,7 +79,7 @@ public class NexUApp extends Application {
 	}
 
 	private NexuAPI buildAPI(final UIDisplay uiDisplay, final OperationFactory operationFactory, final DatabaseWebLoader loader) throws IOException {
-		File nexuHome = NexuLauncher.getNexuHome();
+		File nexuHome = getConfig().getNexuHome();
 		SCDatabase db = null;
 		if (nexuHome != null) {
 			File store = new File(nexuHome, "store.xml");

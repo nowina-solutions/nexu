@@ -77,7 +77,7 @@ public class NexuLauncher {
 		FileAppender fa = new FileAppender();
 		fa.setName("FileLogger");
 
-		File nexuHome = getNexuHome();
+		File nexuHome = config.getNexuHome();
 
 		fa.setFile(new File(nexuHome, "nexu.log").getAbsolutePath());
 		fa.setLayout(new PatternLayout("%d %-5p [%c{1}] %m%n"));
@@ -112,25 +112,6 @@ public class NexuLauncher {
 	
 	public static ProxyConfigurer getProxyConfigurer() {
 		return proxyConfigurer;
-	}
-
-	/**
-	 * Returns Nexu home directory. If the directory cannot be created or is nt writable, returns null.
-	 * 
-	 * @return
-	 */
-	public static File getNexuHome() {
-		File userHome = new File(System.getProperty("user.home"));
-		if (!userHome.exists()) {
-			return null;
-		}
-		File nexuHome = new File(userHome, "." + getConfig().getApplicationName());
-		if (nexuHome.exists()) {
-			return nexuHome.canWrite() ? nexuHome : null;
-		} else {
-			boolean result = nexuHome.mkdir();
-			return result ? nexuHome : null;
-		}
 	}
 
 	private static boolean checkAlreadyStarted() throws MalformedURLException {

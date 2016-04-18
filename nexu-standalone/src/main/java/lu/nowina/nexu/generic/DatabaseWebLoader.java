@@ -35,7 +35,6 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lu.nowina.nexu.NexuLauncher;
 import lu.nowina.nexu.ProductDatabaseRefresher;
 import lu.nowina.nexu.api.AppConfig;
 
@@ -49,7 +48,8 @@ public class DatabaseWebLoader implements ProductDatabaseRefresher<SCDatabase> {
 	private transient SCDatabase database;
 
 	private final String serverUrl;
-
+	private final File nexuHome;
+	
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, new ThreadFactory() {
 		@Override
 		public Thread newThread(Runnable r) {
@@ -91,6 +91,7 @@ public class DatabaseWebLoader implements ProductDatabaseRefresher<SCDatabase> {
 	};
 
 	public DatabaseWebLoader(AppConfig config, HttpDataLoader dataLoader) throws IOException {
+		this.nexuHome = config.getNexuHome();
 		this.serverUrl = config.getServerUrl();
 		this.dataLoader = dataLoader;
 
@@ -123,7 +124,6 @@ public class DatabaseWebLoader implements ProductDatabaseRefresher<SCDatabase> {
 	}
 
 	public File getDatabaseFile() {
-		final File nexuHome = NexuLauncher.getNexuHome();
 		return new File(nexuHome, "database-web.xml");
 	}
 
