@@ -63,12 +63,14 @@ public class ManageKeystoresController extends AbstractUIOperationController<Voi
 	@SuppressWarnings("unchecked")
 	public void initialize(URL location, ResourceBundle resources) {
 		keystoresTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-		final TableColumn<ConfiguredKeystore, String> keystoreName = new TableColumn<>();
+		final TableColumn<ConfiguredKeystore, String> keystoreName = new TableColumn<>(
+				ResourceBundle.getBundle("bundles/nexu").getString("manage.keystores.table.name.column.title"));
 		keystoreName.setCellValueFactory((param) -> {
 			final String url = param.getValue().getUrl();
 			return new ReadOnlyStringWrapper(url.substring(url.lastIndexOf('/') + 1));
 		});
-		final TableColumn<ConfiguredKeystore, KeystoreType> keystoreType = new TableColumn<>();
+		final TableColumn<ConfiguredKeystore, KeystoreType> keystoreType = new TableColumn<>(
+				ResourceBundle.getBundle("bundles/nexu").getString("manage.keystores.table.type.column.title"));
 		keystoreType.setCellValueFactory(new PropertyValueFactory<>("type"));
 		keystoresTable.getColumns().setAll(keystoreName, keystoreType);
 		keystoresTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
