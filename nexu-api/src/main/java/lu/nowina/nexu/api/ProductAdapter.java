@@ -117,4 +117,10 @@ public interface ProductAdapter {
 	 * @return The menu item specific to this <code>ProductAdapter</code> or <code>null</code> if none.
 	 */
 	SystrayMenuItem getExtensionSystrayMenuItem();
+	
+	/**
+	 * Detects products that will <strong>maybe</strong> be accepted by this <code>ProductAdapter</code>.
+	 * @return Products that will <strong>maybe</strong> be accepted by this <code>ProductAdapter</code>.
+	 */
+	List<? extends Product> detectProducts();
 }

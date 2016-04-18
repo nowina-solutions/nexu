@@ -300,4 +300,13 @@ public class InternalAPI implements NexuAPI {
 		}
 		return result;
 	}
+
+	@Override
+	public List<Product> detectProducts() {
+		final List<Product> result = new ArrayList<>();
+		for(final ProductAdapter adapter : adapters) {
+			result.addAll(adapter.detectProducts());
+		}
+		return result;
+	}
 }

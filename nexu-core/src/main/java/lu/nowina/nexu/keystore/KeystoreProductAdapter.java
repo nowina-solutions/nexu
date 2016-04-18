@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import eu.europa.esig.dss.DigestAlgorithm;
@@ -142,11 +143,19 @@ public class KeystoreProductAdapter implements ProductAdapter {
 		return null;
 	}
 	
-	private File getDatabaseFile() {
-		return new File(nexuHome, "keystore-database.xml");
+	@Override
+	public List<Product> detectProducts() {
+		final List<Product> products = new ArrayList<>();
+		products.addAll(getDatabase().getKeystores());
+		products.add(new NewKeystore());
+		return products;
+	}
+
+	private KeystoreDatabase getDatabase() {
+		return ProductDatabaseLoader.load(KeystoreDatabase.class, new File(nexuHome, "keystore-database.xml"));
 	}
 	
 	public void saveKeystore(final ConfiguredKeystore keystore) {
-		ProductDatabaseLoader.load(KeystoreDatabase.class, getDatabaseFile()).add(keystore);
+		getDatabase().add(keystore);
 	}
 }

@@ -13,9 +13,14 @@
  */
 package lu.nowina.nexu.api;
 
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
+
+import org.apache.commons.lang.StringEscapeUtils;
 
 /**
  * Represents a configured keystore.
@@ -63,5 +68,12 @@ public class ConfiguredKeystore implements Product {
 	 */
 	public void setType(KeystoreType type) {
 		this.type = type;
+	}
+
+	@Override
+	public String getLabel() {
+		return StringEscapeUtils.unescapeJava(MessageFormat.format(
+				ResourceBundle.getBundle("bundles/nexu").getString("product.selection.configured.keystore.button.label"),
+				this.getType().getLabel(), this.getUrl()));
 	}
 }

@@ -32,15 +32,7 @@
     </top>
 	
 	<center>
-		<VBox fx:id="productsContainer" BorderPane.alignment="CENTER" styleClass="form-container">
-			<children>
-				<RadioButton fx:id="addNewKeystore" mnemonicParsing="false" text="%product.selection.add.new.keystore">
-	               	<toggleGroup>
-	        			<ToggleGroup fx:id="product" />
-	               	</toggleGroup>
-       			</RadioButton>
-			</children>
-		</VBox>
+		<VBox fx:id="productsContainer" BorderPane.alignment="CENTER" styleClass="form-container"/>
 	</center>
 
 	<bottom>

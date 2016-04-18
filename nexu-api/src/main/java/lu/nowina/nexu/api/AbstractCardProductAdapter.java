@@ -13,6 +13,7 @@
  */
 package lu.nowina.nexu.api;
 
+import java.util.Collections;
 import java.util.List;
 
 import eu.europa.esig.dss.DigestAlgorithm;
@@ -105,5 +106,13 @@ public abstract class AbstractCardProductAdapter implements ProductAdapter {
 	@Override
 	public SystrayMenuItem getExtensionSystrayMenuItem() {
 		return null;
+	}
+
+	/**
+	 * This implementation returns an empty list.
+	 */
+	@Override
+	public List<Product> detectProducts() {
+		return Collections.emptyList();
 	}
 }

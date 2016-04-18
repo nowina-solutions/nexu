@@ -26,6 +26,8 @@ import lu.nowina.nexu.api.plugin.HttpPlugin;
 public interface NexuAPI {
 
 	List<DetectedCard> detectCards();
+	
+	List<Product> detectProducts();
 
 	List<Match> matchingProductAdapters(Product p);
 

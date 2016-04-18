@@ -13,10 +13,15 @@
  */
 package lu.nowina.nexu.api;
 
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+
+import org.apache.commons.lang.StringEscapeUtils;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "detectedCard", propOrder = { "atr", "terminalIndex" })
@@ -127,5 +132,12 @@ public class DetectedCard implements Product {
 	 */
 	public void setTerminalLabel(String terminalLabel) {
 		this.terminalLabel = terminalLabel;
+	}
+
+	@Override
+	public String getLabel() {
+		return StringEscapeUtils.unescapeJava(MessageFormat.format(
+				ResourceBundle.getBundle("bundles/nexu").getString("product.selection.detected.card.button.label"),
+				this.getTerminalIndex(), this.getTerminalLabel(), this.getAtr()));
 	}
 }

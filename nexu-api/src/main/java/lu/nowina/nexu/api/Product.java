@@ -16,10 +16,14 @@ package lu.nowina.nexu.api;
 /**
  * A product represents a potential signature mean for NexU.
  * 
- * <p>This is a marker interface.
- *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
 public interface Product {
 
+	/**
+	 * Returns a label for this product.
+	 * @return A label for this product.
+	 */
+	String getLabel();
+	
 }
