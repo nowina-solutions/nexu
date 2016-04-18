@@ -110,4 +110,11 @@ public interface ProductAdapter {
 	 * @return The specification of the operation to call to save the configured <code>product</code>.
 	 */
 	FutureOperationInvocation<Boolean> getSaveOperation(NexuAPI api, Product product);
+	
+	/**
+	 * Each <code>ProductAdapter</code> is given the capability to enrich the systray menu with an item
+	 * specific to it. This method is used to retrieve this item.
+	 * @return The menu item specific to this <code>ProductAdapter</code> or <code>null</code> if none.
+	 */
+	SystrayMenuItem getExtensionSystrayMenuItem();
 }

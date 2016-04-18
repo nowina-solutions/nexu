@@ -98,4 +98,12 @@ public abstract class AbstractCardProductAdapter implements ProductAdapter {
 	protected FutureOperationInvocation<Boolean> getSaveOperation(NexuAPI api, DetectedCard card) {
 		return new NoOpFutureOperationInvocation<Boolean>(true);
 	}
+
+	/**
+	 * This implementation returns <code>null</code>.
+	 */
+	@Override
+	public SystrayMenuItem getExtensionSystrayMenuItem() {
+		return null;
+	}
 }

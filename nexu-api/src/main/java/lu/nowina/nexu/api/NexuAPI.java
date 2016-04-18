@@ -29,6 +29,8 @@ public interface NexuAPI {
 
 	List<Match> matchingProductAdapters(Product p);
 
+	List<SystrayMenuItem> getExtensionSystrayMenuItems();
+	
 	EnvironmentInfo getEnvironmentInfo();
 
 	void registerProductAdapter(ProductAdapter adapter);

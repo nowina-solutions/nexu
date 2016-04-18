@@ -41,6 +41,7 @@ import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
+import lu.nowina.nexu.api.SystrayMenuItem;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationFactory;
@@ -286,5 +287,17 @@ public class InternalAPI implements NexuAPI {
 	@Override
 	public AppConfig getAppConfig() {
 		return appConfig;
+	}
+
+	@Override
+	public List<SystrayMenuItem> getExtensionSystrayMenuItems() {
+		final List<SystrayMenuItem> result = new ArrayList<>();
+		for(final ProductAdapter adapter : adapters) {
+			final SystrayMenuItem menuItem = adapter.getExtensionSystrayMenuItem();
+			if(menuItem != null) {
+				result.add(menuItem);
+			}
+		}
+		return result;
 	}
 }

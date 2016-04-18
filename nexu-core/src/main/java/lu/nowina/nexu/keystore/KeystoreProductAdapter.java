@@ -32,6 +32,7 @@ import lu.nowina.nexu.api.NewKeystore;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.api.ProductAdapter;
+import lu.nowina.nexu.api.SystrayMenuItem;
 import lu.nowina.nexu.api.flow.FutureOperationInvocation;
 import lu.nowina.nexu.api.flow.NoOpFutureOperationInvocation;
 import lu.nowina.nexu.view.core.UIOperation;
@@ -132,5 +133,11 @@ public class KeystoreProductAdapter implements ProductAdapter {
 	
 	public void saveKeystore(final ConfiguredKeystore keystore) {
 		//TODO
+	}
+
+	@Override
+	public SystrayMenuItem getExtensionSystrayMenuItem() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
