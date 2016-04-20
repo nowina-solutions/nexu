@@ -71,10 +71,20 @@ public class KeystoreProductAdapter implements ProductAdapter {
 			switch(configuredKeystore.getType()) {
 			case PKCS12:
 				return new Pkcs12SignatureToken(new String(callback.getPassword()),
-						new URL(configuredKeystore.getUrl()).openStream());
+						new URL(configuredKeystore.getUrl()).openStream()) {
+					@Override
+					public void close() {
+						// Issue in DSS ==> do nothing to not invalidate the token
+					}
+				};
 			case JKS:
 				return new JKSSignatureToken(new URL(configuredKeystore.getUrl()).openStream(),
-						new String(callback.getPassword()));
+						new String(callback.getPassword())) {
+					@Override
+					public void close() {
+						// Issue in DSS ==> do nothing to not invalidate the token
+					}
+				};
 			default:
 				throw new IllegalStateException("Unhandled keystore type: " + configuredKeystore.getType());
 			}
