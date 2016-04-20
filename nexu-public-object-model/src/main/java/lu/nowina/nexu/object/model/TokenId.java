@@ -13,8 +13,6 @@
  */
 package lu.nowina.nexu.object.model;
 
-import java.util.Date;
-
 /**
  * POJO containing data about a token in NexU.
  *
@@ -23,7 +21,6 @@ import java.util.Date;
 public class TokenId {
 
 	private String id;
-	private Date creationDate;
 
 	public TokenId() {
 		super();
@@ -36,12 +33,5 @@ public class TokenId {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
-	public Date getCreationDate() {
-		return creationDate;
-	}
 
-	public void setCreationDate(Date creationDate) {
-		this.creationDate = creationDate;
-	}
 }
