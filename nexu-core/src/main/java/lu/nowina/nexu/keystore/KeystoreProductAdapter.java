@@ -21,7 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import eu.europa.esig.dss.DSSException;
 import eu.europa.esig.dss.DigestAlgorithm;
+import eu.europa.esig.dss.token.AbstractSignatureTokenConnection;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.JKSSignatureToken;
 import eu.europa.esig.dss.token.PasswordInputCallback;
@@ -67,32 +69,7 @@ public class KeystoreProductAdapter implements ProductAdapter {
 			throw new IllegalArgumentException("Given product was not configured!");
 		}
 		final ConfiguredKeystore configuredKeystore = (ConfiguredKeystore) product;
-		try {
-			switch(configuredKeystore.getType()) {
-			case PKCS12:
-				return new Pkcs12SignatureToken(new String(callback.getPassword()),
-						new URL(configuredKeystore.getUrl()).openStream()) {
-					@Override
-					public void close() {
-						// Issue in DSS ==> do nothing to not invalidate the token
-					}
-				};
-			case JKS:
-				return new JKSSignatureToken(new URL(configuredKeystore.getUrl()).openStream(),
-						new String(callback.getPassword())) {
-					@Override
-					public void close() {
-						// Issue in DSS ==> do nothing to not invalidate the token
-					}
-				};
-			default:
-				throw new IllegalStateException("Unhandled keystore type: " + configuredKeystore.getType());
-			}
-		} catch (MalformedURLException e) {
-			throw new NexuException(e);
-		} catch (IOException e) {
-			throw new NexuException(e);
-		}
+		return new KeystoreTokenProxy(configuredKeystore, callback);
 	}
 
 	@Override
@@ -186,5 +163,53 @@ public class KeystoreProductAdapter implements ProductAdapter {
 	
 	public void saveKeystore(final ConfiguredKeystore keystore) {
 		getDatabase().add(keystore);
+	}
+	
+	private static class KeystoreTokenProxy extends AbstractSignatureTokenConnection {
+
+		private SignatureTokenConnection proxied;
+		private final ConfiguredKeystore configuredKeystore;
+		private final PasswordInputCallback callback;
+				
+		public KeystoreTokenProxy(ConfiguredKeystore configuredKeystore, PasswordInputCallback callback) {
+			super();
+			this.configuredKeystore = configuredKeystore;
+			this.callback = callback;
+		}
+
+		private void initSignatureTokenConnection() {
+			if(proxied != null) {
+				return;
+			}
+			try {
+				switch(configuredKeystore.getType()) {
+				case PKCS12:
+					proxied = new Pkcs12SignatureToken(new String(callback.getPassword()),
+							new URL(configuredKeystore.getUrl()).openStream());
+					break;
+				case JKS:
+					proxied = new JKSSignatureToken(new URL(configuredKeystore.getUrl()).openStream(),
+							new String(callback.getPassword()));
+					break;
+				default:
+					throw new IllegalStateException("Unhandled keystore type: " + configuredKeystore.getType());
+				}
+			} catch (MalformedURLException e) {
+				throw new NexuException(e);
+			} catch (IOException e) {
+				throw new NexuException(e);
+			}
+		}
+		
+		@Override
+		public void close() {
+			proxied = null;
+		}
+
+		@Override
+		public List<DSSPrivateKeyEntry> getKeys() throws DSSException {
+			initSignatureTokenConnection();
+			return proxied.getKeys();
+		}
 	}
 }
