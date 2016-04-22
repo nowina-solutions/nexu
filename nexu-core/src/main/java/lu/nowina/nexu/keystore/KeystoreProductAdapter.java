@@ -23,7 +23,8 @@ import java.util.ResourceBundle;
 
 import eu.europa.esig.dss.DSSException;
 import eu.europa.esig.dss.DigestAlgorithm;
-import eu.europa.esig.dss.token.AbstractSignatureTokenConnection;
+import eu.europa.esig.dss.SignatureValue;
+import eu.europa.esig.dss.ToBeSigned;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.JKSSignatureToken;
 import eu.europa.esig.dss.token.PasswordInputCallback;
@@ -165,7 +166,7 @@ public class KeystoreProductAdapter implements ProductAdapter {
 		getDatabase().add(keystore);
 	}
 	
-	private static class KeystoreTokenProxy extends AbstractSignatureTokenConnection {
+	private static class KeystoreTokenProxy implements SignatureTokenConnection {
 
 		private SignatureTokenConnection proxied;
 		private final ConfiguredKeystore configuredKeystore;
@@ -203,13 +204,23 @@ public class KeystoreProductAdapter implements ProductAdapter {
 		
 		@Override
 		public void close() {
+			final SignatureTokenConnection stc = proxied;
+			// Always nullify proxied even in case of exception when calling close()
 			proxied = null;
+			stc.close();
 		}
 
 		@Override
 		public List<DSSPrivateKeyEntry> getKeys() throws DSSException {
 			initSignatureTokenConnection();
 			return proxied.getKeys();
+		}
+
+		@Override
+		public SignatureValue sign(ToBeSigned toBeSigned, DigestAlgorithm digestAlgorithm, DSSPrivateKeyEntry keyEntry)
+				throws DSSException {
+			initSignatureTokenConnection();
+			return proxied.sign(toBeSigned, digestAlgorithm, keyEntry);
 		}
 	}
 }
