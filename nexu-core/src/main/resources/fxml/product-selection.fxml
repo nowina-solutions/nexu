@@ -19,6 +19,7 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.control.ScrollPane?>
 
 <BorderPane prefHeight="300.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
   fx:controller="lu.nowina.nexu.view.ui.ProductSelectionController">
@@ -32,7 +33,9 @@
     </top>
 	
 	<center>
-		<VBox fx:id="productsContainer" BorderPane.alignment="CENTER" styleClass="form-container"/>
+		<ScrollPane hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+			<VBox fx:id="productsContainer" BorderPane.alignment="CENTER" styleClass="form-container"/>
+		</ScrollPane>
 	</center>
 
 	<bottom>

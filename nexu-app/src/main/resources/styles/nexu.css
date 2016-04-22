@@ -103,3 +103,7 @@ RadioButton {
     -fx-padding: 0 0 0 10;
 	-fx-font-weight: bold;
 }
+
+ScrollPane {
+	-fx-background-color:transparent;
+}
