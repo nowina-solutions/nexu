@@ -14,19 +14,24 @@
 package lu.nowina.nexu.generic;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+
+import lu.nowina.nexu.ProxyConfigurer;
+import lu.nowina.nexu.api.Feedback;
+import lu.nowina.nexu.api.plugin.HttpStatus;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.protocol.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import lu.nowina.nexu.ProxyConfigurer;
-import lu.nowina.nexu.api.plugin.HttpStatus;
 
 public class HttpDataSender {
 	
@@ -38,14 +43,19 @@ public class HttpDataSender {
 		this.proxyConfigurer = proxyConfigurer;
 	}
 	
-	public void sendFeedback(String url, String feedbackXml) throws IOException {
-		performPostRequestWithNoResponse(url, feedbackXml);
+	public void sendFeedback(String url, Feedback feedback) throws IOException, JAXBException {
+		final StringWriter writer = new StringWriter();
+		final JAXBContext context = JAXBContext.newInstance(Feedback.class);
+		final Marshaller marshaller = context.createMarshaller();
+		marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+		marshaller.marshal(feedback, writer);
+		performPostRequestWithNoResponse(url, writer.toString());
 	}
 	
 	public void performPostRequestWithNoResponse(String requestUrl, String entity) throws IOException {
 		final HttpPost post = new HttpPost(requestUrl);
 		post.setHeader("Content-type", "application/xml");
-		post.setEntity(new StringEntity(entity));
+		post.setEntity(new StringEntity(entity, StandardCharsets.UTF_8));
 		proxyConfigurer.setupProxy(post);
 		HttpClient client = HttpClients.custom().setDefaultCredentialsProvider(
 				proxyConfigurer.getProxyCredentialsProvider(post.getConfig().getProxy())).build();
