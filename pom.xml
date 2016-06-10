@@ -17,6 +17,7 @@
 		<module>nexu-bundle</module>
 		<module>nexu-standalone</module>
 		<module>nexu-public-object-model</module>
+		<module>nexu-https-plugin</module>
 	</modules>
 
 	<properties>
@@ -76,6 +77,11 @@
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
 				<version>1.10</version>
+			</dependency>
+			<dependency>
+				<groupId>net.lingala.zip4j</groupId>
+				<artifactId>zip4j</artifactId>
+				<version>1.3.2</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

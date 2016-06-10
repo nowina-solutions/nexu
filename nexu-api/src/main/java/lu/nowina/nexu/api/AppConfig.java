@@ -56,6 +56,9 @@ public class AppConfig {
 	private static final String USER_PREFERENCES_EDITABLE = "user_preferences_editable";
 	private static final String REQUEST_PROCESSOR_CLASS = "request_processor_class";
 
+	private static final String BINDING_PORTS_HTTPS = "binding_ports_https";
+	private static final String SIGNATURE_REQUEST_VALIDATOR_NONCES_CACHE_MAX_SIZE = "signature_request_validator_nonces_cache_max_size";
+
 	private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
 
 	private String bindingIP;
@@ -97,7 +100,13 @@ public class AppConfig {
 	private String requestProcessorClass;
 	
 	private File nexuHome;
-	
+
+	private List<Integer> bindingPortsHttps;
+
+	private int signatureRequestValidatorNoncesCacheMaxSize;
+
+
+
 	public AppConfig() {
 		try {
 			final URL versionResourceURL = this.getClass().getResource("/version.txt");
@@ -283,6 +292,24 @@ public class AppConfig {
 	public void setRequestProcessorClass(String requestProcessorClass) {
 		this.requestProcessorClass = requestProcessorClass;
 	}
+
+
+	public List<Integer> getBindingPortsHttps() {
+		return bindingPortsHttps;
+	}
+
+	public void setBindingPortsHttps(List<Integer> bindingPortsHttps) {
+		this.bindingPortsHttps = Collections.unmodifiableList(bindingPortsHttps);
+	}
+
+	public int getSignatureRequestValidatorNoncesCacheMaxSize() {
+		return signatureRequestValidatorNoncesCacheMaxSize;
+	}
+
+	public void setSignatureRequestValidatorNoncesCacheMaxSize(int signatureRequestValidatorNoncesCacheMaxSize) {
+		this.signatureRequestValidatorNoncesCacheMaxSize = signatureRequestValidatorNoncesCacheMaxSize;
+	}
+
 	
 	public File getNexuHome() {
 		if(nexuHome != null) {
@@ -330,7 +357,16 @@ public class AppConfig {
 		setUserPreferencesEditable(Boolean.parseBoolean(props.getProperty(USER_PREFERENCES_EDITABLE, "true")));
 		
 		setRequestProcessorClass(props.getProperty(REQUEST_PROCESSOR_CLASS, "lu.nowina.nexu.jetty.RequestProcessor"));
+
+		final String bindingPortHttpsStr = props.getProperty(BINDING_PORTS_HTTPS, "9976, 9977, 9978");
+		if(StringUtils.isNotEmpty(bindingPortHttpsStr)) {
+			setBindingPortsHttps(toListOfInt(bindingPortHttpsStr));
+		}
+		setSignatureRequestValidatorNoncesCacheMaxSize(
+				Integer.parseInt(props.getProperty(SIGNATURE_REQUEST_VALIDATOR_NONCES_CACHE_MAX_SIZE, "500")));
 	}
+
+
 
 	/**
 	 * Returns a list of {@link Integer} from <code>str</code> which should be

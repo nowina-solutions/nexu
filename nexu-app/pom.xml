@@ -18,6 +18,11 @@
 			<artifactId>nexu-rest-plugin</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>lu.nowina.apps</groupId>
+			<artifactId>nexu-https-plugin</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 
 	<build>
