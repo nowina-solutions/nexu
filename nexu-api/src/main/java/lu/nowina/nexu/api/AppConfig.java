@@ -330,7 +330,7 @@ public class AppConfig {
 	public void loadFromProperties(final Properties props) {
 		setApplicationName(props.getProperty(APPLICATION_NAME, "NexU"));
 		
-		final String bindingPortsStr = props.getProperty(BINDING_PORTS, "9876, 9877, 9878");
+		final String bindingPortsStr = props.getProperty(BINDING_PORTS, "9796");
 		if(StringUtils.isNotEmpty(bindingPortsStr)) {
 			setBindingPorts(toListOfInt(bindingPortsStr));
 		}
@@ -339,7 +339,7 @@ public class AppConfig {
 		setServerUrl(props.getProperty(SERVER_URL, "http://lab.nowina.solutions/nexu"));
 		setInstallUrl(props.getProperty(INSTALL_URL, "http://nowina.lu/nexu/"));
 		setNexuHostname(props.getProperty(NEXU_HOSTNAME, "localhost"));
-		setHttpServerClass(props.getProperty(HTTP_SERVER_CLASS, "lu.nowina.nexu.jetty.JettyServer"));
+		setHttpServerClass(props.getProperty(HTTP_SERVER_CLASS, "lu.nowina.nexu.https.JettyHttpsServer"));
 		setDebug(Boolean.parseBoolean(props.getProperty(DEBUG, "false")));
 		setAdvancedModeAvailable(Boolean.parseBoolean(props.getProperty(ADVANCED_MODE_AVAILABLE, "true")));
 		setConnectionsCacheMaxSize(Integer.parseInt(props.getProperty(CONNECTIONS_CACHE_MAX_SIZE, "50")));
@@ -358,7 +358,7 @@ public class AppConfig {
 		
 		setRequestProcessorClass(props.getProperty(REQUEST_PROCESSOR_CLASS, "lu.nowina.nexu.jetty.RequestProcessor"));
 
-		final String bindingPortHttpsStr = props.getProperty(BINDING_PORTS_HTTPS, "9976, 9977, 9978");
+		final String bindingPortHttpsStr = props.getProperty(BINDING_PORTS_HTTPS, "9896");
 		if(StringUtils.isNotEmpty(bindingPortHttpsStr)) {
 			setBindingPortsHttps(toListOfInt(bindingPortHttpsStr));
 		}
