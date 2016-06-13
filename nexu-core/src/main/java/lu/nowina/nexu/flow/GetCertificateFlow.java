@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import lu.nowina.nexu.api.flow.Operation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,10 +58,11 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 	protected Execution<GetCertificateResponse> process(NexuAPI api, GetCertificateRequest req) throws Exception {
 		SignatureTokenConnection token = null;
 		try {
-			final OperationResult<Product> selectProductOperationResult =
-					getOperationFactory().getOperation(UIOperation.class, "/fxml/product-selection.fxml",
-							new Object[]{api.getAppConfig().getApplicationName(),
-									api.detectCards(), api.detectProducts()}).perform();
+			Object[] params = {api.getAppConfig().getApplicationName(),
+					api.detectCards(), api.detectProducts()};
+			Operation<Product> operation = getOperationFactory().getOperation(UIOperation.class, "/fxml/product-selection.fxml",
+					params);
+			final OperationResult<Product> selectProductOperationResult = operation.perform();
 			if(selectProductOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 				final Product selectedProduct = selectProductOperationResult.getResult();
 
