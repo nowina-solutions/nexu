@@ -330,7 +330,7 @@ public class AppConfig {
 	public void loadFromProperties(final Properties props) {
 		setApplicationName(props.getProperty(APPLICATION_NAME, "NexU"));
 		
-		final String bindingPortsStr = props.getProperty(BINDING_PORTS, "9796");
+		final String bindingPortsStr = props.getProperty(BINDING_PORTS, "9795");
 		if(StringUtils.isNotEmpty(bindingPortsStr)) {
 			setBindingPorts(toListOfInt(bindingPortsStr));
 		}
@@ -358,7 +358,7 @@ public class AppConfig {
 		
 		setRequestProcessorClass(props.getProperty(REQUEST_PROCESSOR_CLASS, "lu.nowina.nexu.jetty.RequestProcessor"));
 
-		final String bindingPortHttpsStr = props.getProperty(BINDING_PORTS_HTTPS, "9896");
+		final String bindingPortHttpsStr = props.getProperty(BINDING_PORTS_HTTPS, "9895");
 		if(StringUtils.isNotEmpty(bindingPortHttpsStr)) {
 			setBindingPortsHttps(toListOfInt(bindingPortHttpsStr));
 		}
