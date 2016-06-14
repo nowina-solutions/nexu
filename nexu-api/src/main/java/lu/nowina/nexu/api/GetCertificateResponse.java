@@ -32,7 +32,13 @@ public class GetCertificateResponse {
 	private EncryptionAlgorithm encryptionAlgorithm;
 
 	private List<DigestAlgorithm> supportedDigests;
+	
+	private DigestAlgorithm preferredDigest;
 
+	public GetCertificateResponse() {
+		super();
+	}
+	
 	public TokenId getTokenId() {
 		return tokenId;
 	}
@@ -81,4 +87,11 @@ public class GetCertificateResponse {
 		this.supportedDigests = supportedDigests;
 	}
 
+	public DigestAlgorithm getPreferredDigest() {
+		return preferredDigest;
+	}
+
+	public void setPreferredDigest(DigestAlgorithm preferredDigest) {
+		this.preferredDigest = preferredDigest;
+	}
 }

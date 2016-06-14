@@ -17,7 +17,7 @@ import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.flow.Operation;
-import lu.nowina.nexu.flow.operation.OperationFactory;
+import lu.nowina.nexu.api.flow.OperationFactory;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
 
@@ -55,7 +55,7 @@ public abstract class Flow<I, O> {
 			final Execution<O> out = process(api, input);
 			return out;
 		} finally {
-			display.close();
+			display.close(true);
 		}
 	}
 
@@ -70,10 +70,11 @@ public abstract class Flow<I, O> {
 		if(api.getAppConfig().isEnablePopUps()) {
 			final Feedback feedback = new Feedback(e);
 			getOperationFactory().getOperation(
-					UIOperation.class, getDisplay(), "/fxml/provide-feedback.fxml",
-					new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion()}).perform();
-			getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
-					new Object[]{"Failure"}).perform();
+					UIOperation.class, "/fxml/provide-feedback.fxml",
+					new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
+							api.getAppConfig().getApplicationName()}).perform();
+			getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
+					new Object[]{"exception.failure.message", api.getAppConfig().getApplicationName()}).perform();
 		}
 		return e;
 	}

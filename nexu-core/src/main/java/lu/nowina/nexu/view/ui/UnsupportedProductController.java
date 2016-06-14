@@ -14,11 +14,16 @@
 package lu.nowina.nexu.view.ui;
 
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 /**
@@ -30,10 +35,13 @@ import lu.nowina.nexu.view.core.AbstractUIOperationController;
 public class UnsupportedProductController extends AbstractUIOperationController<Boolean> implements Initializable {
 
 	@FXML
-	Button requestSupport;
+	private Label message;
+	
+	@FXML
+	private Button requestSupport;
 
 	@FXML
-	Button hicSuntDracones;
+	private Button hicSuntDracones;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -45,4 +53,12 @@ public class UnsupportedProductController extends AbstractUIOperationController<
 		});
 	}
 
+	@Override
+	public final void init(Object... params) {
+		Platform.runLater(() -> {
+			message.setText(StringEscapeUtils.unescapeJava(MessageFormat.format(
+					ResourceBundle.getBundle("bundles/nexu").getString("unsuported.product.header"),
+					params[0])));
+		});
+	}
 }

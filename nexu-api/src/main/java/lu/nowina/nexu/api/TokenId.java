@@ -13,14 +13,11 @@
  */
 package lu.nowina.nexu.api;
 
-import java.util.Date;
 import java.util.UUID;
 
 public class TokenId {
 
 	private String id;
-
-	private Date creationDate;
 
 	public TokenId(String id) {
 		this.id = id;
@@ -28,7 +25,6 @@ public class TokenId {
 
 	public TokenId() {
 		id = UUID.randomUUID().toString();
-		creationDate = new Date();
 	}
 
 	public String getId() {
@@ -39,10 +35,6 @@ public class TokenId {
 		this.id = id;
 	}
 	
-	public Date getCreationDate() {
-		return creationDate;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;

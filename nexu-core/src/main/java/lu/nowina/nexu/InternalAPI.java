@@ -26,7 +26,7 @@ import java.util.concurrent.ThreadFactory;
 import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.AuthenticateRequest;
 import lu.nowina.nexu.api.AuthenticateResponse;
-import lu.nowina.nexu.api.CardAdapter;
+import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Execution;
@@ -37,19 +37,20 @@ import lu.nowina.nexu.api.GetIdentityInfoRequest;
 import lu.nowina.nexu.api.GetIdentityInfoResponse;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
+import lu.nowina.nexu.api.SystrayMenuItem;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
+import lu.nowina.nexu.api.flow.OperationFactory;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
 import lu.nowina.nexu.cache.FIFOCache;
 import lu.nowina.nexu.flow.Flow;
 import lu.nowina.nexu.flow.FlowRegistry;
 import lu.nowina.nexu.flow.operation.CoreOperationStatus;
-import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.generic.ConnectionInfo;
-import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.generic.GenericCardAdapter;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.generic.SCInfo;
@@ -72,11 +73,9 @@ public class InternalAPI implements NexuAPI {
 	
 	private Logger logger = LoggerFactory.getLogger(InternalAPI.class.getName());
 
-	private UserPreferences prefs;
-
 	private CardDetector detector;
 
-	private List<CardAdapter> adapters = new ArrayList<>();
+	private List<ProductAdapter> adapters = new ArrayList<>();
 
 	private Map<TokenId, SignatureTokenConnection> connections;
 
@@ -86,7 +85,7 @@ public class InternalAPI implements NexuAPI {
 
 	private SCDatabase myDatabase;
 
-	private DatabaseWebLoader webDatabase;
+	private ProductDatabaseRefresher<SCDatabase> webDatabase;
 
 	private FlowRegistry flowRegistry;
 
@@ -98,13 +97,13 @@ public class InternalAPI implements NexuAPI {
 
 	private Future<?> currentTask;
 	
-	public InternalAPI(UIDisplay display, UserPreferences prefs, SCDatabase store, CardDetector detector, DatabaseWebLoader webLoader,
-			FlowRegistry flowRegistry, OperationFactory operationFactory, AppConfig appConfig) {
+	public InternalAPI(UIDisplay display, SCDatabase myDatabase, CardDetector detector,
+			ProductDatabaseRefresher<SCDatabase> webDatabase, FlowRegistry flowRegistry,
+			OperationFactory operationFactory, AppConfig appConfig) {
 		this.display = display;
-		this.prefs = prefs;
-		this.myDatabase = store;
+		this.myDatabase = myDatabase;
 		this.detector = detector;
-		this.webDatabase = webLoader;
+		this.webDatabase = webDatabase;
 		this.flowRegistry = flowRegistry;
 		this.operationFactory = operationFactory;
 		this.appConfig = appConfig;
@@ -112,7 +111,9 @@ public class InternalAPI implements NexuAPI {
 		this.executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
 			@Override
 			public Thread newThread(Runnable r) {
-				return new Thread(EXECUTOR_THREAD_GROUP, r);
+				final Thread t = new Thread(EXECUTOR_THREAD_GROUP, r);
+				t.setDaemon(true);
+				return t;
 			}
 		});
 		this.currentTask = null;
@@ -124,26 +125,27 @@ public class InternalAPI implements NexuAPI {
 	}
 
 	@Override
-	public List<Match> matchingCardAdapters(DetectedCard d) {
-		if (d == null) {
-			logger.warn("DetectedCard argument should not be null");
+	public List<Match> matchingProductAdapters(Product p) {
+		if (p == null) {
+			logger.warn("Product argument should not be null");
 			return Collections.emptyList();
 		}
-		List<Match> cards = new ArrayList<>();
-		for (CardAdapter card : adapters) {
-			if (card.accept(d)) {
-				logger.info("Card is instance of " + card.getClass().getSimpleName());
-				cards.add(new Match(card, d));
+		List<Match> matches = new ArrayList<>();
+		for (ProductAdapter adapter : adapters) {
+			if (adapter.accept(p)) {
+				logger.info("Product is instance of " + adapter.getClass().getSimpleName());
+				matches.add(new Match(adapter, p));
 			}
 		}
-		if (cards.isEmpty()) {
+		if (matches.isEmpty() && (p instanceof DetectedCard)) {
+			final DetectedCard d = (DetectedCard) p;
 			SCInfo info = null;
 			if (webDatabase != null && webDatabase.getDatabase() != null) {
 				info = webDatabase.getDatabase().getInfo(d.getAtr());
 				if (info == null) {
 					logger.warn("Card " + d.getAtr() + " is not in the web database");
 				} else {
-					cards.add(new Match(new GenericCardAdapter(info), d));
+					matches.add(new Match(new GenericCardAdapter(info), d));
 				}
 
 			}
@@ -152,15 +154,15 @@ public class InternalAPI implements NexuAPI {
 				if (info == null) {
 					logger.warn("Card " + d.getAtr() + " is not in the personal database");
 				} else {
-					cards.add(new Match(new GenericCardAdapter(info), d));
+					matches.add(new Match(new GenericCardAdapter(info), d));
 				}
 			}
 		}
-		return cards;
+		return matches;
 	}
 
 	@Override
-	public void registerCardAdapter(CardAdapter adapter) {
+	public void registerProductAdapter(ProductAdapter adapter) {
 		adapters.add(adapter);
 	}
 
@@ -260,8 +262,8 @@ public class InternalAPI implements NexuAPI {
 		return executeRequest(flow, request);
 	}
 	
-
-	public HttpPlugin getPlugin(String context) {
+	@Override
+	public HttpPlugin getHttpPlugin(String context) {
 		return httpPlugins.get(context);
 	}
 
@@ -282,16 +284,29 @@ public class InternalAPI implements NexuAPI {
 		}
 	}
 
-	public DatabaseWebLoader getWebDatabase() {
-		return webDatabase;
-	}
-
-	public UserPreferences getPrefs() {
-		return prefs;
-	}
-	
 	@Override
 	public AppConfig getAppConfig() {
 		return appConfig;
+	}
+
+	@Override
+	public List<SystrayMenuItem> getExtensionSystrayMenuItems() {
+		final List<SystrayMenuItem> result = new ArrayList<>();
+		for(final ProductAdapter adapter : adapters) {
+			final SystrayMenuItem menuItem = adapter.getExtensionSystrayMenuItem();
+			if(menuItem != null) {
+				result.add(menuItem);
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public List<Product> detectProducts() {
+		final List<Product> result = new ArrayList<>();
+		for(final ProductAdapter adapter : adapters) {
+			result.addAll(adapter.detectProducts());
+		}
+		return result;
 	}
 }

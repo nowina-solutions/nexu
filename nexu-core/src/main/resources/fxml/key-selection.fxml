@@ -23,10 +23,6 @@
 
 <BorderPane prefWidth="375.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.KeySelectionController">
 
-    <stylesheets>
-        <URL value="@/styles/nexu.css" />
-    </stylesheets>
-
     <bottom>
         <HBox styleClass="btn-container" BorderPane.alignment="CENTER">
             <children>
@@ -46,13 +42,13 @@
 					<TextArea fx:id="taX500Principal" prefHeight="130" 
 						GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2" />
 						
-					<Label text="%key.selection.startDate" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+					<Label text="%key.selection.startDate" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="label-left-align"/>
 					<Label fx:id="startDate" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 					
-					<Label text="%key.selection.endDate" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+					<Label text="%key.selection.endDate" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="label-left-align"/>
 					<Label fx:id="endDate" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 					
-					<Label text="%key.selection.usage" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+					<Label text="%key.selection.usage" GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="label-left-align"/>
 					<Label fx:id="usage" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 				</GridPane>
         	</bottom>

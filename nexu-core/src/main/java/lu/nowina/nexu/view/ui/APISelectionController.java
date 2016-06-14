@@ -14,18 +14,26 @@
 package lu.nowina.nexu.view.ui;
 
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
+import lu.nowina.nexu.api.EnvironmentInfo;
+import lu.nowina.nexu.api.OS;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 public class APISelectionController extends AbstractUIOperationController<ScAPI> implements Initializable {
 
+	private static final boolean IS_WINDOWS =
+			EnvironmentInfo.buildFromSystemProperties(System.getProperties()).getOs().equals(OS.WINDOWS);
+	
 	@FXML
 	private Button select;
 
@@ -39,11 +47,14 @@ public class APISelectionController extends AbstractUIOperationController<ScAPI>
 	private RadioButton pkcs11;
 
 	@FXML
-	private RadioButton pkcs12;
-	
+	private RadioButton mocca;
+
 	@FXML
 	private ToggleGroup api;
 
+	@FXML
+	private Label message;
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		select.setOnAction((e) -> {
@@ -54,17 +65,33 @@ public class APISelectionController extends AbstractUIOperationController<ScAPI>
 		});
 		
 		select.disableProperty().bind(api.selectedToggleProperty().isNull());
+		
+		if(!IS_WINDOWS) {
+			mscapi.setVisible(false);
+			mscapi.setManaged(false);
+		}
 	}
 
-	public ScAPI getSelectedAPI() {
+	private ScAPI getSelectedAPI() {
 		if (mscapi.isSelected()) {
+			if(!IS_WINDOWS) {
+				throw new IllegalStateException("MSCAPI not supported on platforms other than Windows!");
+			}
 			return ScAPI.MSCAPI;
 		} else if (pkcs11.isSelected()) {
 			return ScAPI.PKCS_11;
-		} else if (pkcs12.isSelected()) {
-			return ScAPI.PKCS_12;
+		} else if (mocca.isSelected()) {
+			return ScAPI.MOCCA;
 		}
 		return null;
 	}
 
+	@Override
+	public final void init(Object... params) {
+		Platform.runLater(() -> {
+			message.setText(MessageFormat.format(
+					ResourceBundle.getBundle("bundles/nexu").getString("api.selection.header"),
+					params[0]));
+		});
+	}
 }

@@ -14,13 +14,18 @@
 package lu.nowina.nexu.flow;
 
 import java.util.Map;
-import java.util.ResourceBundle;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.europa.esig.dss.SignatureValue;
+import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
+import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.NexuException;
-import lu.nowina.nexu.api.CardAdapter;
-import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.Product;
+import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.SignatureRequest;
 import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
@@ -34,13 +39,6 @@ import lu.nowina.nexu.flow.operation.SignOperation;
 import lu.nowina.nexu.flow.operation.TokenOperationResultKey;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import eu.europa.esig.dss.SignatureValue;
-import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
-import eu.europa.esig.dss.token.SignatureTokenConnection;
 
 class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse> {
 
@@ -75,11 +73,11 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 					token = getTokenConnectionOperationResult.getResult();
 					logger.info("Token " + token);
 					
-					final DetectedCard card = (DetectedCard) map.get(TokenOperationResultKey.SELECTED_CARD);
-					final CardAdapter cardAdapter = (CardAdapter) map.get(TokenOperationResultKey.SELECTED_CARD_ADAPTER);
+					final Product product = (Product) map.get(TokenOperationResultKey.SELECTED_PRODUCT);
+					final ProductAdapter productAdapter = (ProductAdapter) map.get(TokenOperationResultKey.SELECTED_PRODUCT_ADAPTER);
 					final OperationResult<DSSPrivateKeyEntry> selectPrivateKeyOperationResult =
 							getOperationFactory().getOperation(
-									SelectPrivateKeyOperation.class, token, api, card, cardAdapter, null, req.getKeyId()).perform();
+									SelectPrivateKeyOperation.class, token, api, product, productAdapter, null, req.getKeyId()).perform();
 					if (selectPrivateKeyOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 						final DSSPrivateKeyEntry key = selectPrivateKeyOperationResult.getResult();
 
@@ -96,8 +94,8 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 							}
 							
 							if(api.getAppConfig().isEnablePopUps()) {
-								getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
-									new Object[]{ResourceBundle.getBundle("bundles/nexu").getString("operation.signaturePerformed")}).perform();
+								getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
+									new Object[]{"signature.flow.finished"}).perform();
 							}
 							
 							return new Execution<SignatureResponse>(new SignatureResponse(value, key.getCertificate(), key.getCertificateChain()));
@@ -106,15 +104,15 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 						}
 					} else {
 						if(api.getAppConfig().isEnablePopUps()) {
-							getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
-								new Object[]{ResourceBundle.getBundle("bundles/nexu").getString("operation.error.noKeys")}).perform();
+							getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
+								new Object[]{"signature.flow.no.key.selected", api.getAppConfig().getApplicationName()}).perform();
 						}
 						return handleErrorOperationResult(selectPrivateKeyOperationResult);
 					}
 				} else {
 					if(api.getAppConfig().isEnablePopUps()) {
-						getOperationFactory().getOperation(UIOperation.class, getDisplay(), "/fxml/message.fxml",
-							new Object[]{ResourceBundle.getBundle("bundles/nexu").getString("operation.error.token")}).perform();
+						getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
+							new Object[]{"signature.flow.bad.token", api.getAppConfig().getApplicationName()}).perform();
 					}
 					return handleErrorOperationResult(getTokenConnectionOperationResult);
 				}

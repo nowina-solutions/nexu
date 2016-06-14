@@ -23,7 +23,7 @@ import java.util.Arrays;
 import lu.nowina.nexu.AbstractConfigureLoggerTest;
 import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.AppConfig;
-import lu.nowina.nexu.api.CardAdapter;
+import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Execution;
 import lu.nowina.nexu.api.Match;
@@ -33,9 +33,9 @@ import lu.nowina.nexu.api.SignatureResponse;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.Operation;
+import lu.nowina.nexu.api.flow.OperationFactory;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.flow.operation.BasicOperationFactory;
-import lu.nowina.nexu.flow.operation.OperationFactory;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
 
@@ -53,14 +53,14 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 	public void testCardRecognized() throws Exception {
 		UIDisplay display = mock(UIDisplay.class);
 
-		CardAdapter adapter = mock(CardAdapter.class);
+		ProductAdapter adapter = mock(ProductAdapter.class);
 
 		SignatureTokenConnection token = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password");
 
 		NexuAPI api = mock(NexuAPI.class);
 		DetectedCard detectedCard = new DetectedCard("atr", 0);
 		when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
-		when(api.matchingCardAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
+		when(api.matchingProductAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
 		when(api.registerTokenConnection(token)).thenReturn(new TokenId("id"));
 		when(api.getTokenConnection(new TokenId("id"))).thenReturn(token);
 		final AppConfig appConfig = new AppConfig();
@@ -74,7 +74,7 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 		req.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
 		final OperationFactory noUIOperationFactory = new NoUIOperationFactory();
-		noUIOperationFactory.setDisplay(display);
+		((NoUIOperationFactory)noUIOperationFactory).setDisplay(display);
 
 		SignatureFlow flow = new SignatureFlow(display, api);
 		flow.setOperationFactory(noUIOperationFactory);

@@ -14,6 +14,7 @@
 package lu.nowina.nexu.generic;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -25,9 +26,12 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lu.nowina.nexu.DatabaseEventHandler;
+import lu.nowina.nexu.ProductDatabase;
+
 @XmlRootElement(name = "database")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class SCDatabase {
+public class SCDatabase implements ProductDatabase {
 
 	private static final Logger logger = LoggerFactory.getLogger(SCDatabase.class.getName());
 
@@ -48,13 +52,13 @@ public class SCDatabase {
 		if (info == null) {
 			info = new SCInfo();
 			info.setAtr(detectedAtr);
-			getSmartcards().add(info);
+			getSmartcards0().add(info);
 		}
 		info.getInfos().add(cInfo);
 		onAdd();
 	}
 
-	protected void onAdd() {
+	private void onAdd() {
 		if(onAddAction != null) {
 			onAddAction.execute(this);
 		} else {
@@ -77,18 +81,19 @@ public class SCDatabase {
 		return null;
 	}
 
-	public List<SCInfo> getSmartcards() {
+	private List<SCInfo> getSmartcards0() {
 		if (smartcards == null) {
 			this.smartcards = new ArrayList<>();
 		}
 		return smartcards;
 	}
+	
+	public List<SCInfo> getSmartcards() {
+		return Collections.unmodifiableList(getSmartcards0());
+	};
 
-	public void setSmartcards(List<SCInfo> smartcards) {
-		this.smartcards = smartcards;
-	}
-
-	public void setOnAddAction(DatabaseEventHandler onAddAction) {
+	@Override
+	public void setOnAddRemoveAction(DatabaseEventHandler onAddAction) {
 		this.onAddAction = onAddAction;
 	}
 

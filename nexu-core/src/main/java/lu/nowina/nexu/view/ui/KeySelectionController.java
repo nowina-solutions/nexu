@@ -16,30 +16,26 @@ package lu.nowina.nexu.view.ui;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 import java.util.ResourceBundle;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.Event;
-import javafx.event.EventHandler;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.MouseButton;
-import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.x509.CertificateToken;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TextArea;
+import javafx.scene.input.MouseEvent;
+import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 public class KeySelectionController extends AbstractUIOperationController<DSSPrivateKeyEntry> implements Initializable {
 
@@ -121,8 +117,11 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 	}
 	
 	private String createKeyUsageString(CertificateToken token, ResourceBundle resources) {
-		StringBuilder builder = new StringBuilder();
-		boolean[] keyUsages = token.getCertificate().getKeyUsage();
+		final boolean[] keyUsages = token.getCertificate().getKeyUsage();
+		if(keyUsages == null) {
+			return "";
+		}
+		final StringBuilder builder = new StringBuilder();
 		if(keyUsages[0]) {
 			builder.append(resources.getString("keyUsage.digitalSignature") + "\n");
 		}

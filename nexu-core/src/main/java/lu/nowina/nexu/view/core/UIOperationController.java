@@ -24,4 +24,6 @@ public interface UIOperationController<R> {
 
 	void init(Object... params);
 	
+	void setDisplay(UIDisplay display);
+
 }

@@ -13,6 +13,8 @@
  */
 package lu.nowina.nexu.view.core;
 
+import java.io.File;
+
 import eu.europa.esig.dss.token.PasswordInputCallback;
 
 /**
@@ -21,10 +23,13 @@ import eu.europa.esig.dss.token.PasswordInputCallback;
  */
 public interface UIDisplay {
 
-	void close();
-
 	<T> void displayAndWaitUIOperation(UIOperation<T> operation);
 
 	PasswordInputCallback getPasswordInputCallback();
 
+	File displayFileChooser(ExtensionFilter...extensionFilters);
+	
+	void display(NonBlockingUIOperation operation);
+	
+	void close(boolean blockingOperation);
 }

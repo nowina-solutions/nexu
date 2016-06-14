@@ -17,15 +17,17 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import lu.nowina.nexu.api.flow.BasicOperationStatus;
-import lu.nowina.nexu.api.flow.Operation;
-import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.flow.Flow;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import lu.nowina.nexu.api.flow.AbstractFutureOperationInvocation;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
+import lu.nowina.nexu.api.flow.FutureOperationInvocation;
+import lu.nowina.nexu.api.flow.OperationResult;
+import lu.nowina.nexu.flow.Flow;
+import lu.nowina.nexu.flow.operation.UIDisplayAwareOperation;
 
 /**
  * An <code>UIOperation</code> controls the user interaction with the {@link Flow}.
@@ -35,7 +37,6 @@ import org.slf4j.LoggerFactory;
  * 
  * <p>Expected parameters:
  * <ol>
- * <li>{@link UIDisplay}</li>
  * <li>FXML</li>
  * <li>Controller parameters (optional): array of {@link Object}.</li>
  * </ol>
@@ -44,9 +45,9 @@ import org.slf4j.LoggerFactory;
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  * @param <R> The return type of the operation.
  */
-public class UIOperation<R> implements Operation<R> {
+public class UIOperation<R> implements UIDisplayAwareOperation<R> {
 
-	private static final Logger logger = LoggerFactory.getLogger(UIOperation.class.getName());
+	private static final Logger LOGGER = LoggerFactory.getLogger(UIOperation.class.getName());
 
 	private transient Object lock = new Object();
 	private transient volatile OperationResult<R> result = null;
@@ -63,27 +64,26 @@ public class UIOperation<R> implements Operation<R> {
 	}
 	
 	public void setParams(final Object... params) {
-		if(params.length < 2) {
-			throw new IllegalArgumentException("An UIOperation needs at least the display and the fxml.");
+		if(params.length < 1) {
+			throw new IllegalArgumentException("An UIOperation needs at least the fxml.");
 		}
 		try {
-			this.display = (UIDisplay) params[0];
-			this.fxml = (String) params[1];
-			if(params.length > 2) {
-				if(params[2] instanceof Object[]) {
-					this.params = (Object[]) params[2];
+			this.fxml = (String) params[0];
+			if(params.length > 1) {
+				if(params[1] instanceof Object[]) {
+					this.params = (Object[]) params[1];
 				} else {
-					this.params = Arrays.copyOfRange(params, 2, params.length);
+					this.params = Arrays.copyOfRange(params, 1, params.length);
 				}
 			}
 		} catch(ClassCastException e) {
-			throw new IllegalArgumentException("Expected parameters: display, fxml, controller params.");
+			throw new IllegalArgumentException("Expected parameters: fxml, controller params.");
 		}
 	}
 	
 	@Override
-	public final OperationResult<R> perform() {		
-		logger.info("Loading " + fxml + " view");
+	public final OperationResult<R> perform() {
+		LOGGER.info("Loading " + fxml + " view");
 		final FXMLLoader loader = new FXMLLoader();
 		try {
 			loader.setResources(ResourceBundle.getBundle("bundles/nexu"));
@@ -96,18 +96,20 @@ public class UIOperation<R> implements Operation<R> {
 		controller = loader.getController();
 		controller.init(params);
 		controller.setUIOperation(this);
+		controller.setDisplay(display);
 
-		display.displayAndWaitUIOperation(this);
+		display();
+		
 		return result;
 	}
 	
 	public void waitEnd() throws InterruptedException {
 		String name = getOperationName();
-		logger.info("Thread " + Thread.currentThread().getName() + " wait on " + name);
+		LOGGER.info("Thread " + Thread.currentThread().getName() + " wait on " + name);
 		synchronized (lock) {
 			lock.wait();
 		}
-		logger.info("Thread " + Thread.currentThread().getName() + " resumed on " + name);
+		LOGGER.info("Thread " + Thread.currentThread().getName() + " resumed on " + name);
 	}
 
 	/**
@@ -117,8 +119,9 @@ public class UIOperation<R> implements Operation<R> {
 	 */
 	public final void signalEnd(R result) {
 		String name = getOperationName();
-		logger.info("Notify from " + Thread.currentThread().getName() + " on " + name);
+		LOGGER.info("Notify from " + Thread.currentThread().getName() + " on " + name);
 		notifyResult(new OperationResult<>(result));
+		hide();
 	}
 
 	private void notifyResult(OperationResult<R> result) {
@@ -174,4 +177,48 @@ public class UIOperation<R> implements Operation<R> {
 		return true;
 	}
 
+	@Override
+	public final void setDisplay(UIDisplay display) {
+		this.display = display;
+	}
+	
+	protected final UIDisplay getDisplay() {
+		return display;
+	}
+	
+	protected void display() {
+		display.displayAndWaitUIOperation(this);
+	}
+	
+	protected void hide() {
+		display.close(true);
+	}
+	
+	public static <R, T extends UIOperation<R>> FutureOperationInvocation<R> getFutureOperationInvocation(
+			final Class<T> operationClass, final String fxml, final Object... controllerParams) {
+		return new UIFutureOperationInvocation<>(operationClass, fxml, controllerParams);
+	}
+	
+	private static class UIFutureOperationInvocation<R, T extends UIOperation<R>> extends AbstractFutureOperationInvocation<R> {
+		private final Class<T> operationClass;
+		private final String fxml;
+		private final Object[] controllerParams;
+		
+		public UIFutureOperationInvocation(final Class<T> operationClass, final String fxml, final Object... controllerParams) {
+			this.operationClass = operationClass;
+			this.fxml = fxml;
+			this.controllerParams = controllerParams;
+		}
+
+		@Override
+		@SuppressWarnings({"unchecked"})
+		protected Class<T> getOperationClass() {
+			return operationClass;
+		}
+
+		@Override
+		protected Object[] getOperationParams() {
+			return (controllerParams != null) ? new Object[]{fxml, controllerParams} : new Object[]{fxml};
+		}
+	}
 }

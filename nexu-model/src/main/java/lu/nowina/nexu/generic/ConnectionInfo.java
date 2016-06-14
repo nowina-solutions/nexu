@@ -15,6 +15,8 @@ package lu.nowina.nexu.generic;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.adapters.NormalizedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.ScAPI;
@@ -32,6 +34,7 @@ public class ConnectionInfo {
 
 	private ScAPI selectedApi;
 
+	@XmlJavaTypeAdapter(value=NormalizedStringAdapter.class)
 	private String apiParam;
 
 	public ScAPI getSelectedApi() {
@@ -43,7 +46,7 @@ public class ConnectionInfo {
 	}
 
 	public String getApiParam() {
-		return apiParam;
+		return apiParam.trim();
 	}
 
 	public void setApiParam(String apiParam) {

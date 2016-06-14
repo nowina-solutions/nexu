@@ -14,6 +14,7 @@
 package lu.nowina.nexu.flow.operation;
 
 import lu.nowina.nexu.api.flow.Operation;
+import lu.nowina.nexu.api.flow.OperationFactory;
 import lu.nowina.nexu.view.core.UIDisplay;
 import lu.nowina.nexu.view.core.UIOperation;
 

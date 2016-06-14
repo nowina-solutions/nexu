@@ -13,12 +13,16 @@
  */
 package lu.nowina.nexu.api;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +33,31 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class AppConfig {
+
+	private static final String ADVANCED_MODE_AVAILABLE = "advanced_mode_available";
+	private static final String APPLICATION_NAME = "application_name";
+	private static final String DEBUG = "debug";
+	private static final String HTTP_SERVER_CLASS = "http_server_class";
+	private static final String NEXU_HOSTNAME = "nexu_hostname";
+	private static final String INSTALL_URL = "install_url";
+	private static final String SERVER_URL = "server_url";
+	private static final String BINDING_IP = "binding_ip";
+	private static final String BINDING_PORTS = "binding_ports";
+	private static final String CONNECTIONS_CACHE_MAX_SIZE = "connections_cache_max_size";
+	private static final String ENABLE_POP_UPS = "enable_pop_ups";
+	private static final String SEND_ANONYMOUS_INFO_TO_PROXY = "send_anonymous_info_to_proxy";
+	private static final String USE_SYSTEM_PROXY = "use_system_proxy";
+	private static final String PROXY_SERVER = "proxy_server";
+	private static final String PROXY_PORT = "proxy_port";
+	private static final String PROXY_PROTOCOLE = "proxy_use_https";
+	private static final String PROXY_AUTHENTICATION = "proxy_authentication";
+	private static final String PROXY_USERNAME = "proxy_username";
+	private static final String PROXY_PASSWORD = "proxy_password";
+	private static final String USER_PREFERENCES_EDITABLE = "user_preferences_editable";
+	private static final String REQUEST_PROCESSOR_CLASS = "request_processor_class";
+
+	private static final String BINDING_PORTS_HTTPS = "binding_ports_https";
+	private static final String SIGNATURE_REQUEST_VALIDATOR_NONCES_CACHE_MAX_SIZE = "signature_request_validator_nonces_cache_max_size";
 
 	private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
 
@@ -70,6 +99,14 @@ public class AppConfig {
 	
 	private String requestProcessorClass;
 	
+	private File nexuHome;
+
+	private List<Integer> bindingPortsHttps;
+
+	private int signatureRequestValidatorNoncesCacheMaxSize;
+
+
+
 	public AppConfig() {
 		try {
 			final URL versionResourceURL = this.getClass().getResource("/version.txt");
@@ -254,5 +291,94 @@ public class AppConfig {
 
 	public void setRequestProcessorClass(String requestProcessorClass) {
 		this.requestProcessorClass = requestProcessorClass;
+	}
+
+
+	public List<Integer> getBindingPortsHttps() {
+		return bindingPortsHttps;
+	}
+
+	public void setBindingPortsHttps(List<Integer> bindingPortsHttps) {
+		this.bindingPortsHttps = Collections.unmodifiableList(bindingPortsHttps);
+	}
+
+	public int getSignatureRequestValidatorNoncesCacheMaxSize() {
+		return signatureRequestValidatorNoncesCacheMaxSize;
+	}
+
+	public void setSignatureRequestValidatorNoncesCacheMaxSize(int signatureRequestValidatorNoncesCacheMaxSize) {
+		this.signatureRequestValidatorNoncesCacheMaxSize = signatureRequestValidatorNoncesCacheMaxSize;
+	}
+
+	
+	public File getNexuHome() {
+		if(nexuHome != null) {
+			return nexuHome;
+		}
+		final File userHome = new File(System.getProperty("user.home"));
+		if (!userHome.exists()) {
+			return null;
+		}
+		final File file = new File(userHome, "." + getApplicationName());
+		if (file.exists()) {
+			return file.canWrite() ? nexuHome = file : null;
+		} else {
+			return file.mkdir() && file.canWrite() ? nexuHome = file : null;
+		}
+	}
+	
+	public void loadFromProperties(final Properties props) {
+		setApplicationName(props.getProperty(APPLICATION_NAME, "NexU"));
+		
+		final String bindingPortsStr = props.getProperty(BINDING_PORTS, "9795");
+		if(StringUtils.isNotEmpty(bindingPortsStr)) {
+			setBindingPorts(toListOfInt(bindingPortsStr));
+		}
+		
+		setBindingIP(props.getProperty(BINDING_IP, "127.0.0.1"));
+		setServerUrl(props.getProperty(SERVER_URL, "http://lab.nowina.solutions/nexu"));
+		setInstallUrl(props.getProperty(INSTALL_URL, "http://nowina.lu/nexu/"));
+		setNexuHostname(props.getProperty(NEXU_HOSTNAME, "localhost"));
+		setHttpServerClass(props.getProperty(HTTP_SERVER_CLASS, "lu.nowina.nexu.https.JettyHttpsServer"));
+		setDebug(Boolean.parseBoolean(props.getProperty(DEBUG, "false")));
+		setAdvancedModeAvailable(Boolean.parseBoolean(props.getProperty(ADVANCED_MODE_AVAILABLE, "true")));
+		setConnectionsCacheMaxSize(Integer.parseInt(props.getProperty(CONNECTIONS_CACHE_MAX_SIZE, "50")));
+		setEnablePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_POP_UPS, "true")));
+		setSendAnonymousInfoToProxy(Boolean.parseBoolean(props.getProperty(SEND_ANONYMOUS_INFO_TO_PROXY, "true")));
+
+		setUseSystemProxy(Boolean.parseBoolean(props.getProperty(USE_SYSTEM_PROXY, "false")));
+		setProxyServer(props.getProperty(PROXY_SERVER, ""));
+		final String proxyPortStr = props.getProperty(PROXY_PORT, null);
+		setProxyPort((proxyPortStr != null) ? Integer.valueOf(proxyPortStr) : null);
+		setProxyUseHttps(Boolean.parseBoolean(props.getProperty(PROXY_PROTOCOLE, "false")));
+		setProxyAuthentication(Boolean.parseBoolean(props.getProperty(PROXY_AUTHENTICATION, "false")));
+		setProxyUsername(props.getProperty(PROXY_USERNAME, ""));
+		setProxyPassword(props.getProperty(PROXY_PASSWORD, ""));
+		setUserPreferencesEditable(Boolean.parseBoolean(props.getProperty(USER_PREFERENCES_EDITABLE, "true")));
+		
+		setRequestProcessorClass(props.getProperty(REQUEST_PROCESSOR_CLASS, "lu.nowina.nexu.jetty.RequestProcessor"));
+
+		final String bindingPortHttpsStr = props.getProperty(BINDING_PORTS_HTTPS, "9895");
+		if(StringUtils.isNotEmpty(bindingPortHttpsStr)) {
+			setBindingPortsHttps(toListOfInt(bindingPortHttpsStr));
+		}
+		setSignatureRequestValidatorNoncesCacheMaxSize(
+				Integer.parseInt(props.getProperty(SIGNATURE_REQUEST_VALIDATOR_NONCES_CACHE_MAX_SIZE, "500")));
+	}
+
+
+
+	/**
+	 * Returns a list of {@link Integer} from <code>str</code> which should be
+	 * tokenized by commas.
+	 * @param str A list of strings tokenized by commas.
+	 * @return A list of {@link Integer}.
+	 */
+	protected List<Integer> toListOfInt(String str) {
+		final List<Integer> ports = new ArrayList<Integer>();
+		for(final String port: str.split(",")) {
+			ports.add(Integer.parseInt(port.trim()));
+		}
+		return ports;
 	}
 }

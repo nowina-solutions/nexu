@@ -23,10 +23,6 @@
 
 <BorderPane prefHeight="200.0" prefWidth="250.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.MessageController">
 
-	<stylesheets>
-		<URL value="@/styles/nexu.css" />
-	</stylesheets>
-
 	<bottom>
 		<HBox styleClass="btn-container" BorderPane.alignment="CENTER">
 			<children>
@@ -37,7 +33,7 @@
 	<center>
 		<VBox BorderPane.alignment="CENTER">
          <children>
-            <Label text="NexU has finished" fx:id="message" styleClass="message"/>
+            <Label text="NexU has finished" fx:id="message" styleClass="message" wrapText="true"/>
          </children>
 		</VBox>
 	</center>

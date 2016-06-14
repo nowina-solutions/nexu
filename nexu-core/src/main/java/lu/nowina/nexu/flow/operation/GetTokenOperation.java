@@ -61,16 +61,16 @@ public class GetTokenOperation extends AbstractCompositeOperation<Map<TokenOpera
 			map.put(TokenOperationResultKey.TOKEN_ID, previousTokenId);
 			return new OperationResult<Map<TokenOperationResultKey, Object>>(map);
 		} else {
-			final OperationResult<List<Match>> getMatchingCardAdaptersOperationResult =
-					operationFactory.getOperation(GetMatchingCardAdaptersOperation.class, api).perform();
-			if(getMatchingCardAdaptersOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
-				final List<Match> matchingCardAdapters = getMatchingCardAdaptersOperationResult.getResult();
-				return operationFactory.getOperation(CreateTokenOperation.class, api, matchingCardAdapters).perform();
+			final OperationResult<List<Match>> getMatchingProductAdaptersOperationResult =
+					operationFactory.getOperation(GetMatchingProductAdaptersOperation.class, api.detectCards(), api).perform();
+			if(getMatchingProductAdaptersOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
+				final List<Match> matchingProductAdapters = getMatchingProductAdaptersOperationResult.getResult();
+				return operationFactory.getOperation(CreateTokenOperation.class, api, matchingProductAdapters).perform();
 			} else {
-				if(getMatchingCardAdaptersOperationResult.getStatus().equals(BasicOperationStatus.EXCEPTION)) {
-					return new OperationResult<Map<TokenOperationResultKey,Object>>(getMatchingCardAdaptersOperationResult.getException());
+				if(getMatchingProductAdaptersOperationResult.getStatus().equals(BasicOperationStatus.EXCEPTION)) {
+					return new OperationResult<Map<TokenOperationResultKey,Object>>(getMatchingProductAdaptersOperationResult.getException());
 				} else {
-					return new OperationResult<Map<TokenOperationResultKey,Object>>(getMatchingCardAdaptersOperationResult.getStatus());
+					return new OperationResult<Map<TokenOperationResultKey,Object>>(getMatchingProductAdaptersOperationResult.getStatus());
 				}
 			}
 		}

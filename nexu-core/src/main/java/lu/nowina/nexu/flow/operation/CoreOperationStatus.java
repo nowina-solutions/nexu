@@ -23,7 +23,7 @@ import lu.nowina.nexu.api.flow.OperationStatus;
 public enum CoreOperationStatus implements OperationStatus {
 
 	UNSUPPORTED_PRODUCT("unsupported.product", "The provided product is not supported by this version of NexU."),
-	NO_TOKEN("no.token", "The card adapter did not return any token."),
+	NO_TOKEN("no.token", "The product adapter did not return any token."),
 	NO_TOKEN_ID("no.token.id", "No token ID was returned after having registered the token."),
 	NO_PRODUCT_FOUND("no.product.found", "No product was found."),
 	UNKNOWN_TOKEN_ID("unknown.token.id", "There is no registered token for the given token ID."),

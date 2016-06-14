@@ -16,15 +16,15 @@ package lu.nowina.nexu.flow.operation;
 import java.util.Iterator;
 import java.util.List;
 
-import lu.nowina.nexu.api.CardAdapter;
+import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
+import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.api.CertificateFilter;
-import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.api.Product;
+import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.view.core.UIOperation;
-import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
-import eu.europa.esig.dss.token.SignatureTokenConnection;
 
 /**
  * This {@link CompositeOperation} allows to retrieve a private key for a given {@link SignatureTokenConnection}
@@ -34,8 +34,8 @@ import eu.europa.esig.dss.token.SignatureTokenConnection;
  * <ol>
  * <li>{@link SignatureTokenConnection}</li>
  * <li>{@link NexuAPI}</li>
- * <li>{@link DetectedCard} (optional)</li>
- * <li>{@link CardAdapter} (optional)</li>
+ * <li>{@link Product} (optional)</li>
+ * <li>{@link ProductAdapter} (optional)</li>
  * <li>{@link CertificateFilter} (optional)</li>
  * <li>Key filter (optional): {@link String}</li>
  * </ol>
@@ -46,8 +46,8 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 
 	private SignatureTokenConnection token;
 	private NexuAPI api;
-	private DetectedCard card;
-	private CardAdapter cardAdapter;
+	private Product product;
+	private ProductAdapter productAdapter;
 	private CertificateFilter certificateFilter;
 	private String keyFilter;
 	
@@ -61,10 +61,10 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 			this.token = (SignatureTokenConnection) params[0];
 			this.api = (NexuAPI) params[1];
 			if(params.length > 2) {
-				this.card = (DetectedCard) params[2];
+				this.product = (Product) params[2];
 			}
 			if(params.length > 3) {
-				this.cardAdapter = (CardAdapter) params[3];
+				this.productAdapter = (ProductAdapter) params[3];
 			}
 			if(params.length > 4) {
 				certificateFilter = (CertificateFilter) params[4];
@@ -73,15 +73,15 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 				keyFilter = (String) params[5];
 			}
 		} catch(final ClassCastException | ArrayIndexOutOfBoundsException e) {
-			throw new IllegalArgumentException("Expected parameters: SignatureTokenConnection, NexuAPI, DetectedCard (optional), CardAdapter (optional), CertificateFilter (optional), key filter (optional)");
+			throw new IllegalArgumentException("Expected parameters: SignatureTokenConnection, NexuAPI, Product (optional), ProductAdapter (optional), CertificateFilter (optional), key filter (optional)");
 		}
 	}
 	
 	@Override
 	public OperationResult<DSSPrivateKeyEntry> perform() {
 		final List<DSSPrivateKeyEntry> keys;
-		if((cardAdapter != null) && (card != null) && cardAdapter.supportCertificateFilter(card) && (certificateFilter != null)) {
-			keys = cardAdapter.getKeys(token, certificateFilter);
+		if((productAdapter != null) && (product != null) && productAdapter.supportCertificateFilter(product) && (certificateFilter != null)) {
+			keys = productAdapter.getKeys(token, certificateFilter);
 		} else {
 			keys = token.getKeys();
 		}
@@ -119,7 +119,7 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 			} else if(api.getAppConfig().isEnablePopUps()) {
 				@SuppressWarnings("unchecked")
 				final OperationResult<DSSPrivateKeyEntry> op =
-						operationFactory.getOperation(UIOperation.class, display, "/fxml/key-selection.fxml", new Object[]{keys}).perform();
+						operationFactory.getOperation(UIOperation.class, "/fxml/key-selection.fxml", new Object[]{keys}).perform();
 				if(op.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
 					return new OperationResult<DSSPrivateKeyEntry>(BasicOperationStatus.USER_CANCEL);
 				}

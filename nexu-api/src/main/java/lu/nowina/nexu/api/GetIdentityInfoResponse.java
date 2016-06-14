@@ -16,6 +16,7 @@ package lu.nowina.nexu.api;
 import java.time.LocalDate;
 import java.util.Map;
 
+
 /**
  * Holds data for a response for a get identity info request.
  *

@@ -21,6 +21,7 @@ package lu.nowina.nexu.view.core;
 public abstract class AbstractUIOperationController<R> implements UIOperationController<R> {
 
 	private UIOperation<R> uiOperation;
+	private UIDisplay display;
 	
 	public AbstractUIOperationController() {
 		super();
@@ -31,6 +32,11 @@ public abstract class AbstractUIOperationController<R> implements UIOperationCon
 		this.uiOperation = uiOperation;
 	}
 	
+	@Override
+	public final void setDisplay(UIDisplay display) {
+		this.display = display;
+	}
+
 	protected final void signalEnd(R result) {
 		uiOperation.signalEnd(result);
 	}
@@ -44,5 +50,9 @@ public abstract class AbstractUIOperationController<R> implements UIOperationCon
 	 */
 	public void init(Object... params) {
 		// Do nothing by contract
+	}
+	
+	protected final UIDisplay getDisplay() {
+		return display;
 	}
 }

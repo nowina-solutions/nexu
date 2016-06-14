@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ © Nowina Solutions, 2015-2015
+
+ Concédée sous licence EUPL, version 1.1 ou – dès leur approbation par la Commission européenne - versions ultérieures de l’EUPL (la «Licence»).
+ Vous ne pouvez utiliser la présente œuvre que conformément à la Licence.
+ Vous pouvez obtenir une copie de la Licence à l’adresse suivante:
+
+ http://ec.europa.eu/idabc/eupl5
+
+ Sauf obligation légale ou contractuelle écrite, le logiciel distribué sous la Licence est distribué «en l’état»,
+ SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
+ Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
+-->
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane minHeight="350.0" minWidth="300" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.PreferencesController">
+
+	<top>
+		<GridPane alignment="CENTER" styleClass="form-container" vgap="5" hgap="10">
+			<children>
+				<Label styleClass="message" text="%preferences.header" wrapText="true"
+				  GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2" GridPane.rowSpan="1"/>
+				
+                <Label fx:id="useSystemProxyLabel" text="%preferences.systemProxy" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <CheckBox id="useSystemProxy" fx:id="useSystemProxy" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                
+				<Label text="%preferences.proxyServer" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+				<TextField fx:id="proxyServer" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+				
+				<Label text="%preferences.proxyPort" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+				<TextField fx:id="proxyPort" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+				
+				<Label text="%preferences.https" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                <CheckBox id="useHttps" fx:id="useHttps" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+				
+				<Label text="%preferences.authenticationRequired" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+				<CheckBox id="proxyAuthentication" fx:id="proxyAuthentication" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+				
+				<Label text="%preferences.proxyUsername" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+				<TextField fx:id="proxyUsername" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+				
+				<Label text="%preferences.proxyPassword" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+				<PasswordField fx:id="proxyPassword" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+			</children>
+		</GridPane>
+	</top>
+	<bottom>
+        <HBox styleClass="btn-container" BorderPane.alignment="CENTER"
+          GridPane.columnIndex="0" GridPane.rowIndex="8" GridPane.columnSpan="2" GridPane.rowSpan="1">
+            <children>
+                <Button fx:id="ok" mnemonicParsing="false" styleClass="btn-primary" text="%button.ok" />
+                <Button fx:id="cancel" mnemonicParsing="false" styleClass="btn-primary" text="%button.cancel" />
+                <Button fx:id="reset" mnemonicParsing="false" styleClass="btn-primary" text="%button.reset" />
+            </children>
+        </HBox>
+	</bottom>
+</BorderPane>

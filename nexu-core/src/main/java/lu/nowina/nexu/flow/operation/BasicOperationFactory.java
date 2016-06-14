@@ -14,6 +14,7 @@
 package lu.nowina.nexu.flow.operation;
 
 import lu.nowina.nexu.api.flow.Operation;
+import lu.nowina.nexu.api.flow.OperationFactory;
 import lu.nowina.nexu.view.core.UIDisplay;
 
 /**
@@ -37,6 +38,9 @@ public class BasicOperationFactory implements OperationFactory {
 				final CompositeOperation<R> compositeOperation = (CompositeOperation<R>) operation;
 				compositeOperation.setOperationFactory(this);
 				compositeOperation.setDisplay(display);
+			} else if(operation instanceof UIDisplayAwareOperation) {
+				final UIDisplayAwareOperation<R> uiDisplayAwareOperation = (UIDisplayAwareOperation<R>) operation;
+				uiDisplayAwareOperation.setDisplay(display);
 			}
 			operation.setParams(params);
 			return operation;
@@ -47,7 +51,6 @@ public class BasicOperationFactory implements OperationFactory {
 		}
 	}
 
-	@Override
 	public void setDisplay(UIDisplay display) {
 		this.display = display;
 	}

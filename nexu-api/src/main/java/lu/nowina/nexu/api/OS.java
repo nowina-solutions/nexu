@@ -29,9 +29,12 @@ import org.slf4j.LoggerFactory;
 @XmlEnum
 public enum OS {
 
-	MACOSX, LINUX, WINDOWS, NOT_RECOGNIZED;
+	MACOSX("DYLIB", "*.dylib"),
+	LINUX("SO", "*.so"),
+	WINDOWS("DLL", "*.dll"),
+	NOT_RECOGNIZED("", "");
 
-	private static final Logger logger = LoggerFactory.getLogger(OS.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(OS.class);
 
 	public static OS forOSName(String osName) {
 		if (osName.startsWith("Mac")) {
@@ -41,9 +44,24 @@ public enum OS {
 		} else if (osName.toLowerCase().contains("linux")) {
 			return LINUX;
 		} else {
-			logger.warn("OS name not recognized " + osName);
+			LOGGER.warn("OS name not recognized " + osName);
 			return NOT_RECOGNIZED;
 		}
 	}
 
+	private final String nativeLibraryFileExtensionDescription;
+	private final String nativeLibraryFileExtension;
+	
+	private OS(final String nativeLibraryFileExtensionDescription, final String nativeLibraryFileExtension) {
+		this.nativeLibraryFileExtensionDescription = nativeLibraryFileExtensionDescription;
+		this.nativeLibraryFileExtension = nativeLibraryFileExtension;
+	}
+
+	public String getNativeLibraryFileExtensionDescription() {
+		return nativeLibraryFileExtensionDescription;
+	}
+
+	public String getNativeLibraryFileExtension() {
+		return nativeLibraryFileExtension;
+	}
 }

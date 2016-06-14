@@ -64,15 +64,15 @@ public class AdvancedCreationFeedbackOperation extends AbstractCompositeOperatio
 			feedback.setFeedbackStatus(FeedbackStatus.SUCCESS);
 			feedback.setApiParameter((String) map.get(TokenOperationResultKey.SELECTED_API_PARAMS));
 			feedback.setSelectedAPI((ScAPI) map.get(TokenOperationResultKey.SELECTED_API));
-			feedback.setSelectedCard((DetectedCard) map.get(TokenOperationResultKey.SELECTED_CARD));
+			feedback.setSelectedCard((DetectedCard) map.get(TokenOperationResultKey.SELECTED_PRODUCT));
 
 			if ((feedback.getSelectedCard() != null) && (feedback.getSelectedAPI() != null) &&
 					((feedback.getSelectedAPI() == ScAPI.MOCCA) || (feedback.getSelectedAPI() == ScAPI.MSCAPI) ||
 							(feedback.getApiParameter() != null))) {
 				final OperationResult<Feedback> result =
-						operationFactory.getOperation(UIOperation.class, display,
-								"/fxml/store-result.fxml",
-								new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion()}).perform();
+						operationFactory.getOperation(UIOperation.class, "/fxml/store-result.fxml",
+								new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
+										api.getAppConfig().getApplicationName()}).perform();
 				if(result.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 					final Feedback back = result.getResult();
 					if (back != null) {
@@ -81,8 +81,9 @@ public class AdvancedCreationFeedbackOperation extends AbstractCompositeOperatio
 					}
 				}
 			} else {
-				operationFactory.getOperation(UIOperation.class, display, "/fxml/provide-feedback.fxml",
-						new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion()}).perform();
+				operationFactory.getOperation(UIOperation.class, "/fxml/provide-feedback.fxml",
+						new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
+								api.getAppConfig().getApplicationName()}).perform();
 			}
 		}		
 		return new OperationResult<Void>((Void) null);

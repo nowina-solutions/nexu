@@ -93,4 +93,17 @@ RadioButton {
 
 .text-area .content{
     -fx-background-color: #C0C0C0;
- }
+}
+
+.label-left-align {
+    -fx-padding: 0 0 0 10;
+}
+
+.label-left-align-bold {
+    -fx-padding: 0 0 0 10;
+	-fx-font-weight: bold;
+}
+
+ScrollPane {
+	-fx-background-color:transparent;
+}
