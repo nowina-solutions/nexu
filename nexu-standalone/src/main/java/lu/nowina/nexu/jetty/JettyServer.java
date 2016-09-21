@@ -19,7 +19,6 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 
-@Deprecated
 public class JettyServer extends AbstractJettyServer {
 
 	@Override

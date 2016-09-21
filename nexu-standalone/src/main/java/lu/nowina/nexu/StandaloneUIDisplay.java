@@ -25,6 +25,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import lu.nowina.nexu.api.MessageDisplayCallback;
 import lu.nowina.nexu.api.flow.OperationFactory;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.view.core.ExtensionFilter;
@@ -132,6 +133,25 @@ public class StandaloneUIDisplay implements UIDisplay {
 	@Override
 	public PasswordInputCallback getPasswordInputCallback() {
 		return new FlowPasswordCallback();
+	}
+	
+	private final class FlowMessageDisplayCallback implements MessageDisplayCallback {
+		@Override
+		public void display(Message message) {
+			StandaloneUIDisplay.this.operationFactory.getOperation(
+					NonBlockingUIOperation.class, "/fxml/message.fxml",
+					"message.display.callback." + message.name().toLowerCase().replace('_', '.')).perform();
+		}
+
+		@Override
+		public void dispose() {
+			StandaloneUIDisplay.this.close(false);
+		}
+	}
+	
+	@Override
+	public MessageDisplayCallback getMessageDisplayCallback() {
+		return new FlowMessageDisplayCallback();
 	}
 
 	@Override

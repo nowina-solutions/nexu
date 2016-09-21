@@ -57,7 +57,6 @@ public class AppConfig {
 	private static final String REQUEST_PROCESSOR_CLASS = "request_processor_class";
 
 	private static final String BINDING_PORTS_HTTPS = "binding_ports_https";
-	private static final String SIGNATURE_REQUEST_VALIDATOR_NONCES_CACHE_MAX_SIZE = "signature_request_validator_nonces_cache_max_size";
 
 	private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
 
@@ -102,10 +101,6 @@ public class AppConfig {
 	private File nexuHome;
 
 	private List<Integer> bindingPortsHttps;
-
-	private int signatureRequestValidatorNoncesCacheMaxSize;
-
-
 
 	public AppConfig() {
 		try {
@@ -293,7 +288,6 @@ public class AppConfig {
 		this.requestProcessorClass = requestProcessorClass;
 	}
 
-
 	public List<Integer> getBindingPortsHttps() {
 		return bindingPortsHttps;
 	}
@@ -302,15 +296,6 @@ public class AppConfig {
 		this.bindingPortsHttps = Collections.unmodifiableList(bindingPortsHttps);
 	}
 
-	public int getSignatureRequestValidatorNoncesCacheMaxSize() {
-		return signatureRequestValidatorNoncesCacheMaxSize;
-	}
-
-	public void setSignatureRequestValidatorNoncesCacheMaxSize(int signatureRequestValidatorNoncesCacheMaxSize) {
-		this.signatureRequestValidatorNoncesCacheMaxSize = signatureRequestValidatorNoncesCacheMaxSize;
-	}
-
-	
 	public File getNexuHome() {
 		if(nexuHome != null) {
 			return nexuHome;
@@ -339,7 +324,7 @@ public class AppConfig {
 		setServerUrl(props.getProperty(SERVER_URL, "http://lab.nowina.solutions/nexu"));
 		setInstallUrl(props.getProperty(INSTALL_URL, "http://nowina.lu/nexu/"));
 		setNexuHostname(props.getProperty(NEXU_HOSTNAME, "localhost"));
-		setHttpServerClass(props.getProperty(HTTP_SERVER_CLASS, "lu.nowina.nexu.https.JettyHttpsServer"));
+		setHttpServerClass(props.getProperty(HTTP_SERVER_CLASS, "lu.nowina.nexu.jetty.JettyServer"));
 		setDebug(Boolean.parseBoolean(props.getProperty(DEBUG, "false")));
 		setAdvancedModeAvailable(Boolean.parseBoolean(props.getProperty(ADVANCED_MODE_AVAILABLE, "true")));
 		setConnectionsCacheMaxSize(Integer.parseInt(props.getProperty(CONNECTIONS_CACHE_MAX_SIZE, "50")));
@@ -362,8 +347,6 @@ public class AppConfig {
 		if(StringUtils.isNotEmpty(bindingPortHttpsStr)) {
 			setBindingPortsHttps(toListOfInt(bindingPortHttpsStr));
 		}
-		setSignatureRequestValidatorNoncesCacheMaxSize(
-				Integer.parseInt(props.getProperty(SIGNATURE_REQUEST_VALIDATOR_NONCES_CACHE_MAX_SIZE, "500")));
 	}
 
 

@@ -116,7 +116,13 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		final Product supportedProduct = match.getProduct();
 		final ProductAdapter adapter = match.getAdapter();
 
-		final SignatureTokenConnection connect = adapter.connect(api, supportedProduct, display.getPasswordInputCallback());
+		final SignatureTokenConnection connect;
+		if(adapter.supportMessageDisplayCallback(supportedProduct)) {
+			connect = adapter.connect(api, supportedProduct, display.getPasswordInputCallback(),
+					display.getMessageDisplayCallback());
+		} else {
+			connect = adapter.connect(api, supportedProduct, display.getPasswordInputCallback());
+		}
 		if (connect == null) {
 			LOG.error("No connect returned");
 			return new OperationResult<Map<TokenOperationResultKey, Object>>(CoreOperationStatus.NO_TOKEN);

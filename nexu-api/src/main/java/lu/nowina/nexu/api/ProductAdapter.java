@@ -37,6 +37,12 @@ public interface ProductAdapter {
 	boolean accept(Product product);
 
 	/**
+	 * Returns <code>true</code> if this product adapter supports {@link MessageDisplayCallback} for the given <code>product</code>.
+	 * @return <code>true</code> if this product adapter supports {@link MessageDisplayCallback} for the given <code>product</code>.
+	 */
+	boolean supportMessageDisplayCallback(Product product);
+	
+	/**
 	 * Creates a {@link SignatureTokenConnection} for the given product.
 	 * @param api The unique instance of {@link NexuAPI}.
 	 * @param product The target product.
@@ -45,6 +51,17 @@ public interface ProductAdapter {
 	 */
 	SignatureTokenConnection connect(NexuAPI api, Product product, PasswordInputCallback callback);
 
+	/**
+	 * Creates a {@link SignatureTokenConnection} for the given product.
+	 * @param api The unique instance of {@link NexuAPI}.
+	 * @param product The target product.
+	 * @param callback Password input callback.
+	 * @param messageCallback Message display callback.
+	 * @return A {@link SignatureTokenConnection} for the given product.
+	 */
+	SignatureTokenConnection connect(NexuAPI api, Product product, PasswordInputCallback callback,
+			MessageDisplayCallback messageCallback);
+	
 	/**
 	 * Returns <code>true</code> if this product adapter can return identity information for the given <code>product</code>.
 	 * @return <code>true</code> if this product adapter can return identity information for the given <code>product</code>.
