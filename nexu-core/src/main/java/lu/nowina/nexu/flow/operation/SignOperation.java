@@ -18,6 +18,8 @@ import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.ToBeSigned;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
+import lu.nowina.nexu.CancelledOperationException;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.Operation;
 import lu.nowina.nexu.api.flow.OperationResult;
 
@@ -59,6 +61,10 @@ public class SignOperation implements Operation<SignatureValue> {
 
 	@Override
 	public OperationResult<SignatureValue> perform() {
-		return new OperationResult<SignatureValue>(token.sign(toBeSigned, digestAlgorithm, key));
+		try {
+			return new OperationResult<SignatureValue>(token.sign(toBeSigned, digestAlgorithm, key));
+		} catch(final CancelledOperationException e) {
+			return new OperationResult<SignatureValue>(BasicOperationStatus.USER_CANCEL);
+		}
 	}
 }

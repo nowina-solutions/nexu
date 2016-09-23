@@ -37,6 +37,8 @@ import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.generic.ConnectionInfo;
 import lu.nowina.nexu.generic.GenericCardAdapter;
+import lu.nowina.nexu.generic.MOCCASignatureTokenConnectionAdapter;
+import lu.nowina.nexu.generic.Pkcs11SignatureTokenAdapter;
 import lu.nowina.nexu.generic.SCInfo;
 import lu.nowina.nexu.model.Pkcs11Params;
 import lu.nowina.nexu.view.core.UIOperation;
@@ -157,7 +159,9 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		final TokenId tokenId;
 		switch (result.getResult()) {
 		case MOCCA:
-			tokenId = api.registerTokenConnection(new MOCCASignatureTokenConnection(display.getPasswordInputCallback()));
+			tokenId = api.registerTokenConnection(
+					new MOCCASignatureTokenConnectionAdapter(new MOCCASignatureTokenConnection(
+							display.getPasswordInputCallback())));
 			break;
 		case MSCAPI:
 			tokenId = api.registerTokenConnection(new MSCAPISignatureToken());
@@ -172,8 +176,9 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 			final Pkcs11Params pkcs11Params = op2.getResult();
 			final String absolutePath = pkcs11Params.getPkcs11Lib().getAbsolutePath();
 			map.put(TokenOperationResultKey.SELECTED_API_PARAMS, absolutePath);
-			tokenId = api.registerTokenConnection(new Pkcs11SignatureToken(absolutePath, display.getPasswordInputCallback(),
-					selectedCard.getTerminalIndex()));
+			tokenId = api.registerTokenConnection(
+					new Pkcs11SignatureTokenAdapter(new Pkcs11SignatureToken(
+							absolutePath, display.getPasswordInputCallback(), selectedCard.getTerminalIndex())));
 			break;
 		default:
 			return new OperationResult<Map<TokenOperationResultKey, Object>>(CoreOperationStatus.UNSUPPORTED_PRODUCT);

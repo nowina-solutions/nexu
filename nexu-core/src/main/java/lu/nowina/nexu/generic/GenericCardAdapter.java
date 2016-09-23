@@ -55,13 +55,13 @@ public class GenericCardAdapter extends AbstractCardProductAdapter {
 		ScAPI scApi = cInfo.getSelectedApi();
 		switch (scApi) {
 		case MSCAPI:
+			// Cannot intercept cancel and timeout for MSCAPI (too generic error).
 			return new MSCAPISignatureToken();
 		case PKCS_11:
 			String absolutePath = cInfo.getApiParam();
-			return new Pkcs11SignatureToken(absolutePath, callback, card.getTerminalIndex());
+			return new Pkcs11SignatureTokenAdapter(new Pkcs11SignatureToken(absolutePath, callback, card.getTerminalIndex()));
 		case MOCCA:
-			MOCCASignatureTokenConnection mocca = new MOCCASignatureTokenConnection(callback);
-			return mocca;
+			return new MOCCASignatureTokenConnectionAdapter(new MOCCASignatureTokenConnection(callback));
 		default:
 			throw new RuntimeException("API not supported");
 		}

@@ -218,7 +218,9 @@ public class KeystoreProductAdapter implements ProductAdapter {
 			final SignatureTokenConnection stc = proxied;
 			// Always nullify proxied even in case of exception when calling close()
 			proxied = null;
-			stc.close();
+			if(stc != null) {
+				stc.close();
+			}
 		}
 
 		@Override

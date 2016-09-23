@@ -18,6 +18,7 @@ import java.util.List;
 
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
+import lu.nowina.nexu.CancelledOperationException;
 import lu.nowina.nexu.api.CertificateFilter;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.Product;
@@ -80,10 +81,14 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 	@Override
 	public OperationResult<DSSPrivateKeyEntry> perform() {
 		final List<DSSPrivateKeyEntry> keys;
-		if((productAdapter != null) && (product != null) && productAdapter.supportCertificateFilter(product) && (certificateFilter != null)) {
-			keys = productAdapter.getKeys(token, certificateFilter);
-		} else {
-			keys = token.getKeys();
+		try {
+			if((productAdapter != null) && (product != null) && productAdapter.supportCertificateFilter(product) && (certificateFilter != null)) {
+				keys = productAdapter.getKeys(token, certificateFilter);
+			} else {
+				keys = token.getKeys();
+			}
+		} catch(final CancelledOperationException e) {
+			return new OperationResult<DSSPrivateKeyEntry>(BasicOperationStatus.USER_CANCEL);
 		}
 		
 		DSSPrivateKeyEntry key = null;
