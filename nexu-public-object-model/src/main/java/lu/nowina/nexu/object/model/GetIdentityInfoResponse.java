@@ -13,7 +13,8 @@
  */
 package lu.nowina.nexu.object.model;
 
-import java.time.LocalDate;
+import org.joda.time.LocalDate;
+
 import java.util.Map;
 
 /**

@@ -20,12 +20,14 @@ import com.google.gson.GsonBuilder;
 
 import eu.europa.esig.dss.x509.CertificateToken;
 import lu.nowina.nexu.api.Execution;
+import org.joda.time.LocalDate;
 
 public class GsonHelper {
 
 	private static final Gson customGson = new GsonBuilder()
 			.registerTypeHierarchyAdapter(byte[].class, new ByteArrayTypeAdapter())
-			.registerTypeAdapter(CertificateToken.class, new CertificateTypeAdapter()).create();
+			.registerTypeAdapter(CertificateToken.class, new CertificateTypeAdapter())
+			.registerTypeAdapter(LocalDate.class, new JodaDateTypeAdapter()).create();
 
 	public static String toJson(Object o) {
 		return customGson.toJson(o);

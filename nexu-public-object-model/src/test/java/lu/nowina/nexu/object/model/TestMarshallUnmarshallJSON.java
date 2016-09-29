@@ -13,6 +13,8 @@
  */
 package lu.nowina.nexu.object.model;
 
+import lu.nowina.nexu.json.JodaDateTypeAdapter;
+import org.joda.time.LocalDate;
 import org.junit.Test;
 
 import com.google.common.reflect.TypeParameter;
@@ -28,8 +30,8 @@ import eu.europa.esig.dss.token.JKSSignatureToken;
 import eu.europa.esig.dss.x509.CertificateToken;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +48,8 @@ import lu.nowina.nexu.json.GsonHelper;
  */
 public class TestMarshallUnmarshallJSON {
 
-	private static final Gson customGson = new GsonBuilder().create();
+	private static final Gson customGson = new GsonBuilder()
+			.registerTypeAdapter(LocalDate.class, new JodaDateTypeAdapter()).create();
 
 	@SuppressWarnings("serial")
 	private static <T> TypeToken<Execution<T>> buildTokenType(Class<T> clas) {
@@ -356,4 +359,41 @@ public class TestMarshallUnmarshallJSON {
 		Assert.assertEquals(BasicOperationStatus.EXCEPTION.getLabel(), resp.getErrorMessage());
 		assertFeedback(resp);
 	}
+
+	@Test
+	public void testDateSerialization() {
+
+		LocalDate now = LocalDate.fromDateFields(new Date(115, 0, 4));
+		Assert.assertEquals("2015-01-04", now.toString());
+
+		GetIdentityInfoResponse response = new GetIdentityInfoResponse();
+		response.setCardValidityDateBegin(now);
+
+		String json = GsonHelper.toJson(response);
+		String should = "{\"cardValidityDateBegin\":{\"year\":2015,\"month\":1,\"day\":4}}";
+		Assert.assertEquals(should, json);
+
+		GetIdentityInfoResponse resp2 = GsonHelper.fromJson(json, GetIdentityInfoResponse.class);
+		Assert.assertEquals(now, resp2.getCardValidityDateBegin());
+
+	}
+
+	@Test
+	public void testDateSerialization2() {
+
+		LocalDate now = LocalDate.fromDateFields(new Date(116, 8, 30));
+		Assert.assertEquals("2016-09-30", now.toString());
+
+		GetIdentityInfoResponse response = new GetIdentityInfoResponse();
+		response.setCardValidityDateBegin(now);
+
+		String json = GsonHelper.toJson(response);
+		String should = "{\"cardValidityDateBegin\":{\"year\":2016,\"month\":9,\"day\":30}}";
+		Assert.assertEquals(should, json);
+
+		GetIdentityInfoResponse resp2 = GsonHelper.fromJson(json, GetIdentityInfoResponse.class);
+		Assert.assertEquals(now, resp2.getCardValidityDateBegin());
+
+	}
+
 }

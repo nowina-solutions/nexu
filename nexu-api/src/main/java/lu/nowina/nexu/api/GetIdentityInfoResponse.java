@@ -13,7 +13,8 @@
  */
 package lu.nowina.nexu.api;
 
-import java.time.LocalDate;
+import org.joda.time.LocalDate;
+
 import java.util.Map;
 
 
