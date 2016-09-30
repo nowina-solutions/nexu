@@ -20,6 +20,7 @@ import lu.nowina.nexu.object.model.GetIdentityInfoResponse.Gender;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Mappings;
 
 /**
  * This test <code>MapStruct</code> mapper is used only to ease the maintenance
@@ -52,11 +53,13 @@ public interface FromPublicObjectModelToAPITestMapper {
 	
 	// Util
 	lu.nowina.nexu.api.CertificateFilter mapCertificateFilter(CertificateFilter certificateFilter);
-	@Mapping(target="apiParameter", ignore=true)
-	@Mapping(target="detected", ignore=true)
-	@Mapping(target="selectedAPI", ignore=true)
-	@Mapping(target="selectedCard", ignore=true)
-	@Mapping(target="exception", ignore=true)
+	@Mappings({
+		@Mapping(target="apiParameter", ignore=true),
+		@Mapping(target="detected", ignore=true),
+		@Mapping(target="selectedAPI", ignore=true),
+		@Mapping(target="selectedCard", ignore=true),
+		@Mapping(target="exception", ignore=true)
+	})
 	lu.nowina.nexu.api.Feedback mapFeedback(Feedback feedback);
 	lu.nowina.nexu.api.TokenId mapTokenId(TokenId tokenId);
 	eu.europa.esig.dss.ToBeSigned mapToBeSigned(ToBeSigned toBeSigned);
