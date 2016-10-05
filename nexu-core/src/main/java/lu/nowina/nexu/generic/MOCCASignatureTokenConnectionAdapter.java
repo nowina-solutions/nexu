@@ -39,6 +39,8 @@ public class MOCCASignatureTokenConnectionAdapter implements SignatureTokenConne
 				if((t instanceof CancelledException) ||
 						(t instanceof TimeoutException)) {
 					throw new CancelledOperationException(e);
+				} else if(t instanceof CancelledOperationException) {
+					throw (CancelledOperationException) t;
 				}
 				t = t.getCause();
 			}
@@ -56,6 +58,8 @@ public class MOCCASignatureTokenConnectionAdapter implements SignatureTokenConne
 				if((t instanceof CancelledException) ||
 						(t instanceof TimeoutException)) {
 					throw new CancelledOperationException(e);
+				} else if(t instanceof CancelledOperationException) {
+					throw (CancelledOperationException) t;
 				}
 				t = t.getCause();
 			}

@@ -37,6 +37,8 @@ public class Pkcs11SignatureTokenAdapter implements SignatureTokenConnection {
 				if("CKR_CANCEL".equals(t.getMessage()) ||
 						"CKR_FUNCTION_CANCELED".equals(t.getMessage())) {
 					throw new CancelledOperationException(e);
+				} else if(t instanceof CancelledOperationException) {
+					throw (CancelledOperationException) t;
 				}
 				t = t.getCause();
 			}
@@ -54,6 +56,8 @@ public class Pkcs11SignatureTokenAdapter implements SignatureTokenConnection {
 				if("CKR_CANCEL".equals(t.getMessage()) ||
 						"CKR_FUNCTION_CANCELED".equals(t.getMessage())) {
 					throw new CancelledOperationException(e);
+				} else if(t instanceof CancelledOperationException) {
+					throw (CancelledOperationException) t;
 				}
 				t = t.getCause();
 			}
