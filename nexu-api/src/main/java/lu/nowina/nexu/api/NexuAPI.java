@@ -15,6 +15,8 @@ package lu.nowina.nexu.api;
 
 import java.util.List;
 
+import javax.smartcardio.CardTerminal;
+
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
 
@@ -23,8 +25,11 @@ import lu.nowina.nexu.api.plugin.HttpPlugin;
  * 
  * @author David Naramski
  */
+@SuppressWarnings("restriction")
 public interface NexuAPI {
 
+	CardTerminal getCardTerminal(DetectedCard card);
+	
 	List<DetectedCard> detectCards();
 	
 	List<Product> detectProducts();

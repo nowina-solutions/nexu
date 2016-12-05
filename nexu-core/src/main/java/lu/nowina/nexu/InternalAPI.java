@@ -23,6 +23,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 
+import javax.smartcardio.CardTerminal;
+
 import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.AuthenticateRequest;
 import lu.nowina.nexu.api.AuthenticateResponse;
@@ -67,6 +69,7 @@ import eu.europa.esig.dss.token.SignatureTokenConnection;
  * @author David Naramski
  *
  */
+@SuppressWarnings("restriction")
 public class InternalAPI implements NexuAPI {
 
 	public static final ThreadGroup EXECUTOR_THREAD_GROUP = new ThreadGroup("ExecutorThreadGroup");
@@ -122,6 +125,11 @@ public class InternalAPI implements NexuAPI {
 	@Override
 	public List<DetectedCard> detectCards() {
 		return detector.detectCard();
+	}
+
+	@Override
+	public CardTerminal getCardTerminal(DetectedCard card) {
+		return detector.getCardTerminal(card);
 	}
 
 	@Override

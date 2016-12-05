@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import lu.nowina.nexu.api.AppConfig;
-import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.flow.OperationFactory;
 import lu.nowina.nexu.api.plugin.HttpPlugin;
@@ -59,7 +58,7 @@ public class APIBuilder {
 	public NexuAPI build(final UIDisplay display, final AppConfig appConfig, final FlowRegistry flowRegistry,
 			final SCDatabase localDatabase, final ProductDatabaseRefresher<SCDatabase> remoteDatabaseLoader,
 			final OperationFactory operationFactory) {
-		final CardDetector detector = new CardDetector(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
+		final CardDetector detector = new CardDetector();
 
 		return new InternalAPI(display, localDatabase, detector, remoteDatabaseLoader, flowRegistry,
 				operationFactory, appConfig);

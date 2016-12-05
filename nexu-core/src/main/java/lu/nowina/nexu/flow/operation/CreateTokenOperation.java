@@ -161,7 +161,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		case MOCCA:
 			tokenId = api.registerTokenConnection(
 					new MOCCASignatureTokenConnectionAdapter(new MOCCASignatureTokenConnection(
-							display.getPasswordInputCallback())));
+							display.getPasswordInputCallback()), api, selectedCard));
 			break;
 		case MSCAPI:
 			tokenId = api.registerTokenConnection(new MSCAPISignatureToken());

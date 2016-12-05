@@ -1,5 +1,5 @@
 /**
- * © Nowina Solutions, 2015-2015
+ * © Nowina Solutions, 2015-2016
  *
  * Concédée sous licence EUPL, version 1.1 ou – dès leur approbation par la Commission européenne - versions ultérieures de l’EUPL (la «Licence»).
  * Vous ne pouvez utiliser la présente œuvre que conformément à la Licence.
@@ -13,7 +13,8 @@
  */
 package lu.nowina.nexu;
 
-import java.io.File;
+import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +28,10 @@ import javax.smartcardio.TerminalFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jnasmartcardio.Smartcardio;
+import jnasmartcardio.Smartcardio.JnaCardTerminals;
+import jnasmartcardio.Smartcardio.JnaPCSCException;
 import lu.nowina.nexu.api.DetectedCard;
-import lu.nowina.nexu.api.EnvironmentInfo;
-import lu.nowina.nexu.api.OS;
 
 /**
  * Detects smartcard.
@@ -40,45 +42,67 @@ public class CardDetector {
 
 	private static final Logger logger = LoggerFactory.getLogger(CardDetector.class.getSimpleName());
 
-	public CardDetector(EnvironmentInfo info) {
-		try {
-			if (info.getOs() == OS.LINUX) {
-				logger.info("The OS is Linux, we check for Library");
-				File libFile = at.gv.egiz.smcc.util.LinuxLibraryFinder.getLibraryPath("pcsclite", "1");
-				if (libFile != null) {
-					logger.info("Library installed is " + libFile.getAbsolutePath());
-					System.setProperty("sun.security.smartcardio.library", libFile.getAbsolutePath());
+	static {
+		Security.insertProviderAt(new Smartcardio(), 1);
+	}
+	
+	private JnaCardTerminals cardTerminals;
+	
+	public CardDetector() {
+		this.cardTerminals = null;
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				if(cardTerminals != null) {
+					try {
+						cardTerminals.close();
+					} catch (JnaPCSCException e) {
+						logger.warn("Exception when closing JnaCardTerminals", e);
+					}
 				}
 			}
-		} catch (Exception e) {
-			logger.error("Error while loading library for Linux", e);
-		}
+		});
 	}
 
+	private List<CardTerminal> getCardTerminals() {
+		if(cardTerminals == null) {
+			final TerminalFactory terminalFactory;
+			try {
+				terminalFactory = TerminalFactory.getInstance("PC/SC", null);
+			} catch(final NoSuchAlgorithmException e) {
+				// Should never happen as we give the provider
+				throw new IllegalStateException(e);
+			}
+			cardTerminals = (JnaCardTerminals) terminalFactory.terminals();
+		}
+		try {
+			return cardTerminals.list();
+		} catch(final CardException e) {
+			final Throwable cause = e.getCause();
+			if((cause != null) && ("SCARD_E_SERVICE_STOPPED".equals(cause.getMessage()))) {
+				logger.debug("Service stopped. Re-establish a new connection.");
+				try {
+					this.cardTerminals.close();
+				} catch(final Exception e1) {
+					logger.warn("Exception when closing JnaCardTerminals", e1);
+				}
+				this.cardTerminals = null;
+				return getCardTerminals();
+			} else {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+	
 	/**
 	 * Detect the smartcard connected to the computer.
 	 *
 	 * @return a list of smartcard detection.
 	 */
 	public List<DetectedCard> detectCard() {
-		List<DetectedCard> listCardDetect = null;
-		listCardDetect = new ArrayList<DetectedCard>();
-		final TerminalFactory terminalFactory = TerminalFactory.getDefault();
-
-		final List<CardTerminal> listCardTerminal;
-		try {
-			listCardTerminal = terminalFactory.terminals().list();
-		} catch (Exception e) {
-			// on MacOS and Linux there is an exception when there are no
-			// terminals connected
-			// but it is OK to continue with the intitalisation - user can
-			// connect + refresh
-			logger.debug("Error listing the terminals", e);
-			logger.info("No terminals found.");
-			return listCardDetect;
-		}
+		final List<DetectedCard> listCardDetect = new ArrayList<DetectedCard>();
 		int terminalIndex = 0;
-		for (CardTerminal cardTerminal : listCardTerminal) {
+		for (CardTerminal cardTerminal : getCardTerminals()) {
 			// cardTerminal.isCardPresent() always returns false on MacOS, so
 			// catch the CardException instead
 			try {
@@ -99,4 +123,30 @@ public class CardDetector {
 		return listCardDetect;
 	}
 
+	public CardTerminal getCardTerminal(final DetectedCard detectedCard) {
+		for(final CardTerminal cardTerminal : getCardTerminals()) {
+			Card card = null;
+			try {
+				card = cardTerminal.connect("*");
+				final byte[] atr = card.getATR().getBytes();
+				if(cardTerminal.getName().equals(detectedCard.getTerminalLabel()) &&
+				   DetectedCard.atrToString(atr).equals(detectedCard.getAtr())) {
+					return cardTerminal;
+				}
+			} catch(final CardException e) {
+				// Log exception and continue
+				logger.debug("CardException on connect", e);
+			} finally {
+				try {
+					if(card != null) {
+						card.disconnect(false);
+					}
+				} catch (CardException e) {
+					logger.warn("CardException on disconnect.", e);
+				}
+			}
+		}
+		throw new IllegalArgumentException("Cannot find CardTerminal with label " +
+				detectedCard.getTerminalLabel() + " and ATR " + detectedCard.getAtr());
+	}
 }

@@ -61,7 +61,7 @@ public class GenericCardAdapter extends AbstractCardProductAdapter {
 			String absolutePath = cInfo.getApiParam();
 			return new Pkcs11SignatureTokenAdapter(new Pkcs11SignatureToken(absolutePath, callback, card.getTerminalIndex()));
 		case MOCCA:
-			return new MOCCASignatureTokenConnectionAdapter(new MOCCASignatureTokenConnection(callback));
+			return new MOCCASignatureTokenConnectionAdapter(new MOCCASignatureTokenConnection(callback), api, card);
 		default:
 			throw new RuntimeException("API not supported");
 		}
