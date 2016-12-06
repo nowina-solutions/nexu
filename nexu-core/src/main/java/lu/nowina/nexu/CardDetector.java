@@ -14,9 +14,12 @@
 package lu.nowina.nexu;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.smartcardio.ATR;
 import javax.smartcardio.Card;
@@ -63,7 +66,7 @@ public class CardDetector {
 			public void run() {
 				if(cardTerminals != null) {
 					try {
-						//TODO : close cardTerminals
+						closeCardTerminals();
 					} catch (Exception e) {
 						logger.warn("Exception when closing cardTerminals", e);
 					}
@@ -88,7 +91,7 @@ public class CardDetector {
 			if((cause != null) && ("SCARD_E_SERVICE_STOPPED".equals(cause.getMessage())) && !cardTerminalsCreated) {
 				logger.debug("Service stopped. Re-establish a new connection.");
 				try {
-					// TODO: close cardTerminals
+					closeCardTerminals();
 				} catch(final Exception e1) {
 					logger.warn("Exception when closing cardTerminals", e1);
 				}
@@ -154,5 +157,30 @@ public class CardDetector {
 		}
 		throw new IllegalArgumentException("Cannot find CardTerminal with label " +
 				detectedCard.getTerminalLabel() + " and ATR " + detectedCard.getAtr());
+	}
+	
+	private void closeCardTerminals() throws Exception {
+		final Class<?> pcscTerminalsClass = Class.forName("sun.security.smartcardio.PCSCTerminals");
+        final Field contextIdField = pcscTerminalsClass.getDeclaredField("contextId");
+        contextIdField.setAccessible(true);
+        final long contextId = contextIdField.getLong(null);
+        
+        if(contextId != 0L) {
+        	// TODO: release current context
+        	
+        	// Remove current context value
+        	contextIdField.setLong(null, 0L);
+        	
+        	// Clear terminals
+            final Field terminalsField = pcscTerminalsClass.getDeclaredField("terminals");
+            terminalsField.setAccessible(true);
+        	final Map<?, ?> terminals = (Map<?, ?>) terminalsField.get(null);
+        	terminals.clear();
+        	
+            // Establish new context
+        	final Method initContextMethod = pcscTerminalsClass.getDeclaredMethod("initContext");
+        	initContextMethod.setAccessible(true);
+        	initContextMethod.invoke(null);
+        }
 	}
 }
