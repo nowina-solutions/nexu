@@ -70,7 +70,7 @@ public class NexuLauncher {
 		ConsoleAppender console = new ConsoleAppender(); // create appender
 		String PATTERN = "%d [%p|%c|%C{1}|%t] %m%n";
 		console.setLayout(new PatternLayout(PATTERN));
-		console.setThreshold(config.isDebug() ? Level.DEBUG : Level.WARN);
+		console.setThreshold(config.isDebug() ? Level.DEBUG : Level.INFO);
 		console.activateOptions();
 		org.apache.log4j.Logger.getRootLogger().addAppender(console);
 
@@ -79,7 +79,7 @@ public class NexuLauncher {
 		File nexuHome = config.getNexuHome();
 		rfa.setFile(new File(nexuHome, "nexu.log").getAbsolutePath());
 		rfa.setLayout(new PatternLayout("%d %-5p [%c{1}] %m%n"));
-		rfa.setThreshold(config.isDebug() ? Level.DEBUG : Level.WARN);
+		rfa.setThreshold(config.isDebug() ? Level.DEBUG : Level.INFO);
 		rfa.setAppend(true);
 		rfa.activateOptions();
 		rfa.setMaxFileSize(config.getRollingLogMaxFileSize());
