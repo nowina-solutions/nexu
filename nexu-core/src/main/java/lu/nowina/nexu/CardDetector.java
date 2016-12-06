@@ -31,6 +31,14 @@ import javax.smartcardio.TerminalFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.jna.IntegerType;
+import com.sun.jna.Library;
+import com.sun.jna.Native;
+import com.sun.jna.NativeLong;
+import com.sun.jna.NativeMappedConverter;
+import com.sun.jna.Platform;
+import com.sun.jna.Pointer;
+
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.OS;
@@ -45,6 +53,8 @@ public class CardDetector {
 	private static final Logger logger = LoggerFactory.getLogger(CardDetector.class.getSimpleName());
 
 	private CardTerminals cardTerminals;
+	
+	private final WinscardLibrary lib;
 	
 	public CardDetector(final EnvironmentInfo info) {
 		if (info.getOs() == OS.LINUX) {
@@ -73,6 +83,9 @@ public class CardDetector {
 				}
 			}
 		});
+		
+		final String libraryName = Platform.isWindows() ? WINDOWS_PATH : Platform.isMac() ? MAC_PATH : PCSC_PATH;
+		this.lib = (WinscardLibrary) Native.loadLibrary(libraryName, WinscardLibrary.class);
 	}
 
 	private List<CardTerminal> getCardTerminals() {
@@ -166,7 +179,13 @@ public class CardDetector {
         final long contextId = contextIdField.getLong(null);
         
         if(contextId != 0L) {
-        	// TODO: release current context
+        	// Release current context
+        	final Dword result = lib.SCardReleaseContext(new SCardContext(contextId));
+        	if(result.longValue() != 0L) {
+        		logger.warn("Error when releasing context: " + result.longValue());
+        	} else {
+        		logger.debug("Context was released successfully.");
+        	}
         	
         	// Remove current context value
         	contextIdField.setLong(null, 0L);
@@ -182,5 +201,87 @@ public class CardDetector {
         	initContextMethod.setAccessible(true);
         	initContextMethod.invoke(null);
         }
+	}
+
+	/***********************************************************************************************************/
+	/* All following are inspired by                                                                           */
+	/* https://github.com/jnasmartcardio/jnasmartcardio/blob/master/src/main/java/jnasmartcardio/Winscard.java */
+	/***********************************************************************************************************/
+
+	private static final String WINDOWS_PATH = "WinSCard.dll";
+	private static final String MAC_PATH = "/System/Library/Frameworks/PCSC.framework/PCSC";
+	private static final String PCSC_PATH = "libpcsclite.so.1";
+
+	/**
+	 * The winscard API, also known as PC/SC. Implementations of this API exist
+	 * on Windows, OS X, and Linux, although the symbol names and sizeof
+	 * parameters differs on different platforms.
+	 */
+	private static interface WinscardLibrary extends Library {
+		Dword SCardReleaseContext(SCardContext hContext);
+	}
+
+	// Following classes are public for {@link NativeMappedConverter#defaultValue()}.
+	
+	/**
+	 * The DWORD type used by WinSCard.h, used wherever an integer is needed in
+	 * SCard functions. On Windows and OS X, this is always typedef'd to a
+	 * uint32_t. In the pcsclite library on Linux, it is a long
+	 * instead, which is 64 bits on 64-bit Linux.
+	 */
+	public static class Dword extends IntegerType {
+		public static final int SIZE = Platform.isWindows() || Platform.isMac() ? 4 : NativeLong.SIZE;
+		
+		private static final long serialVersionUID = 1L;
+		
+		public Dword() {
+			this(0l);
+		}
+		
+		public Dword(long value) {
+			super(SIZE, value);
+		}
+		
+		@Override
+		public String toString() {
+			return Long.toString(longValue());
+		}
+	}
+	
+	/**
+	 * Base class for handles used in PC/SC. On Windows, it is a handle
+	 * (ULONG_PTR which cannot be dereferenced). On PCSC, it is an integer
+	 * (int32_t on OS X, long on Linux).
+	 */
+	public static class Handle extends IntegerType {
+		private static final long serialVersionUID = 1L;
+		
+		public static final int SIZE = Platform.isWindows() ? Pointer.SIZE : Dword.SIZE;
+		
+		public Handle(long value) {
+			super(SIZE, value);
+		}
+		
+		@Override
+		public String toString() {
+			return String.format("%s{%x}", getClass().getSimpleName(), longValue());
+		}
+	}
+	
+	/**
+	 * The SCARDCONTEXT type defined in WinSCard.h, used for most SCard
+	 * functions.
+	 */
+	public static class SCardContext extends Handle {
+		private static final long serialVersionUID = 1L;
+		
+		/** no-arg constructor needed for {@link NativeMappedConverter#defaultValue()}*/
+		public SCardContext() {
+			this(0l);
+		}
+		
+		public SCardContext(long value) {
+			super(value);
+		}
 	}
 }
