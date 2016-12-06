@@ -108,6 +108,11 @@ public class CardDetector {
 				} catch(final Exception e1) {
 					logger.warn("Exception when closing cardTerminals", e1);
 				}
+				try {
+					establishNewContext();
+				} catch(final Exception e1) {
+					throw new RuntimeException(e1);
+				}
 				this.cardTerminals = null;
 				return getCardTerminals();
 			} else {
@@ -195,14 +200,16 @@ public class CardDetector {
             terminalsField.setAccessible(true);
         	final Map<?, ?> terminals = (Map<?, ?>) terminalsField.get(null);
         	terminals.clear();
-        	
-            // Establish new context
-        	final Method initContextMethod = pcscTerminalsClass.getDeclaredMethod("initContext");
-        	initContextMethod.setAccessible(true);
-        	initContextMethod.invoke(null);
         }
 	}
 
+	private void establishNewContext() throws Exception {
+		final Class<?> pcscTerminalsClass = Class.forName("sun.security.smartcardio.PCSCTerminals");
+    	final Method initContextMethod = pcscTerminalsClass.getDeclaredMethod("initContext");
+    	initContextMethod.setAccessible(true);
+    	initContextMethod.invoke(null);
+	}
+	
 	/***********************************************************************************************************/
 	/* All following are inspired by                                                                           */
 	/* https://github.com/jnasmartcardio/jnasmartcardio/blob/master/src/main/java/jnasmartcardio/Winscard.java */
