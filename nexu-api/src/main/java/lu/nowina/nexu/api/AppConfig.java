@@ -61,6 +61,8 @@ public class AppConfig {
 
 	private static final String BINDING_PORTS_HTTPS = "binding_ports_https";
 
+	private static final String ENABLE_DATABASE_WEB_LOADER = "enable_database_web_loader";
+	
 	private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
 
 	private String bindingIP;
@@ -109,6 +111,8 @@ public class AppConfig {
 
 	private int rollingLogMaxFileNumber;
 
+	private boolean enableDatabaseWebLoader;
+	
 	public AppConfig() {
 		try {
 			final URL versionResourceURL = this.getClass().getResource("/version.txt");
@@ -329,6 +333,14 @@ public class AppConfig {
 		this.rollingLogMaxFileNumber = rollingLogMaxFileNumber;
 	}
 
+	public boolean isEnableDatabaseWebLoader() {
+		return enableDatabaseWebLoader;
+	}
+
+	public void setEnableDatabaseWebLoader(boolean enableDatabaseWebLoader) {
+		this.enableDatabaseWebLoader = enableDatabaseWebLoader;
+	}
+
 	public File getNexuHome() {
 		if (nexuHome != null) {
 			return nexuHome;
@@ -383,6 +395,8 @@ public class AppConfig {
 		if (StringUtils.isNotEmpty(bindingPortHttpsStr)) {
 			setBindingPortsHttps(toListOfInt(bindingPortHttpsStr));
 		}
+		
+		setEnableDatabaseWebLoader(Boolean.parseBoolean(props.getProperty(ENABLE_DATABASE_WEB_LOADER, "true")));
 	}
 
 	/**

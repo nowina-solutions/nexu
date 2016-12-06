@@ -103,13 +103,6 @@ public class DatabaseWebLoader implements ProductDatabaseRefresher<SCDatabase> {
 		} catch (IOException | JAXBException e) {
 			LOGGER.error("Cannot load database from cache", e);
 		}
-
-		try {
-			updateDatabase();
-		} catch (IOException | JAXBException e) {
-			LOGGER.error("Cannot update database", e);
-		}
-
 	}
 
 	private byte[] loadDatabaseFromCache() throws IOException, JAXBException {
@@ -186,6 +179,12 @@ public class DatabaseWebLoader implements ProductDatabaseRefresher<SCDatabase> {
 	}
 
 	public void start() {
+		try {
+			updateDatabase();
+		} catch (final IOException | JAXBException e) {
+			LOGGER.error("Cannot update database", e);
+		}
+
 		if (databaseData == null) {
 			scheduleUpdate();
 		} else {
