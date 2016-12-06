@@ -13,8 +13,7 @@
  */
 package lu.nowina.nexu;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.Security;
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,15 +22,15 @@ import javax.smartcardio.ATR;
 import javax.smartcardio.Card;
 import javax.smartcardio.CardException;
 import javax.smartcardio.CardTerminal;
+import javax.smartcardio.CardTerminals;
 import javax.smartcardio.TerminalFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jnasmartcardio.Smartcardio;
-import jnasmartcardio.Smartcardio.JnaCardTerminals;
-import jnasmartcardio.Smartcardio.JnaPCSCException;
 import lu.nowina.nexu.api.DetectedCard;
+import lu.nowina.nexu.api.EnvironmentInfo;
+import lu.nowina.nexu.api.OS;
 
 /**
  * Detects smartcard.
@@ -42,22 +41,31 @@ public class CardDetector {
 
 	private static final Logger logger = LoggerFactory.getLogger(CardDetector.class.getSimpleName());
 
-	static {
-		Security.insertProviderAt(new Smartcardio(), 1);
-	}
+	private CardTerminals cardTerminals;
 	
-	private JnaCardTerminals cardTerminals;
-	
-	public CardDetector() {
+	public CardDetector(final EnvironmentInfo info) {
+		if (info.getOs() == OS.LINUX) {
+			logger.info("The OS is Linux, we check for Library");
+			try {
+				final File libFile = at.gv.egiz.smcc.util.LinuxLibraryFinder.getLibraryPath("pcsclite", "1");
+				if (libFile != null) {
+					logger.info("Library installed is at " + libFile.getAbsolutePath());
+					System.setProperty("sun.security.smartcardio.library", libFile.getAbsolutePath());
+				}
+			} catch (final Exception e) {
+				logger.error("Error while loading library for Linux", e);
+			}
+		}
+		
 		this.cardTerminals = null;
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
 				if(cardTerminals != null) {
 					try {
-						cardTerminals.close();
-					} catch (JnaPCSCException e) {
-						logger.warn("Exception when closing JnaCardTerminals", e);
+						//TODO : close cardTerminals
+					} catch (Exception e) {
+						logger.warn("Exception when closing cardTerminals", e);
 					}
 				}
 			}
@@ -65,26 +73,24 @@ public class CardDetector {
 	}
 
 	private List<CardTerminal> getCardTerminals() {
+		final boolean cardTerminalsCreated;
 		if(cardTerminals == null) {
-			final TerminalFactory terminalFactory;
-			try {
-				terminalFactory = TerminalFactory.getInstance("PC/SC", null);
-			} catch(final NoSuchAlgorithmException e) {
-				// Should never happen as we give the provider
-				throw new IllegalStateException(e);
-			}
-			cardTerminals = (JnaCardTerminals) terminalFactory.terminals();
+			final TerminalFactory terminalFactory = TerminalFactory.getDefault();
+			cardTerminals = terminalFactory.terminals();
+			cardTerminalsCreated = true;
+		} else {
+			cardTerminalsCreated = false;
 		}
 		try {
 			return cardTerminals.list();
 		} catch(final CardException e) {
 			final Throwable cause = e.getCause();
-			if((cause != null) && ("SCARD_E_SERVICE_STOPPED".equals(cause.getMessage()))) {
+			if((cause != null) && ("SCARD_E_SERVICE_STOPPED".equals(cause.getMessage())) && !cardTerminalsCreated) {
 				logger.debug("Service stopped. Re-establish a new connection.");
 				try {
-					this.cardTerminals.close();
+					// TODO: close cardTerminals
 				} catch(final Exception e1) {
-					logger.warn("Exception when closing JnaCardTerminals", e1);
+					logger.warn("Exception when closing cardTerminals", e1);
 				}
 				this.cardTerminals = null;
 				return getCardTerminals();
@@ -129,7 +135,7 @@ public class CardDetector {
 			try {
 				card = cardTerminal.connect("*");
 				final byte[] atr = card.getATR().getBytes();
-				if(cardTerminal.getName().equals(detectedCard.getTerminalLabel()) &&
+				if(((detectedCard.getTerminalLabel() == null) || cardTerminal.getName().equals(detectedCard.getTerminalLabel())) &&
 				   DetectedCard.atrToString(atr).equals(detectedCard.getAtr())) {
 					return cardTerminal;
 				}

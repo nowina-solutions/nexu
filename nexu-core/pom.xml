@@ -51,10 +51,6 @@
 			<scope>test</scope>
 		</dependency>
         <dependency>
-            <groupId>io.github.jnasmartcardio</groupId>
-            <artifactId>jnasmartcardio</artifactId>
-        </dependency>
-        <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
         </dependency>

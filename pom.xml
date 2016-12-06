@@ -28,7 +28,6 @@
 		<dss.version>4.6.0</dss.version>
         <maven.release.plugin.version>2.5.3</maven.release.plugin.version>
         <slf4j.version>1.7.12</slf4j.version>
-        <jnasmartcardio.version>0.2.6</jnasmartcardio.version>
         <jna.version>4.2.2</jna.version>
 	</properties>
 
@@ -86,20 +85,9 @@
 				<version>1.3.2</version>
 			</dependency>
             <dependency>
-                <groupId>io.github.jnasmartcardio</groupId>
-                <artifactId>jnasmartcardio</artifactId>
-                <version>${jnasmartcardio.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>net.java.dev.jna</groupId>
-                        <artifactId>jna</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
                 <groupId>net.java.dev.jna</groupId>
                 <artifactId>jna</artifactId>
-                <version>${jna.version}</version> <!-- Use last version of JNA. -->
+                <version>${jna.version}</version>
             </dependency>
 		</dependencies>
 	</dependencyManagement>
