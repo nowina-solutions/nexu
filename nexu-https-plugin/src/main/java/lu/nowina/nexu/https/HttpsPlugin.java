@@ -290,10 +290,16 @@ public class HttpsPlugin implements NexuPlugin {
 	 */
 	private List<InitializationMessage> installCaCertInMacUserKeychain(final NexuAPI api, final File caCert,
 			final ResourceBundle resourceBundle, final ResourceBundle baseResourceBundle) {
-		final ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-c",
-				"security add-certificate " + caCert.getAbsolutePath() +
-				"; security add-trusted-cert -p ssl " + caCert.getAbsolutePath());
+		Path tempFilePath = null;
 		try {
+			// 1. Copy mac_user_keychain_add-certs.sh
+			tempFilePath = Files.createTempFile("mac_user_keychain_add-certs", "sh");
+			final File tempFile = tempFilePath.toFile();
+			FileUtils.copyURLToFile(this.getClass().getResource("/mac_user_keychain_add-certs.sh"), tempFile);
+			
+			// 2. Run mac_user_keychain_add-certs.sh
+			final ProcessBuilder pb = new ProcessBuilder("/bin/bash", tempFile.getAbsolutePath(),
+					caCert.getAbsolutePath());
 			final Process p = pb.start();
 			if(!p.waitFor(180, TimeUnit.SECONDS)) {
 				throw new NexuException("Timeout occurred when trying to install CA certificate in Mac user keychain");
@@ -302,7 +308,7 @@ public class HttpsPlugin implements NexuPlugin {
 				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Mac user keychain");
 			}
 			return Collections.emptyList();
-		} catch(final Exception e) {
+		} catch(Exception e) {
 			LOGGER.warn("Exception when trying to install certificate in Mac user keychain", e);
 			return Arrays.asList(new InitializationMessage(
 					MessageType.CONFIRMATION,
@@ -313,6 +319,14 @@ public class HttpsPlugin implements NexuPlugin {
 					e
 				)
 			);
+		} finally {
+			if(tempFilePath != null) {
+				try {
+					Files.delete(tempFilePath);
+				} catch (IOException e) {
+					LOGGER.error("IOException when deleting " + tempFilePath.toString() + ": " + e.getMessage(), e);
+				}
+			}
 		}
 	}
 }
