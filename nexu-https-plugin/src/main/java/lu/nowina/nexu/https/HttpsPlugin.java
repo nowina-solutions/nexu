@@ -132,6 +132,10 @@ public class HttpsPlugin implements NexuPlugin {
 			messages.addAll(installCaCertInFirefoxForWindows(api, caCert, resourceBundle, baseResourceBundle));
 			messages.addAll(installCaCertInWindowsStore(api, caCert, resourceBundle, baseResourceBundle));
 			break;
+		case MACOSX:
+			messages.addAll(installCaCertInFirefoxForMac(api, caCert, resourceBundle, baseResourceBundle));
+			messages.addAll(installCaCertInMacUserKeychain(api, caCert, resourceBundle, baseResourceBundle));
+			break;
 		default:
 			LOGGER.warn("Automatic installation of CA certficate is not yet supported for " + envInfo.getOs());
 		}
@@ -139,9 +143,7 @@ public class HttpsPlugin implements NexuPlugin {
 	}
 	
 	/**
-	 * Install the CA Cert in Firefox for Windows
-	 * 
-	 * @param caCert
+	 * Install the CA Cert in Firefox for Windows.
 	 */
 	private List<InitializationMessage> installCaCertInFirefoxForWindows(final NexuAPI api, final File caCert, final ResourceBundle resourceBundle, final ResourceBundle baseResourceBundle) {
 		Path tempDirPath = null;
@@ -191,8 +193,56 @@ public class HttpsPlugin implements NexuPlugin {
 	}
 
 	/**
+	 * Install the CA Cert in Firefox for Mac.
+	 */
+	private List<InitializationMessage> installCaCertInFirefoxForMac(final NexuAPI api, final File caCert,
+			final ResourceBundle resourceBundle, final ResourceBundle baseResourceBundle) {
+		Path tempDirPath = null;
+		try {
+			// 1. Copy and unzip firefox_add-certs-mac-1.0.zip
+			tempDirPath = Files.createTempDirectory("NexU-Firefox-Add_certs");
+			final File tempDirFile = tempDirPath.toFile();
+			final File zipFile = new File(tempDirFile, "firefox_add-certs-mac-1.0.zip");
+			FileUtils.copyURLToFile(this.getClass().getResource("/firefox_add-certs-mac-1.0.zip"), zipFile);
+			new ZipFile(zipFile).extractAll(tempDirPath.toString());
+			
+			// 2. Run add_certs.sh
+			final ProcessBuilder pb = new ProcessBuilder("/bin/bash", "add_certs.sh", api.getAppConfig().getApplicationName(),
+					caCert.getAbsolutePath());
+			pb.directory(new File(tempDirFile.getAbsolutePath() + File.separator +
+					"firefox_add-certs-mac-1.0" + File.separator + "bin"));
+			final Process p = pb.start();
+			if(!p.waitFor(180, TimeUnit.SECONDS)) {
+				throw new NexuException("Timeout occurred when trying to install CA certificate in Firefox");
+			}
+			if(p.exitValue() != 0) {
+				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Firefox");
+			}
+			return Collections.emptyList();
+		} catch(Exception e) {
+			LOGGER.warn("Exception when trying to install certificate in Firefox", e);
+			return Arrays.asList(new InitializationMessage(
+					MessageType.CONFIRMATION,
+					resourceBundle.getString("warn.install.cert.title"),
+					MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "FireFox"),
+					baseResourceBundle.getString("provide.feedback"),
+					true,
+					e
+				)
+			);
+		} finally {
+			if(tempDirPath != null) {
+				try {
+					FileUtils.deleteDirectory(tempDirPath.toFile());
+				} catch (IOException e) {
+					LOGGER.error("IOException when deleting " + tempDirPath.toString() + ": " + e.getMessage(), e);
+				}
+			}
+		}
+	}
+	
+	/**
 	 * Installs the CA certificate in Windows Store (used by Chrome, IE and Edge amongst others).
-	 * @param caCert The certificate to install.
 	 */
 	private List<InitializationMessage> installCaCertInWindowsStore(final NexuAPI api, final File caCert, final ResourceBundle resourceBundle, final ResourceBundle baseResourceBundle) {
 		try (
@@ -227,6 +277,37 @@ public class HttpsPlugin implements NexuPlugin {
 					MessageType.CONFIRMATION,
 					resourceBundle.getString("warn.install.cert.title"),
 					MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "Windows Store"),
+					baseResourceBundle.getString("provide.feedback"),
+					true,
+					e
+				)
+			);
+		}
+	}
+	
+	/**
+	 * Installs the CA certificate in Mac user keychain (used by Safari amongst others).
+	 */
+	private List<InitializationMessage> installCaCertInMacUserKeychain(final NexuAPI api, final File caCert,
+			final ResourceBundle resourceBundle, final ResourceBundle baseResourceBundle) {
+		final ProcessBuilder pb = new ProcessBuilder("/bin/bash", "-c",
+				"security add-certificate " + caCert.getAbsolutePath() +
+				"; security add-trusted-cert -p ssl " + caCert.getAbsolutePath());
+		try {
+			final Process p = pb.start();
+			if(!p.waitFor(180, TimeUnit.SECONDS)) {
+				throw new NexuException("Timeout occurred when trying to install CA certificate in Mac user keychain");
+			}
+			if(p.exitValue() != 0) {
+				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Mac user keychain");
+			}
+			return Collections.emptyList();
+		} catch(final Exception e) {
+			LOGGER.warn("Exception when trying to install certificate in Mac user keychain", e);
+			return Arrays.asList(new InitializationMessage(
+					MessageType.CONFIRMATION,
+					resourceBundle.getString("warn.install.cert.title"),
+					MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "Mac user keychain"),
 					baseResourceBundle.getString("provide.feedback"),
 					true,
 					e
