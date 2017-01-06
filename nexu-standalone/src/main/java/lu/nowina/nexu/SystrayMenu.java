@@ -44,7 +44,7 @@ public class SystrayMenu {
 			final PopupMenu popup = new PopupMenu();
 			
 			final MenuItem aboutItem = new MenuItem(resources.getString("systray.menu.about"));
-			aboutItem.addActionListener((l) -> about(operationFactory, api, webLoader));
+			aboutItem.addActionListener((l) -> about(operationFactory, api, webLoader, resources));
 			popup.add(aboutItem);
 			
 			final MenuItem preferencesItem = new MenuItem(resources.getString("systray.menu.preferences"));
@@ -75,9 +75,11 @@ public class SystrayMenu {
 		}
 	}
 	
-	private void about(final OperationFactory operationFactory, final NexuAPI api, final DatabaseWebLoader webLoader) {
+	private void about(final OperationFactory operationFactory, final NexuAPI api, final DatabaseWebLoader webLoader,
+			final ResourceBundle resources) {
 		operationFactory.getOperation(NonBlockingUIOperation.class, "/fxml/about.fxml",
-				api.getAppConfig().getApplicationName(), api.getAppConfig().getApplicationVersion(), webLoader).perform();
+				api.getAppConfig().getApplicationName(), api.getAppConfig().getApplicationVersion(), webLoader,
+				resources).perform();
 	}
 	
 	private void preferences(final OperationFactory operationFactory, final NexuAPI api, final UserPreferences prefs) {
