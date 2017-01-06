@@ -59,6 +59,6 @@ public class AboutController extends AbstractUIOperationController<Void> impleme
 		final ResourceBundle resources = (ResourceBundle) params[3];
 		final String digest = loader.digestDatabase();
 		dbVersion.setText(digest != null ? digest : resources.getString("about.no.database"));
-		dbFile.setText(loader.getDatabaseFile().getAbsolutePath());
+		dbFile.setText(digest != null ? loader.getDatabaseFile().getAbsolutePath() : resources.getString("about.no.database"));
 	}
 }
