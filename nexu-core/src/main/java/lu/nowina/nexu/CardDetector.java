@@ -18,6 +18,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -101,7 +102,7 @@ public class CardDetector {
 			return cardTerminals.list();
 		} catch(final CardException e) {
 			final Throwable cause = e.getCause();
-			if((cause != null) && ("SCARD_E_SERVICE_STOPPED".equals(cause.getMessage())) && !cardTerminalsCreated) {
+			if((cause != null) && "SCARD_E_SERVICE_STOPPED".equals(cause.getMessage()) && !cardTerminalsCreated) {
 				logger.debug("Service stopped. Re-establish a new connection.");
 				try {
 					closeCardTerminals();
@@ -115,6 +116,8 @@ public class CardDetector {
 				}
 				this.cardTerminals = null;
 				return getCardTerminals();
+			} else if((cause != null) && "SCARD_E_NO_READERS_AVAILABLE".equals(cause.getMessage())) {
+				return Collections.emptyList();
 			} else {
 				throw new RuntimeException(e);
 			}
