@@ -71,7 +71,7 @@ public class HttpsPlugin implements NexuPlugin {
 		File keyStoreFile = new File(nexuHome, "keystore.jks");
 		final File caCert;
 		if (!keyStoreFile.exists()) {
-			caCert = createKeystore(nexuHome);
+			caCert = createKeystore(nexuHome, api.getAppConfig().getApplicationName());
 		} else {
 			caCert = getKeystore(nexuHome);
 		}
@@ -85,7 +85,7 @@ public class HttpsPlugin implements NexuPlugin {
 	 * 
 	 * @return A file containing the CA cert of the keystore
 	 */
-	File createKeystore(File nexuHome) {
+	File createKeystore(final File nexuHome, final String applicationName) {
 
 		try {
 			File keyStoreFile = new File(nexuHome, "keystore.jks");
@@ -99,7 +99,8 @@ public class HttpsPlugin implements NexuPlugin {
 			cal.add(Calendar.YEAR, 10);
 			Date notAfter = cal.getTime();
 
-			X509Certificate cert = pki.generateSelfSignedCertificate(pair.getPrivate(), pair.getPublic(), notBefore, notAfter, "cn=localhost, O=Nexu, C=LU");
+			X509Certificate cert = pki.generateSelfSignedCertificate(pair.getPrivate(), pair.getPublic(),
+					notBefore, notAfter, "cn=localhost, O=" + applicationName + ", C=LU");
 
 			KeyStore keyStore = KeyStore.getInstance("JKS");
 			keyStore.load(null, null);
