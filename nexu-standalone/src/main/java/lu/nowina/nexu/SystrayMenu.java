@@ -38,7 +38,7 @@ public class SystrayMenu {
 		final ResourceBundle resources = ResourceBundle.getBundle("bundles/nexu");
 
 		final List<SystrayMenuItem> extensionSystrayMenuItems = api.getExtensionSystrayMenuItems();
-		final SystrayMenuItem[] systrayMenuItems = new SystrayMenuItem[extensionSystrayMenuItems.size() + 3];
+		final SystrayMenuItem[] systrayMenuItems = new SystrayMenuItem[extensionSystrayMenuItems.size() + 2];
 
 		systrayMenuItems[0] = createAboutSystrayMenuItem(operationFactory, api, webLoader, resources);
 		systrayMenuItems[1] = createPreferencesSystrayMenuItem(operationFactory, api, prefs, resources);
@@ -48,7 +48,7 @@ public class SystrayMenu {
 			systrayMenuItems[i++] = systrayMenuItem;
 		}
 
-		systrayMenuItems[i] = createExitSystrayMenuItem(resources);
+		final SystrayMenuItem exitMenuItem = createExitSystrayMenuItem(resources);
 
 		final String tooltip = api.getAppConfig().getApplicationName();
 		final URL trayIconURL = this.getClass().getResource("/tray-icon.png");
@@ -59,13 +59,13 @@ public class SystrayMenu {
 				// Use reflection to avoid wrong initialization issues
 				Class.forName("lu.nowina.nexu.systray.AWTSystrayMenuInitializer")
 					.asSubclass(SystrayMenuInitializer.class).newInstance()
-					.init(tooltip, trayIconURL, operationFactory, systrayMenuItems);
+					.init(tooltip, trayIconURL, operationFactory, exitMenuItem, systrayMenuItems);
 				break;
 			case LINUX:
 				// Use reflection to avoid wrong initialization issues
 				Class.forName("lu.nowina.nexu.systray.DorkboxSystrayMenuInitializer")
 					.asSubclass(SystrayMenuInitializer.class).newInstance()
-					.init(tooltip, trayIconURL, operationFactory, systrayMenuItems);
+					.init(tooltip, trayIconURL, operationFactory, exitMenuItem, systrayMenuItems);
 				break;
 			case NOT_RECOGNIZED:
 				LOGGER.warn("System tray is currently not supported for NOT_RECOGNIZED OS.");

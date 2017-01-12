@@ -40,7 +40,7 @@ public class DorkboxSystrayMenuInitializer implements SystrayMenuInitializer {
 
 	@Override
 	public void init(final String tooltip, final URL trayIconURL, final OperationFactory operationFactory,
-			final SystrayMenuItem... systrayMenuItems) {
+			final SystrayMenuItem exitMenuItem, final SystrayMenuItem... systrayMenuItems) {
 		final SystemTray systemTray = SystemTray.getNative();
 		if (systemTray == null) {
 			LOGGER.warn("System tray is currently not supported.");
@@ -54,6 +54,9 @@ public class DorkboxSystrayMenuInitializer implements SystrayMenuInitializer {
 			menu.add(new MenuItem(systrayMenuItem.getLabel(),
 					(e) -> systrayMenuItem.getFutureOperationInvocation().call(operationFactory)));
 		}
+		
+		menu.add(new MenuItem(exitMenuItem.getLabel(),
+				(e) -> exitMenuItem.getFutureOperationInvocation().call(operationFactory)));
 	}
 
 }

@@ -31,9 +31,10 @@ public interface SystrayMenuInitializer {
      * @param tooltip The tooltip to show (if supported).
      * @param trayIconURL The URL for the tray icon.
      * @param operationFactory The {@link OperationFactory}.
+     * @param exitMenuItem The systray menu item for exit.
      * @param systrayMenuItems Systray menu items.
      */
     void init(final String tooltip, final URL trayIconURL, final OperationFactory operationFactory,
-    		final SystrayMenuItem... systrayMenuItems);
+    		final SystrayMenuItem exitMenuItem, final SystrayMenuItem... systrayMenuItems);
     
 }

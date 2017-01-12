@@ -43,7 +43,7 @@ public class AWTSystrayMenuInitializer implements SystrayMenuInitializer {
 	
 	@Override
 	public void init(final String tooltip, final URL trayIconURL, final OperationFactory operationFactory,
-			final SystrayMenuItem... systrayMenuItems) {
+			final SystrayMenuItem exitMenuItem, final SystrayMenuItem... systrayMenuItems) {
 		if (SystemTray.isSupported()) {
 			final PopupMenu popup = new PopupMenu();
 			
@@ -57,6 +57,10 @@ public class AWTSystrayMenuInitializer implements SystrayMenuInitializer {
 			final TrayIcon trayIcon = new TrayIcon(image, tooltip, popup);
 			trayIcon.setImageAutoSize(true);
 			
+			final MenuItem mi = new MenuItem(exitMenuItem.getLabel());
+			mi.addActionListener((l) -> exit(operationFactory, exitMenuItem, trayIcon));
+			popup.add(mi);
+			
 			try {
 				SystemTray.getSystemTray().add(trayIcon);
 			} catch (final AWTException e) {
@@ -67,4 +71,9 @@ public class AWTSystrayMenuInitializer implements SystrayMenuInitializer {
 		}
 	}
 
+	private void exit(final OperationFactory operationFactory, final SystrayMenuItem exitMenuItem,
+			final TrayIcon trayIcon) {
+		SystemTray.getSystemTray().remove(trayIcon);
+		exitMenuItem.getFutureOperationInvocation().call(operationFactory);
+	}
 }
