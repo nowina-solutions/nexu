@@ -138,8 +138,14 @@ public class HttpsPlugin implements NexuPlugin {
 			messages.addAll(installCaCertInFirefoxForMac(api, caCert, resourceBundle, baseResourceBundle));
 			messages.addAll(installCaCertInMacUserKeychain(api, caCert, resourceBundle, baseResourceBundle));
 			break;
+		case LINUX:
+			messages.addAll(installCaCertInLinuxFFChromeStores(api, caCert, resourceBundle, baseResourceBundle));
+			break;
+		case NOT_RECOGNIZED:
+			LOGGER.warn("Automatic installation of CA certficate is not yet supported for NOT_RECOGNIZED.");
+			break;
 		default:
-			LOGGER.warn("Automatic installation of CA certficate is not yet supported for " + envInfo.getOs());
+			throw new IllegalArgumentException("Unhandled value: " + envInfo.getOs());
 		}
 		return messages;
 	}
@@ -323,6 +329,53 @@ public class HttpsPlugin implements NexuPlugin {
 					MessageType.CONFIRMATION,
 					resourceBundle.getString("warn.install.cert.title"),
 					MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "Mac user keychain"),
+					baseResourceBundle.getString("provide.feedback"),
+					true,
+					e
+				)
+			);
+		} finally {
+			if(tempFilePath != null) {
+				try {
+					Files.delete(tempFilePath);
+				} catch (IOException e) {
+					LOGGER.error("IOException when deleting " + tempFilePath.toString() + ": " + e.getMessage(), e);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Installs the CA certificate in Linux FF and Chrome/Chromium stores.
+	 */
+	private List<InitializationMessage> installCaCertInLinuxFFChromeStores(final NexuAPI api, final File caCert,
+			final ResourceBundle resourceBundle, final ResourceBundle baseResourceBundle) {
+		Path tempFilePath = null;
+		try {
+			// 1. Copy linux_add-certs.sh
+			tempFilePath = Files.createTempFile("linux_add-certs.sh", "sh");
+			final File tempFile = tempFilePath.toFile();
+			FileUtils.copyURLToFile(this.getClass().getResource("/linux_add-certs.sh"), tempFile);
+			
+			// 2. Run linux_add-certs.sh
+			final ProcessBuilder pb = new ProcessBuilder("/bin/bash", tempFile.getAbsolutePath(),
+					api.getAppConfig().getApplicationName(), caCert.getAbsolutePath());
+			pb.redirectErrorStream(true);
+			final Process p = pb.start();
+			if(!p.waitFor(180, TimeUnit.SECONDS)) {
+				throw new NexuException("Timeout occurred when trying to install CA certificate in Linux FF and Chrome/Chromium stores.");
+			}
+			if(p.exitValue() != 0) {
+				final String output = IOUtils.toString(p.getInputStream());
+				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Linux FF and Chrome/Chromium stores. Output: " + output);
+			}
+			return Collections.emptyList();
+		} catch(Exception e) {
+			LOGGER.warn("Exception when trying to install certificate in Linux FF and Chrome/Chromium stores", e);
+			return Arrays.asList(new InitializationMessage(
+					MessageType.CONFIRMATION,
+					resourceBundle.getString("warn.install.cert.title"),
+					MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "Linux Firefox & Chrome/Chromium stores"),
 					baseResourceBundle.getString("provide.feedback"),
 					true,
 					e
