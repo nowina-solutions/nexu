@@ -37,6 +37,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,12 +164,15 @@ public class HttpsPlugin implements NexuPlugin {
 			FileUtils.copyFile(caCert, new File(caCertDestDir, caCert.getName()));
 			
 			// 3. Run add-certs.cmd
-			final Process p = Runtime.getRuntime().exec(unzippedFolder + File.separator + "add-certs.cmd");
+			final ProcessBuilder pb = new ProcessBuilder(unzippedFolder + File.separator + "add-certs.cmd");
+			pb.redirectErrorStream(true);
+			final Process p = pb.start();
 			if(!p.waitFor(180, TimeUnit.SECONDS)) {
 				throw new NexuException("Timeout occurred when trying to install CA certificate in Firefox");
 			}
 			if(p.exitValue() != 0) {
-				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Firefox");
+				final String output = IOUtils.toString(p.getInputStream());
+				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Firefox. Output: " + output);
 			}
 			return Collections.emptyList();
 		} catch(Exception e) {
@@ -212,12 +216,14 @@ public class HttpsPlugin implements NexuPlugin {
 					caCert.getAbsolutePath());
 			pb.directory(new File(tempDirFile.getAbsolutePath() + File.separator +
 					"firefox_add-certs-mac-1.0" + File.separator + "bin"));
+			pb.redirectErrorStream(true);
 			final Process p = pb.start();
 			if(!p.waitFor(180, TimeUnit.SECONDS)) {
 				throw new NexuException("Timeout occurred when trying to install CA certificate in Firefox");
 			}
 			if(p.exitValue() != 0) {
-				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Firefox");
+				final String output = IOUtils.toString(p.getInputStream());
+				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Firefox. Output: " + output);
 			}
 			return Collections.emptyList();
 		} catch(Exception e) {
@@ -301,12 +307,14 @@ public class HttpsPlugin implements NexuPlugin {
 			// 2. Run mac_user_keychain_add-certs.sh
 			final ProcessBuilder pb = new ProcessBuilder("/bin/bash", tempFile.getAbsolutePath(),
 					caCert.getAbsolutePath());
+			pb.redirectErrorStream(true);
 			final Process p = pb.start();
 			if(!p.waitFor(180, TimeUnit.SECONDS)) {
 				throw new NexuException("Timeout occurred when trying to install CA certificate in Mac user keychain");
 			}
 			if(p.exitValue() != 0) {
-				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Mac user keychain");
+				final String output = IOUtils.toString(p.getInputStream());
+				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Mac user keychain. Output: " + output);
 			}
 			return Collections.emptyList();
 		} catch(Exception e) {

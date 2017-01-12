@@ -28,7 +28,9 @@ import java.util.Date;
 import java.util.Random;
 
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
@@ -75,8 +77,12 @@ public class PKIManager {
 				membersKeyInfo);
 
 		/* Add Key Usage */
-		KeyUsage keyUsage = new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign | KeyUsage.cRLSign);
+		KeyUsage keyUsage = new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign | KeyUsage.cRLSign | KeyUsage.keyEncipherment);
 		certBuilder.addExtension(Extension.keyUsage, true, keyUsage);
+		
+		final ExtendedKeyUsage extendedKeyUsage = new ExtendedKeyUsage(new KeyPurposeId[]{
+				KeyPurposeId.id_kp_clientAuth, KeyPurposeId.id_kp_serverAuth});
+		certBuilder.addExtension(Extension.extendedKeyUsage, false, extendedKeyUsage);
 
 		X509CertificateHolder membersCert = certBuilder.build(rootSigner);
 		return membersCert;
