@@ -64,8 +64,6 @@
             <groupId>com.dorkbox</groupId>
             <artifactId>SystemTray</artifactId>
             <version>3.0.RC6</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/lib/SystemTray-3.0.RC6.jar</systemPath>
         </dependency>
 	</dependencies>
 
