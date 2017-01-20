@@ -67,6 +67,7 @@ public class ManageKeystoresController extends AbstractUIOperationController<Voi
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		keystoresTable.setPlaceholder(new Label(resources.getString("table.view.no.content")));
 		keystoresTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 		keystoreNameTableColumn.setCellValueFactory((param) -> {
 			final String url = param.getValue().getUrl();
