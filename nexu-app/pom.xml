@@ -12,16 +12,19 @@
 			<groupId>lu.nowina.apps</groupId>
 			<artifactId>nexu-standalone</artifactId>
 			<version>${project.version}</version>
+            <scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
 			<artifactId>nexu-rest-plugin</artifactId>
 			<version>${project.version}</version>
+            <scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
 			<artifactId>nexu-https-plugin</artifactId>
 			<version>${project.version}</version>
+            <scope>runtime</scope>
 		</dependency>
 	</dependencies>
 
