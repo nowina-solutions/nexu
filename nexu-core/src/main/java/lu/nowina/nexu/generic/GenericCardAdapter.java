@@ -45,6 +45,16 @@ public class GenericCardAdapter extends AbstractCardProductAdapter {
 	}
 
 	@Override
+	protected String getLabel(NexuAPI api, DetectedCard card, PasswordInputCallback callback) {
+		return card.getLabel();
+	}
+
+	@Override
+	protected String getLabel(NexuAPI api, DetectedCard card, PasswordInputCallback callback, MessageDisplayCallback messageCallback) {
+		throw new IllegalStateException("This product adapter does not support message display callback.");
+	}
+
+	@Override
 	protected boolean supportMessageDisplayCallback(DetectedCard card) {
 		return false;
 	}

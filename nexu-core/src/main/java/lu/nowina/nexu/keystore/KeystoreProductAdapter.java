@@ -66,6 +66,16 @@ public class KeystoreProductAdapter implements ProductAdapter {
 	}
 
 	@Override
+	public String getLabel(NexuAPI api, Product product, PasswordInputCallback callback) {
+		return product.getLabel();
+	}
+
+	@Override
+	public String getLabel(NexuAPI api, Product product, PasswordInputCallback callback, MessageDisplayCallback messageCallback) {
+		throw new IllegalStateException("This product adapter does not support message display callback.");
+	}
+
+	@Override
 	public boolean supportMessageDisplayCallback(Product product) {
 		return false;
 	}

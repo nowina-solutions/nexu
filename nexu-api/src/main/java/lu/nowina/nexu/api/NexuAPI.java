@@ -57,4 +57,6 @@ public interface NexuAPI {
 	AppConfig getAppConfig();
 	
 	HttpPlugin getHttpPlugin(String pluginId);
+	
+	String getLabel(Product p);
 }

@@ -317,4 +317,19 @@ public class InternalAPI implements NexuAPI {
 		}
 		return result;
 	}
+
+	@Override
+	public String getLabel(Product p) {
+		final List<Match> matches = this.matchingProductAdapters(p);
+		if(matches.isEmpty()) {
+			return p.getLabel();
+		} else {
+			final ProductAdapter adapter = matches.iterator().next().getAdapter();
+			if(adapter.supportMessageDisplayCallback(p)) {
+				return adapter.getLabel(this, p, display.getPasswordInputCallback(), display.getMessageDisplayCallback());
+			} else {
+				return adapter.getLabel(this, p, display.getPasswordInputCallback());
+			}
+		}
+	}
 }

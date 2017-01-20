@@ -37,6 +37,25 @@ public interface ProductAdapter {
 	boolean accept(Product product);
 
 	/**
+	 * Returns a label for the given <code>product</code>.
+	 * @param api The unique instance of {@link NexuAPI}.
+	 * @param product The target product.
+	 * @param callback Password input callback.
+	 * @return A label for the given <code>product</code>.
+	 */
+	String getLabel(NexuAPI api, Product product, PasswordInputCallback callback);
+	
+	/**
+	 * Returns a label for the given <code>product</code>.
+	 * @param api The unique instance of {@link NexuAPI}.
+	 * @param product The target product.
+	 * @param callback Password input callback.
+	 * @param messageCallback Message display callback.
+	 * @return A label for the given <code>product</code>.
+	 */
+	String getLabel(NexuAPI api, Product product, PasswordInputCallback callback, MessageDisplayCallback messageCallback);
+	
+	/**
 	 * Returns <code>true</code> if this product adapter supports {@link MessageDisplayCallback} for the given <code>product</code>.
 	 * @return <code>true</code> if this product adapter supports {@link MessageDisplayCallback} for the given <code>product</code>.
 	 */
