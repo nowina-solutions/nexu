@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>lu.nowina.apps</groupId>
 	<artifactId>nexu</artifactId>
-	<version>1.9-SNAPSHOT</version>
+	<version>1.9</version>
 	<packaging>pom</packaging>
 	<name>NexU</name>
 
@@ -33,7 +33,7 @@
 
     <scm>
         <developerConnection>scm:git:https://github.com/nowina-solutions/nexu.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>nexu-1.9</tag>
     </scm>
     
 	<licenses>

@@ -3,7 +3,7 @@
   <parent>
     <groupId>lu.nowina.apps</groupId>
     <artifactId>nexu</artifactId>
-    <version>1.9-SNAPSHOT</version>
+    <version>1.9</version>
   </parent>
   <artifactId>nexu-api</artifactId>
 
