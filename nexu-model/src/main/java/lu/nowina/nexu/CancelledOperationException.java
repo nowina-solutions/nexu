@@ -11,23 +11,32 @@
  * SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
  * Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
  */
-package lu.nowina.nexu.jetty;
+package lu.nowina.nexu;
 
-import java.net.InetAddress;
+/**
+ * This exception is thrown when an operation is cancelled because
+ * of any reasons (cancelled by user, timeout, etc.).
+ *
+ * @author Jean Lepropre (jean.lepropre@nowina.lu)
+ */
+public class CancelledOperationException extends NexuException {
 
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
+	private static final long serialVersionUID = 1L;
 
-public class JettyServer extends AbstractJettyServer {
-
-	@Override
-	protected Connector[] getConnectors() {
-		final HttpConfiguration http = new HttpConfiguration();
-		final JettyListAwareServerConnector connector = new JettyListAwareServerConnector(getServer());
-		connector.addConnectionFactory(new HttpConnectionFactory(http));
-		connector.setPorts(getApi().getAppConfig().getBindingPorts());
-		connector.setHost(InetAddress.getLoopbackAddress().getCanonicalHostName());
-		return new Connector[]{connector};
+	public CancelledOperationException() {
+		super();
 	}
+
+	public CancelledOperationException(String message) {
+		super(message);
+	}
+
+	public CancelledOperationException(Throwable cause) {
+		super(cause);
+	}
+
+	public CancelledOperationException(String message, Throwable cause) {
+		super(message, cause);
+	}
+	
 }

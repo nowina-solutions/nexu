@@ -65,7 +65,9 @@ public class NexUApp extends Application {
 		
 		loader = new DatabaseWebLoader(getConfig(),
 				new HttpDataLoader(NexuLauncher.getProxyConfigurer(), getConfig().getApplicationVersion(), getConfig().isSendAnonymousInfoToProxy()));
-		loader.start();
+		if(getConfig().isEnableDatabaseWebLoader()) {
+			loader.start();
+		}
 		
 		final NexuAPI api = buildAPI(uiDisplay, operationFactory, loader);
 

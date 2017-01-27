@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>lu.nowina.apps</groupId>
 	<artifactId>nexu</artifactId>
-	<version>1.6.1</version>
+	<version>1.10-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>NexU</name>
 
@@ -28,11 +28,12 @@
 		<dss.version>4.6.0</dss.version>
         <maven.release.plugin.version>2.5.3</maven.release.plugin.version>
         <slf4j.version>1.7.12</slf4j.version>
+        <jna.version>4.2.2</jna.version>
 	</properties>
 
     <scm>
         <developerConnection>scm:git:https://github.com/nowina-solutions/nexu.git</developerConnection>
-        <tag>nexu-1.6</tag>
+        <tag>HEAD</tag>
     </scm>
     
 	<licenses>
@@ -83,6 +84,11 @@
 				<artifactId>zip4j</artifactId>
 				<version>1.3.2</version>
 			</dependency>
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna</artifactId>
+                <version>${jna.version}</version>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -111,6 +117,29 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <version>${maven.release.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.2</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>install-dorkbox</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <file>nexu-standalone/lib/SystemTray-3.0.RC6.jar</file>
+                    <sources>nexu-standalone/lib/SystemTray-3.0.RC6-sources.jar</sources>
+                    <groupId>com.dorkbox</groupId>
+                    <artifactId>SystemTray</artifactId>
+                    <version>3.0.RC6</version>
+                    <packaging>jar</packaging>
+                </configuration>
             </plugin>
         </plugins>
 		<extensions>

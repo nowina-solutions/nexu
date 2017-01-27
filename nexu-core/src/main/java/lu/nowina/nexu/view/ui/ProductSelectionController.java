@@ -28,6 +28,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.Pane;
 import lu.nowina.nexu.api.DetectedCard;
+import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
@@ -76,8 +77,10 @@ public class ProductSelectionController extends AbstractUIOperationController<Pr
 			final List<Product> products = (List<Product>) params[2];
 			final List<RadioButton> radioButtons = new ArrayList<>(cards.size() + products.size());
 			
+			final NexuAPI api = (NexuAPI) params[3];
+			
 			for(final DetectedCard card : cards) {
-				final RadioButton button = new RadioButton(card.getLabel());
+				final RadioButton button = new RadioButton(api.getLabel(card));
 				button.setToggleGroup(product);
 				button.setUserData(card);
 				button.setMnemonicParsing(false);
@@ -85,7 +88,7 @@ public class ProductSelectionController extends AbstractUIOperationController<Pr
 			}
 
 			for(final Product p : products) {
-				final RadioButton button = new RadioButton(p.getLabel());
+				final RadioButton button = new RadioButton(api.getLabel(p));
 				button.setToggleGroup(product);
 				button.setUserData(p);
 				button.setMnemonicParsing(false);

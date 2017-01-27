@@ -18,6 +18,6 @@ public class HttpsPluginTest {
 	@Test
 	public void test2() throws Exception {
 		HttpsPlugin launcher = new HttpsPlugin();
-		launcher.createKeystore(target);
+		launcher.createKeystore(target, "NexU");
 	}
 }

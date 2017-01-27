@@ -59,7 +59,7 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 		SignatureTokenConnection token = null;
 		try {
 			Object[] params = {api.getAppConfig().getApplicationName(),
-					api.detectCards(), api.detectProducts()};
+					api.detectCards(), api.detectProducts(), api};
 			Operation<Product> operation = getOperationFactory().getOperation(UIOperation.class, "/fxml/product-selection.fxml",
 					params);
 			final OperationResult<Product> selectProductOperationResult = operation.perform();

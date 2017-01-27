@@ -56,9 +56,13 @@ public class AppConfig {
 	private static final String USER_PREFERENCES_EDITABLE = "user_preferences_editable";
 	private static final String REQUEST_PROCESSOR_CLASS = "request_processor_class";
 
-	private static final String BINDING_PORTS_HTTPS = "binding_ports_https";
-	private static final String SIGNATURE_REQUEST_VALIDATOR_NONCES_CACHE_MAX_SIZE = "signature_request_validator_nonces_cache_max_size";
+	private static final String ROLLING_LOG_FILE_SIZE = "rolling_log_file_size";
+	private static final String ROLLING_LOG_FILE_NUMBER = "rolling_log_file_number";
 
+	private static final String BINDING_PORTS_HTTPS = "binding_ports_https";
+
+	private static final String ENABLE_DATABASE_WEB_LOADER = "enable_database_web_loader";
+	
 	private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
 
 	private String bindingIP;
@@ -76,17 +80,17 @@ public class AppConfig {
 	private boolean debug;
 
 	private boolean advancedModeAvailable;
-	
+
 	private String applicationName;
-	
+
 	private String applicationVersion;
-	
+
 	private int connectionsCacheMaxSize;
-	
+
 	private boolean enablePopUps;
-	
+
 	private boolean sendAnonymousInfoToProxy;
-	
+
 	private boolean useSystemProxy;
 	private String proxyServer;
 	private Integer proxyPort;
@@ -94,23 +98,25 @@ public class AppConfig {
 	private boolean proxyAuthentication;
 	private String proxyUsername;
 	private String proxyPassword;
-	
+
 	private boolean userPreferencesEditable;
-	
+
 	private String requestProcessorClass;
-	
+
 	private File nexuHome;
 
 	private List<Integer> bindingPortsHttps;
 
-	private int signatureRequestValidatorNoncesCacheMaxSize;
+	private String rollingLogMaxFileSize;
 
+	private int rollingLogMaxFileNumber;
 
-
+	private boolean enableDatabaseWebLoader;
+	
 	public AppConfig() {
 		try {
 			final URL versionResourceURL = this.getClass().getResource("/version.txt");
-			if(versionResourceURL == null) {
+			if (versionResourceURL == null) {
 				logger.error("Cannot retrieve application version: version.txt not found");
 			} else {
 				this.applicationVersion = IOUtils.toString(versionResourceURL);
@@ -120,7 +126,7 @@ public class AppConfig {
 			this.applicationVersion = "";
 		}
 	}
-	
+
 	public String getBindingIP() {
 		return bindingIP;
 	}
@@ -293,7 +299,6 @@ public class AppConfig {
 		this.requestProcessorClass = requestProcessorClass;
 	}
 
-
 	public List<Integer> getBindingPortsHttps() {
 		return bindingPortsHttps;
 	}
@@ -302,17 +307,42 @@ public class AppConfig {
 		this.bindingPortsHttps = Collections.unmodifiableList(bindingPortsHttps);
 	}
 
-	public int getSignatureRequestValidatorNoncesCacheMaxSize() {
-		return signatureRequestValidatorNoncesCacheMaxSize;
+	public String getRollingLogMaxFileSize() {
+		return rollingLogMaxFileSize;
 	}
 
-	public void setSignatureRequestValidatorNoncesCacheMaxSize(int signatureRequestValidatorNoncesCacheMaxSize) {
-		this.signatureRequestValidatorNoncesCacheMaxSize = signatureRequestValidatorNoncesCacheMaxSize;
+	/**
+	 * This method allows to set the maximum size for a log file. Expected format : 64KB, 10MB,...
+	 * 
+	 * @param rollingLogMaxFileSize
+	 */
+	public void setRollingLogMaxFileSize(String rollingLogMaxFileSize) {
+		this.rollingLogMaxFileSize = rollingLogMaxFileSize;
 	}
 
-	
+	public int getRollingLogMaxFileNumber() {
+		return rollingLogMaxFileNumber;
+	}
+
+	/**
+	 * This method allows to set the maxium number of log files to keep on the file system.
+	 * 
+	 * @param rollingLogMaxFileNumber
+	 */
+	public void setRollingLogMaxFileNumber(int rollingLogMaxFileNumber) {
+		this.rollingLogMaxFileNumber = rollingLogMaxFileNumber;
+	}
+
+	public boolean isEnableDatabaseWebLoader() {
+		return enableDatabaseWebLoader;
+	}
+
+	public void setEnableDatabaseWebLoader(boolean enableDatabaseWebLoader) {
+		this.enableDatabaseWebLoader = enableDatabaseWebLoader;
+	}
+
 	public File getNexuHome() {
-		if(nexuHome != null) {
+		if (nexuHome != null) {
 			return nexuHome;
 		}
 		final File userHome = new File(System.getProperty("user.home"));
@@ -326,7 +356,7 @@ public class AppConfig {
 			return file.mkdir() && file.canWrite() ? nexuHome = file : null;
 		}
 	}
-	
+
 	public void loadFromProperties(final Properties props) {
 		setApplicationName(props.getProperty(APPLICATION_NAME, "NexU"));
 		
@@ -334,12 +364,12 @@ public class AppConfig {
 		if(StringUtils.isNotEmpty(bindingPortsStr)) {
 			setBindingPorts(toListOfInt(bindingPortsStr));
 		}
-		
+
 		setBindingIP(props.getProperty(BINDING_IP, "127.0.0.1"));
 		setServerUrl(props.getProperty(SERVER_URL, "http://lab.nowina.solutions/nexu"));
 		setInstallUrl(props.getProperty(INSTALL_URL, "http://nowina.lu/nexu/"));
 		setNexuHostname(props.getProperty(NEXU_HOSTNAME, "localhost"));
-		setHttpServerClass(props.getProperty(HTTP_SERVER_CLASS, "lu.nowina.nexu.https.JettyHttpsServer"));
+		setHttpServerClass(props.getProperty(HTTP_SERVER_CLASS, "lu.nowina.nexu.jetty.JettyServer"));
 		setDebug(Boolean.parseBoolean(props.getProperty(DEBUG, "false")));
 		setAdvancedModeAvailable(Boolean.parseBoolean(props.getProperty(ADVANCED_MODE_AVAILABLE, "true")));
 		setConnectionsCacheMaxSize(Integer.parseInt(props.getProperty(CONNECTIONS_CACHE_MAX_SIZE, "50")));
@@ -355,28 +385,31 @@ public class AppConfig {
 		setProxyUsername(props.getProperty(PROXY_USERNAME, ""));
 		setProxyPassword(props.getProperty(PROXY_PASSWORD, ""));
 		setUserPreferencesEditable(Boolean.parseBoolean(props.getProperty(USER_PREFERENCES_EDITABLE, "true")));
-		
+
+		setRollingLogMaxFileNumber(Integer.parseInt(props.getProperty(ROLLING_LOG_FILE_NUMBER, "5")));
+		setRollingLogMaxFileSize(props.getProperty(ROLLING_LOG_FILE_SIZE, "10MB"));
+
 		setRequestProcessorClass(props.getProperty(REQUEST_PROCESSOR_CLASS, "lu.nowina.nexu.jetty.RequestProcessor"));
 
 		final String bindingPortHttpsStr = props.getProperty(BINDING_PORTS_HTTPS, "9895");
-		if(StringUtils.isNotEmpty(bindingPortHttpsStr)) {
+		if (StringUtils.isNotEmpty(bindingPortHttpsStr)) {
 			setBindingPortsHttps(toListOfInt(bindingPortHttpsStr));
 		}
-		setSignatureRequestValidatorNoncesCacheMaxSize(
-				Integer.parseInt(props.getProperty(SIGNATURE_REQUEST_VALIDATOR_NONCES_CACHE_MAX_SIZE, "500")));
+		
+		setEnableDatabaseWebLoader(Boolean.parseBoolean(props.getProperty(ENABLE_DATABASE_WEB_LOADER, "true")));
 	}
-
-
 
 	/**
 	 * Returns a list of {@link Integer} from <code>str</code> which should be
 	 * tokenized by commas.
-	 * @param str A list of strings tokenized by commas.
+	 * 
+	 * @param str
+	 *            A list of strings tokenized by commas.
 	 * @return A list of {@link Integer}.
 	 */
 	protected List<Integer> toListOfInt(String str) {
 		final List<Integer> ports = new ArrayList<Integer>();
-		for(final String port: str.split(",")) {
+		for (final String port : str.split(",")) {
 			ports.add(Integer.parseInt(port.trim()));
 		}
 		return ports;

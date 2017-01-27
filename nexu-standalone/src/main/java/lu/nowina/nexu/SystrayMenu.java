@@ -1,5 +1,5 @@
 /**
- * © Nowina Solutions, 2015-2015
+ * © Nowina Solutions, 2015-2017
  *
  * Concédée sous licence EUPL, version 1.1 ou – dès leur approbation par la Commission européenne - versions ultérieures de l’EUPL (la «Licence»).
  * Vous ne pouvez utiliser la présente œuvre que conformément à la Licence.
@@ -13,13 +13,8 @@
  */
 package lu.nowina.nexu;
 
-import java.awt.AWTException;
-import java.awt.Image;
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
-import java.awt.SystemTray;
-import java.awt.Toolkit;
-import java.awt.TrayIcon;
+import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
@@ -28,70 +23,128 @@ import org.slf4j.LoggerFactory;
 import javafx.application.Platform;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.SystrayMenuItem;
+import lu.nowina.nexu.api.flow.FutureOperationInvocation;
 import lu.nowina.nexu.api.flow.OperationFactory;
+import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.generic.DatabaseWebLoader;
+import lu.nowina.nexu.systray.SystrayMenuInitializer;
 import lu.nowina.nexu.view.core.NonBlockingUIOperation;
 
 public class SystrayMenu {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SystrayMenu.class.getName());
 
-	private final TrayIcon trayIcon;
-	
 	public SystrayMenu(OperationFactory operationFactory, DatabaseWebLoader webLoader, NexuAPI api, UserPreferences prefs) {
-		if (SystemTray.isSupported()) {
-			final ResourceBundle resources = ResourceBundle.getBundle("bundles/nexu");
-			final PopupMenu popup = new PopupMenu();
-			
-			final MenuItem aboutItem = new MenuItem(resources.getString("systray.menu.about"));
-			aboutItem.addActionListener((l) -> about(operationFactory, api, webLoader));
-			popup.add(aboutItem);
-			
-			final MenuItem preferencesItem = new MenuItem(resources.getString("systray.menu.preferences"));
-			preferencesItem.addActionListener((l) -> preferences(operationFactory, api, prefs));
-			popup.add(preferencesItem);
-			
-			for(final SystrayMenuItem menuItem : api.getExtensionSystrayMenuItems()) {
-				final MenuItem mi = new MenuItem(menuItem.getLabel());
-				mi.addActionListener((l) -> menuItem.getFutureOperationInvocation().call(operationFactory));
-				popup.add(mi);
-			}
-			
-			final MenuItem exitItem = new MenuItem(resources.getString("systray.menu.exit"));
-			exitItem.addActionListener((l) -> exit());
-			popup.add(exitItem);
+		final ResourceBundle resources = ResourceBundle.getBundle("bundles/nexu");
 
-			final Image image = Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/tray-icon.png"));
-			trayIcon = new TrayIcon(image, api.getAppConfig().getApplicationName(), popup);
-			trayIcon.setImageAutoSize(true);
-			try {
-				SystemTray.getSystemTray().add(trayIcon);
-			} catch (AWTException e) {
-				LOGGER.error("Cannot add TrayIcon", e);
+		final List<SystrayMenuItem> extensionSystrayMenuItems = api.getExtensionSystrayMenuItems();
+		final SystrayMenuItem[] systrayMenuItems = new SystrayMenuItem[extensionSystrayMenuItems.size() + 2];
+
+		systrayMenuItems[0] = createAboutSystrayMenuItem(operationFactory, api, webLoader, resources);
+		systrayMenuItems[1] = createPreferencesSystrayMenuItem(operationFactory, api, prefs, resources);
+
+		int i = 2;
+		for(final SystrayMenuItem systrayMenuItem : extensionSystrayMenuItems) {
+			systrayMenuItems[i++] = systrayMenuItem;
+		}
+
+		final SystrayMenuItem exitMenuItem = createExitSystrayMenuItem(resources);
+
+		final String tooltip = api.getAppConfig().getApplicationName();
+		final URL trayIconURL = this.getClass().getResource("/tray-icon.png");
+		try {
+			switch(api.getEnvironmentInfo().getOs()) {
+			case WINDOWS:
+			case MACOSX:
+				// Use reflection to avoid wrong initialization issues
+				Class.forName("lu.nowina.nexu.systray.AWTSystrayMenuInitializer")
+					.asSubclass(SystrayMenuInitializer.class).newInstance()
+					.init(tooltip, trayIconURL, operationFactory, exitMenuItem, systrayMenuItems);
+				break;
+			case LINUX:
+				// Use reflection to avoid wrong initialization issues
+				Class.forName("lu.nowina.nexu.systray.DorkboxSystrayMenuInitializer")
+					.asSubclass(SystrayMenuInitializer.class).newInstance()
+					.init(tooltip, trayIconURL, operationFactory, exitMenuItem, systrayMenuItems);
+				break;
+			case NOT_RECOGNIZED:
+				LOGGER.warn("System tray is currently not supported for NOT_RECOGNIZED OS.");
+				break;
+			default:
+				throw new IllegalArgumentException("Unhandled value: " + api.getEnvironmentInfo().getOs());
 			}
-		} else {
-			trayIcon = null;
-			LOGGER.error("System tray is currently not supported.");
+		} catch (InstantiationException e) {
+			LOGGER.error("Cannot initialize systray menu", e);
+		} catch (IllegalAccessException e) {
+			LOGGER.error("Cannot initialize systray menu", e);
+		} catch (ClassNotFoundException e) {
+			LOGGER.error("Cannot initialize systray menu", e);
 		}
 	}
-	
-	private void about(final OperationFactory operationFactory, final NexuAPI api, final DatabaseWebLoader webLoader) {
-		operationFactory.getOperation(NonBlockingUIOperation.class, "/fxml/about.fxml",
-				api.getAppConfig().getApplicationName(), api.getAppConfig().getApplicationVersion(), webLoader).perform();
+
+	private SystrayMenuItem createAboutSystrayMenuItem(final OperationFactory operationFactory, final NexuAPI api,
+			final DatabaseWebLoader webLoader, final ResourceBundle resources) {
+		return new SystrayMenuItem() {
+			@Override
+			public String getLabel() {
+				return resources.getString("systray.menu.about");
+			}
+			
+			@Override
+			public FutureOperationInvocation<Void> getFutureOperationInvocation() {
+				return new FutureOperationInvocation<Void>() {
+					@Override
+					public OperationResult<Void> call(OperationFactory operationFactory) {
+						return operationFactory.getOperation(NonBlockingUIOperation.class, "/fxml/about.fxml",
+								api.getAppConfig().getApplicationName(), api.getAppConfig().getApplicationVersion(),
+								webLoader, resources).perform();
+					}
+				};
+			}
+		};
 	}
-	
-	private void preferences(final OperationFactory operationFactory, final NexuAPI api, final UserPreferences prefs) {
-		final ProxyConfigurer proxyConfigurer = new ProxyConfigurer(api.getAppConfig(), prefs);
-		
-		operationFactory.getOperation(NonBlockingUIOperation.class, "/fxml/preferences.fxml",
-				proxyConfigurer, prefs, !api.getAppConfig().isUserPreferencesEditable()).perform();
+
+	private SystrayMenuItem createPreferencesSystrayMenuItem(final OperationFactory operationFactory,
+			final NexuAPI api, final UserPreferences prefs, final ResourceBundle resources) {
+		return new SystrayMenuItem() {
+			@Override
+			public String getLabel() {
+				return resources.getString("systray.menu.preferences");
+			}
+			
+			@Override
+			public FutureOperationInvocation<Void> getFutureOperationInvocation() {
+				return new FutureOperationInvocation<Void>() {
+					@Override
+					public OperationResult<Void> call(OperationFactory operationFactory) {
+						final ProxyConfigurer proxyConfigurer = new ProxyConfigurer(api.getAppConfig(), prefs);
+
+						return operationFactory.getOperation(NonBlockingUIOperation.class, "/fxml/preferences.fxml",
+								proxyConfigurer, prefs, !api.getAppConfig().isUserPreferencesEditable()).perform();
+					}
+				};
+			}
+		};
 	}
-	
-	private void exit() {
-		LOGGER.info("Exiting...");
-		if(trayIcon != null) {
-			SystemTray.getSystemTray().remove(trayIcon);
-		}
-		Platform.exit();
+
+	private SystrayMenuItem createExitSystrayMenuItem(final ResourceBundle resources) {
+		return new SystrayMenuItem() {
+			@Override
+			public String getLabel() {
+				return resources.getString("systray.menu.exit");
+			}
+			
+			@Override
+			public FutureOperationInvocation<Void> getFutureOperationInvocation() {
+				return new FutureOperationInvocation<Void>() {
+					@Override
+					public OperationResult<Void> call(OperationFactory operationFactory) {
+						LOGGER.info("Exiting...");
+						Platform.exit();
+						return new OperationResult<Void>((Void) null);
+					}
+				};
+			}
+		};
 	}
 }

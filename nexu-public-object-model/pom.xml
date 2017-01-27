@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>lu.nowina.apps</groupId>
 		<artifactId>nexu</artifactId>
-		<version>1.6.1</version>
+		<version>1.10-SNAPSHOT</version>
 	</parent>
 	<artifactId>nexu-public-object-model</artifactId>
 
 	<properties>
-	    <!-- We MUST use last beta version because of https://github.com/mapstruct/mapstruct/issues/634. -->
-		<org.mapstruct.version>1.1.0.Beta1</org.mapstruct.version>
+	    <!-- We MUST use last version because of https://github.com/mapstruct/mapstruct/issues/634. -->
+		<org.mapstruct.version>1.1.0.Final</org.mapstruct.version>
 	</properties>
 
 	<dependencies>

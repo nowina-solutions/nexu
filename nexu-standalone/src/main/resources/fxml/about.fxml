@@ -18,11 +18,15 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
-<BorderPane prefHeight="170.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.AboutController">
+<BorderPane prefHeight="170.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.AboutController">
 
 	<top>
-		<GridPane hgap="5" vgap="5" alignment="CENTER">
+		<GridPane hgap="5" vgap="5" alignment="TOP_LEFT">
+            <BorderPane.margin>
+                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </BorderPane.margin>
 			<children>
 				<Label styleClass="aboutTitle" text="%about.header" wrapText="true"
 					GridPane.columnIndex="0" GridPane.rowIndex="0" fx:id="aboutTitle"/>

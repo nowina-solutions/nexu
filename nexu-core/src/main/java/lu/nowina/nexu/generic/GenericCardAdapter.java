@@ -26,6 +26,7 @@ import lu.nowina.nexu.api.AbstractCardProductAdapter;
 import lu.nowina.nexu.api.CertificateFilter;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.GetIdentityInfoResponse;
+import lu.nowina.nexu.api.MessageDisplayCallback;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.ScAPI;
 
@@ -44,23 +45,44 @@ public class GenericCardAdapter extends AbstractCardProductAdapter {
 	}
 
 	@Override
+	protected String getLabel(NexuAPI api, DetectedCard card, PasswordInputCallback callback) {
+		return card.getLabel();
+	}
+
+	@Override
+	protected String getLabel(NexuAPI api, DetectedCard card, PasswordInputCallback callback, MessageDisplayCallback messageCallback) {
+		throw new IllegalStateException("This product adapter does not support message display callback.");
+	}
+
+	@Override
+	protected boolean supportMessageDisplayCallback(DetectedCard card) {
+		return false;
+	}
+	
+	@Override
 	protected SignatureTokenConnection connect(NexuAPI api, DetectedCard card, PasswordInputCallback callback) {
 		ConnectionInfo cInfo = info.getConnectionInfo(api.getEnvironmentInfo());
 		ScAPI scApi = cInfo.getSelectedApi();
 		switch (scApi) {
 		case MSCAPI:
+			// Cannot intercept cancel and timeout for MSCAPI (too generic error).
 			return new MSCAPISignatureToken();
 		case PKCS_11:
 			String absolutePath = cInfo.getApiParam();
-			return new Pkcs11SignatureToken(absolutePath, callback, card.getTerminalIndex());
+			return new Pkcs11SignatureTokenAdapter(new Pkcs11SignatureToken(absolutePath, callback, card.getTerminalIndex()));
 		case MOCCA:
-			MOCCASignatureTokenConnection mocca = new MOCCASignatureTokenConnection(callback);
-			return mocca;
+			return new MOCCASignatureTokenConnectionAdapter(new MOCCASignatureTokenConnection(callback), api, card);
 		default:
 			throw new RuntimeException("API not supported");
 		}
 	}
 
+	@Override
+	protected SignatureTokenConnection connect(NexuAPI api, DetectedCard card, PasswordInputCallback callback,
+			MessageDisplayCallback messageCallback) {
+		throw new IllegalStateException("This product adapter does not support message display callback.");
+	}
+	
 	@Override
 	protected boolean canReturnIdentityInfo(DetectedCard card) {
 		return false;

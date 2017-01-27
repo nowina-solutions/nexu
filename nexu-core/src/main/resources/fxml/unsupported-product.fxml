@@ -19,7 +19,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane id="AnchorPane" prefHeight="270.0" prefWidth="300.0" styleClass="unsupported-product" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.UnsupportedProductController">
+<BorderPane id="AnchorPane" prefHeight="325.0" prefWidth="300.0" styleClass="unsupported-product" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.UnsupportedProductController">
 
 	<center>
 		<VBox BorderPane.alignment="CENTER">

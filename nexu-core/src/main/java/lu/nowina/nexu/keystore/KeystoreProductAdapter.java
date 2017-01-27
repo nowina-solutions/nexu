@@ -35,6 +35,7 @@ import lu.nowina.nexu.ProductDatabaseLoader;
 import lu.nowina.nexu.api.CertificateFilter;
 import lu.nowina.nexu.api.ConfiguredKeystore;
 import lu.nowina.nexu.api.GetIdentityInfoResponse;
+import lu.nowina.nexu.api.MessageDisplayCallback;
 import lu.nowina.nexu.api.NewKeystore;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.Product;
@@ -65,12 +66,32 @@ public class KeystoreProductAdapter implements ProductAdapter {
 	}
 
 	@Override
+	public String getLabel(NexuAPI api, Product product, PasswordInputCallback callback) {
+		return product.getLabel();
+	}
+
+	@Override
+	public String getLabel(NexuAPI api, Product product, PasswordInputCallback callback, MessageDisplayCallback messageCallback) {
+		throw new IllegalStateException("This product adapter does not support message display callback.");
+	}
+
+	@Override
+	public boolean supportMessageDisplayCallback(Product product) {
+		return false;
+	}
+
+	@Override
 	public SignatureTokenConnection connect(NexuAPI api, Product product, PasswordInputCallback callback) {
 		if (product instanceof NewKeystore) {
 			throw new IllegalArgumentException("Given product was not configured!");
 		}
 		final ConfiguredKeystore configuredKeystore = (ConfiguredKeystore) product;
 		return new KeystoreTokenProxy(configuredKeystore, callback);
+	}
+
+	@Override
+	public SignatureTokenConnection connect(NexuAPI api, Product product, PasswordInputCallback callback, MessageDisplayCallback messageCallback) {
+		throw new IllegalStateException("This product adapter does not support message display callback.");
 	}
 
 	@Override
@@ -207,7 +228,9 @@ public class KeystoreProductAdapter implements ProductAdapter {
 			final SignatureTokenConnection stc = proxied;
 			// Always nullify proxied even in case of exception when calling close()
 			proxied = null;
-			stc.close();
+			if(stc != null) {
+				stc.close();
+			}
 		}
 
 		@Override

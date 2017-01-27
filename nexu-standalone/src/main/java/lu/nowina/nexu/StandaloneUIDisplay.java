@@ -25,6 +25,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import lu.nowina.nexu.api.MessageDisplayCallback;
+import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationFactory;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.view.core.ExtensionFilter;
@@ -125,13 +127,47 @@ public class StandaloneUIDisplay implements UIDisplay {
 			@SuppressWarnings("unchecked")
 			final OperationResult<char[]> passwordResult = StandaloneUIDisplay.this.operationFactory.getOperation(
 					UIOperation.class, "/fxml/password-input.fxml").perform();
-			return passwordResult.getResult();
+			if(passwordResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
+				return passwordResult.getResult();
+			} else if(passwordResult.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
+				throw new CancelledOperationException();
+			} else if(passwordResult.getStatus().equals(BasicOperationStatus.EXCEPTION)) {
+				final Exception e = passwordResult.getException();
+				if(e instanceof RuntimeException) {
+					// Throw exception as is
+					throw (RuntimeException) e;
+				} else {
+					// Wrap in a runtime exception
+					throw new NexuException(e);
+				}
+			} else {
+				throw new IllegalArgumentException("Not managed operation status: " + passwordResult.getStatus().getCode());
+			}
 		}
 	}
 
 	@Override
 	public PasswordInputCallback getPasswordInputCallback() {
 		return new FlowPasswordCallback();
+	}
+	
+	private final class FlowMessageDisplayCallback implements MessageDisplayCallback {
+		@Override
+		public void display(Message message) {
+			StandaloneUIDisplay.this.operationFactory.getOperation(
+					NonBlockingUIOperation.class, "/fxml/message.fxml",
+					"message.display.callback." + message.name().toLowerCase().replace('_', '.')).perform();
+		}
+
+		@Override
+		public void dispose() {
+			StandaloneUIDisplay.this.close(false);
+		}
+	}
+	
+	@Override
+	public MessageDisplayCallback getMessageDisplayCallback() {
+		return new FlowMessageDisplayCallback();
 	}
 
 	@Override

@@ -37,6 +37,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +72,7 @@ public class HttpsPlugin implements NexuPlugin {
 		File keyStoreFile = new File(nexuHome, "keystore.jks");
 		final File caCert;
 		if (!keyStoreFile.exists()) {
-			caCert = createKeystore(nexuHome);
+			caCert = createKeystore(nexuHome, api.getAppConfig().getApplicationName());
 		} else {
 			caCert = getKeystore(nexuHome);
 		}
@@ -85,7 +86,7 @@ public class HttpsPlugin implements NexuPlugin {
 	 * 
 	 * @return A file containing the CA cert of the keystore
 	 */
-	File createKeystore(File nexuHome) {
+	File createKeystore(final File nexuHome, final String applicationName) {
 
 		try {
 			File keyStoreFile = new File(nexuHome, "keystore.jks");
@@ -99,7 +100,8 @@ public class HttpsPlugin implements NexuPlugin {
 			cal.add(Calendar.YEAR, 10);
 			Date notAfter = cal.getTime();
 
-			X509Certificate cert = pki.generateSelfSignedCertificate(pair.getPrivate(), pair.getPublic(), notBefore, notAfter, "cn=localhost, O=Nexu, C=LU");
+			X509Certificate cert = pki.generateSelfSignedCertificate(pair.getPrivate(), pair.getPublic(),
+					notBefore, notAfter, "cn=localhost, O=" + applicationName + ", C=LU");
 
 			KeyStore keyStore = KeyStore.getInstance("JKS");
 			keyStore.load(null, null);
@@ -132,16 +134,24 @@ public class HttpsPlugin implements NexuPlugin {
 			messages.addAll(installCaCertInFirefoxForWindows(api, caCert, resourceBundle, baseResourceBundle));
 			messages.addAll(installCaCertInWindowsStore(api, caCert, resourceBundle, baseResourceBundle));
 			break;
+		case MACOSX:
+			messages.addAll(installCaCertInFirefoxForMac(api, caCert, resourceBundle, baseResourceBundle));
+			messages.addAll(installCaCertInMacUserKeychain(api, caCert, resourceBundle, baseResourceBundle));
+			break;
+		case LINUX:
+			messages.addAll(installCaCertInLinuxFFChromeStores(api, caCert, resourceBundle, baseResourceBundle));
+			break;
+		case NOT_RECOGNIZED:
+			LOGGER.warn("Automatic installation of CA certficate is not yet supported for NOT_RECOGNIZED.");
+			break;
 		default:
-			LOGGER.warn("Automatic installation of CA certficate is not yet supported for " + envInfo.getOs());
+			throw new IllegalArgumentException("Unhandled value: " + envInfo.getOs());
 		}
 		return messages;
 	}
 	
 	/**
-	 * Install the CA Cert in Firefox for Windows
-	 * 
-	 * @param caCert
+	 * Install the CA Cert in Firefox for Windows.
 	 */
 	private List<InitializationMessage> installCaCertInFirefoxForWindows(final NexuAPI api, final File caCert, final ResourceBundle resourceBundle, final ResourceBundle baseResourceBundle) {
 		Path tempDirPath = null;
@@ -160,12 +170,15 @@ public class HttpsPlugin implements NexuPlugin {
 			FileUtils.copyFile(caCert, new File(caCertDestDir, caCert.getName()));
 			
 			// 3. Run add-certs.cmd
-			final Process p = Runtime.getRuntime().exec(unzippedFolder + File.separator + "add-certs.cmd");
+			final ProcessBuilder pb = new ProcessBuilder(unzippedFolder + File.separator + "add-certs.cmd");
+			pb.redirectErrorStream(true);
+			final Process p = pb.start();
 			if(!p.waitFor(180, TimeUnit.SECONDS)) {
 				throw new NexuException("Timeout occurred when trying to install CA certificate in Firefox");
 			}
 			if(p.exitValue() != 0) {
-				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Firefox");
+				final String output = IOUtils.toString(p.getInputStream());
+				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Firefox. Output: " + output);
 			}
 			return Collections.emptyList();
 		} catch(Exception e) {
@@ -191,8 +204,58 @@ public class HttpsPlugin implements NexuPlugin {
 	}
 
 	/**
+	 * Install the CA Cert in Firefox for Mac.
+	 */
+	private List<InitializationMessage> installCaCertInFirefoxForMac(final NexuAPI api, final File caCert,
+			final ResourceBundle resourceBundle, final ResourceBundle baseResourceBundle) {
+		Path tempDirPath = null;
+		try {
+			// 1. Copy and unzip firefox_add-certs-mac-1.0.zip
+			tempDirPath = Files.createTempDirectory("NexU-Firefox-Add_certs");
+			final File tempDirFile = tempDirPath.toFile();
+			final File zipFile = new File(tempDirFile, "firefox_add-certs-mac-1.0.zip");
+			FileUtils.copyURLToFile(this.getClass().getResource("/firefox_add-certs-mac-1.0.zip"), zipFile);
+			new ZipFile(zipFile).extractAll(tempDirPath.toString());
+			
+			// 2. Run add_certs.sh
+			final ProcessBuilder pb = new ProcessBuilder("/bin/bash", "add_certs.sh", api.getAppConfig().getApplicationName(),
+					caCert.getAbsolutePath());
+			pb.directory(new File(tempDirFile.getAbsolutePath() + File.separator +
+					"firefox_add-certs-mac-1.0" + File.separator + "bin"));
+			pb.redirectErrorStream(true);
+			final Process p = pb.start();
+			if(!p.waitFor(180, TimeUnit.SECONDS)) {
+				throw new NexuException("Timeout occurred when trying to install CA certificate in Firefox");
+			}
+			if(p.exitValue() != 0) {
+				final String output = IOUtils.toString(p.getInputStream());
+				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Firefox. Output: " + output);
+			}
+			return Collections.emptyList();
+		} catch(Exception e) {
+			LOGGER.warn("Exception when trying to install certificate in Firefox", e);
+			return Arrays.asList(new InitializationMessage(
+					MessageType.CONFIRMATION,
+					resourceBundle.getString("warn.install.cert.title"),
+					MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "FireFox"),
+					baseResourceBundle.getString("provide.feedback"),
+					true,
+					e
+				)
+			);
+		} finally {
+			if(tempDirPath != null) {
+				try {
+					FileUtils.deleteDirectory(tempDirPath.toFile());
+				} catch (IOException e) {
+					LOGGER.error("IOException when deleting " + tempDirPath.toString() + ": " + e.getMessage(), e);
+				}
+			}
+		}
+	}
+	
+	/**
 	 * Installs the CA certificate in Windows Store (used by Chrome, IE and Edge amongst others).
-	 * @param caCert The certificate to install.
 	 */
 	private List<InitializationMessage> installCaCertInWindowsStore(final NexuAPI api, final File caCert, final ResourceBundle resourceBundle, final ResourceBundle baseResourceBundle) {
 		try (
@@ -232,6 +295,100 @@ public class HttpsPlugin implements NexuPlugin {
 					e
 				)
 			);
+		}
+	}
+	
+	/**
+	 * Installs the CA certificate in Mac user keychain (used by Safari amongst others).
+	 */
+	private List<InitializationMessage> installCaCertInMacUserKeychain(final NexuAPI api, final File caCert,
+			final ResourceBundle resourceBundle, final ResourceBundle baseResourceBundle) {
+		Path tempFilePath = null;
+		try {
+			// 1. Copy mac_user_keychain_add-certs.sh
+			tempFilePath = Files.createTempFile("mac_user_keychain_add-certs", "sh");
+			final File tempFile = tempFilePath.toFile();
+			FileUtils.copyURLToFile(this.getClass().getResource("/mac_user_keychain_add-certs.sh"), tempFile);
+			
+			// 2. Run mac_user_keychain_add-certs.sh
+			final ProcessBuilder pb = new ProcessBuilder("/bin/bash", tempFile.getAbsolutePath(),
+					caCert.getAbsolutePath());
+			pb.redirectErrorStream(true);
+			final Process p = pb.start();
+			if(!p.waitFor(180, TimeUnit.SECONDS)) {
+				throw new NexuException("Timeout occurred when trying to install CA certificate in Mac user keychain");
+			}
+			if(p.exitValue() != 0) {
+				final String output = IOUtils.toString(p.getInputStream());
+				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Mac user keychain. Output: " + output);
+			}
+			return Collections.emptyList();
+		} catch(Exception e) {
+			LOGGER.warn("Exception when trying to install certificate in Mac user keychain", e);
+			return Arrays.asList(new InitializationMessage(
+					MessageType.CONFIRMATION,
+					resourceBundle.getString("warn.install.cert.title"),
+					MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "Mac user keychain"),
+					baseResourceBundle.getString("provide.feedback"),
+					true,
+					e
+				)
+			);
+		} finally {
+			if(tempFilePath != null) {
+				try {
+					Files.delete(tempFilePath);
+				} catch (IOException e) {
+					LOGGER.error("IOException when deleting " + tempFilePath.toString() + ": " + e.getMessage(), e);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Installs the CA certificate in Linux FF and Chrome/Chromium stores.
+	 */
+	private List<InitializationMessage> installCaCertInLinuxFFChromeStores(final NexuAPI api, final File caCert,
+			final ResourceBundle resourceBundle, final ResourceBundle baseResourceBundle) {
+		Path tempFilePath = null;
+		try {
+			// 1. Copy linux_add-certs.sh
+			tempFilePath = Files.createTempFile("linux_add-certs.sh", "sh");
+			final File tempFile = tempFilePath.toFile();
+			FileUtils.copyURLToFile(this.getClass().getResource("/linux_add-certs.sh"), tempFile);
+			
+			// 2. Run linux_add-certs.sh
+			final ProcessBuilder pb = new ProcessBuilder("/bin/bash", tempFile.getAbsolutePath(),
+					api.getAppConfig().getApplicationName(), caCert.getAbsolutePath());
+			pb.redirectErrorStream(true);
+			final Process p = pb.start();
+			if(!p.waitFor(180, TimeUnit.SECONDS)) {
+				throw new NexuException("Timeout occurred when trying to install CA certificate in Linux FF and Chrome/Chromium stores.");
+			}
+			if(p.exitValue() != 0) {
+				final String output = IOUtils.toString(p.getInputStream());
+				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Linux FF and Chrome/Chromium stores. Output: " + output);
+			}
+			return Collections.emptyList();
+		} catch(Exception e) {
+			LOGGER.warn("Exception when trying to install certificate in Linux FF and Chrome/Chromium stores", e);
+			return Arrays.asList(new InitializationMessage(
+					MessageType.CONFIRMATION,
+					resourceBundle.getString("warn.install.cert.title"),
+					MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "Linux Firefox & Chrome/Chromium stores"),
+					baseResourceBundle.getString("provide.feedback"),
+					true,
+					e
+				)
+			);
+		} finally {
+			if(tempFilePath != null) {
+				try {
+					Files.delete(tempFilePath);
+				} catch (IOException e) {
+					LOGGER.error("IOException when deleting " + tempFilePath.toString() + ": " + e.getMessage(), e);
+				}
+			}
 		}
 	}
 }

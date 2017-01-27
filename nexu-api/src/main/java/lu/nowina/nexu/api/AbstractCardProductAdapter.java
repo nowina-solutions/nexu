@@ -39,6 +39,27 @@ public abstract class AbstractCardProductAdapter implements ProductAdapter {
 	}
 
 	protected abstract boolean accept(DetectedCard card);
+
+	@Override
+	public String getLabel(NexuAPI api, Product product, PasswordInputCallback callback) {
+		return getLabel(api, (DetectedCard) product, callback);
+	}
+
+	protected abstract String getLabel(NexuAPI api, DetectedCard card, PasswordInputCallback callback);
+
+	@Override
+	public String getLabel(NexuAPI api, Product product, PasswordInputCallback callback, MessageDisplayCallback messageCallback) {
+		return getLabel(api, (DetectedCard) product, callback, messageCallback);
+	}
+
+	protected abstract String getLabel(NexuAPI api, DetectedCard card, PasswordInputCallback callback, MessageDisplayCallback messageCallback);
+
+	@Override
+	public final boolean supportMessageDisplayCallback(Product product) {
+		return supportMessageDisplayCallback((DetectedCard) product);
+	}
+	
+	protected abstract boolean supportMessageDisplayCallback(DetectedCard product);
 	
 	@Override
 	public final SignatureTokenConnection connect(NexuAPI api, Product product, PasswordInputCallback callback) {
@@ -47,6 +68,15 @@ public abstract class AbstractCardProductAdapter implements ProductAdapter {
 
 	protected abstract SignatureTokenConnection connect(NexuAPI api, DetectedCard card, PasswordInputCallback callback);
 	
+	@Override
+	public final SignatureTokenConnection connect(NexuAPI api, Product product, PasswordInputCallback callback,
+			MessageDisplayCallback messageCallback) {
+		return connect(api, (DetectedCard) product, callback, messageCallback);
+	}
+
+	protected abstract SignatureTokenConnection connect(NexuAPI api, DetectedCard card, PasswordInputCallback callback,
+			MessageDisplayCallback messageCallback);
+
 	@Override
 	public final boolean canReturnIdentityInfo(Product product) {
 		return (product instanceof DetectedCard) && canReturnIdentityInfo((DetectedCard) product);

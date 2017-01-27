@@ -56,8 +56,9 @@ public class AboutController extends AbstractUIOperationController<Void> impleme
 		this.applicationVersion.setText(applicationVersion);
 		
 		final DatabaseWebLoader loader = (DatabaseWebLoader) params[2];
+		final ResourceBundle resources = (ResourceBundle) params[3];
 		final String digest = loader.digestDatabase();
-		dbVersion.setText(digest != null ? digest : "no_database");
-		dbFile.setText(loader.getDatabaseFile().getAbsolutePath());
+		dbVersion.setText(digest != null ? digest : resources.getString("about.no.database"));
+		dbFile.setText(digest != null ? loader.getDatabaseFile().getAbsolutePath() : resources.getString("about.no.database"));
 	}
 }
