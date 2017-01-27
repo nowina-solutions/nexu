@@ -1,19 +1,13 @@
-# Nexu
+# NexU
 
-## Build
+To fill in the gap left by the demise of Java Applets to communicate with smartcards, 
+Nowina has developed an innovative, open-source multi-browser multi-platform remote 
+signature tool called NexU.
 
-**Build requirements**
+## Overview 
 
-* WiX on Windows Platform
+http://nowina.lu/news/nexu/
 
-**Maven**
+## Demo 
 
-```
-mvn clean install
-
-```
-
-## Execute
-
-1. Start lu.nowina.nexu.NexUApp in project nexu-app.
-2. Try URL http://localhost:9876/rest/certificates
+http://labs.nowina.solutions/nexu-demo/
