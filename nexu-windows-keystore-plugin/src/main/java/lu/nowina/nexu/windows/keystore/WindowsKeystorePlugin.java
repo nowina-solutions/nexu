@@ -22,7 +22,7 @@ import lu.nowina.nexu.api.plugin.InitializationMessage;
 import lu.nowina.nexu.api.plugin.SignaturePlugin;
 
 /**
- * TODO : Plugin that registers Keystore implementation to NexU.
+ * Plugin that registers Windows Keystore implementation to NexU.
  * 
  * @author simon.ghisalberti
  *

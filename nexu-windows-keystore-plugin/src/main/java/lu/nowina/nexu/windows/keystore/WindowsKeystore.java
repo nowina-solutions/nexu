@@ -6,6 +6,12 @@ import org.apache.commons.lang.StringEscapeUtils;
 
 import lu.nowina.nexu.api.Product;
 
+/**
+ * Represents a Windows keystore.
+ * 
+ * @author simon.ghisalberti
+ *
+ */
 public class WindowsKeystore implements Product {
 
 	public WindowsKeystore() {

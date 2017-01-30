@@ -33,6 +33,8 @@ import lu.nowina.nexu.api.flow.NoOpFutureOperationInvocation;
 
 /**
  * 
+ * Product adapter for {@link WindowsKeystore}.
+ * 
  * @author simon.ghisalberti
  *
  */
