@@ -15,6 +15,11 @@ public class WindowsKeystore implements Product {
 		super();
 	}
 
+	public WindowsKeystore(String atr) {
+		super();
+		this.atr = atr;
+	}
+
 	public String getAtr() {
 		return atr;
 	}

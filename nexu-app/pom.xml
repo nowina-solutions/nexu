@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>lu.nowina.apps</groupId>
@@ -12,39 +13,45 @@
 			<groupId>lu.nowina.apps</groupId>
 			<artifactId>nexu-standalone</artifactId>
 			<version>${project.version}</version>
-            <scope>runtime</scope>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
 			<artifactId>nexu-rest-plugin</artifactId>
 			<version>${project.version}</version>
-            <scope>runtime</scope>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
 			<artifactId>nexu-https-plugin</artifactId>
 			<version>${project.version}</version>
-            <scope>runtime</scope>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>lu.nowina.apps</groupId>
+			<artifactId>nexu-windows-keystore-plugin</artifactId>
+			<version>${project.version}</version>
+			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 
 	<build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/version.txt</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>**/version.txt</exclude>
-                </excludes>
-            </resource>
-        </resources>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/version.txt</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+				<excludes>
+					<exclude>**/version.txt</exclude>
+				</excludes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -66,7 +73,8 @@
 								</filter>
 							</filters>
 							<transformers>
-								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
 									<mainClass>lu.nowina.nexu.NexuLauncher</mainClass>
 								</transformer>
 							</transformers>
