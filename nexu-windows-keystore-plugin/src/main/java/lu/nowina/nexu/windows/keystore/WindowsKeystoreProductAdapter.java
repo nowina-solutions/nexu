@@ -16,8 +16,6 @@ package lu.nowina.nexu.windows.keystore;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
 import eu.europa.esig.dss.DigestAlgorithm;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.MSCAPISignatureToken;
@@ -66,9 +64,6 @@ public class WindowsKeystoreProductAdapter implements ProductAdapter {
 
 	@Override
 	public SignatureTokenConnection connect(NexuAPI api, Product product, PasswordInputCallback callback) {
-		// MSCAPISignatureToken mscapiToken = new MSCAPISignatureToken();
-		// mscapiToken.getKeys();
-		// return mscapiToken;
 		return new MSCAPISignatureToken();
 	}
 
@@ -130,12 +125,7 @@ public class WindowsKeystoreProductAdapter implements ProductAdapter {
 	@Override
 	public List<Product> detectProducts() {
 		final List<Product> products = new ArrayList<>();
-		List<DSSPrivateKeyEntry> keys = new MSCAPISignatureToken().getKeys();
-		for (DSSPrivateKeyEntry key : keys) {
-			if (key.getCertificate() != null && !StringUtils.isEmpty(key.getCertificate().getSubjectShortName())) {
-				products.add(new WindowsKeystore(key.getCertificate().getSubjectShortName()));
-			}
-		}
+		products.add(new WindowsKeystore());
 		return products;
 	}
 
