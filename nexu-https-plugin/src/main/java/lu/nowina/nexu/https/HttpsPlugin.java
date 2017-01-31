@@ -176,7 +176,9 @@ public class HttpsPlugin implements NexuPlugin {
 			if(!p.waitFor(180, TimeUnit.SECONDS)) {
 				throw new NexuException("Timeout occurred when trying to install CA certificate in Firefox");
 			}
-			if(p.exitValue() != 0) {
+			if(p.exitValue() == 1) {
+				LOGGER.info("Mozilla Firefox not installed.");
+			} else if(p.exitValue() != 0) {
 				final String output = IOUtils.toString(p.getInputStream());
 				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Firefox. Output: " + output);
 			}
