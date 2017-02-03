@@ -11,8 +11,13 @@
 	<dependencies>
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
-			<artifactId>nexu-core</artifactId>
+			<artifactId>nexu-api</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-token</artifactId>
+			<version>${dss.version}</version>
 		</dependency>
 	</dependencies>
 
