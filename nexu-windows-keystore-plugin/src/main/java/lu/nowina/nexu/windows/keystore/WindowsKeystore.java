@@ -33,7 +33,7 @@ public class WindowsKeystore implements Product {
 
 	@Override
 	public String getLabel() {
-		return StringEscapeUtils.unescapeJava(ResourceBundle.getBundle("bundles/nexu").getString("product.selection.windows.keystore"));
+		return StringEscapeUtils.unescapeJava(ResourceBundle.getBundle("bundles/windowskeystore").getString("product.selection.windows.keystore"));
 	}
 
 }
