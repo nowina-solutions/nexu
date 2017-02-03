@@ -11,4 +11,4 @@ rem SANS GARANTIES OU CONDITIONS QUELLES QUâ€™ELLES SOIENT, expresses ou im
 rem Consultez la Licence pour les autorisations et les restrictions linguistiques speÌ�cifiques relevant de la Licence.
 
 @echo off
-start .\java\bin\javaw -jar nexu.jar
+start .\java\bin\javaw -Djavafx.preloader=lu.nowina.nexu.NexUPreLoader -Dglass.accessible.force=false -jar nexu.jar
