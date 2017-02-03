@@ -18,6 +18,7 @@
 		<module>nexu-standalone</module>
 		<module>nexu-public-object-model</module>
 		<module>nexu-https-plugin</module>
+		<module>nexu-windows-keystore-plugin</module>
 	</modules>
 
 	<properties>
