@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>lu.nowina.apps</groupId>
 	<artifactId>nexu</artifactId>
-	<version>1.11-SNAPSHOT</version>
+	<version>1.12-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>NexU</name>
 
@@ -18,6 +18,7 @@
 		<module>nexu-standalone</module>
 		<module>nexu-public-object-model</module>
 		<module>nexu-https-plugin</module>
+		<module>nexu-windows-keystore-plugin</module>
 	</modules>
 
 	<properties>

@@ -5,13 +5,7 @@
 		<artifactId>nexu</artifactId>
 		<version>1.12-SNAPSHOT</version>
 	</parent>
-	<artifactId>nexu-model</artifactId>
-
-	<properties>
-		<project.encoding>UTF-8</project.encoding>
-		<maven.compiler.source>1.7</maven.compiler.source>
-		<maven.compiler.target>1.7</maven.compiler.target>
-	</properties>
+	<artifactId>nexu-windows-keystore-plugin</artifactId>
 
 	<dependencies>
 		<dependency>
@@ -20,10 +14,14 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
+			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
+			<artifactId>dss-token</artifactId>
+			<version>${dss.version}</version>
 		</dependency>
 	</dependencies>
-	
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
 </project>
