@@ -26,7 +26,7 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<encoding>UTF-8</encoding>
 		<skip.package>false</skip.package>
-		<dss.version>4.6.0</dss.version>
+		<dss.version>5.0.RC1</dss.version>
         <maven.release.plugin.version>2.5.3</maven.release.plugin.version>
         <slf4j.version>1.7.12</slf4j.version>
         <jna.version>4.2.2</jna.version>
@@ -54,6 +54,10 @@
 			<name>Joinup</name>
 			<url>https://joinup.ec.europa.eu/nexus/content/groups/public/</url>
 		</repository>
+        <repository>
+            <id>ec.europa.eu/cefdigital</id>
+            <url>https://ec.europa.eu/cefdigital/artifact/content/groups/public/</url>
+        </repository>
 	</repositories>
 
 	<distributionManagement>
@@ -89,6 +93,21 @@
                 <groupId>net.java.dev.jna</groupId>
                 <artifactId>jna</artifactId>
                 <version>${jna.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>2.6</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>2.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.santuario</groupId>
+                <artifactId>xmlsec</artifactId>
+                <version>2.0.2</version>
             </dependency>
 		</dependencies>
 	</dependencyManagement>
