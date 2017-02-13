@@ -55,7 +55,7 @@
 			<url>https://joinup.ec.europa.eu/nexus/content/groups/public/</url>
 		</repository>
         <repository>
-            <id>ec.europa.eu/cefdigital</id>
+            <id>ec.europa.eu-cefdigital</id>
             <url>https://ec.europa.eu/cefdigital/artifact/content/groups/public/</url>
         </repository>
 	</repositories>
