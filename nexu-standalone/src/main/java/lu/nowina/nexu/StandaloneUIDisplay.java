@@ -26,6 +26,7 @@ import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import lu.nowina.nexu.api.MessageDisplayCallback;
+import lu.nowina.nexu.api.NexuPasswordInputCallback;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationFactory;
 import lu.nowina.nexu.api.flow.OperationResult;
@@ -120,13 +121,20 @@ public class StandaloneUIDisplay implements UIDisplay {
 		}
 	}
 
-	private final class FlowPasswordCallback implements PasswordInputCallback {
+	private final class FlowPasswordCallback implements NexuPasswordInputCallback {
+		
+		private String passwordPrompt;
+		
+		public FlowPasswordCallback() {
+			this.passwordPrompt = null;
+		}
+		
 		@Override
 		public char[] getPassword() {
 			LOGGER.info("Request password");
 			@SuppressWarnings("unchecked")
 			final OperationResult<char[]> passwordResult = StandaloneUIDisplay.this.operationFactory.getOperation(
-					UIOperation.class, "/fxml/password-input.fxml").perform();
+					UIOperation.class, "/fxml/password-input.fxml", passwordPrompt).perform();
 			if(passwordResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 				return passwordResult.getResult();
 			} else if(passwordResult.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
@@ -143,6 +151,11 @@ public class StandaloneUIDisplay implements UIDisplay {
 			} else {
 				throw new IllegalArgumentException("Not managed operation status: " + passwordResult.getStatus().getCode());
 			}
+		}
+
+		@Override
+		public void setPasswordPrompt(String passwordPrompt) {
+			this.passwordPrompt = passwordPrompt;
 		}
 	}
 
