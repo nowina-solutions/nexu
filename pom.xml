@@ -32,7 +32,7 @@
 	</properties>
 
     <scm>
-        <developerConnection>scm:git:https://github.com/nowina-solutions/nexu.git</developerConnection>
+        <developerConnection>scm:git:https://bitbucket.org/nowina-nexu/nexu-community.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
     
