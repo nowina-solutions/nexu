@@ -24,12 +24,14 @@ import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -74,11 +76,46 @@ public class HttpsPlugin implements NexuPlugin {
 		if (!keyStoreFile.exists()) {
 			caCert = createKeystore(nexuHome, api.getAppConfig().getApplicationName());
 		} else {
-			caCert = getKeystore(nexuHome);
+			final File testCaCert = getKeystore(nexuHome);
+			try {
+				if(!hasSubjectAltNames(testCaCert)) {
+					// Re-create key store if certificate does not have a subject alt name (NOW-122).
+					caCert = createKeystore(nexuHome, api.getAppConfig().getApplicationName());
+				} else {
+					caCert = testCaCert;
+				}
+			} catch(final IOException | CertificateException e) {
+				LOGGER.warn("Exception when trying to determine if certificate has subject alternative names", e);
+				return Arrays.asList(new InitializationMessage(
+						MessageType.CONFIRMATION,
+						resourceBundle.getString("warn.install.cert.title"),
+						MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "subjectAltNames"),
+						baseResourceBundle.getString("provide.feedback"),
+						true,
+						e
+					)
+				);
+			}
 		}
 		return installCaCert(api, caCert, resourceBundle, baseResourceBundle);
 	}
 
+	private boolean hasSubjectAltNames(final File caCert) throws IOException, CertificateException {
+		try (
+				final FileInputStream fis = new FileInputStream(caCert);
+				final BufferedInputStream bis = new BufferedInputStream(fis);
+				) {
+			final CertificateFactory cf = CertificateFactory.getInstance("X.509");
+			final X509Certificate cert = (X509Certificate) cf.generateCertificate(bis);
+			final Collection<List<?>> subjectAltNames = cert.getSubjectAlternativeNames();
+			if((subjectAltNames != null) && !subjectAltNames.isEmpty()) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+	
 	/**
 	 * Create a keystore in the directory given in parameters
 	 * 
