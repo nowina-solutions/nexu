@@ -17,6 +17,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,12 +25,14 @@ import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -74,11 +77,46 @@ public class HttpsPlugin implements NexuPlugin {
 		if (!keyStoreFile.exists()) {
 			caCert = createKeystore(nexuHome, api.getAppConfig().getApplicationName());
 		} else {
-			caCert = getKeystore(nexuHome);
+			final File testCaCert = getKeystore(nexuHome, api.getAppConfig().getApplicationName());
+			try {
+				if(!hasSubjectAltNames(testCaCert)) {
+					// Re-create key store if certificate does not have a subject alt name (NOW-122).
+					caCert = createKeystore(nexuHome, api.getAppConfig().getApplicationName());
+				} else {
+					caCert = testCaCert;
+				}
+			} catch(final IOException | CertificateException e) {
+				LOGGER.warn("Exception when trying to determine if certificate has subject alternative names", e);
+				return Arrays.asList(new InitializationMessage(
+						MessageType.CONFIRMATION,
+						resourceBundle.getString("warn.install.cert.title"),
+						MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "subjectAltNames"),
+						baseResourceBundle.getString("provide.feedback"),
+						true,
+						e
+					)
+				);
+			}
 		}
 		return installCaCert(api, caCert, resourceBundle, baseResourceBundle);
 	}
 
+	private boolean hasSubjectAltNames(final File caCert) throws IOException, CertificateException {
+		try (
+				final FileInputStream fis = new FileInputStream(caCert);
+				final BufferedInputStream bis = new BufferedInputStream(fis);
+				) {
+			final CertificateFactory cf = CertificateFactory.getInstance("X.509");
+			final X509Certificate cert = (X509Certificate) cf.generateCertificate(bis);
+			final Collection<List<?>> subjectAltNames = cert.getSubjectAlternativeNames();
+			if((subjectAltNames != null) && !subjectAltNames.isEmpty()) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+	
 	/**
 	 * Create a keystore in the directory given in parameters
 	 * 
@@ -110,7 +148,7 @@ public class HttpsPlugin implements NexuPlugin {
 			keyStore.store(output, "password".toCharArray());
 			output.close();
 
-			File caCert = new File(nexuHome, "ca-cert.crt");
+			File caCert = new File(nexuHome, applicationName + "-" + notBefore.getTime() + ".crt");
 			FileOutputStream caOutput = new FileOutputStream(caCert);
 			caOutput.write(cert.getEncoded());
 			caOutput.close();
@@ -122,8 +160,20 @@ public class HttpsPlugin implements NexuPlugin {
 
 	}
 
-	private File getKeystore(File nexuHome) {
-		return new File(nexuHome, "ca-cert.crt");
+	private File getKeystore(final File nexuHome, final String applicationName) {
+		final String[] files = nexuHome.list(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.startsWith(applicationName + "-") && name.endsWith(".crt");
+			}
+		});
+		if(files.length > 0) {
+			Arrays.sort(files);
+			return new File(nexuHome, files[files.length - 1]);
+		} else {
+			// Backward compatibility
+			return new File(nexuHome, "ca-cert.crt");
+		}
 	}
 	
 	private List<InitializationMessage> installCaCert(final NexuAPI api, final File caCert, final ResourceBundle resourceBundle, final ResourceBundle baseResourceBundle) {
@@ -220,7 +270,8 @@ public class HttpsPlugin implements NexuPlugin {
 			new ZipFile(zipFile).extractAll(tempDirPath.toString());
 			
 			// 2. Run add_certs.sh
-			final ProcessBuilder pb = new ProcessBuilder("/bin/bash", "add_certs.sh", api.getAppConfig().getApplicationName(),
+			final ProcessBuilder pb = new ProcessBuilder("/bin/bash", "add_certs.sh",
+					caCert.getName().substring(0, caCert.getName().lastIndexOf('.')),
 					caCert.getAbsolutePath());
 			pb.directory(new File(tempDirFile.getAbsolutePath() + File.separator +
 					"firefox_add-certs-mac-1.0" + File.separator + "bin"));
@@ -361,7 +412,7 @@ public class HttpsPlugin implements NexuPlugin {
 			
 			// 2. Run linux_add-certs.sh
 			final ProcessBuilder pb = new ProcessBuilder("/bin/bash", tempFile.getAbsolutePath(),
-					api.getAppConfig().getApplicationName(), caCert.getAbsolutePath());
+					caCert.getName().substring(0, caCert.getName().lastIndexOf('.')), caCert.getAbsolutePath());
 			pb.redirectErrorStream(true);
 			final Process p = pb.start();
 			if(!p.waitFor(180, TimeUnit.SECONDS)) {

@@ -30,6 +30,8 @@ import java.util.Random;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.ExtendedKeyUsage;
 import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.GeneralName;
+import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.asn1.x509.KeyPurposeId;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
@@ -76,6 +78,10 @@ public class PKIManager {
 		X509v3CertificateBuilder certBuilder = new X509v3CertificateBuilder(issuerName, membersSerial, membersNotBefore, membersNotAfter, subjectNameString,
 				membersKeyInfo);
 
+		/* Add subjectAltName */
+		final GeneralNames names = new GeneralNames(new GeneralName(GeneralName.dNSName, "localhost"));
+		certBuilder.addExtension(Extension.subjectAlternativeName, false, names);
+		
 		/* Add Key Usage */
 		KeyUsage keyUsage = new KeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign | KeyUsage.cRLSign | KeyUsage.keyEncipherment);
 		certBuilder.addExtension(Extension.keyUsage, true, keyUsage);
