@@ -17,6 +17,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -76,7 +77,7 @@ public class HttpsPlugin implements NexuPlugin {
 		if (!keyStoreFile.exists()) {
 			caCert = createKeystore(nexuHome, api.getAppConfig().getApplicationName());
 		} else {
-			final File testCaCert = getKeystore(nexuHome);
+			final File testCaCert = getKeystore(nexuHome, api.getAppConfig().getApplicationName());
 			try {
 				if(!hasSubjectAltNames(testCaCert)) {
 					// Re-create key store if certificate does not have a subject alt name (NOW-122).
@@ -147,7 +148,7 @@ public class HttpsPlugin implements NexuPlugin {
 			keyStore.store(output, "password".toCharArray());
 			output.close();
 
-			File caCert = new File(nexuHome, "ca-cert.crt");
+			File caCert = new File(nexuHome, applicationName + "-" + notBefore.getTime() + ".crt");
 			FileOutputStream caOutput = new FileOutputStream(caCert);
 			caOutput.write(cert.getEncoded());
 			caOutput.close();
@@ -159,8 +160,20 @@ public class HttpsPlugin implements NexuPlugin {
 
 	}
 
-	private File getKeystore(File nexuHome) {
-		return new File(nexuHome, "ca-cert.crt");
+	private File getKeystore(final File nexuHome, final String applicationName) {
+		final String[] files = nexuHome.list(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.startsWith(applicationName + "-") && name.endsWith(".crt");
+			}
+		});
+		if(files.length > 0) {
+			Arrays.sort(files);
+			return new File(nexuHome, files[files.length - 1]);
+		} else {
+			// Backward compatibility
+			return new File(nexuHome, "ca-cert.crt");
+		}
 	}
 	
 	private List<InitializationMessage> installCaCert(final NexuAPI api, final File caCert, final ResourceBundle resourceBundle, final ResourceBundle baseResourceBundle) {
