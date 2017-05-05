@@ -270,7 +270,8 @@ public class HttpsPlugin implements NexuPlugin {
 			new ZipFile(zipFile).extractAll(tempDirPath.toString());
 			
 			// 2. Run add_certs.sh
-			final ProcessBuilder pb = new ProcessBuilder("/bin/bash", "add_certs.sh", api.getAppConfig().getApplicationName(),
+			final ProcessBuilder pb = new ProcessBuilder("/bin/bash", "add_certs.sh",
+					caCert.getName().substring(0, caCert.getName().lastIndexOf('.')),
 					caCert.getAbsolutePath());
 			pb.directory(new File(tempDirFile.getAbsolutePath() + File.separator +
 					"firefox_add-certs-mac-1.0" + File.separator + "bin"));
