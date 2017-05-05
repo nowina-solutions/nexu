@@ -411,7 +411,7 @@ public class HttpsPlugin implements NexuPlugin {
 			
 			// 2. Run linux_add-certs.sh
 			final ProcessBuilder pb = new ProcessBuilder("/bin/bash", tempFile.getAbsolutePath(),
-					api.getAppConfig().getApplicationName(), caCert.getAbsolutePath());
+					caCert.getName().substring(0, caCert.getName().lastIndexOf('.')), caCert.getAbsolutePath());
 			pb.redirectErrorStream(true);
 			final Process p = pb.start();
 			if(!p.waitFor(180, TimeUnit.SECONDS)) {
