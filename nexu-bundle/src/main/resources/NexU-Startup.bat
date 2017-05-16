@@ -1,18 +1,14 @@
-rem © Nowina Solutions, 2015-2015
+rem Â© Nowina Solutions, 2015-2015
 rem
-rem Concédée sous licence EUPL, version 1.1 ou – dès leur approbation par la Commission européenne - versions ultérieures de l’EUPL (la «Licence»).
-rem Vous ne pouvez utiliser la présente œuvre que conformément à la Licence.
-rem Vous pouvez obtenir une copie de la Licence à l’adresse suivante:
+rem ConceÌ�deÌ�e sous licence EUPL, version 1.1 ou â€“ deÌ€s leur approbation par la Commission europeÌ�enne - versions ulteÌ�rieures de lâ€™EUPL (la Â«LicenceÂ»).
+rem Vous ne pouvez utiliser la preÌ�sente Å“uvre que conformeÌ�ment aÌ€ la Licence.
+rem Vous pouvez obtenir une copie de la Licence aÌ€ lâ€™adresse suivante:
 rem
 rem http://ec.europa.eu/idabc/eupl5
 rem
-rem Sauf obligation légale ou contractuelle écrite, le logiciel distribué sous la Licence est distribué «en l’état»,
-rem SANS GARANTIES OU CONDITIONS QUELLES QU’ELLES SOIENT, expresses ou implicites.
-rem Consultez la Licence pour les autorisations et les restrictions linguistiques spécifiques relevant de la Licence.
+rem Sauf obligation leÌ�gale ou contractuelle eÌ�crite, le logiciel distribueÌ� sous la Licence est distribueÌ� Â«en lâ€™eÌ�tatÂ»,
+rem SANS GARANTIES OU CONDITIONS QUELLES QUâ€™ELLES SOIENT, expresses ou implicites.
+rem Consultez la Licence pour les autorisations et les restrictions linguistiques speÌ�cifiques relevant de la Licence.
 
 @echo off
-
-set JRE_HOME=.\java
-set CATALINA_HOME=.\tomcat
-
-start javaw -jar nexu.jar
+start .\java\bin\javaw -Djavafx.preloader=lu.nowina.nexu.NexUPreLoader -Dglass.accessible.force=false -jar nexu.jar
