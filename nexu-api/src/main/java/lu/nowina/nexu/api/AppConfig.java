@@ -62,7 +62,9 @@ public class AppConfig {
 	private static final String BINDING_PORTS_HTTPS = "binding_ports_https";
 
 	private static final String ENABLE_DATABASE_WEB_LOADER = "enable_database_web_loader";
-	
+
+	private static final String ENABLE_SYSTRAY_MENU = "enable_systray_menu";
+
 	private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
 
 	private String bindingIP;
@@ -112,6 +114,8 @@ public class AppConfig {
 	private int rollingLogMaxFileNumber;
 
 	private boolean enableDatabaseWebLoader;
+	
+	private boolean enableSystrayMenu;
 	
 	public AppConfig() {
 		try {
@@ -341,6 +345,14 @@ public class AppConfig {
 		this.enableDatabaseWebLoader = enableDatabaseWebLoader;
 	}
 
+	public boolean isEnableSystrayMenu() {
+		return enableSystrayMenu;
+	}
+
+	public void setEnableSystrayMenu(boolean enableSystrayMenu) {
+		this.enableSystrayMenu = enableSystrayMenu;
+	}
+
 	public File getNexuHome() {
 		if (nexuHome != null) {
 			return nexuHome;
@@ -397,6 +409,7 @@ public class AppConfig {
 		}
 		
 		setEnableDatabaseWebLoader(Boolean.parseBoolean(props.getProperty(ENABLE_DATABASE_WEB_LOADER, "true")));
+		setEnableSystrayMenu(Boolean.parseBoolean(props.getProperty(ENABLE_SYSTRAY_MENU, "true")));
 	}
 
 	/**
