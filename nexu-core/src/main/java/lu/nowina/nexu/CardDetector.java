@@ -18,6 +18,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,9 @@ import lu.nowina.nexu.api.OS;
 @SuppressWarnings("restriction")
 public class CardDetector {
 
+	private static final List<String> RESET_CONTEXT_ERRORS = Arrays.asList(
+			"SCARD_E_SERVICE_STOPPED", "WINDOWS_ERROR_INVALID_HANDLE", "SCARD_E_INVALID_HANDLE");
+	
 	private static final Logger logger = LoggerFactory.getLogger(CardDetector.class.getSimpleName());
 
 	private CardTerminals cardTerminals;
@@ -102,8 +106,10 @@ public class CardDetector {
 			return cardTerminals.list();
 		} catch(final CardException e) {
 			final Throwable cause = e.getCause();
-			if((cause != null) && "SCARD_E_SERVICE_STOPPED".equals(cause.getMessage()) && !cardTerminalsCreated) {
-				logger.debug("Service stopped. Re-establish a new connection.");
+			if((cause != null) && RESET_CONTEXT_ERRORS.contains(cause.getMessage()) && !cardTerminalsCreated) {
+				logger.debug("Error class: " + cause.getClass().getName() +
+						". Message: " + cause.getMessage() +
+						". Re-establish a new connection.");
 				try {
 					closeCardTerminals();
 				} catch(final Exception e1) {

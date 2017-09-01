@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>lu.nowina.apps</groupId>
 		<artifactId>nexu</artifactId>
-		<version>1.12-SNAPSHOT</version>
+		<version>1.12</version>
 	</parent>
 	<artifactId>nexu-util</artifactId>
 
@@ -33,6 +33,11 @@
 			<artifactId>gson</artifactId>
 			<version>2.5</version>
 		</dependency>
+        <dependency>
+            <groupId>eu.europa.ec.joinup.sd-dss</groupId>
+            <artifactId>dss-utils-apache-commons</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
