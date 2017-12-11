@@ -16,7 +16,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.oracle</groupId>
-			<artifactId>jre-win32</artifactId>
+			<artifactId>jre-x86</artifactId>
 			<version>8.0.45</version>
 			<type>zip</type>
 		</dependency>

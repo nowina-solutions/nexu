@@ -45,18 +45,14 @@
 	</licenses>
 
 	<repositories>
-		<repository>
-            <id>joinup-dss-thirdparty</id>
-            <url>http://joinup.ec.europa.eu/site/sd-dss/maven2</url>
-        </repository>
-		<repository>
-			<id>joinup</id>
-			<name>Joinup</name>
-			<url>https://joinup.ec.europa.eu/nexus/content/groups/public/</url>
-		</repository>
         <repository>
             <id>ec.europa.eu-cefdigital</id>
             <url>https://ec.europa.eu/cefdigital/artifact/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>forge.nowina.lu</id>
+            <name>Internal repository</name>
+            <url>http://forge.nowina.local/nexus/content/groups/nowina/</url>
         </repository>
 	</repositories>
 
