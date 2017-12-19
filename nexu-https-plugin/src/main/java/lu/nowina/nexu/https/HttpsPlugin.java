@@ -32,7 +32,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -109,8 +108,7 @@ public class HttpsPlugin implements NexuPlugin {
 				) {
 			final CertificateFactory cf = CertificateFactory.getInstance("X.509");
 			final X509Certificate cert = (X509Certificate) cf.generateCertificate(bis);
-			final Collection<List<?>> subjectAltNames = cert.getSubjectAlternativeNames();
-			if((subjectAltNames != null) && !subjectAltNames.isEmpty() && (cert.getBasicConstraints() != -1)) {
+			if(cert.getBasicConstraints() != -1) {
 				return true;
 			} else {
 				return false;
