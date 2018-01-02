@@ -17,8 +17,8 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyPair;
@@ -32,7 +32,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -73,15 +72,16 @@ public class HttpsPlugin implements NexuPlugin {
 		LOGGER.info("Verify if keystore is ready");
 		File nexuHome = api.getAppConfig().getNexuHome();
 		File keyStoreFile = new File(nexuHome, "keystore.jks");
+		final PKIManager pki = new PKIManager();
 		final File caCert;
 		if (!keyStoreFile.exists()) {
-			caCert = createKeystore(nexuHome, api.getAppConfig().getApplicationName());
+			caCert = createRootCAKeystore(nexuHome, api.getAppConfig().getApplicationName(), pki);
 		} else {
-			final File testCaCert = getKeystore(nexuHome, api.getAppConfig().getApplicationName());
+			final File testCaCert = pki.getRootCertificate(nexuHome, api.getAppConfig().getApplicationName());
 			try {
-				if(!hasSubjectAltNames(testCaCert)) {
+				if(!fulfillRequirements(testCaCert)) {
 					// Re-create key store if certificate does not have a subject alt name (NOW-122).
-					caCert = createKeystore(nexuHome, api.getAppConfig().getApplicationName());
+					caCert = createRootCAKeystore(nexuHome, api.getAppConfig().getApplicationName(), pki);
 				} else {
 					caCert = testCaCert;
 				}
@@ -101,15 +101,14 @@ public class HttpsPlugin implements NexuPlugin {
 		return installCaCert(api, caCert, resourceBundle, baseResourceBundle);
 	}
 
-	private boolean hasSubjectAltNames(final File caCert) throws IOException, CertificateException {
+	private boolean fulfillRequirements(final File caCert) throws IOException, CertificateException {
 		try (
 				final FileInputStream fis = new FileInputStream(caCert);
 				final BufferedInputStream bis = new BufferedInputStream(fis);
 				) {
 			final CertificateFactory cf = CertificateFactory.getInstance("X.509");
 			final X509Certificate cert = (X509Certificate) cf.generateCertificate(bis);
-			final Collection<List<?>> subjectAltNames = cert.getSubjectAlternativeNames();
-			if((subjectAltNames != null) && !subjectAltNames.isEmpty()) {
+			if(cert.getBasicConstraints() != -1) {
 				return true;
 			} else {
 				return false;
@@ -118,64 +117,45 @@ public class HttpsPlugin implements NexuPlugin {
 	}
 	
 	/**
-	 * Create a keystore in the directory given in parameters
-	 * 
-	 * @param nexuHome
-	 * 
-	 * @return A file containing the CA cert of the keystore
+	 * Create a keystore for root CA in the directory given in parameters.
+	 * @param nexuHome Target directory that will store the keystore.
+	 * @param applicationName Name of the application.
+	 * @param pki Instance of {@link PKIManager}.
+	 * @return A file containing the certificate of the root CA.
 	 */
-	File createKeystore(final File nexuHome, final String applicationName) {
-
+	File createRootCAKeystore(final File nexuHome, final String applicationName, final PKIManager pki) {
 		try {
-			File keyStoreFile = new File(nexuHome, "keystore.jks");
+			final File keyStoreFile = new File(nexuHome, "keystore.jks");
 			LOGGER.info("Creating keystore " + keyStoreFile.getAbsolutePath());
 
-			PKIManager pki = new PKIManager();
-			KeyPair pair = pki.createKeyPair();
+			final KeyPair pair = pki.createKeyPair();
 
-			Calendar cal = Calendar.getInstance();
-			Date notBefore = cal.getTime();
+			final Calendar cal = Calendar.getInstance();
+			final Date notBefore = cal.getTime();
 			cal.add(Calendar.YEAR, 10);
-			Date notAfter = cal.getTime();
+			final Date notAfter = cal.getTime();
 
-			X509Certificate cert = pki.generateSelfSignedCertificate(pair.getPrivate(), pair.getPublic(),
-					notBefore, notAfter, "cn=localhost, O=" + applicationName + ", C=LU");
+			final X509Certificate cert = pki.generateRootSelfSignedCertificate(pair.getPrivate(), pair.getPublic(),
+					notBefore, notAfter, applicationName);
 
-			KeyStore keyStore = KeyStore.getInstance("JKS");
+			final KeyStore keyStore = KeyStore.getInstance("JKS");
 			keyStore.load(null, null);
-			FileOutputStream output = new FileOutputStream(keyStoreFile);
-			keyStore.setKeyEntry("localhost", pair.getPrivate(), "password".toCharArray(), new Certificate[] { cert });
-			keyStore.store(output, "password".toCharArray());
-			output.close();
+			try(final FileOutputStream output = new FileOutputStream(keyStoreFile)) {
+				keyStore.setKeyEntry("localhost", pair.getPrivate(), "password".toCharArray(), new Certificate[] { cert });
+				keyStore.store(output, "password".toCharArray());
+			}
 
-			File caCert = new File(nexuHome, applicationName + "-" + notBefore.getTime() + ".crt");
-			FileOutputStream caOutput = new FileOutputStream(caCert);
-			caOutput.write(cert.getEncoded());
-			caOutput.close();
+			final File caCert = new File(nexuHome, applicationName + "-" + notBefore.getTime() + ".crt");
+			try(final FileOutputStream caOutput = new FileOutputStream(caCert)) {
+				caOutput.write(cert.getEncoded());
+			}
 
 			return caCert;
 		} catch (Exception e) {
 			throw new RuntimeException("Cannot create keystore", e);
 		}
-
 	}
 
-	private File getKeystore(final File nexuHome, final String applicationName) {
-		final String[] files = nexuHome.list(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String name) {
-				return name.startsWith(applicationName + "-") && name.endsWith(".crt");
-			}
-		});
-		if(files.length > 0) {
-			Arrays.sort(files);
-			return new File(nexuHome, files[files.length - 1]);
-		} else {
-			// Backward compatibility
-			return new File(nexuHome, "ca-cert.crt");
-		}
-	}
-	
 	private List<InitializationMessage> installCaCert(final NexuAPI api, final File caCert, final ResourceBundle resourceBundle, final ResourceBundle baseResourceBundle) {
 		final List<InitializationMessage> messages = new ArrayList<>();
 		final EnvironmentInfo envInfo = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
@@ -229,7 +209,7 @@ public class HttpsPlugin implements NexuPlugin {
 			if(p.exitValue() == 1) {
 				LOGGER.info("Mozilla Firefox not installed.");
 			} else if(p.exitValue() != 0) {
-				final String output = IOUtils.toString(p.getInputStream());
+				final String output = IOUtils.toString(p.getInputStream(), Charset.defaultCharset());
 				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Firefox. Output: " + output);
 			}
 			return Collections.emptyList();
@@ -281,7 +261,7 @@ public class HttpsPlugin implements NexuPlugin {
 				throw new NexuException("Timeout occurred when trying to install CA certificate in Firefox");
 			}
 			if(p.exitValue() != 0) {
-				final String output = IOUtils.toString(p.getInputStream());
+				final String output = IOUtils.toString(p.getInputStream(), Charset.defaultCharset());
 				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Firefox. Output: " + output);
 			}
 			return Collections.emptyList();
@@ -372,7 +352,7 @@ public class HttpsPlugin implements NexuPlugin {
 				throw new NexuException("Timeout occurred when trying to install CA certificate in Mac user keychain");
 			}
 			if(p.exitValue() != 0) {
-				final String output = IOUtils.toString(p.getInputStream());
+				final String output = IOUtils.toString(p.getInputStream(), Charset.defaultCharset());
 				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Mac user keychain. Output: " + output);
 			}
 			return Collections.emptyList();
@@ -419,7 +399,7 @@ public class HttpsPlugin implements NexuPlugin {
 				throw new NexuException("Timeout occurred when trying to install CA certificate in Linux FF and Chrome/Chromium stores.");
 			}
 			if(p.exitValue() != 0) {
-				final String output = IOUtils.toString(p.getInputStream());
+				final String output = IOUtils.toString(p.getInputStream(), Charset.defaultCharset());
 				throw new NexuException("Batch script returned " + p.exitValue() + " when trying to install CA certificate in Linux FF and Chrome/Chromium stores. Output: " + output);
 			}
 			return Collections.emptyList();

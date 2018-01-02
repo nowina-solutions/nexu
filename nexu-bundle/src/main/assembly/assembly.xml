@@ -34,7 +34,7 @@ Consultez la Licence pour les autorisations et les restrictions linguistiques sp
 		<dependencySet>
 			<unpack>true</unpack>
 			<includes>
-				<include>com.oracle:jre-win32:zip</include>
+				<include>com.oracle:jre-x86:zip</include>
 			</includes>
 			<outputDirectory>java</outputDirectory>
 			<fileMode>0644</fileMode>
