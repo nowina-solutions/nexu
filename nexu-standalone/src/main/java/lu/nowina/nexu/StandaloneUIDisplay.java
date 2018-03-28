@@ -167,9 +167,15 @@ public class StandaloneUIDisplay implements UIDisplay {
 	private final class FlowMessageDisplayCallback implements MessageDisplayCallback {
 		@Override
 		public void display(Message message) {
-			StandaloneUIDisplay.this.operationFactory.getOperation(
+			if(Message.INPUT_PINPAD.equals(message)) {
+				StandaloneUIDisplay.this.operationFactory.getOperation(
+						NonBlockingUIOperation.class, "/fxml/message-no-button.fxml",
+						"message.display.callback." + message.name().toLowerCase().replace('_', '.')).perform();
+			} else {
+				StandaloneUIDisplay.this.operationFactory.getOperation(
 					NonBlockingUIOperation.class, "/fxml/message.fxml",
 					"message.display.callback." + message.name().toLowerCase().replace('_', '.')).perform();
+			}
 		}
 
 		@Override
