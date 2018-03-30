@@ -15,12 +15,20 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.oracle</groupId>
-			<artifactId>jre-x86</artifactId>
-			<version>8.0.45</version>
-			<type>zip</type>
+			<groupId>com.oracle.java</groupId>
+			<artifactId>jre</artifactId>
+			<version>1.8.0_131</version>
+			<classifier>win64</classifier>
+			<type>tgz</type>
 		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>alfresco</id>
+			<url>https://artifacts.alfresco.com/nexus/content/repositories/public</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<plugins>

@@ -30,6 +30,7 @@
         <maven.release.plugin.version>2.5.3</maven.release.plugin.version>
         <slf4j.version>1.7.12</slf4j.version>
         <jna.version>4.2.2</jna.version>
+        <mocca.version>1.3.30</mocca.version>
 	</properties>
 
     <scm>
@@ -48,11 +49,6 @@
         <repository>
             <id>ec.europa.eu-cefdigital</id>
             <url>https://ec.europa.eu/cefdigital/artifact/content/groups/public/</url>
-        </repository>
-        <repository>
-            <id>forge.nowina.lu</id>
-            <name>Internal repository</name>
-            <url>http://forge.nowina.local/nexus/content/groups/nowina/</url>
         </repository>
 	</repositories>
 
@@ -111,6 +107,11 @@
                 <version>${dss.version}</version>
                 <scope>runtime</scope>
             </dependency>
+			<dependency>
+				<groupId>at.gv.egiz</groupId>
+				<artifactId>smcc</artifactId>
+				<version>${mocca.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

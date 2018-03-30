@@ -24,6 +24,10 @@
 			<version>${dss.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>at.gv.egiz</groupId>
+			<artifactId>smcc</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>lu.nowina.apps</groupId>
 			<artifactId>nexu-model</artifactId>
 			<version>${project.version}</version>
@@ -55,6 +59,23 @@
             <artifactId>jna</artifactId>
         </dependency>
 	</dependencies>
+	
+	<repositories>
+        <repository>
+            <id>egiz-mocca</id>
+            <url>https://apps.egiz.gv.at/maven/</url>
+        </repository>
+		<repository>
+            <id>joinup-dss-thirdparty</id>
+            <url>http://joinup.ec.europa.eu/site/sd-dss/maven2</url>
+            <releases>
+	            <enabled>false</enabled>
+	        </releases>
+	        <snapshots>
+	            <enabled>false</enabled>
+	        </snapshots>
+        </repository>
+	</repositories>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
