@@ -23,13 +23,6 @@
 		</dependency>
 	</dependencies>
 
-	<repositories>
-		<repository>
-			<id>alfresco</id>
-			<url>https://artifacts.alfresco.com/nexus/content/repositories/public</url>
-		</repository>
-	</repositories>
-
 	<build>
 		<plugins>
 			<plugin>
