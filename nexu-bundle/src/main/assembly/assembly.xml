@@ -34,9 +34,9 @@ Consultez la Licence pour les autorisations et les restrictions linguistiques sp
 		<dependencySet>
 			<unpack>true</unpack>
 			<includes>
-				<include>com.oracle.java:jre:tgz:win64</include>
+				<include>com.oracle.java:jre:tgz:win32</include>
 			</includes>
-			<outputDirectory>java</outputDirectory>
+			<outputDirectory></outputDirectory>
 			<fileMode>0644</fileMode>
 		</dependencySet>
 		<dependencySet>

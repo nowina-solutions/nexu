@@ -18,7 +18,7 @@
 			<groupId>com.oracle.java</groupId>
 			<artifactId>jre</artifactId>
 			<version>1.8.0_131</version>
-			<classifier>win64</classifier>
+			<classifier>win32</classifier>
 			<type>tgz</type>
 		</dependency>
 	</dependencies>
