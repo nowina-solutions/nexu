@@ -73,14 +73,14 @@
 	</repositories>
 
 	<distributionManagement>
-		<repository>
-			<id>joinup-nexus</id>
-			<url>dav:https://joinup.ec.europa.eu/webdav/sd-dss/www/maven2</url>
-		</repository>
-		<snapshotRepository>
-			<id>joinup-nexus</id>
-			<url>dav:https://joinup.ec.europa.eu/webdav/sd-dss/www/maven2</url>
-		</snapshotRepository>
+	  <snapshotRepository>
+	    <id>ossrh</id>
+	    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+	  </snapshotRepository>
+	  <repository>
+	    <id>ossrh</id>
+	    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+	  </repository>
 	</distributionManagement>
 
 	<dependencyManagement>
@@ -185,47 +185,70 @@
                 </configuration>
             </plugin>
         </plugins>
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-webdav-jackrabbit</artifactId>
-        		<version>2.2</version>
-        	</extension>
-		</extensions>
 	</build>
 
 	<profiles>
-
 		<profile>
 			<id>no_package</id>
 			<properties>
 				<skip.package>true</skip.package>
 			</properties>
 		</profile>
-
 		<profile>
-			<id>rebel</id>
+			<id>deploy</id>
 			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.zeroturnaround</groupId>
-						<artifactId>jrebel-maven-plugin</artifactId>
-						<version>1.1.5</version>
-						<executions>
-							<execution>
-								<id>generate-rebel-xml</id>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>generate</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
+			  <plugins>
+			    <plugin>
+			      <groupId>org.apache.maven.plugins</groupId>
+			      <artifactId>maven-source-plugin</artifactId>
+			      <version>2.2.1</version>
+			      <executions>
+			        <execution>
+			          <id>attach-sources</id>
+			          <goals>
+			            <goal>jar-no-fork</goal>
+			          </goals>
+			        </execution>
+			      </executions>
+			    </plugin>
+			    <plugin>
+			      <groupId>org.apache.maven.plugins</groupId>
+			      <artifactId>maven-javadoc-plugin</artifactId>
+			      <version>2.9.1</version>
+			      <executions>
+			        <execution>
+			          <id>attach-javadocs</id>
+			          <goals>
+			            <goal>jar</goal>
+			          </goals>
+			          <configuration>
+			          	<additionalparam>-Xdoclint:none</additionalparam>
+			          	<quiet>true</quiet>
+			          </configuration>
+			        </execution>
+			      </executions>
+			    </plugin>
+			    <plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-gpg-plugin</artifactId>
+					<version>1.6</version>
+					<executions>
+					 <execution>
+					   <id>sign-artifacts</id>
+					   <phase>verify</phase>
+					   <goals>
+					     <goal>sign</goal>
+					   </goals>
+					 </execution>
+					</executions>
+					<configuration>
+				        <keyname>${gpg.keyname}</keyname>
+				        <passphraseServerId>${gpg.keyname}</passphraseServerId>
+			      </configuration>
+				</plugin>
+			  </plugins>
 			</build>
-
 		</profile>
-
 	</profiles>
 
 </project>
