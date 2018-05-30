@@ -119,7 +119,7 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 										resp.setPreferredDigest(productAdapter.getPreferredDigestAlgorithm(product));
 									}
 
-									if(api.getAppConfig().isEnablePopUps()) {
+									if(api.getAppConfig().isEnablePopUps() && api.getAppConfig().isEnableInformativePopUps()) {
 										getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml", 
 												new Object[]{ "certificates.flow.finished" }).perform();
 									}
