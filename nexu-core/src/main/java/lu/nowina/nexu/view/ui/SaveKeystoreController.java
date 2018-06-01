@@ -36,22 +36,25 @@ public class SaveKeystoreController extends AbstractUIOperationController<Boolea
 
 	@FXML
 	private Label message;
-	
+
 	@FXML
 	private Label keystoreFilename;
 
 	@FXML
+	private Label keystoreSlotNumber;
+
+	@FXML
 	private Label keystoreType;
-	
+
 	private ResourceBundle resources;
-	
+
 	private KeystoreProductAdapter productAdapter;
 	private ConfiguredKeystore keystore;
-	
+
 	public SaveKeystoreController() {
 		super();
 	}
-	
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		this.resources = resources;
@@ -69,11 +72,10 @@ public class SaveKeystoreController extends AbstractUIOperationController<Boolea
 		this.productAdapter = (KeystoreProductAdapter) params[1];
 		this.keystore = (ConfiguredKeystore) params[2];
 		Platform.runLater(() -> {
-			message.setText(MessageFormat.format(
-					resources.getString("save.keystore.header"),
-					params[0]));
+			message.setText(MessageFormat.format(resources.getString("save.keystore.header"), params[0]));
 			keystoreType.setText(keystore.getType().getLabel());
-			keystoreFilename.setText(keystore.getUrl().substring(keystore.getUrl().lastIndexOf('/')+1));
+			keystoreFilename.setText(keystore.getUrl().substring(keystore.getUrl().lastIndexOf('/') + 1));
+			keystoreSlotNumber.setText(String.valueOf(keystore.getSlotNumber()));
 		});
 	}
 }

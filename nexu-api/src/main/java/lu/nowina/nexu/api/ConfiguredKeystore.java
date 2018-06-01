@@ -29,10 +29,11 @@ import org.apache.commons.lang.StringEscapeUtils;
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "configuredKeystore", propOrder = { "url", "type" })
+@XmlType(name = "configuredKeystore", propOrder = { "url", "type", "slotNumber" })
 public class ConfiguredKeystore implements Product {
 
 	private String url;
+	private int slotNumber;
 	private KeystoreType type;
 	@XmlTransient
 	private boolean toBeSaved;
@@ -40,6 +41,14 @@ public class ConfiguredKeystore implements Product {
 	public ConfiguredKeystore() {
 		super();
 		this.toBeSaved = false;
+	}
+	
+	public int getSlotNumber() {
+		return slotNumber;
+	}
+
+	public void setSlotNumber(int slotNumber) {
+		this.slotNumber = slotNumber;
 	}
 
 	/**
