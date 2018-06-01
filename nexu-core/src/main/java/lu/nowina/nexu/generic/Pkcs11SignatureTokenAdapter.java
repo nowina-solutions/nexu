@@ -4,6 +4,7 @@ import java.util.List;
 
 import eu.europa.esig.dss.DSSException;
 import eu.europa.esig.dss.DigestAlgorithm;
+import eu.europa.esig.dss.MaskGenerationFunction;
 import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.ToBeSigned;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
@@ -16,7 +17,7 @@ import lu.nowina.nexu.CancelledOperationException;
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
 public class Pkcs11SignatureTokenAdapter implements SignatureTokenConnection {
-	
+
 	private SignatureTokenConnection adapted;
 
 	public Pkcs11SignatureTokenAdapter(SignatureTokenConnection adapted) {
@@ -31,13 +32,12 @@ public class Pkcs11SignatureTokenAdapter implements SignatureTokenConnection {
 	public List<DSSPrivateKeyEntry> getKeys() throws DSSException {
 		try {
 			return adapted.getKeys();
-		} catch(final Exception e) {
+		} catch (final Exception e) {
 			Throwable t = e;
-			while(t != null) {
-				if("CKR_CANCEL".equals(t.getMessage()) ||
-						"CKR_FUNCTION_CANCELED".equals(t.getMessage())) {
+			while (t != null) {
+				if ("CKR_CANCEL".equals(t.getMessage()) || "CKR_FUNCTION_CANCELED".equals(t.getMessage())) {
 					throw new CancelledOperationException(e);
-				} else if(t instanceof CancelledOperationException) {
+				} else if (t instanceof CancelledOperationException) {
 					throw (CancelledOperationException) t;
 				}
 				t = t.getCause();
@@ -47,16 +47,23 @@ public class Pkcs11SignatureTokenAdapter implements SignatureTokenConnection {
 		}
 	}
 
-	public SignatureValue sign(ToBeSigned toBeSigned, DigestAlgorithm digestAlgorithm, DSSPrivateKeyEntry keyEntry) throws DSSException {
+	public SignatureValue sign(ToBeSigned toBeSigned, DigestAlgorithm digestAlgorithm, DSSPrivateKeyEntry keyEntry)
+			throws DSSException {
+		return sign(toBeSigned, digestAlgorithm, null, keyEntry);
+	}
+
+	@Override
+	public SignatureValue sign(ToBeSigned toBeSigned, DigestAlgorithm digestAlgorithm, MaskGenerationFunction mgf,
+			DSSPrivateKeyEntry keyEntry) throws DSSException {
+
 		try {
-			return adapted.sign(toBeSigned, digestAlgorithm, keyEntry);
-		} catch(final Exception e) {
+			return adapted.sign(toBeSigned, digestAlgorithm, mgf, keyEntry);
+		} catch (final Exception e) {
 			Throwable t = e;
-			while(t != null) {
-				if("CKR_CANCEL".equals(t.getMessage()) ||
-						"CKR_FUNCTION_CANCELED".equals(t.getMessage())) {
+			while (t != null) {
+				if ("CKR_CANCEL".equals(t.getMessage()) || "CKR_FUNCTION_CANCELED".equals(t.getMessage())) {
 					throw new CancelledOperationException(e);
-				} else if(t instanceof CancelledOperationException) {
+				} else if (t instanceof CancelledOperationException) {
 					throw (CancelledOperationException) t;
 				}
 				t = t.getCause();
@@ -65,4 +72,5 @@ public class Pkcs11SignatureTokenAdapter implements SignatureTokenConnection {
 			throw e;
 		}
 	}
+
 }

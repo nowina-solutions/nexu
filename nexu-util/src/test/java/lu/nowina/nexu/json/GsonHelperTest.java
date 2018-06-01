@@ -14,6 +14,7 @@
 package lu.nowina.nexu.json;
 
 import java.io.FileInputStream;
+import java.security.KeyStore.PasswordProtection;
 
 import org.apache.commons.codec.binary.Base64;
 import org.junit.Assert;
@@ -56,7 +57,7 @@ public class GsonHelperTest {
 	@Test
 	public void test3() throws Exception {
 		
-		JKSSignatureToken token = new JKSSignatureToken(new FileInputStream("src/test/resources/keystore.jks"), "password");
+		JKSSignatureToken token = new JKSSignatureToken(new FileInputStream("src/test/resources/keystore.jks"), new PasswordProtection("password".toCharArray()));
 		DSSPrivateKeyEntry key = token.getKeys().get(0);
 		TestWithCertificate cert = new TestWithCertificate(key);
 		

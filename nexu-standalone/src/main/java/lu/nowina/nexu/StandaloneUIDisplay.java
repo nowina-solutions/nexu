@@ -50,8 +50,8 @@ public class StandaloneUIDisplay implements UIDisplay {
 	private OperationFactory operationFactory;
 	
 	public StandaloneUIDisplay() {
-		this.blockingStage = createStage(true);
-		this.nonBlockingStage = createStage(false);
+		this.blockingStage = createStage(true, null);
+		this.nonBlockingStage = createStage(false, null);
 	}
 
 	private void display(Parent panel, boolean blockingOperation) {
@@ -61,9 +61,9 @@ public class StandaloneUIDisplay implements UIDisplay {
 			LOGGER.info("Display " + panel + " in display " + this + " from Thread " + Thread.currentThread().getName());
 			if (!stage.isShowing()) {
 				if(blockingOperation) {
-					stage = blockingStage = createStage(true);
+					stage = blockingStage = createStage(true, null);
 				} else {
-					stage = nonBlockingStage = createStage(false);
+					stage = nonBlockingStage = createStage(false, null);
 				}
 				LOGGER.info("Loading ui " + panel + " is a new Stage " + stage);
 			} else {
@@ -76,8 +76,9 @@ public class StandaloneUIDisplay implements UIDisplay {
 		});
 	}
 
-	private Stage createStage(final boolean blockingStage) {
+	private Stage createStage(final boolean blockingStage, String title) {
 		final Stage newStage = new Stage();
+		newStage.setTitle(title);
 		newStage.setAlwaysOnTop(true);
 		newStage.setOnCloseRequest((e) -> {
 			LOGGER.info("Closing stage " + newStage + " from " + Thread.currentThread().getName());
@@ -97,9 +98,9 @@ public class StandaloneUIDisplay implements UIDisplay {
 			Stage oldStage = (blockingOperation) ? blockingStage : nonBlockingStage;
 			LOGGER.info("Hide stage " + oldStage + " and create new stage");
 			if(blockingOperation) {
-				blockingStage = createStage(true);
+				blockingStage = createStage(true, null);
 			} else {
-				nonBlockingStage = createStage(false);
+				nonBlockingStage = createStage(false, null);
 			}
 			oldStage.hide();
 		});

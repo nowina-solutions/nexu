@@ -18,6 +18,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.security.KeyStore.PasswordProtection;
 import java.util.Arrays;
 
 import lu.nowina.nexu.AbstractConfigureLoggerTest;
@@ -55,7 +56,8 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 
 		ProductAdapter adapter = mock(ProductAdapter.class);
 
-		SignatureTokenConnection token = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"), "password");
+		SignatureTokenConnection token = new JKSSignatureToken(this.getClass().getResourceAsStream("/keystore.jks"),
+				new PasswordProtection("password".toCharArray()));
 
 		NexuAPI api = mock(NexuAPI.class);
 		DetectedCard detectedCard = new DetectedCard("atr", 0);
@@ -74,7 +76,7 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 		req.setDigestAlgorithm(DigestAlgorithm.SHA256);
 
 		final OperationFactory noUIOperationFactory = new NoUIOperationFactory();
-		((NoUIOperationFactory)noUIOperationFactory).setDisplay(display);
+		((NoUIOperationFactory) noUIOperationFactory).setDisplay(display);
 
 		SignatureFlow flow = new SignatureFlow(display, api);
 		flow.setOperationFactory(noUIOperationFactory);
@@ -132,19 +134,19 @@ public class SignatureFlowTest extends AbstractConfigureLoggerTest {
 	}
 
 	private static class NoUIOperationFactory extends BasicOperationFactory {
-		
+
 		@SuppressWarnings("rawtypes")
 		private final Operation successOperation;
-		
+
 		public NoUIOperationFactory() {
 			this.successOperation = mock(Operation.class);
 			when(successOperation.perform()).thenReturn(new OperationResult<Void>(BasicOperationStatus.SUCCESS));
 		}
-		
+
 		@Override
 		@SuppressWarnings("unchecked")
 		public <R, T extends Operation<R>> Operation<R> getOperation(Class<T> clazz, Object... params) {
-			if(UIOperation.class.isAssignableFrom(clazz)) {
+			if (UIOperation.class.isAssignableFrom(clazz)) {
 				return successOperation;
 			} else {
 				return super.getOperation(clazz, params);

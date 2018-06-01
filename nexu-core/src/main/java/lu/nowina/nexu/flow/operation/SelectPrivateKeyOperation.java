@@ -96,7 +96,7 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 		final Iterator<DSSPrivateKeyEntry> it = keys.iterator();
 		while (it.hasNext()) {
 			final DSSPrivateKeyEntry e = it.next();
-			if ("CN=Token Signing Public Key".equals(e.getCertificate().getIssuerDN().getName())) {
+			if ("CN=Token Signing Public Key".equals(e.getCertificate().getCertificate().getIssuerDN().getName())) {
 				it.remove();
 			}
 		}
