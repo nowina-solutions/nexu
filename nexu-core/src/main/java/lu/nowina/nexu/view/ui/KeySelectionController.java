@@ -13,7 +13,13 @@
  */
 package lu.nowina.nexu.view.ui;
 
+import java.awt.Desktop;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.cert.CertificateEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -24,18 +30,21 @@ import org.slf4j.LoggerFactory;
 import eu.europa.esig.dss.DSSASN1Utils;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.x509.CertificateToken;
+import javafx.application.HostServices;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 public class KeySelectionController extends AbstractUIOperationController<DSSPrivateKeyEntry> implements Initializable {
@@ -51,18 +60,6 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 	@FXML
 	private ListView<DSSPrivateKeyEntry> listView;
 	
-	@FXML
-	private TextArea taX500Principal;
-	
-	@FXML
-	private Label startDate;
-	
-	@FXML
-	private Label endDate;
-	
-	@FXML
-	private Label usage;
-
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		select.setOnAction((event) -> {
@@ -85,7 +82,39 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 				protected void updateItem(DSSPrivateKeyEntry k, boolean bln) {
 					super.updateItem(k, bln);
 					if (k != null) {
-						setText(DSSASN1Utils.getSubjectCommonName(k.getCertificate()));
+						CertificateToken certificateToken = k.getCertificate();
+						Label lSubject = new Label();
+						lSubject.setText(DSSASN1Utils.getSubjectCommonName(k.getCertificate()));
+						lSubject.setStyle("-fx-font-weight: bold;");
+						Label lEmitter = new Label();
+						lEmitter.setText(String.format("Issuer: %s - Usage: %s", DSSASN1Utils.get(certificateToken.getIssuerX500Principal()).get("2.5.4.3"), createKeyUsageString(certificateToken, resources)));
+						Label lValidity = new Label();
+						SimpleDateFormat format = new SimpleDateFormat("dd MMMMMM yyyy");
+						String startDate = format.format(certificateToken.getNotBefore());
+						String endDate = format.format(certificateToken.getNotAfter());
+						lValidity.setText(String.format("Valid from: %s to: %s", startDate, endDate));
+						
+						Button button = new Button("Open certificate");
+						button.setOnAction(actionEvent ->{
+							Path path = null;
+					        try {
+					            path = Paths.get("c:", "Tmp","certificate.der");
+					            Files.write(path, certificateToken.getCertificate().getTBSCertificate());
+					            Desktop.getDesktop().open(path.toFile());
+					        } catch (IOException | CertificateEncodingException e) {
+					            e.printStackTrace();
+					        }
+								
+						});
+						
+						VBox vBox = new VBox(lSubject, lEmitter, lValidity, button);
+						
+						Label lTest = new Label();
+						lTest.setText("test");
+						VBox vBoxLeft = new VBox(lTest);
+								
+						HBox hBox = new HBox(vBoxLeft, vBox);
+						setGraphic(hBox);
 					}
 				}
 
@@ -100,21 +129,11 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 			public void handle(MouseEvent event) {
 				DSSPrivateKeyEntry key = listView.getSelectionModel().getSelectedItem();
 				if(key != null) {
-					CertificateToken token = listView.getSelectionModel().getSelectedItem().getCertificate();
-					taX500Principal.setText(token.getSubjectX500Principal().toString().replace(", ", "\n"));
 					
-					SimpleDateFormat format = new SimpleDateFormat("dd MMMMMM yyyy");
-					startDate.setText(format.format(token.getNotBefore()));
-					endDate.setText(format.format(token.getNotAfter()));
-					usage.setText(createKeyUsageString(token, resources));
 				}
 			}
 			
 		});
-		
-		taX500Principal.setEditable(false);
-		taX500Principal.setMouseTransparent(true);
-		taX500Principal.setFocusTraversable(false);
 	}
 	
 	private String createKeyUsageString(CertificateToken token, ResourceBundle resources) {

@@ -37,21 +37,6 @@
     		<center>
         		<ListView fx:id="listView" prefHeight="120.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
         	</center>
-        	<bottom>
-        		<GridPane vgap="5" hgap="5">
-					<TextArea fx:id="taX500Principal" prefHeight="130" 
-						GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.columnSpan="2" />
-						
-					<Label text="%key.selection.startDate" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="label-left-align"/>
-					<Label fx:id="startDate" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-					
-					<Label text="%key.selection.endDate" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="label-left-align"/>
-					<Label fx:id="endDate" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-					
-					<Label text="%key.selection.usage" GridPane.columnIndex="0" GridPane.rowIndex="3" styleClass="label-left-align"/>
-					<Label fx:id="usage" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-				</GridPane>
-        	</bottom>
         </BorderPane>
     </center>
 
