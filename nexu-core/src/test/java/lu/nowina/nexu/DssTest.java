@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.bouncycastle.asn1.x509.IssuerSerial;
 
+import eu.europa.esig.dss.CertificatePolicy;
 import eu.europa.esig.dss.DSSASN1Utils;
 import eu.europa.esig.dss.DSSUtils;
 import eu.europa.esig.dss.QCStatementOids;
@@ -20,15 +21,23 @@ public class DssTest {
 		// File("C:\\Users\\landry.soules\\Dev\\Projects\\Nexu\\Tests\\Landry Soules
 		// (Signature).DER"));
 		CertificateToken certificateToken = DSSUtils.loadCertificate(
-				new File("C:\\Users\\landry.soules\\Dev\\Projects\\Nexu\\Tests\\Landry Soules (Authentication).DER"));
+//				new File("C:\\Users\\landry.soules\\Dev\\Projects\\Nexu\\Tests\\Landry Soules (Authentication).DER"));
+				new File("/home/landry/Dev/Projects/Nexu/Tests/landry_soules_authentication.der"));
 		System.out.println("certificate token : " + certificateToken.toString());
 
+		certificateToken.getCertificate();
+		
+		List<CertificatePolicy> policies = DSSASN1Utils.getCertificatePolicies(certificateToken);
+		for(CertificatePolicy policy: policies) {
+			System.out.println(policy.getOid() + " " + policy.getCpsUrl());
+		}
+		
 		List<String> qcStatementsIdList = DSSASN1Utils.getQCStatementsIdList(certificateToken);
 		System.out.println(qcStatementsIdList);
 
 		for (QCStatementOids oid : QCStatementOids.values()) {
 
-			System.out.println(oid + " " + oid.getOid());
+			System.out.println(oid + " " + oid.getOid() + " " + oid.getDescription());
 		}
 
 		Set<KeyUsageBit> keyUsageBits = certificateToken.getKeyUsageBits();
