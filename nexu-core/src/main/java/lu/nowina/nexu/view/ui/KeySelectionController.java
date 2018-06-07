@@ -19,6 +19,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -27,13 +28,14 @@ import org.slf4j.LoggerFactory;
 
 import eu.europa.esig.dss.DSSASN1Utils;
 import eu.europa.esig.dss.DSSUtils;
+import eu.europa.esig.dss.QCStatementOids;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.x509.CertificateToken;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
@@ -41,7 +43,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
@@ -49,6 +52,10 @@ import lu.nowina.nexu.view.core.AbstractUIOperationController;
 public class KeySelectionController extends AbstractUIOperationController<DSSPrivateKeyEntry> implements Initializable {
 
 	private static final Logger logger = LoggerFactory.getLogger(KeySelectionController.class.getName());
+
+	private static final String ICON_UNLOCKED = "/images/unlocked.png";
+	private static final String ICON_QC = "/images/medal.png";
+	private static final String ICON_QCSD = "/images/quality.png";
 
 	@FXML
 	private Button select;
@@ -82,9 +89,11 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 					super.updateItem(k, bln);
 					if (k != null) {
 						CertificateToken certificateToken = k.getCertificate();
+
 						Label lSubject = new Label();
 						lSubject.setText(DSSASN1Utils.getSubjectCommonName(certificateToken));
 						lSubject.setStyle("-fx-font-weight: bold;");
+
 						Label lEmitter = new Label();
 						lEmitter.setText(String.format("Issuer: %s - Usage: %s",
 								DSSASN1Utils.get(certificateToken.getIssuerX500Principal()).get("2.5.4.3"),
@@ -94,14 +103,14 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 						String startDate = format.format(certificateToken.getNotBefore());
 						String endDate = format.format(certificateToken.getNotAfter());
 						lValidity.setText(String.format("Valid from: %s to: %s", startDate, endDate));
-						
+
 						Hyperlink link = new Hyperlink("Open certificate");
-						
+
 						link.setOnAction(actionEvent -> {
 							if (Desktop.isDesktopSupported()) {
 								try {
-
 									File tmpFile = File.createTempFile("certificate", ".crt");
+									tmpFile.deleteOnExit();
 									String certificateStr = DSSUtils.convertToPEM(certificateToken);
 									FileWriter writer = new FileWriter(tmpFile);
 									writer.write(certificateStr);
@@ -121,9 +130,14 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 
 						VBox vBox = new VBox(lSubject, lEmitter, lValidity, link);
 
-						Label lTest = new Label();
-						lTest.setText("test");
-						VBox vBoxLeft = new VBox(lTest);
+						VBox vBoxLeft;
+						try {
+							vBoxLeft = new VBox(getQCIcons(certificateToken).stream().toArray(ImageView[]::new));
+						} catch (IOException e) {
+							logger.error(e.getMessage(), e);
+							vBoxLeft = new VBox();
+						}
+						vBoxLeft.setPadding(new Insets(0, 10, 0, 0));
 						vBoxLeft.setAlignment(Pos.CENTER);
 
 						HBox hBox = new HBox(vBoxLeft, vBox);
@@ -134,18 +148,25 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 			};
 
 		});
+	}
 
-		listView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+	private List<ImageView> getQCIcons(CertificateToken certificateToken) throws IOException {
+		List<ImageView> qcIconsImages = new ArrayList<>();
+		List<String> qcStatements = DSSASN1Utils.getQCStatementsIdList(certificateToken);
+		if (qcStatements.contains(QCStatementOids.QC_COMPLIANCE.getOid())) {
+			qcIconsImages.add(fetchImage(ICON_QC));
+		}
+		if (qcStatements.contains(QCStatementOids.QC_SSCD.getOid())) {
+			qcIconsImages.add(fetchImage(ICON_QCSD));
+		}
+		if (qcIconsImages.isEmpty()) {
+			qcIconsImages.add(fetchImage(ICON_UNLOCKED));
+		}
+		return qcIconsImages;
+	}
 
-			@Override
-			public void handle(MouseEvent event) {
-				DSSPrivateKeyEntry key = listView.getSelectionModel().getSelectedItem();
-				if (key != null) {
-
-				}
-			}
-
-		});
+	private ImageView fetchImage(String imagePath) throws IOException {
+		return new ImageView(new Image(getClass().getResource(imagePath).openStream()));
 	}
 
 	private String createKeyUsageString(CertificateToken token, ResourceBundle resources) {

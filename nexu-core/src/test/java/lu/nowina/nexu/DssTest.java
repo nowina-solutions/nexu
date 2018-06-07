@@ -22,7 +22,7 @@ public class DssTest {
 		// (Signature).DER"));
 		CertificateToken certificateToken = DSSUtils.loadCertificate(
 //				new File("C:\\Users\\landry.soules\\Dev\\Projects\\Nexu\\Tests\\Landry Soules (Authentication).DER"));
-				new File("/home/landry/Dev/Projects/Nexu/Tests/landry_soules_authentication.der"));
+				new File("/home/landry/Dev/Projects/Nexu/Tests/landry_soules_signature.pem"));
 		System.out.println("certificate token : " + certificateToken.toString());
 
 		certificateToken.getCertificate();
