@@ -1,6 +1,7 @@
 # About this fork!
 
-This fork supports addition of HSM PKCS11 keystore. 
+* This fork supports addition of HSM PKCS11 keystore. 
+* This fork has authentication flow working.
 
 # NexU
 
