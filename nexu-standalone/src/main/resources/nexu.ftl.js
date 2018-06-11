@@ -16,6 +16,12 @@ function nexu_get_certificates(success_callback, error_callback) {
 	transmitRequest("certificates", {}, success_callback, error_callback);
 }
 
+/* function to authenticate user */
+function nexu_authenticate(dataToSign, success_callback, error_callback) {
+	var data = '{ "challenge": { "bytes": "' + dataToSign + '" }}';
+	transmitRequest("authenticate", data, success_callback, error_callback);
+}
+
 /* function to use if we already know a certificate and its tokenId/keyId */
 function nexu_sign_with_token_infos(tokenId, keyId, dataToSign, digestAlgo, success_callback, error_callback) {
 	var data = '{ "tokenId":{"id":"' + tokenId + '"}, "keyId":"' + keyId + '", "toBeSigned": { "bytes": "' + dataToSign + '" } , "digestAlgorithm":"' + digestAlgo + '"}';

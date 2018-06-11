@@ -31,6 +31,8 @@ public class BasicFlowRegistry implements FlowRegistry {
 			return new GetCertificateFlow(display, api);
 		case SIGNATURE_FLOW:
 			return new SignatureFlow(display, api);
+		case AUTHENTICATE_FLOW:
+			return new AuthenticateFlow(display, api);
 		default:
 			logger.warn("Unknown flow code " + code);
 			throw new NullPointerException("Flow not recognized/not implemented in this version.");
