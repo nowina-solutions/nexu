@@ -125,6 +125,9 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 				@SuppressWarnings("unchecked")
 				final OperationResult<DSSPrivateKeyEntry> op =
 						operationFactory.getOperation(UIOperation.class, "/fxml/key-selection.fxml", new Object[]{keys}).perform();
+				if(op.getStatus().equals(CoreOperationStatus.BACK)) {
+					return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.BACK);
+				}
 				if(op.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
 					return new OperationResult<DSSPrivateKeyEntry>(BasicOperationStatus.USER_CANCEL);
 				}

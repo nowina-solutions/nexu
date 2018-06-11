@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import lu.nowina.nexu.flow.operation.CoreOperationStatus;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 public class KeySelectionController extends AbstractUIOperationController<DSSPrivateKeyEntry> implements Initializable {
@@ -62,6 +64,9 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 
 	@FXML
 	private Button cancel;
+
+	@FXML
+	private Button back;
 
 	@FXML
 	private ListView<DSSPrivateKeyEntry> listView;
@@ -80,6 +85,9 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 		cancel.setOnAction((e) -> {
 			signalUserCancel();
 		});
+
+		back.setOnAction(e -> signalEndWithStatus(CoreOperationStatus.BACK));
+
 		listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 		listView.setCellFactory(param -> {
 			return new ListCell<DSSPrivateKeyEntry>() {
@@ -95,16 +103,17 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 						lSubject.setStyle("-fx-font-weight: bold;");
 
 						Label lEmitter = new Label();
-						lEmitter.setText(String.format("Issuer: %s - Usage: %s",
+						lEmitter.setText(MessageFormat.format(resources.getString("key.selection.issuer.usage"),
 								DSSASN1Utils.get(certificateToken.getIssuerX500Principal()).get("2.5.4.3"),
 								createKeyUsageString(certificateToken, resources)));
 						Label lValidity = new Label();
 						SimpleDateFormat format = new SimpleDateFormat("dd MMMMMM yyyy");
 						String startDate = format.format(certificateToken.getNotBefore());
 						String endDate = format.format(certificateToken.getNotAfter());
-						lValidity.setText(String.format("Valid from: %s to: %s", startDate, endDate));
+						lValidity.setText(
+								MessageFormat.format(resources.getString("key.selection.validity"), startDate, endDate));
 
-						Hyperlink link = new Hyperlink("Open certificate");
+						Hyperlink link = new Hyperlink(resources.getString("key.selection.certificate.open"));
 
 						link.setOnAction(actionEvent -> {
 							if (Desktop.isDesktopSupported()) {
