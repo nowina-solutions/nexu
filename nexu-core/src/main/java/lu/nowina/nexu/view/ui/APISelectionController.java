@@ -45,6 +45,9 @@ public class APISelectionController extends AbstractUIOperationController<ScAPI>
 
 	@FXML
 	private RadioButton pkcs11;
+	
+	@FXML
+	private RadioButton safenetPkcs11;
 
 	@FXML
 	private RadioButton mocca;
@@ -80,6 +83,8 @@ public class APISelectionController extends AbstractUIOperationController<ScAPI>
 			return ScAPI.MSCAPI;
 		} else if (pkcs11.isSelected()) {
 			return ScAPI.PKCS_11;
+		} else if (safenetPkcs11.isSelected()) {
+			return ScAPI.HSM_PKCS_11;
 		} else if (mocca.isSelected()) {
 			return ScAPI.MOCCA;
 		}

@@ -1,5 +1,5 @@
 /**
- * © Nowina Solutions, 2015-2017
+ * © Nowina Solutions, 2015-2015
  *
  * Concédée sous licence EUPL, version 1.1 ou – dès leur approbation par la Commission européenne - versions ultérieures de l’EUPL (la «Licence»).
  * Vous ne pouvez utiliser la présente œuvre que conformément à la Licence.

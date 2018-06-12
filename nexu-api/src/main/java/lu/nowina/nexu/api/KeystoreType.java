@@ -27,8 +27,8 @@ import javax.xml.bind.annotation.XmlType;
 public enum KeystoreType {
 
 	@XmlEnumValue("JKS") JKS("JKS"),
-	@XmlEnumValue("PKCS12") PKCS12("PKCS#12");
-	
+	@XmlEnumValue("PKCS11") PKCS11("PKCS#11"),
+	@XmlEnumValue("PKCS12") PKCS12("PKCS#12");	
 	private String label;
 	
 	private KeystoreType(final String label) {

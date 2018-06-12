@@ -22,10 +22,9 @@ import javax.xml.bind.annotation.XmlType;
 public enum ScAPI {
 
 	@XmlEnumValue("MSCAPI") MSCAPI("MSCAPI"),
-
 	@XmlEnumValue("PKCS11") PKCS_11("PKCS11"),
-
-	@XmlEnumValue("MOCCA") MOCCA("MOCCA");
+	@XmlEnumValue("MOCCA") MOCCA("MOCCA"), 
+	@XmlEnumValue("HSM PKCS11") HSM_PKCS_11("HSM PKCS11");
 
 	private final String value;
 
