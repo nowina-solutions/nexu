@@ -209,8 +209,7 @@ public class KeystoreProductAdapter implements ProductAdapter {
 			try {
 				switch (configuredKeystore.getType()) {
 				case PKCS12:
-					proxied = new Pkcs12SignatureToken(new String(callback.getPassword()),
-							new URL(configuredKeystore.getUrl()).openStream());
+					proxied = new Pkcs12SignatureToken(new URL(configuredKeystore.getUrl()).openStream(), new String(callback.getPassword()));
 					break;
 				case JKS:
 					proxied = new JKSSignatureToken(new URL(configuredKeystore.getUrl()).openStream(),

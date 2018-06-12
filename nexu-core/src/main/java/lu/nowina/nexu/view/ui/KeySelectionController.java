@@ -21,6 +21,7 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.europa.esig.dss.DSSASN1Utils;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.x509.CertificateToken;
 import javafx.collections.FXCollections;
@@ -84,7 +85,7 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 				protected void updateItem(DSSPrivateKeyEntry k, boolean bln) {
 					super.updateItem(k, bln);
 					if (k != null) {
-						setText(k.getCertificate().getSubjectShortName());
+						setText(DSSASN1Utils.getSubjectCommonName(k.getCertificate()));
 					}
 				}
 

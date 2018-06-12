@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
  © Nowina Solutions, 2015-2015
 
@@ -19,26 +20,13 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.control.PasswordField?>
 
-<BorderPane prefHeight="250.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.PasswordInputController">
-
-	<bottom>
-		<HBox styleClass="btn-container" BorderPane.alignment="CENTER">
-			<children>
-				<Button fx:id="cancel" styleClass="btn-default" mnemonicParsing="false" text="%button.cancel" />
-				<Button fx:id="ok" styleClass="btn-primary" mnemonicParsing="false" text="%button.next" />
-			</children>
-		</HBox>
-	</bottom>
-	
+<BorderPane prefHeight="125.0" prefWidth="250.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="lu.nowina.nexu.view.ui.MessageController">
 	<center>
-		<VBox BorderPane.alignment="CENTER" styleClass="form-container">
+		<VBox BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="passwordPrompt" text="%password.input" />
-            <PasswordField fx:id="password" promptText="*******" />
+            <Label text="NexU has finished" fx:id="message" styleClass="message" wrapText="true"/>
          </children>
 		</VBox>
 	</center>
-	
 </BorderPane>

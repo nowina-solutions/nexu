@@ -44,7 +44,7 @@ CHROME_NSS_DB_ROOT_DIRECTORY="$HOME/.pki/nssdb"
 # If Chrome NSS DB root directory exists, add certificate
 if [ -d "$CHROME_NSS_DB_ROOT_DIRECTORY" ]
 then
-  certutil -A -n "$1-localhost" -i "$2" -t "P,,", -d sql:"$CHROME_NSS_DB_ROOT_DIRECTORY"
+  certutil -A -n "$1-localhost" -i "$2" -t "cTC,cTC,cTC", -d sql:"$CHROME_NSS_DB_ROOT_DIRECTORY"
   return_value=$?
   if [ $return_value -ne 0 ]
   then

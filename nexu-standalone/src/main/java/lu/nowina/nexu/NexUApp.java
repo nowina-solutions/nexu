@@ -75,7 +75,11 @@ public class NexUApp extends Application {
 
 		server = startHttpServer(api);
 
-		new SystrayMenu(operationFactory, loader, api, new UserPreferences(getConfig().getApplicationName()));
+		if(api.getAppConfig().isEnableSystrayMenu()) {
+			new SystrayMenu(operationFactory, loader, api, new UserPreferences(getConfig().getApplicationName()));
+		} else {
+			logger.info("Systray menu is disabled.");
+		}
 
 		logger.info("Start finished");
 	}
@@ -138,6 +142,7 @@ public class NexUApp extends Application {
 
 	@Override
 	public void stop() throws Exception {
+		logger.info("Stopping application...");
 		try {
 			if(server != null) {
 				server.stop();

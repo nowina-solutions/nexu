@@ -174,7 +174,7 @@ public class HSMPkcs11SignatureToken extends AbstractSignatureTokenConnection {
 				final String alias = aliases.nextElement();
 				if (keyStore.isKeyEntry(alias)) {
 					final PrivateKeyEntry entry = (PrivateKeyEntry) keyStore.getEntry(alias, null);
-					list.add(new KSPrivateKeyEntry(entry));
+					list.add(new KSPrivateKeyEntry(alias, entry));
 				}
 				System.out.println(alias);
 			}

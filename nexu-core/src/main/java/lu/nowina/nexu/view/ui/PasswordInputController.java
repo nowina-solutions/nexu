@@ -16,11 +16,14 @@ package lu.nowina.nexu.view.ui;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import org.apache.commons.lang.StringUtils;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
@@ -32,6 +35,9 @@ public class PasswordInputController extends AbstractUIOperationController<char[
 	@FXML
 	private Button cancel;
 
+	@FXML
+	private Label passwordPrompt;
+	
 	@FXML
 	private PasswordField password;
 
@@ -47,4 +53,11 @@ public class PasswordInputController extends AbstractUIOperationController<char[
 		});
 	}
 
+	@Override
+	public void init(Object... params) {
+		final String passwordPrompt = (String) params[0];
+		if(StringUtils.isNotEmpty(passwordPrompt)) {
+			this.passwordPrompt.setText(passwordPrompt);
+		}
+	}
 }

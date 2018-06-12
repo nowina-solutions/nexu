@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>lu.nowina.apps</groupId>
 		<artifactId>nexu</artifactId>
-		<version>1.12-SNAPSHOT</version>
+		<version>1.14</version>
 	</parent>
 
 	<artifactId>nexu-proxy</artifactId>
@@ -174,9 +174,20 @@
 			</exclusions>
 		</dependency>
 
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.santuario</groupId>
+            <artifactId>xmlsec</artifactId>
+        </dependency>
+        
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 
         <dependency>

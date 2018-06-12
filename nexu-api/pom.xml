@@ -3,7 +3,7 @@
   <parent>
     <groupId>lu.nowina.apps</groupId>
     <artifactId>nexu</artifactId>
-    <version>1.12-SNAPSHOT</version>
+    <version>1.14</version>
   </parent>
   <artifactId>nexu-api</artifactId>
 
@@ -19,6 +19,14 @@
 			<artifactId>dss-spi</artifactId>
 			<version>${dss.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

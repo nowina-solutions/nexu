@@ -38,9 +38,11 @@ public class MessageController extends AbstractUIOperationController<Void> imple
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		ok.setOnAction((e) -> {
-			signalEnd(null);
-		}); 
+		if(ok != null) {
+			ok.setOnAction((e) -> {
+				signalEnd(null);
+			});
+		}
 		defaultErrorText = resources.getString("error");
 		this.resources = resources;
 	}
