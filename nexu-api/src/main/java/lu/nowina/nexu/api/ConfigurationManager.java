@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import com.sun.jna.platform.win32.Shell32Util;
 import com.sun.jna.platform.win32.ShlObj;
 
-
 /**
  * Handles creation of Nexu configuration folder.
  * 
@@ -101,7 +100,7 @@ public class ConfigurationManager {
 				Files.copy(configFile.toPath(), Paths.get(windowsConfigFolder.getAbsolutePath(), configFile.getName()));
 			} catch (FileAlreadyExistsException faee) {
 				// If file already exists, we don't do anything
-				LOGGER.debug("File %s already exists, we don't replace it.", configFile.getAbsolutePath());
+				LOGGER.debug("File {} already exists, we don't replace it.", configFile.getAbsolutePath());
 			}
 		}
 		// If everything went fine, we just backup old backup folder
@@ -115,7 +114,10 @@ public class ConfigurationManager {
 	}
 
 	public String getWindowsAppDataPath() {
-		return Shell32Util.getFolderPath(ShlObj.CSIDL_LOCAL_APPDATA);
+		if (getOs().toLowerCase().contains("windows")) {
+			return Shell32Util.getFolderPath(ShlObj.CSIDL_LOCAL_APPDATA);
+		}
+		return "";
 	}
 
 	public String getOs() {
@@ -129,12 +131,12 @@ public class ConfigurationManager {
 	public Path getCommonConfigPath(String appName) {
 		return Paths.get(getUserHome(), "." + appName);
 	}
-	
+
 	public Path getWindowsConfigPath() {
 		return Paths.get(getWindowsAppDataPath(), getCompanyName());
 	}
-	
+
 	public Path getConfigBackupPath(File originalFile) {
-		return Paths.get(originalFile.getAbsolutePath() + ".BKP" );
+		return Paths.get(originalFile.getAbsolutePath() + ".BKP");
 	}
 }
