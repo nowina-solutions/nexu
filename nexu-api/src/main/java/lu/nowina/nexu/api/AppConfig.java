@@ -26,12 +26,9 @@ import static org.apache.commons.lang.StringUtils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.jna.platform.win32.Shell32Util;
-import com.sun.jna.platform.win32.ShlObj;
-
 /**
  * Configuration of the NexU Platform
- * 
+ *
  * @author David Naramski
  *
  */
@@ -48,6 +45,8 @@ public class AppConfig {
 	private static final String BINDING_PORTS = "binding_ports";
 	private static final String CONNECTIONS_CACHE_MAX_SIZE = "connections_cache_max_size";
 	private static final String ENABLE_POP_UPS = "enable_pop_ups";
+	//This property is less restrictive than enable_pop_ups, since this one allows display of certificate selection
+	private static final String ENABLE_INFORMATIVE_POP_UPS = "enable_informative_pop_ups";
 	private static final String SEND_ANONYMOUS_INFO_TO_PROXY = "send_anonymous_info_to_proxy";
 	private static final String USE_SYSTEM_PROXY = "use_system_proxy";
 	private static final String PROXY_SERVER = "proxy_server";
@@ -93,6 +92,7 @@ public class AppConfig {
 	private int connectionsCacheMaxSize;
 
 	private boolean enablePopUps;
+	private boolean enableInformativePopUps;
 
 	private boolean sendAnonymousInfoToProxy;
 
@@ -117,9 +117,9 @@ public class AppConfig {
 	private int rollingLogMaxFileNumber;
 
 	private boolean enableDatabaseWebLoader;
-	
+
 	private boolean enableSystrayMenu;
-	
+
 	public AppConfig() {
 		try {
 			final URL versionResourceURL = this.getClass().getResource("/version.txt");
@@ -320,7 +320,7 @@ public class AppConfig {
 
 	/**
 	 * This method allows to set the maximum size for a log file. Expected format : 64KB, 10MB,...
-	 * 
+	 *
 	 * @param rollingLogMaxFileSize
 	 */
 	public void setRollingLogMaxFileSize(String rollingLogMaxFileSize) {
@@ -333,7 +333,7 @@ public class AppConfig {
 
 	/**
 	 * This method allows to set the maxium number of log files to keep on the file system.
-	 * 
+	 *
 	 * @param rollingLogMaxFileNumber
 	 */
 	public void setRollingLogMaxFileNumber(int rollingLogMaxFileNumber) {
@@ -390,6 +390,7 @@ public class AppConfig {
 		setAdvancedModeAvailable(Boolean.parseBoolean(props.getProperty(ADVANCED_MODE_AVAILABLE, "true")));
 		setConnectionsCacheMaxSize(Integer.parseInt(props.getProperty(CONNECTIONS_CACHE_MAX_SIZE, "50")));
 		setEnablePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_POP_UPS, "true")));
+		setEnableInformativePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_INFORMATIVE_POP_UPS, "true")));
 		setSendAnonymousInfoToProxy(Boolean.parseBoolean(props.getProperty(SEND_ANONYMOUS_INFO_TO_PROXY, "true")));
 
 		setUseSystemProxy(Boolean.parseBoolean(props.getProperty(USE_SYSTEM_PROXY, "false")));
@@ -411,7 +412,7 @@ public class AppConfig {
 		if (isNotEmpty(bindingPortHttpsStr)) {
 			setBindingPortsHttps(toListOfInt(bindingPortHttpsStr));
 		}
-		
+
 		setEnableDatabaseWebLoader(Boolean.parseBoolean(props.getProperty(ENABLE_DATABASE_WEB_LOADER, "true")));
 		setEnableSystrayMenu(Boolean.parseBoolean(props.getProperty(ENABLE_SYSTRAY_MENU, "true")));
 	}
@@ -419,7 +420,7 @@ public class AppConfig {
 	/**
 	 * Returns a list of {@link Integer} from <code>str</code> which should be
 	 * tokenized by commas.
-	 * 
+	 *
 	 * @param str
 	 *            A list of strings tokenized by commas.
 	 * @return A list of {@link Integer}.
@@ -434,5 +435,13 @@ public class AppConfig {
 	
 	public ConfigurationManager getConfigurationManager() {
 		return new ConfigurationManager();
+	}
+
+	public boolean isEnableInformativePopUps() {
+		return enableInformativePopUps;
+	}
+
+	public void setEnableInformativePopUps(boolean enableInformativePopUps) {
+		this.enableInformativePopUps = enableInformativePopUps;
 	}
 }

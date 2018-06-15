@@ -26,7 +26,7 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<encoding>UTF-8</encoding>
 		<skip.package>false</skip.package>
-		<dss.version>5.0.RC1</dss.version>
+		<dss.version>5.3</dss.version>
         <maven.release.plugin.version>2.5.3</maven.release.plugin.version>
         <slf4j.version>1.7.12</slf4j.version>
         <jna.version>4.2.2</jna.version>
@@ -50,6 +50,7 @@
             <id>ec.europa.eu-cefdigital</id>
             <url>https://ec.europa.eu/cefdigital/artifact/content/groups/public/</url>
         </repository>
+        
         <repository>
             <id>egiz-mocca</id>
             <url>https://apps.egiz.gv.at/maven/</url>
