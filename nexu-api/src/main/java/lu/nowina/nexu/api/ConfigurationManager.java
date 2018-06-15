@@ -51,7 +51,7 @@ public class ConfigurationManager {
 
 	}
 
-	public File manageCommonConfiguration(String appName) {
+	File manageCommonConfiguration(String appName) {
 		final File file = getCommonConfigPath(appName).toFile();
 		if (file.exists()) {
 			return file.canWrite() ? file : null;
@@ -60,8 +60,11 @@ public class ConfigurationManager {
 		}
 	}
 
-	public File manageWindowsConfiguration(String appName) throws IOException {
+	File manageWindowsConfiguration(String appName) throws IOException {
 		final File windowsConfFolder = createWindowsConfigurationFolder(appName);
+		/* It is possible that an "old" configuration folder exists on the host. If such configuration folder exists, NexU copy all the
+		 * old configuration files to the new location. 
+		 */
 		File incorrectConfigFile = findExistingConfigFolder(appName);
 		if (incorrectConfigFile.exists()) {
 			moveExistingConfigFolder(incorrectConfigFile, windowsConfFolder);
@@ -69,7 +72,7 @@ public class ConfigurationManager {
 		return windowsConfFolder;
 	}
 
-	public File createWindowsConfigurationFolder(String appName) {
+	File createWindowsConfigurationFolder(String appName) {
 		final String appDataPath = getWindowsAppDataPath();
 		if (isBlank(appDataPath)) {
 			return null;
@@ -82,7 +85,7 @@ public class ConfigurationManager {
 		}
 	}
 
-	public File findExistingConfigFolder(String appName) {
+	File findExistingConfigFolder(String appName) {
 		final File oldConfigFolder = getCommonConfigPath(appName).toFile();
 		if (oldConfigFolder == null) {
 			return null;
@@ -94,7 +97,7 @@ public class ConfigurationManager {
 		return oldConfigFolder;
 	}
 
-	public File moveExistingConfigFolder(File existingConfigFolder, File windowsConfigFolder) throws IOException {
+	File moveExistingConfigFolder(File existingConfigFolder, File windowsConfigFolder) throws IOException {
 		for (File configFile : existingConfigFolder.listFiles()) {
 			try {
 				Files.copy(configFile.toPath(), Paths.get(windowsConfigFolder.getAbsolutePath(), configFile.getName()));
@@ -109,34 +112,34 @@ public class ConfigurationManager {
 		return backupFolder;
 	}
 
-	public String getUserHome() {
+	String getUserHome() {
 		return System.getProperty("user.home");
 	}
 
-	public String getWindowsAppDataPath() {
+	String getWindowsAppDataPath() {
 		if (getOs().toLowerCase().contains("windows")) {
 			return Shell32Util.getFolderPath(ShlObj.CSIDL_LOCAL_APPDATA);
 		}
 		return "";
 	}
 
-	public String getOs() {
+	String getOs() {
 		return System.getProperty("os.name");
 	}
 
-	public String getCompanyName() {
+	String getCompanyName() {
 		return "Nowina";
 	}
 
-	public Path getCommonConfigPath(String appName) {
+	Path getCommonConfigPath(String appName) {
 		return Paths.get(getUserHome(), "." + appName);
 	}
 
-	public Path getWindowsConfigPath() {
+	Path getWindowsConfigPath() {
 		return Paths.get(getWindowsAppDataPath(), getCompanyName());
 	}
 
-	public Path getConfigBackupPath(File originalFile) {
+	Path getConfigBackupPath(File originalFile) {
 		return Paths.get(originalFile.getAbsolutePath() + ".BKP");
 	}
 }
