@@ -22,9 +22,12 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.StringUtils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.sun.jna.platform.win32.Shell32Util;
+import com.sun.jna.platform.win32.ShlObj;
 
 /**
  * Configuration of the NexU Platform
@@ -357,23 +360,24 @@ public class AppConfig {
 		if (nexuHome != null) {
 			return nexuHome;
 		}
-		final File userHome = new File(System.getProperty("user.home"));
-		if (!userHome.exists()) {
-			return null;
+		
+		ConfigurationManager configurationManager = getConfigurationManager();
+		try {
+			nexuHome = configurationManager.manageConfiguration(getApplicationName());
+		} catch (IOException e) {
+			logger.error("Error while managing Nexu config : {}", e.getMessage(), e);
+			nexuHome = null;
 		}
-		final File file = new File(userHome, "." + getApplicationName());
-		if (file.exists()) {
-			return file.canWrite() ? nexuHome = file : null;
-		} else {
-			return file.mkdir() && file.canWrite() ? nexuHome = file : null;
-		}
+		return nexuHome;
 	}
+	
+	
 
 	public void loadFromProperties(final Properties props) {
 		setApplicationName(props.getProperty(APPLICATION_NAME, "NexU"));
 
 		final String bindingPortsStr = props.getProperty(BINDING_PORTS, "9795");
-		if (StringUtils.isNotEmpty(bindingPortsStr)) {
+		if (isNotEmpty(bindingPortsStr)) {
 			setBindingPorts(toListOfInt(bindingPortsStr));
 		}
 
@@ -404,7 +408,7 @@ public class AppConfig {
 		setRequestProcessorClass(props.getProperty(REQUEST_PROCESSOR_CLASS, "lu.nowina.nexu.jetty.RequestProcessor"));
 
 		final String bindingPortHttpsStr = props.getProperty(BINDING_PORTS_HTTPS, "9895");
-		if (StringUtils.isNotEmpty(bindingPortHttpsStr)) {
+		if (isNotEmpty(bindingPortHttpsStr)) {
 			setBindingPortsHttps(toListOfInt(bindingPortHttpsStr));
 		}
 		
@@ -426,5 +430,9 @@ public class AppConfig {
 			ports.add(Integer.parseInt(port.trim()));
 		}
 		return ports;
+	}
+	
+	public ConfigurationManager getConfigurationManager() {
+		return new ConfigurationManager();
 	}
 }
