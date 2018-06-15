@@ -25,6 +25,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import lu.nowina.nexu.flow.StageHelper;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 public class PasswordInputController extends AbstractUIOperationController<char[]> implements Initializable {
@@ -43,18 +44,16 @@ public class PasswordInputController extends AbstractUIOperationController<char[
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		EventHandler<ActionEvent> handler = (event) -> {
-			signalEnd(password.getText().toCharArray());
-		};
+		EventHandler<ActionEvent> handler = event -> signalEnd(password.getText().toCharArray());
 		ok.setOnAction(handler);
 		password.setOnAction(handler);
-		cancel.setOnAction((e) -> {
-			signalUserCancel();
-		});
+		cancel.setOnAction(e -> signalUserCancel());
 	}
 
 	@Override
 	public void init(Object... params) {
+		StageHelper.getInstance().setTitle(String.format("%s - %s", params[0],
+				ResourceBundle.getBundle("bundles/nexu").getString("password.title")));
 		final String passwordPrompt = (String) params[0];
 		if(StringUtils.isNotEmpty(passwordPrompt)) {
 			this.passwordPrompt.setText(passwordPrompt);

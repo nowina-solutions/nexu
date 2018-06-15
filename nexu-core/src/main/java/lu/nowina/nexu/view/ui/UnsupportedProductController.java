@@ -24,6 +24,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import lu.nowina.nexu.api.NexuAPI;
+import lu.nowina.nexu.flow.StageHelper;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 /**
@@ -36,7 +38,7 @@ public class UnsupportedProductController extends AbstractUIOperationController<
 
 	@FXML
 	private Label message;
-	
+
 	@FXML
 	private Button requestSupport;
 
@@ -45,20 +47,15 @@ public class UnsupportedProductController extends AbstractUIOperationController<
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		hicSuntDracones.setOnAction((ev) -> {
-			signalEnd(true);
-		});
-		requestSupport.setOnAction((ev) -> {
-			signalEnd(false);
-		});
+		hicSuntDracones.setOnAction(ev -> signalEnd(true));
+		requestSupport.setOnAction(ev -> signalEnd(false));
 	}
 
 	@Override
 	public final void init(Object... params) {
-		Platform.runLater(() -> {
-			message.setText(StringEscapeUtils.unescapeJava(MessageFormat.format(
-					ResourceBundle.getBundle("bundles/nexu").getString("unsuported.product.header"),
-					params[0])));
-		});
+		StageHelper.getInstance().setTitle(String.format("%s - %s", params[0], ResourceBundle.getBundle("bundles/nexu").getString("unsuported.product.title")));
+
+		Platform.runLater(() -> message.setText(StringEscapeUtils.unescapeJava(MessageFormat
+				.format(ResourceBundle.getBundle("bundles/nexu").getString("unsuported.product.header"), params[0]))));
 	}
 }

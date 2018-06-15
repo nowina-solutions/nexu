@@ -30,6 +30,7 @@ import lu.nowina.nexu.api.NexuPasswordInputCallback;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationFactory;
 import lu.nowina.nexu.api.flow.OperationResult;
+import lu.nowina.nexu.flow.StageHelper;
 import lu.nowina.nexu.view.core.ExtensionFilter;
 import lu.nowina.nexu.view.core.NonBlockingUIOperation;
 import lu.nowina.nexu.view.core.UIDisplay;
@@ -72,7 +73,9 @@ public class StandaloneUIDisplay implements UIDisplay {
 			final Scene scene = new Scene(panel);
 			scene.getStylesheets().add(this.getClass().getResource("/styles/nexu.css").toString());
 			stage.setScene(scene);
+			stage.setTitle(StageHelper.getInstance().getTitle());
 			stage.show();
+			StageHelper.getInstance().setTitle("");
 		});
 	}
 

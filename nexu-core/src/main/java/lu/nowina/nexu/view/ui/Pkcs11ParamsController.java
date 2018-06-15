@@ -25,6 +25,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.OS;
+import lu.nowina.nexu.flow.StageHelper;
 import lu.nowina.nexu.model.Pkcs11Params;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 import lu.nowina.nexu.view.core.ExtensionFilter;
@@ -32,7 +33,7 @@ import lu.nowina.nexu.view.core.ExtensionFilter;
 public class Pkcs11ParamsController extends AbstractUIOperationController<Pkcs11Params> implements Initializable {
 
 	private static final OS OS = EnvironmentInfo.buildFromSystemProperties(System.getProperties()).getOs();
-	
+
 	@FXML
 	private Button ok;
 
@@ -44,25 +45,29 @@ public class Pkcs11ParamsController extends AbstractUIOperationController<Pkcs11
 
 	private File pkcs11File;
 	private BooleanProperty pkcs11FileSpecified;
-	
+
 	public Pkcs11ParamsController() {
 		pkcs11FileSpecified = new SimpleBooleanProperty(false);
+	}
+	
+	@Override
+	public void init(Object... params) {
+		StageHelper.getInstance().setTitle(String.format("%s - %s", params[0],
+				ResourceBundle.getBundle("bundles/nexu").getString("pkcs11.params.title")));
 	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		ok.setOnAction((event) -> {
+		ok.setOnAction(event -> {
 			Pkcs11Params result = new Pkcs11Params();
 			result.setPkcs11Lib(pkcs11File);
 			signalEnd(result);
 		});
 		ok.disableProperty().bind(Bindings.not(pkcs11FileSpecified));
-		cancel.setOnAction((e) -> {
-			signalUserCancel();
-		});
-		selectFile.setOnAction((e) -> {
-			pkcs11File = getDisplay().displayFileChooser(new ExtensionFilter(OS.getNativeLibraryFileExtensionDescription(),
-					OS.getNativeLibraryFileExtension()));
+		cancel.setOnAction(e -> signalUserCancel());
+		selectFile.setOnAction(e -> {
+			pkcs11File = getDisplay().displayFileChooser(new ExtensionFilter(
+					OS.getNativeLibraryFileExtensionDescription(), OS.getNativeLibraryFileExtension()));
 			pkcs11FileSpecified.set(pkcs11File != null);
 		});
 	}

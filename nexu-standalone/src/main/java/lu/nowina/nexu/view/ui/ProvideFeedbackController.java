@@ -23,6 +23,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import lu.nowina.nexu.flow.StageHelper;
 
 public class ProvideFeedbackController extends AbstractFeedbackUIOperationController implements Initializable {
 
@@ -40,22 +41,22 @@ public class ProvideFeedbackController extends AbstractFeedbackUIOperationContro
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		ok.setOnAction((e) -> {
+		ok.setOnAction(e -> {
 			getFeedback().setUserComment(userComment.getText());
 			sendFeedback();
 		});
-		cancel.setOnAction((e) -> {
-			signalUserCancel();
-		});
+		cancel.setOnAction(e -> signalUserCancel());
 	}
 
 	@Override
 	protected void doInit(Object... params) {
-		Platform.runLater(() -> {
+		StageHelper.getInstance().setTitle(String.format("%s - %s", getApplicationName(),
+				ResourceBundle.getBundle("bundles/nexu").getString("feedback.title")));
+		Platform.runLater(() -> 
 			message.setText(MessageFormat.format(
 					ResourceBundle.getBundle("bundles/nexu").getString("feedback.message"),
-					getApplicationName()));
-		});
+					getApplicationName()))
+		);
 	}
 
 }

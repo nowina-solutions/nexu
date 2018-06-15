@@ -27,6 +27,7 @@ import javafx.scene.control.ToggleGroup;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.OS;
 import lu.nowina.nexu.api.ScAPI;
+import lu.nowina.nexu.flow.StageHelper;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 public class APISelectionController extends AbstractUIOperationController<ScAPI> implements Initializable {
@@ -88,10 +89,12 @@ public class APISelectionController extends AbstractUIOperationController<ScAPI>
 
 	@Override
 	public final void init(Object... params) {
-		Platform.runLater(() -> {
+		StageHelper.getInstance().setTitle(String.format("%s - %s", params[0],
+				ResourceBundle.getBundle("bundles/nexu").getString("api.selection.title")));
+		Platform.runLater(() -> 
 			message.setText(MessageFormat.format(
 					ResourceBundle.getBundle("bundles/nexu").getString("api.selection.header"),
-					params[0]));
-		});
+					params[0]))
+		);
 	}
 }
