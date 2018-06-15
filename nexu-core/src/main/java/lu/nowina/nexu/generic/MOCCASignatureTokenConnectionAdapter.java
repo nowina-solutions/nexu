@@ -126,6 +126,7 @@ public class MOCCASignatureTokenConnectionAdapter implements SignatureTokenConne
 		}
 	}
 
+	@Deprecated
 	public SignatureValue sign(ToBeSigned toBeSigned, DigestAlgorithm digestAlgorithm, DSSPrivateKeyEntry keyEntry) throws DSSException {
 		return sign(toBeSigned, digestAlgorithm,null, keyEntry);
 	}

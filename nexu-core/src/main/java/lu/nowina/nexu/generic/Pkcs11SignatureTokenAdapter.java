@@ -47,6 +47,7 @@ public class Pkcs11SignatureTokenAdapter implements SignatureTokenConnection {
 		}
 	}
 
+	@Deprecated
 	public SignatureValue sign(ToBeSigned toBeSigned, DigestAlgorithm digestAlgorithm, DSSPrivateKeyEntry keyEntry)
 			throws DSSException {
 		return sign(toBeSigned, digestAlgorithm, null, keyEntry);
