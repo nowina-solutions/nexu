@@ -121,7 +121,7 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 
 									if(api.getAppConfig().isEnablePopUps()) {
 										getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml", 
-												new Object[]{ "certificates.flow.finished" }).perform();
+												 "certificates.flow.finished", api.getAppConfig().getApplicationName()).perform();
 									}
 									return new Execution<GetCertificateResponse>(resp);
 								} else {

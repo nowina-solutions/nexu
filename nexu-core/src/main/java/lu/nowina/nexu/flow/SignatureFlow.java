@@ -95,7 +95,7 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 							
 							if(api.getAppConfig().isEnablePopUps()) {
 								getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
-									new Object[]{"signature.flow.finished"}).perform();
+									"signature.flow.finished", api.getAppConfig().getApplicationName()).perform();
 							}
 							
 							return new Execution<SignatureResponse>(new SignatureResponse(value, key.getCertificate(), key.getCertificateChain()));
@@ -105,14 +105,14 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 					} else {
 						if(api.getAppConfig().isEnablePopUps()) {
 							getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
-								new Object[]{"signature.flow.no.key.selected", api.getAppConfig().getApplicationName()}).perform();
+								"signature.flow.no.key.selected", api.getAppConfig().getApplicationName()).perform();
 						}
 						return handleErrorOperationResult(selectPrivateKeyOperationResult);
 					}
 				} else {
 					if(api.getAppConfig().isEnablePopUps()) {
 						getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
-							new Object[]{"signature.flow.bad.token", api.getAppConfig().getApplicationName()}).perform();
+							"signature.flow.bad.token", api.getAppConfig().getApplicationName()).perform();
 					}
 					return handleErrorOperationResult(getTokenConnectionOperationResult);
 				}

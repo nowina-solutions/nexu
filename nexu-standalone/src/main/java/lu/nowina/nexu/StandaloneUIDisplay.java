@@ -19,6 +19,8 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.javafx.scene.SceneHelper;
+
 import eu.europa.esig.dss.token.PasswordInputCallback;
 import javafx.application.Platform;
 import javafx.scene.Parent;
@@ -137,7 +139,7 @@ public class StandaloneUIDisplay implements UIDisplay {
 			LOGGER.info("Request password");
 			@SuppressWarnings("unchecked")
 			final OperationResult<char[]> passwordResult = StandaloneUIDisplay.this.operationFactory.getOperation(
-					UIOperation.class, "/fxml/password-input.fxml", passwordPrompt).perform();
+					UIOperation.class, "/fxml/password-input.fxml", passwordPrompt, NexuLauncher.getConfig().getApplicationName()).perform();
 			if(passwordResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 				return passwordResult.getResult();
 			} else if(passwordResult.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
@@ -173,11 +175,11 @@ public class StandaloneUIDisplay implements UIDisplay {
 			if(Message.INPUT_PINPAD.equals(message)) {
 				StandaloneUIDisplay.this.operationFactory.getOperation(
 						NonBlockingUIOperation.class, "/fxml/message-no-button.fxml",
-						"message.display.callback." + message.name().toLowerCase().replace('_', '.')).perform();
+						"message.display.callback." + message.name().toLowerCase().replace('_', '.'), NexuLauncher.getConfig()).perform();
 			} else {
 				StandaloneUIDisplay.this.operationFactory.getOperation(
 					NonBlockingUIOperation.class, "/fxml/message.fxml",
-					"message.display.callback." + message.name().toLowerCase().replace('_', '.')).perform();
+					"message.display.callback." + message.name().toLowerCase().replace('_', '.'), NexuLauncher.getConfig()).perform();
 			}
 		}
 

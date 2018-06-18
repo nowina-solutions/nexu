@@ -36,6 +36,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseEvent;
+import lu.nowina.nexu.flow.StageHelper;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 public class KeySelectionController extends AbstractUIOperationController<DSSPrivateKeyEntry> implements Initializable {
@@ -50,16 +51,16 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 
 	@FXML
 	private ListView<DSSPrivateKeyEntry> listView;
-	
+
 	@FXML
 	private TextArea taX500Principal;
-	
+
 	@FXML
 	private Label startDate;
-	
+
 	@FXML
 	private Label endDate;
-	
+
 	@FXML
 	private Label usage;
 
@@ -93,61 +94,61 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 
 			return cell;
 		});
-		
+
 		listView.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
 			@Override
 			public void handle(MouseEvent event) {
 				DSSPrivateKeyEntry key = listView.getSelectionModel().getSelectedItem();
-				if(key != null) {
+				if (key != null) {
 					CertificateToken token = listView.getSelectionModel().getSelectedItem().getCertificate();
 					taX500Principal.setText(token.getSubjectX500Principal().toString().replace(", ", "\n"));
-					
+
 					SimpleDateFormat format = new SimpleDateFormat("dd MMMMMM yyyy");
 					startDate.setText(format.format(token.getNotBefore()));
 					endDate.setText(format.format(token.getNotAfter()));
 					usage.setText(createKeyUsageString(token, resources));
 				}
 			}
-			
+
 		});
-		
+
 		taX500Principal.setEditable(false);
 		taX500Principal.setMouseTransparent(true);
 		taX500Principal.setFocusTraversable(false);
 	}
-	
+
 	private String createKeyUsageString(CertificateToken token, ResourceBundle resources) {
 		final boolean[] keyUsages = token.getCertificate().getKeyUsage();
-		if(keyUsages == null) {
+		if (keyUsages == null) {
 			return "";
 		}
 		final StringBuilder builder = new StringBuilder();
-		if(keyUsages[0]) {
+		if (keyUsages[0]) {
 			builder.append(resources.getString("keyUsage.digitalSignature") + "\n");
 		}
-		if(keyUsages[1]) {
+		if (keyUsages[1]) {
 			builder.append(resources.getString("keyUsage.nonRepudiation") + "\n");
 		}
-		if(keyUsages[2]) {
+		if (keyUsages[2]) {
 			builder.append(resources.getString("keyUsage.keyEncipherment") + "\n");
 		}
-		if(keyUsages[3]) {
+		if (keyUsages[3]) {
 			builder.append(resources.getString("keyUsage.dataEncipherment") + "\n");
 		}
-		if(keyUsages[4]) {
+		if (keyUsages[4]) {
 			builder.append(resources.getString("keyUsage.keyAgreement") + "\n");
 		}
-		if(keyUsages[5]) {
+		if (keyUsages[5]) {
 			builder.append(resources.getString("keyUsage.keyCertSign") + "\n");
 		}
-		if(keyUsages[6]) {
+		if (keyUsages[6]) {
 			builder.append(resources.getString("keyUsage.crlSign") + "\n");
 		}
-		if(keyUsages[7]) {
+		if (keyUsages[7]) {
 			builder.append(resources.getString("keyUsage.encipherOnly") + "\n");
 		}
-		if(keyUsages[8]) {
+		if (keyUsages[8]) {
 			builder.append(resources.getString("keyUsage.decipherOnly") + "\n");
 		}
 		return builder.toString();
@@ -156,6 +157,8 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 	@Override
 	@SuppressWarnings("unchecked")
 	public void init(Object... params) {
+		StageHelper.getInstance().setTitle(String.format("%s - %s", params[1],
+				ResourceBundle.getBundle("bundles/nexu").getString("key.selection.title")));
 		List<DSSPrivateKeyEntry> keys = (List<DSSPrivateKeyEntry>) params[0];
 		ObservableList<DSSPrivateKeyEntry> items = FXCollections.observableArrayList(keys);
 		listView.setItems(items);
