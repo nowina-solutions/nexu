@@ -66,6 +66,7 @@ public class AppConfig {
 	private static final String ENABLE_DATABASE_WEB_LOADER = "enable_database_web_loader";
 
 	private static final String ENABLE_SYSTRAY_MENU = "enable_systray_menu";
+	private static final String CORS_ALLOWED_ORIGIN = "cors_allowed_origin";	
 
 	private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
 
@@ -119,6 +120,9 @@ public class AppConfig {
 	private boolean enableDatabaseWebLoader;
 
 	private boolean enableSystrayMenu;
+
+	// String used for http header Access-Control-Allow-Origin. Default: "*"
+	private String corsAllowedOrigin;
 
 	public AppConfig() {
 		try {
@@ -415,6 +419,7 @@ public class AppConfig {
 
 		setEnableDatabaseWebLoader(Boolean.parseBoolean(props.getProperty(ENABLE_DATABASE_WEB_LOADER, "true")));
 		setEnableSystrayMenu(Boolean.parseBoolean(props.getProperty(ENABLE_SYSTRAY_MENU, "true")));
+		setCorsAllowedOrigin(props.getProperty(CORS_ALLOWED_ORIGIN, "*"));
 	}
 
 	/**
@@ -443,5 +448,13 @@ public class AppConfig {
 
 	public void setEnableInformativePopUps(boolean enableInformativePopUps) {
 		this.enableInformativePopUps = enableInformativePopUps;
+	}
+
+	public String getCorsAllowedOrigin() {
+		return corsAllowedOrigin;
+	}
+
+	public void setCorsAllowedOrigin(String corsAllowedOrigin) {
+		this.corsAllowedOrigin = corsAllowedOrigin;
 	}
 }
