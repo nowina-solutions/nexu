@@ -39,14 +39,4 @@
 			</children>
 		</HBox>
 	</bottom>
-	<center>
-		<VBox styleClass="form-container" BorderPane.alignment="CENTER">
-         <children>
-            <VBox prefHeight="200.0" prefWidth="100.0">
-               <children>
-                  <CheckBox fx:id="publish" mnemonicParsing="false" text="%store.configuration.commonServer" />
-               </children></VBox>
-         </children>
-		</VBox>
-	</center>
 </BorderPane>

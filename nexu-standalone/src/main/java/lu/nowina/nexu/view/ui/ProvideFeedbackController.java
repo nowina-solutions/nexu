@@ -13,9 +13,20 @@
  */
 package lu.nowina.nexu.view.ui;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
+
+import javax.xml.bind.JAXBException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.sun.javafx.application.HostServicesDelegate;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -23,8 +34,13 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import lu.nowina.nexu.NexuException;
+import lu.nowina.nexu.api.Feedback;
+import lu.nowina.nexu.generic.DebugHelper;
 
 public class ProvideFeedbackController extends AbstractFeedbackUIOperationController implements Initializable {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProvideFeedbackController.class);
 
 	@FXML
 	private Button ok;
@@ -40,22 +56,33 @@ public class ProvideFeedbackController extends AbstractFeedbackUIOperationContro
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		ok.setOnAction((e) -> {
-			getFeedback().setUserComment(userComment.getText());
-			sendFeedback();
+
+		ok.setOnAction(e -> {
+			
+			DebugHelper dh = new DebugHelper();
+			Feedback feedback = null;
+			try {
+				feedback = dh.processError(new NexuException("dummy error message"));
+			} catch (IOException |JAXBException ex) {
+				LOGGER.warn(ex.getMessage(), ex);
+			} 
+			new Thread(() -> {
+				try {
+					Desktop.getDesktop().browse(new URI("https://github.com/nowina-solutions/nexu/issues/new"));
+				} catch (IOException | URISyntaxException ioe) {
+					System.out.println(ioe.getMessage());
+				}
+			}).start();
+			signalEnd(feedback);
 		});
-		cancel.setOnAction((e) -> {
-			signalUserCancel();
-		});
+		cancel.setOnAction(e -> signalUserCancel());
 	}
 
 	@Override
 	protected void doInit(Object... params) {
-		Platform.runLater(() -> {
-			message.setText(MessageFormat.format(
-					ResourceBundle.getBundle("bundles/nexu").getString("feedback.message"),
-					getApplicationName()));
-		});
+		Platform.runLater(() -> message.setText(MessageFormat.format(
+				ResourceBundle.getBundle("bundles/nexu").getString("feedback.message"),
+				ResourceBundle.getBundle("bundles/nexu").getString("button.report.incident"), getApplicationName())));
 	}
 
 }
