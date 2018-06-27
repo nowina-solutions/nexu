@@ -24,6 +24,7 @@ import eu.europa.esig.dss.token.MSCAPISignatureToken;
 import eu.europa.esig.dss.token.Pkcs11SignatureToken;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 import eu.europa.esig.dss.token.mocca.MOCCASignatureTokenConnection;
+import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.api.FeedbackStatus;
@@ -34,6 +35,7 @@ import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
+import lu.nowina.nexu.api.flow.Operation;
 import lu.nowina.nexu.api.flow.OperationResult;
 import lu.nowina.nexu.generic.ConnectionInfo;
 import lu.nowina.nexu.generic.GenericCardAdapter;
@@ -106,7 +108,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 					feedback.setFeedbackStatus(FeedbackStatus.PRODUCT_NOT_SUPPORTED);
 					operationFactory.getOperation(UIOperation.class, "/fxml/provide-feedback.fxml",
 							new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
-									api.getAppConfig().getApplicationName()}).perform();
+									api.getAppConfig().getApplicationName(), api.getAppConfig()}).perform();
 				}
 				return new OperationResult<Map<TokenOperationResultKey, Object>>(CoreOperationStatus.UNSUPPORTED_PRODUCT);
 			}

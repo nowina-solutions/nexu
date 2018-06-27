@@ -71,10 +71,8 @@ public abstract class Flow<I, O> {
 			final Feedback feedback = new Feedback(e);
 			getOperationFactory().getOperation(
 					UIOperation.class, "/fxml/provide-feedback.fxml",
-					new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
-							api.getAppConfig().getApplicationName()}).perform();
-			getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
-					new Object[]{"exception.failure.message", api.getAppConfig().getApplicationName()}).perform();
+					new Object[] {feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
+							api.getAppConfig().getApplicationName(), api.getAppConfig()}).perform();
 		}
 		return e;
 	}

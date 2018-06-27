@@ -126,7 +126,6 @@ public class DebugHelper {
 		Process process = Runtime.getRuntime().exec("xdg-mime query default inode/directory");
 		BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-		BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 		String os = stdInput.readLine().split("\\.")[0];
 		Runtime.getRuntime().exec(String.format("%s %s", os, debugFilePath));
 	}

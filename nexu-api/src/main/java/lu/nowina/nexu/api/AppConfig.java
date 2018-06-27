@@ -66,6 +66,8 @@ public class AppConfig {
 	private static final String ENABLE_DATABASE_WEB_LOADER = "enable_database_web_loader";
 
 	private static final String ENABLE_SYSTRAY_MENU = "enable_systray_menu";
+	
+	private static final String TICKET_URL = "ticket_url";
 
 	private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
 
@@ -119,6 +121,8 @@ public class AppConfig {
 	private boolean enableDatabaseWebLoader;
 
 	private boolean enableSystrayMenu;
+	
+	private String ticketUrl;
 
 	public AppConfig() {
 		try {
@@ -391,7 +395,8 @@ public class AppConfig {
 		setConnectionsCacheMaxSize(Integer.parseInt(props.getProperty(CONNECTIONS_CACHE_MAX_SIZE, "50")));
 		setEnablePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_POP_UPS, "true")));
 		setEnableInformativePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_INFORMATIVE_POP_UPS, "true")));
-		setSendAnonymousInfoToProxy(Boolean.parseBoolean(props.getProperty(SEND_ANONYMOUS_INFO_TO_PROXY, "true")));
+		// Always set to false, just in case
+		setSendAnonymousInfoToProxy(false);
 
 		setUseSystemProxy(Boolean.parseBoolean(props.getProperty(USE_SYSTEM_PROXY, "false")));
 		setProxyServer(props.getProperty(PROXY_SERVER, ""));
@@ -415,6 +420,7 @@ public class AppConfig {
 
 		setEnableDatabaseWebLoader(Boolean.parseBoolean(props.getProperty(ENABLE_DATABASE_WEB_LOADER, "true")));
 		setEnableSystrayMenu(Boolean.parseBoolean(props.getProperty(ENABLE_SYSTRAY_MENU, "true")));
+		setTicketUrl(props.getProperty(TICKET_URL, "https://github.com/nowina-solutions/nexu/issues/new"));
 	}
 
 	/**
@@ -443,5 +449,13 @@ public class AppConfig {
 
 	public void setEnableInformativePopUps(boolean enableInformativePopUps) {
 		this.enableInformativePopUps = enableInformativePopUps;
+	}
+
+	public String getTicketUrl() {
+		return ticketUrl;
+	}
+
+	public void setTicketUrl(String ticketUrl) {
+		this.ticketUrl = ticketUrl;
 	}
 }

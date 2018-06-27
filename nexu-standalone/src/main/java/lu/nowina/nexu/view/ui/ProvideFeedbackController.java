@@ -62,15 +62,15 @@ public class ProvideFeedbackController extends AbstractFeedbackUIOperationContro
 			DebugHelper dh = new DebugHelper();
 			Feedback feedback = null;
 			try {
-				feedback = dh.processError(new NexuException("dummy error message"));
+				feedback = dh.processError(new NexuException());
 			} catch (IOException |JAXBException ex) {
 				LOGGER.warn(ex.getMessage(), ex);
 			} 
 			new Thread(() -> {
 				try {
-					Desktop.getDesktop().browse(new URI("https://github.com/nowina-solutions/nexu/issues/new"));
+					Desktop.getDesktop().browse(new URI(getAppConfig().getTicketUrl()));
 				} catch (IOException | URISyntaxException ioe) {
-					System.out.println(ioe.getMessage());
+					LOGGER.error(ioe.getMessage());
 				}
 			}).start();
 			signalEnd(feedback);
