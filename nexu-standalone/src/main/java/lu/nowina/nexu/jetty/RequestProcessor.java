@@ -107,7 +107,8 @@ public class RequestProcessor extends AbstractHandler {
 			return;
 		}
 		
-		response.setHeader("Access-Control-Allow-Origin", "*");
+		response.setHeader("Access-Control-Allow-Origin", api.getAppConfig().getCorsAllowedOrigin());
+		response.setHeader("Vary", "Origin");
 		response.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
 		response.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
@@ -116,7 +117,6 @@ public class RequestProcessor extends AbstractHandler {
 			response.getWriter().close();
 			return;
 		}
-
 		logger.info("Request " + target);
 
 		try {
