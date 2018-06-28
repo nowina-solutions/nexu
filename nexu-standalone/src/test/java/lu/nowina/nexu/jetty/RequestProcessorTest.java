@@ -8,8 +8,10 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +34,7 @@ public class RequestProcessorTest {
 	private AppConfig appConfig;
 	private Request request;
 	private HttpServletRequest httpRequest;
+	private Properties props;
 
 	@SuppressWarnings("rawtypes")
 	@Before
@@ -53,15 +56,25 @@ public class RequestProcessorTest {
 		httpRequest = mock(HttpServletRequest.class);
 		when(httpRequest.getRemoteHost()).thenReturn("127.0.0.1");
 		when(response.getWriter()).thenReturn(new PrintWriter(System.out));
+		props = new Properties();
 	}
-
+	
 	@Test
 	public void testCorsOriginProvided() throws IOException, ServletException {
 		final String allowedOrigin = "http://dss.nowina.lu";
-		appConfig.setCorsAllowedOrigin(allowedOrigin);
+		final String allowedOriginProp = String.format("cors_allowed_origin=%s", allowedOrigin);
+		props.load(new StringReader(allowedOriginProp));
+		appConfig.loadFromProperties(props);
 		rp.handle("/", request, httpRequest, response);
 		assertEquals(allowedOrigin, parameters.get("Access-Control-Allow-Origin"));
-
+		
 	}
 
+	@Test
+	public void testCorsOriginNotProvided() throws IOException, ServletException {
+		appConfig.loadFromProperties(new Properties());
+		rp.handle("/", request, httpRequest, response);
+		assertEquals("*", parameters.get("Access-Control-Allow-Origin"));
+	}
+	
 }
