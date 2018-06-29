@@ -89,8 +89,7 @@ public class APISelectionController extends AbstractUIOperationController<ScAPI>
 
 	@Override
 	public final void init(Object... params) {
-		StageHelper.getInstance().setTitle(String.format("%s - %s", params[0],
-				ResourceBundle.getBundle("bundles/nexu").getString("api.selection.title")));
+		StageHelper.getInstance().setTitle((String) params[0], "api.selection.title");
 		Platform.runLater(() -> 
 			message.setText(MessageFormat.format(
 					ResourceBundle.getBundle("bundles/nexu").getString("api.selection.header"),

@@ -52,8 +52,7 @@ public class PasswordInputController extends AbstractUIOperationController<char[
 
 	@Override
 	public void init(Object... params) {
-		StageHelper.getInstance().setTitle(String.format("%s - %s", params[1],
-				ResourceBundle.getBundle("bundles/nexu").getString("password.title")));
+		StageHelper.getInstance().setTitle((String) params[1], "password.title");
 		final String passwordPrompt = (String) params[0];
 		if(StringUtils.isNotEmpty(passwordPrompt)) {
 			this.passwordPrompt.setText(passwordPrompt);

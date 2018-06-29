@@ -157,8 +157,7 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 	@Override
 	@SuppressWarnings("unchecked")
 	public void init(Object... params) {
-		StageHelper.getInstance().setTitle(String.format("%s - %s", params[1],
-				ResourceBundle.getBundle("bundles/nexu").getString("key.selection.title")));
+		StageHelper.getInstance().setTitle((String) params[1], "key.selection.title");
 		List<DSSPrivateKeyEntry> keys = (List<DSSPrivateKeyEntry>) params[0];
 		ObservableList<DSSPrivateKeyEntry> items = FXCollections.observableArrayList(keys);
 		listView.setItems(items);

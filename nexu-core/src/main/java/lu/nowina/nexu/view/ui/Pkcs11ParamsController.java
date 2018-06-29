@@ -52,8 +52,7 @@ public class Pkcs11ParamsController extends AbstractUIOperationController<Pkcs11
 	
 	@Override
 	public void init(Object... params) {
-		StageHelper.getInstance().setTitle(String.format("%s - %s", params[0],
-				ResourceBundle.getBundle("bundles/nexu").getString("pkcs11.params.title")));
+		StageHelper.getInstance().setTitle((String) params[0], "pkcs11.params.title");
 	}
 
 	@Override

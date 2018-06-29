@@ -68,8 +68,7 @@ public class StoreResultController extends AbstractFeedbackUIOperationController
 		}
 		
 		Platform.runLater(() -> {
-			StageHelper.getInstance().setTitle(String.format("%s - %s", getApplicationName(),
-					ResourceBundle.getBundle("bundles/nexu").getString("store.configuration.title")));
+			StageHelper.getInstance().setTitle(getApplicationName(), "store.configuration.title");
 			message.setText(StringEscapeUtils.unescapeJava(MessageFormat.format(
 					ResourceBundle.getBundle("bundles/nexu").getString("store.configuration.header"),
 					getApplicationName())));

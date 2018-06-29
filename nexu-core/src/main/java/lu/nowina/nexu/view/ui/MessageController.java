@@ -22,7 +22,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.flow.StageHelper;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
@@ -55,8 +54,7 @@ public class MessageController extends AbstractUIOperationController<Void> imple
 				message.setText(
 						MessageFormat.format(resources.getString(value), Arrays.copyOfRange(params, 1, params.length)));
 			}
-			StageHelper.getInstance().setTitle(String.format("%s - %s", params[1],
-					ResourceBundle.getBundle("bundles/nexu").getString("message.title")));
+			StageHelper.getInstance().setTitle((String) params[1], "message.title");
 		} else {
 			message.setText(defaultErrorText);
 		}

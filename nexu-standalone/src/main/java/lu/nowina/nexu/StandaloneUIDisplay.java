@@ -77,7 +77,7 @@ public class StandaloneUIDisplay implements UIDisplay {
 			stage.setScene(scene);
 			stage.setTitle(StageHelper.getInstance().getTitle());
 			stage.show();
-			StageHelper.getInstance().setTitle("");
+			StageHelper.getInstance().setTitle("", null);
 		});
 	}
 

@@ -54,8 +54,7 @@ public class ConfigureKeystoreController extends AbstractUIOperationController<C
 	
 	@Override
 	public void init(Object... params) {
-		StageHelper.getInstance().setTitle(String.format("%s - %s", params[0],
-				ResourceBundle.getBundle("bundles/nexu").getString("save.keystore.title")));
+		StageHelper.getInstance().setTitle((String)params[0], "save.keystore.title");
 	}
 	
 	@Override

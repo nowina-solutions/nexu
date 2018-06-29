@@ -65,8 +65,8 @@ public class ProductSelectionController extends AbstractUIOperationController<Pr
 	@Override
 	public final void init(Object... params) {
 		final NexuAPI api = (NexuAPI) params[3];
-		StageHelper.getInstance().setTitle(String.format("%s - %s", api.getAppConfig().getApplicationName(),
-				ResourceBundle.getBundle("bundles/nexu").getString("product.selection.title")));
+		StageHelper.getInstance().setTitle(api.getAppConfig().getApplicationName(),
+				"product.selection.title");
 
 		Platform.runLater(() -> {
 			message.setText(MessageFormat
