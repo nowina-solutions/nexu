@@ -22,6 +22,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import lu.nowina.nexu.flow.StageHelper;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 public class MessageController extends AbstractUIOperationController<Void> implements Initializable {
@@ -31,17 +32,15 @@ public class MessageController extends AbstractUIOperationController<Void> imple
 
 	@FXML
 	private Button ok;
-	
+
 	private String defaultErrorText;
 
 	private ResourceBundle resources;
-	
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		if(ok != null) {
-			ok.setOnAction((e) -> {
-				signalEnd(null);
-			});
+		if (ok != null) {
+			ok.setOnAction(e -> signalEnd(null));
 		}
 		defaultErrorText = resources.getString("error");
 		this.resources = resources;
@@ -52,8 +51,10 @@ public class MessageController extends AbstractUIOperationController<Void> imple
 		if (params.length > 0) {
 			final String value = (String) params[0];
 			if (value != null) {
-				message.setText(MessageFormat.format(resources.getString(value), Arrays.copyOfRange(params, 1, params.length)));
+				message.setText(
+						MessageFormat.format(resources.getString(value), Arrays.copyOfRange(params, 1, params.length)));
 			}
+			StageHelper.getInstance().setTitle((String) params[1], "message.title");
 		} else {
 			message.setText(defaultErrorText);
 		}

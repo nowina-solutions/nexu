@@ -169,7 +169,7 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
 		case PKCS_11:
 			@SuppressWarnings("unchecked")
 			final OperationResult<Pkcs11Params> op2 =
-				operationFactory.getOperation(UIOperation.class, "/fxml/pkcs11-params.fxml").perform();
+				operationFactory.getOperation(UIOperation.class, "/fxml/pkcs11-params.fxml", api.getAppConfig().getApplicationName()).perform();
 			if(op2.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
 				return new OperationResult<Map<TokenOperationResultKey, Object>>(BasicOperationStatus.USER_CANCEL);
 			}

@@ -135,7 +135,7 @@ public class KeystoreProductAdapter implements ProductAdapter {
 	@SuppressWarnings("unchecked")
 	public FutureOperationInvocation<Product> getConfigurationOperation(NexuAPI api, Product product) {
 		if (product instanceof NewKeystore) {
-			return UIOperation.getFutureOperationInvocation(UIOperation.class, "/fxml/configure-keystore.fxml");
+			return UIOperation.getFutureOperationInvocation(UIOperation.class, "/fxml/configure-keystore.fxml", api.getAppConfig().getApplicationName());
 		} else {
 			return new NoOpFutureOperationInvocation<Product>(product);
 		}

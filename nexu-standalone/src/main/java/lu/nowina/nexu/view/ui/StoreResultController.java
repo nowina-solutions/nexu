@@ -27,6 +27,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import lu.nowina.nexu.flow.StageHelper;
 
 public class StoreResultController extends AbstractFeedbackUIOperationController implements Initializable {
 
@@ -46,7 +47,7 @@ public class StoreResultController extends AbstractFeedbackUIOperationController
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		store.setOnAction((e) -> {
+		store.setOnAction(e -> {
 			logger.info("Store for " + getFeedback().getSelectedCard().getAtr()
 					+ " parameters: " + getFeedback().getSelectedAPI() + " - " + getFeedback().getApiParameter());
 			if (publish.isSelected()) {
@@ -55,9 +56,7 @@ public class StoreResultController extends AbstractFeedbackUIOperationController
 				signalEnd(getFeedback());
 			}
 		});
-		forget.setOnAction((e) -> {
-			signalEnd(null);
-		});
+		forget.setOnAction(e -> signalEnd(null));
 		publish.setSelected(true);
 	}
 
@@ -67,11 +66,13 @@ public class StoreResultController extends AbstractFeedbackUIOperationController
 			throw new IllegalArgumentException("Invalid Feedback (card: " + getFeedback().getSelectedCard()
 					+ ", api: " + getFeedback().getSelectedAPI() + ")");
 		}
-
+		
 		Platform.runLater(() -> {
+			StageHelper.getInstance().setTitle(getApplicationName(), "store.configuration.title");
 			message.setText(StringEscapeUtils.unescapeJava(MessageFormat.format(
 					ResourceBundle.getBundle("bundles/nexu").getString("store.configuration.header"),
 					getApplicationName())));
-		});
+		}
+		);
 	}
 }

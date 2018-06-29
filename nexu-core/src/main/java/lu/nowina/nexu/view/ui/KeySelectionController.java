@@ -49,6 +49,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import lu.nowina.nexu.flow.operation.CoreOperationStatus;
+import lu.nowina.nexu.flow.StageHelper;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 public class KeySelectionController extends AbstractUIOperationController<DSSPrivateKeyEntry> implements Initializable {
@@ -217,6 +218,7 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
 	@Override
 	@SuppressWarnings("unchecked")
 	public void init(Object... params) {
+		StageHelper.getInstance().setTitle((String) params[1], "key.selection.title");
 		List<DSSPrivateKeyEntry> keys = (List<DSSPrivateKeyEntry>) params[0];
 		ObservableList<DSSPrivateKeyEntry> items = FXCollections.observableArrayList(keys);
 		listView.setItems(items);
