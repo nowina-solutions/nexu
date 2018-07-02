@@ -80,7 +80,9 @@ public class ProvideFeedbackController extends AbstractFeedbackUIOperationContro
 
 	@Override
 	protected void doInit(Object... params) {
-		Platform.runLater(() -> message.setText(MessageFormat.format(
+		StageHelper.getInstance().setTitle(getApplicationName(), "feedback.title");
+		Platform.runLater(() ->
+			message.setText(MessageFormat.format(
 				ResourceBundle.getBundle("bundles/nexu").getString("feedback.message"),
 				ResourceBundle.getBundle("bundles/nexu").getString("button.report.incident"), getApplicationName())));
 	}

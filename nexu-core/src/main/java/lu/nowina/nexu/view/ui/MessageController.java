@@ -56,6 +56,7 @@ public class MessageController extends AbstractUIOperationController<Void> imple
 			}
 			StageHelper.getInstance().setTitle((String) params[1], "message.title");
 		} else {
+			StageHelper.getInstance().setTitle("", "message.title");
 			message.setText(defaultErrorText);
 		}
 	}
