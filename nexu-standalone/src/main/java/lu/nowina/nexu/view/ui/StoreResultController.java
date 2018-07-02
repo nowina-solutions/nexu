@@ -40,31 +40,23 @@ public class StoreResultController extends AbstractFeedbackUIOperationController
 	private Button forget;
 
 	@FXML
-	private CheckBox publish;
-	
-	@FXML
 	private Label message;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		store.setOnAction(e -> {
-			logger.info("Store for " + getFeedback().getSelectedCard().getAtr()
-					+ " parameters: " + getFeedback().getSelectedAPI() + " - " + getFeedback().getApiParameter());
-			if (publish.isSelected()) {
-				sendFeedback();
-			} else {
-				signalEnd(getFeedback());
-			}
+			logger.info("Store for " + getFeedback().getSelectedCard().getAtr() + " parameters: "
+					+ getFeedback().getSelectedAPI() + " - " + getFeedback().getApiParameter());
+			signalEnd(getFeedback());
 		});
 		forget.setOnAction(e -> signalEnd(null));
-		publish.setSelected(true);
 	}
 
 	@Override
 	protected void doInit(Object... params) {
 		if ((getFeedback().getSelectedCard() == null) || (getFeedback().getSelectedAPI() == null)) {
-			throw new IllegalArgumentException("Invalid Feedback (card: " + getFeedback().getSelectedCard()
-					+ ", api: " + getFeedback().getSelectedAPI() + ")");
+			throw new IllegalArgumentException("Invalid Feedback (card: " + getFeedback().getSelectedCard() + ", api: "
+					+ getFeedback().getSelectedAPI() + ")");
 		}
 		
 		Platform.runLater(() -> {

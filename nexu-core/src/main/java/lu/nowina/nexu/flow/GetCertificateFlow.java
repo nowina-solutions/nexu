@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import lu.nowina.nexu.api.flow.Operation;
+import lu.nowina.nexu.api.flow.OperationFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +79,6 @@ class GetCertificateFlow extends AbstractCoreFlow<GetCertificateRequest, GetCert
 								getOperationFactory().getOperation(ConfigureProductOperation.class, matchingProductAdapters, api).perform();
 						if(configureProductOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 							matchingProductAdapters = configureProductOperationResult.getResult();
-
 							final OperationResult<Map<TokenOperationResultKey, Object>> createTokenOperationResult =
 									getOperationFactory().getOperation(CreateTokenOperation.class, api, matchingProductAdapters).perform();
 							if (createTokenOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {

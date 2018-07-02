@@ -69,6 +69,10 @@ public class AppConfig {
 	private static final String ENABLE_SYSTRAY_MENU = "enable_systray_menu";
 	private static final String CORS_ALLOWED_ORIGIN = "cors_allowed_origin";	
 
+	private static final String TICKET_URL = "ticket_url";
+	private static final String ENABLE_INCIDENT_REPORT = "enable_incident_report";
+
+
 	private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
 
 	private String bindingIP;
@@ -121,6 +125,10 @@ public class AppConfig {
 	private boolean enableDatabaseWebLoader;
 
 	private boolean enableSystrayMenu;
+	
+	private String ticketUrl;
+	
+	private boolean enableIncidentReport;
 
 	// String used for http header Access-Control-Allow-Origin. Default: "*"
 	private String corsAllowedOrigin;
@@ -396,7 +404,8 @@ public class AppConfig {
 		setConnectionsCacheMaxSize(Integer.parseInt(props.getProperty(CONNECTIONS_CACHE_MAX_SIZE, "50")));
 		setEnablePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_POP_UPS, "true")));
 		setEnableInformativePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_INFORMATIVE_POP_UPS, "true")));
-		setSendAnonymousInfoToProxy(Boolean.parseBoolean(props.getProperty(SEND_ANONYMOUS_INFO_TO_PROXY, "true")));
+		// Always set to false, just in case
+		setSendAnonymousInfoToProxy(false);
 
 		setUseSystemProxy(Boolean.parseBoolean(props.getProperty(USE_SYSTEM_PROXY, "false")));
 		setProxyServer(props.getProperty(PROXY_SERVER, ""));
@@ -421,6 +430,8 @@ public class AppConfig {
 		setEnableDatabaseWebLoader(Boolean.parseBoolean(props.getProperty(ENABLE_DATABASE_WEB_LOADER, "true")));
 		setEnableSystrayMenu(Boolean.parseBoolean(props.getProperty(ENABLE_SYSTRAY_MENU, "true")));
 		setCorsAllowedOrigin(props.getProperty(CORS_ALLOWED_ORIGIN, "*"));
+		setTicketUrl(props.getProperty(TICKET_URL, "https://github.com/nowina-solutions/nexu/issues/new"));
+		setEnableIncidentReport(Boolean.parseBoolean(props.getProperty(ENABLE_INCIDENT_REPORT, "true")));
 	}
 
 	/**
@@ -458,4 +469,21 @@ public class AppConfig {
 	public void setCorsAllowedOrigin(String corsAllowedOrigin) {
 		this.corsAllowedOrigin = corsAllowedOrigin;
 	}
+
+	public String getTicketUrl() {
+		return ticketUrl;
+	}
+
+	public void setTicketUrl(String ticketUrl) {
+		this.ticketUrl = ticketUrl;
+	}
+
+	public boolean isEnableIncidentReport() {
+		return enableIncidentReport;
+	}
+
+	public void setEnableIncidentReport(boolean enableIncidentReport) {
+		this.enableIncidentReport = enableIncidentReport;
+	}
+
 }

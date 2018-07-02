@@ -16,6 +16,7 @@ package lu.nowina.nexu.view.ui;
 import java.util.Arrays;
 
 import lu.nowina.nexu.NexuLauncher;
+import lu.nowina.nexu.api.AppConfig;
 import lu.nowina.nexu.api.EnvironmentInfo;
 import lu.nowina.nexu.api.Feedback;
 import lu.nowina.nexu.generic.FeedbackSender;
@@ -39,6 +40,8 @@ public abstract class AbstractFeedbackUIOperationController extends AbstractUIOp
 	private String serverUrl;
 	private String applicationVersion;
 	private String applicationName;
+	// Needed by ProvideFeedbackController, in order to get JIRA's url as well as other potentially useful information
+	private AppConfig appConfig;
 	
 	@Override
 	public final void init(Object... params) {
@@ -47,16 +50,17 @@ public abstract class AbstractFeedbackUIOperationController extends AbstractUIOp
 			serverUrl = (String) params[1];
 			applicationVersion = (String) params[2];
 			applicationName = (String) params[3];
+			appConfig = (AppConfig) params[4];
 		} catch(final ClassCastException | ArrayIndexOutOfBoundsException e) {
-			throw new IllegalArgumentException("Expected parameters: Feedback, serverUrl (String), application version (String) and  application name (String)");
+			throw new IllegalArgumentException("Expected parameters: Feedback, serverUrl (String), application version (String), application name (String), and application configuration (AppConfig)");
 		}
 		
 		if((feedback == null) || (serverUrl == null) || (applicationVersion == null) || (applicationName == null)) {
-			throw new IllegalArgumentException("Expected parameters: Feedback, serverUrl (String), application version (String) and  application name (String)");
+			throw new IllegalArgumentException("Expected parameters: Feedback, serverUrl (String), application version (String), application name (String), and application configuration (AppConfig)");
 		}
 
-		if(params.length > 4) {
-			doInit(Arrays.copyOfRange(params, 4, params.length));
+		if(params.length > 5) {
+			doInit(Arrays.copyOfRange(params, 5, params.length));
 		} else {
 			doInit((Object) null); 
 		}
@@ -97,4 +101,9 @@ public abstract class AbstractFeedbackUIOperationController extends AbstractUIOp
 	protected String getApplicationName() {
 		return applicationName;
 	}
+
+	public AppConfig getAppConfig() {
+		return appConfig;
+	}
+
 }

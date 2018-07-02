@@ -135,6 +135,8 @@ public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 		final AppConfig appConfig = new AppConfig();
 		appConfig.setAdvancedModeAvailable(true);
 		appConfig.setEnablePopUps(true);
+		appConfig.setTicketUrl("http://random.url");
+		appConfig.setApplicationName("Dummy App");
 		when(api.getAppConfig()).thenReturn(appConfig);
 
 		final OperationFactory operationFactory = mock(OperationFactory.class);
