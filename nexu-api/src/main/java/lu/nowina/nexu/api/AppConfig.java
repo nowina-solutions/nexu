@@ -68,6 +68,8 @@ public class AppConfig {
 	private static final String ENABLE_SYSTRAY_MENU = "enable_systray_menu";
 	
 	private static final String TICKET_URL = "ticket_url";
+	
+	private static final String ENABLE_INCIDENT_REPORT = "enable_incident_report";
 
 	private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
 
@@ -123,6 +125,8 @@ public class AppConfig {
 	private boolean enableSystrayMenu;
 	
 	private String ticketUrl;
+	
+	private boolean enableIncidentReport;
 
 	public AppConfig() {
 		try {
@@ -421,6 +425,7 @@ public class AppConfig {
 		setEnableDatabaseWebLoader(Boolean.parseBoolean(props.getProperty(ENABLE_DATABASE_WEB_LOADER, "true")));
 		setEnableSystrayMenu(Boolean.parseBoolean(props.getProperty(ENABLE_SYSTRAY_MENU, "true")));
 		setTicketUrl(props.getProperty(TICKET_URL, "https://github.com/nowina-solutions/nexu/issues/new"));
+		setEnableIncidentReport(Boolean.parseBoolean(props.getProperty(ENABLE_INCIDENT_REPORT, "true")));
 	}
 
 	/**
@@ -458,4 +463,13 @@ public class AppConfig {
 	public void setTicketUrl(String ticketUrl) {
 		this.ticketUrl = ticketUrl;
 	}
+
+	public boolean isEnableIncidentReport() {
+		return enableIncidentReport;
+	}
+
+	public void setEnableIncidentReport(boolean enableIncidentReport) {
+		this.enableIncidentReport = enableIncidentReport;
+	}
+
 }
