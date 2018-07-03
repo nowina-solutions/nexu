@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>lu.nowina.apps</groupId>
 	<artifactId>nexu</artifactId>
-	<version>1.14</version>
+	<version>1.15</version>
 	<packaging>pom</packaging>
 	<name>NexU</name>
 
@@ -26,15 +26,16 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<encoding>UTF-8</encoding>
 		<skip.package>false</skip.package>
-		<dss.version>5.0.RC1</dss.version>
+		<dss.version>5.3</dss.version>
         <maven.release.plugin.version>2.5.3</maven.release.plugin.version>
         <slf4j.version>1.7.12</slf4j.version>
         <jna.version>4.2.2</jna.version>
+        <mocca.version>1.3.30</mocca.version>
 	</properties>
 
     <scm>
         <developerConnection>scm:git:https://bitbucket.org/nowina-nexu/nexu-community.git</developerConnection>
-        <tag>nexu-1.14</tag>
+        <tag>nexu-1.15</tag>
     </scm>
     
 	<licenses>
@@ -49,22 +50,38 @@
             <id>ec.europa.eu-cefdigital</id>
             <url>https://ec.europa.eu/cefdigital/artifact/content/groups/public/</url>
         </repository>
+        
         <repository>
-            <id>forge.nowina.lu</id>
-            <name>Internal repository</name>
-            <url>http://forge.nowina.local/nexus/content/groups/nowina/</url>
+            <id>egiz-mocca</id>
+            <url>https://apps.egiz.gv.at/maven/</url>
+        </repository>
+        <!-- This will disable repository lookup that comes from transitive dependency -->
+        <!-- and that will make the build failed because of 403 HTTP error.            -->
+        <repository>
+            <id>joinup-dss-thirdparty</id>
+            <url>http://joinup.ec.europa.eu/site/sd-dss/maven2</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>alfresco</id>
+            <url>https://artifacts.alfresco.com/nexus/content/repositories/public</url>
         </repository>
 	</repositories>
 
 	<distributionManagement>
-		<repository>
-			<id>joinup-nexus</id>
-			<url>dav:https://joinup.ec.europa.eu/webdav/sd-dss/www/maven2</url>
-		</repository>
-		<snapshotRepository>
-			<id>joinup-nexus</id>
-			<url>dav:https://joinup.ec.europa.eu/webdav/sd-dss/www/maven2</url>
-		</snapshotRepository>
+	  <snapshotRepository>
+	    <id>ossrh</id>
+	    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+	  </snapshotRepository>
+	  <repository>
+	    <id>ossrh</id>
+	    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+	  </repository>
 	</distributionManagement>
 
 	<dependencyManagement>
@@ -91,6 +108,11 @@
                 <version>${jna.version}</version>
             </dependency>
             <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna-platform</artifactId>
+                <version>${jna.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>commons-lang</groupId>
                 <artifactId>commons-lang</artifactId>
                 <version>2.6</version>
@@ -111,6 +133,11 @@
                 <version>${dss.version}</version>
                 <scope>runtime</scope>
             </dependency>
+			<dependency>
+				<groupId>at.gv.egiz</groupId>
+				<artifactId>smcc</artifactId>
+				<version>${mocca.version}</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -164,47 +191,70 @@
                 </configuration>
             </plugin>
         </plugins>
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-webdav-jackrabbit</artifactId>
-        		<version>2.2</version>
-        	</extension>
-		</extensions>
 	</build>
 
 	<profiles>
-
 		<profile>
 			<id>no_package</id>
 			<properties>
 				<skip.package>true</skip.package>
 			</properties>
 		</profile>
-
 		<profile>
-			<id>rebel</id>
+			<id>deploy</id>
 			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.zeroturnaround</groupId>
-						<artifactId>jrebel-maven-plugin</artifactId>
-						<version>1.1.5</version>
-						<executions>
-							<execution>
-								<id>generate-rebel-xml</id>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>generate</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
+			  <plugins>
+			    <plugin>
+			      <groupId>org.apache.maven.plugins</groupId>
+			      <artifactId>maven-source-plugin</artifactId>
+			      <version>2.2.1</version>
+			      <executions>
+			        <execution>
+			          <id>attach-sources</id>
+			          <goals>
+			            <goal>jar-no-fork</goal>
+			          </goals>
+			        </execution>
+			      </executions>
+			    </plugin>
+			    <plugin>
+			      <groupId>org.apache.maven.plugins</groupId>
+			      <artifactId>maven-javadoc-plugin</artifactId>
+			      <version>2.9.1</version>
+			      <executions>
+			        <execution>
+			          <id>attach-javadocs</id>
+			          <goals>
+			            <goal>jar</goal>
+			          </goals>
+			          <configuration>
+			          	<additionalparam>-Xdoclint:none</additionalparam>
+			          	<quiet>true</quiet>
+			          </configuration>
+			        </execution>
+			      </executions>
+			    </plugin>
+			    <plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-gpg-plugin</artifactId>
+					<version>1.6</version>
+					<executions>
+					 <execution>
+					   <id>sign-artifacts</id>
+					   <phase>verify</phase>
+					   <goals>
+					     <goal>sign</goal>
+					   </goals>
+					 </execution>
+					</executions>
+					<configuration>
+				        <keyname>${gpg.keyname}</keyname>
+				        <passphraseServerId>${gpg.keyname}</passphraseServerId>
+			      </configuration>
+				</plugin>
+			  </plugins>
 			</build>
-
 		</profile>
-
 	</profiles>
 
 </project>

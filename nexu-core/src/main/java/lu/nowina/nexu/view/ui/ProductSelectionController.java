@@ -30,6 +30,7 @@ import javafx.scene.layout.Pane;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.Product;
+import lu.nowina.nexu.flow.StageHelper;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 public class ProductSelectionController extends AbstractUIOperationController<Product> implements Initializable {
@@ -39,7 +40,7 @@ public class ProductSelectionController extends AbstractUIOperationController<Pr
 
 	@FXML
 	private Pane productsContainer;
-	
+
 	@FXML
 	private Button select;
 
@@ -47,16 +48,12 @@ public class ProductSelectionController extends AbstractUIOperationController<Pr
 	private Button cancel;
 
 	private ToggleGroup product;
-	
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		select.setOnAction((e) -> {
-			signalEnd(getSelectedProduct());
-		});
-		cancel.setOnAction((e) -> {
-			signalUserCancel();
-		});
-		
+		select.setOnAction(e -> signalEnd(getSelectedProduct()));
+		cancel.setOnAction(e -> signalUserCancel());
+
 		product = new ToggleGroup();
 		select.disableProperty().bind(product.selectedToggleProperty().isNull());
 	}
@@ -67,19 +64,20 @@ public class ProductSelectionController extends AbstractUIOperationController<Pr
 
 	@Override
 	public final void init(Object... params) {
+		final NexuAPI api = (NexuAPI) params[3];
+		StageHelper.getInstance().setTitle(api.getAppConfig().getApplicationName(),
+				"product.selection.title");
+
 		Platform.runLater(() -> {
-			message.setText(MessageFormat.format(
-					ResourceBundle.getBundle("bundles/nexu").getString("product.selection.header"),
-					params[0]));
+			message.setText(MessageFormat
+					.format(ResourceBundle.getBundle("bundles/nexu").getString("product.selection.header"), params[0]));
 			@SuppressWarnings("unchecked")
 			final List<DetectedCard> cards = (List<DetectedCard>) params[1];
 			@SuppressWarnings("unchecked")
 			final List<Product> products = (List<Product>) params[2];
 			final List<RadioButton> radioButtons = new ArrayList<>(cards.size() + products.size());
-			
-			final NexuAPI api = (NexuAPI) params[3];
-			
-			for(final DetectedCard card : cards) {
+
+			for (final DetectedCard card : cards) {
 				final RadioButton button = new RadioButton(api.getLabel(card));
 				button.setToggleGroup(product);
 				button.setUserData(card);
@@ -87,7 +85,7 @@ public class ProductSelectionController extends AbstractUIOperationController<Pr
 				radioButtons.add(button);
 			}
 
-			for(final Product p : products) {
+			for (final Product p : products) {
 				final RadioButton button = new RadioButton(api.getLabel(p));
 				button.setToggleGroup(product);
 				button.setUserData(p);

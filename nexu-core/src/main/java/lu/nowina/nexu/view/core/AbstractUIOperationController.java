@@ -13,6 +13,9 @@
  */
 package lu.nowina.nexu.view.core;
 
+import lu.nowina.nexu.api.flow.OperationResult;
+import lu.nowina.nexu.api.flow.OperationStatus;
+
 /**
  * Convenient base class for {@link UIOperationController}.
  *
@@ -41,6 +44,15 @@ public abstract class AbstractUIOperationController<R> implements UIOperationCon
 		uiOperation.signalEnd(result);
 	}
 	
+	/**
+	 * Provides the flow alternative actions (other than next or cancel).
+	 * @param operationStatus
+	 * Status the flow will check before dispatching to an action.	
+	 */
+	protected final void signalEndWithStatus(final OperationStatus operationStatus) {
+		uiOperation.signalEnd(operationStatus);
+	}
+
 	protected final void signalUserCancel() {
 		uiOperation.signalUserCancel();
 	}

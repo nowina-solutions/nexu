@@ -26,6 +26,7 @@ import lu.nowina.nexu.api.flow.AbstractFutureOperationInvocation;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.FutureOperationInvocation;
 import lu.nowina.nexu.api.flow.OperationResult;
+import lu.nowina.nexu.api.flow.OperationStatus;
 import lu.nowina.nexu.flow.Flow;
 import lu.nowina.nexu.flow.operation.UIDisplayAwareOperation;
 
@@ -124,6 +125,10 @@ public class UIOperation<R> implements UIDisplayAwareOperation<R> {
 		hide();
 	}
 
+	public final void signalEnd(final OperationStatus operationStatus) {
+		notifyResult(new OperationResult<>(operationStatus));
+	}
+	
 	private void notifyResult(OperationResult<R> result) {
 		this.result = result;
 		synchronized (lock) {

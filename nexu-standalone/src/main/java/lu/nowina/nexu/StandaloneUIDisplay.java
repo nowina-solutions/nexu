@@ -19,6 +19,8 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.javafx.scene.SceneHelper;
+
 import eu.europa.esig.dss.token.PasswordInputCallback;
 import javafx.application.Platform;
 import javafx.scene.Parent;
@@ -30,6 +32,7 @@ import lu.nowina.nexu.api.NexuPasswordInputCallback;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationFactory;
 import lu.nowina.nexu.api.flow.OperationResult;
+import lu.nowina.nexu.flow.StageHelper;
 import lu.nowina.nexu.view.core.ExtensionFilter;
 import lu.nowina.nexu.view.core.NonBlockingUIOperation;
 import lu.nowina.nexu.view.core.UIDisplay;
@@ -50,8 +53,8 @@ public class StandaloneUIDisplay implements UIDisplay {
 	private OperationFactory operationFactory;
 	
 	public StandaloneUIDisplay() {
-		this.blockingStage = createStage(true);
-		this.nonBlockingStage = createStage(false);
+		this.blockingStage = createStage(true, null);
+		this.nonBlockingStage = createStage(false, null);
 	}
 
 	private void display(Parent panel, boolean blockingOperation) {
@@ -61,9 +64,9 @@ public class StandaloneUIDisplay implements UIDisplay {
 			LOGGER.info("Display " + panel + " in display " + this + " from Thread " + Thread.currentThread().getName());
 			if (!stage.isShowing()) {
 				if(blockingOperation) {
-					stage = blockingStage = createStage(true);
+					stage = blockingStage = createStage(true, null);
 				} else {
-					stage = nonBlockingStage = createStage(false);
+					stage = nonBlockingStage = createStage(false, null);
 				}
 				LOGGER.info("Loading ui " + panel + " is a new Stage " + stage);
 			} else {
@@ -72,12 +75,15 @@ public class StandaloneUIDisplay implements UIDisplay {
 			final Scene scene = new Scene(panel);
 			scene.getStylesheets().add(this.getClass().getResource("/styles/nexu.css").toString());
 			stage.setScene(scene);
+			stage.setTitle(StageHelper.getInstance().getTitle());
 			stage.show();
+			StageHelper.getInstance().setTitle("", null);
 		});
 	}
 
-	private Stage createStage(final boolean blockingStage) {
+	private Stage createStage(final boolean blockingStage, String title) {
 		final Stage newStage = new Stage();
+		newStage.setTitle(title);
 		newStage.setAlwaysOnTop(true);
 		newStage.setOnCloseRequest((e) -> {
 			LOGGER.info("Closing stage " + newStage + " from " + Thread.currentThread().getName());
@@ -97,9 +103,9 @@ public class StandaloneUIDisplay implements UIDisplay {
 			Stage oldStage = (blockingOperation) ? blockingStage : nonBlockingStage;
 			LOGGER.info("Hide stage " + oldStage + " and create new stage");
 			if(blockingOperation) {
-				blockingStage = createStage(true);
+				blockingStage = createStage(true, null);
 			} else {
-				nonBlockingStage = createStage(false);
+				nonBlockingStage = createStage(false, null);
 			}
 			oldStage.hide();
 		});
@@ -134,7 +140,7 @@ public class StandaloneUIDisplay implements UIDisplay {
 			LOGGER.info("Request password");
 			@SuppressWarnings("unchecked")
 			final OperationResult<char[]> passwordResult = StandaloneUIDisplay.this.operationFactory.getOperation(
-					UIOperation.class, "/fxml/password-input.fxml", passwordPrompt).perform();
+					UIOperation.class, "/fxml/password-input.fxml", passwordPrompt, NexuLauncher.getConfig().getApplicationName()).perform();
 			if(passwordResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 				return passwordResult.getResult();
 			} else if(passwordResult.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
@@ -170,11 +176,11 @@ public class StandaloneUIDisplay implements UIDisplay {
 			if(Message.INPUT_PINPAD.equals(message)) {
 				StandaloneUIDisplay.this.operationFactory.getOperation(
 						NonBlockingUIOperation.class, "/fxml/message-no-button.fxml",
-						"message.display.callback." + message.name().toLowerCase().replace('_', '.')).perform();
+						"message.display.callback." + message.name().toLowerCase().replace('_', '.'), NexuLauncher.getConfig()).perform();
 			} else {
 				StandaloneUIDisplay.this.operationFactory.getOperation(
 					NonBlockingUIOperation.class, "/fxml/message.fxml",
-					"message.display.callback." + message.name().toLowerCase().replace('_', '.')).perform();
+					"message.display.callback." + message.name().toLowerCase().replace('_', '.'), NexuLauncher.getConfig()).perform();
 			}
 		}
 

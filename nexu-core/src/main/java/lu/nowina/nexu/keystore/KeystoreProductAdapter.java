@@ -17,12 +17,14 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.KeyStore.PasswordProtection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import eu.europa.esig.dss.DSSException;
 import eu.europa.esig.dss.DigestAlgorithm;
+import eu.europa.esig.dss.MaskGenerationFunction;
 import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.ToBeSigned;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
@@ -133,7 +135,7 @@ public class KeystoreProductAdapter implements ProductAdapter {
 	@SuppressWarnings("unchecked")
 	public FutureOperationInvocation<Product> getConfigurationOperation(NexuAPI api, Product product) {
 		if (product instanceof NewKeystore) {
-			return UIOperation.getFutureOperationInvocation(UIOperation.class, "/fxml/configure-keystore.fxml");
+			return UIOperation.getFutureOperationInvocation(UIOperation.class, "/fxml/configure-keystore.fxml", api.getAppConfig().getApplicationName());
 		} else {
 			return new NoOpFutureOperationInvocation<Product>(product);
 		}
@@ -207,11 +209,11 @@ public class KeystoreProductAdapter implements ProductAdapter {
 				switch(configuredKeystore.getType()) {
 				case PKCS12:
 					proxied = new Pkcs12SignatureToken(new URL(configuredKeystore.getUrl()).openStream(),
-							new String(callback.getPassword()));
+							new PasswordProtection(callback.getPassword()));
 					break;
 				case JKS:
 					proxied = new JKSSignatureToken(new URL(configuredKeystore.getUrl()).openStream(),
-							new String(callback.getPassword()));
+							new PasswordProtection(callback.getPassword()));
 					break;
 				default:
 					throw new IllegalStateException("Unhandled keystore type: " + configuredKeystore.getType());
@@ -244,6 +246,12 @@ public class KeystoreProductAdapter implements ProductAdapter {
 				throws DSSException {
 			initSignatureTokenConnection();
 			return proxied.sign(toBeSigned, digestAlgorithm, keyEntry);
+		}
+
+		@Override
+		public SignatureValue sign(ToBeSigned toBeSigned, DigestAlgorithm digestAlgorithm, MaskGenerationFunction mgf, DSSPrivateKeyEntry keyEntry) throws DSSException {
+			initSignatureTokenConnection();
+			return proxied.sign(toBeSigned, digestAlgorithm, mgf, keyEntry);
 		}
 	}
 }

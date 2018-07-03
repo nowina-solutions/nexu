@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>lu.nowina.apps</groupId>
 		<artifactId>nexu</artifactId>
-		<version>1.14</version>
+		<version>1.15</version>
 	</parent>
 	<artifactId>nexu-bundle</artifactId>
 	<packaging>pom</packaging>
@@ -15,10 +15,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.oracle</groupId>
-			<artifactId>jre-x86</artifactId>
-			<version>8.0.45</version>
-			<type>zip</type>
+			<groupId>com.oracle.java</groupId>
+			<artifactId>jre</artifactId>
+			<version>1.8.0_131</version>
+			<classifier>win32</classifier>
+			<type>tgz</type>
 		</dependency>
 	</dependencies>
 

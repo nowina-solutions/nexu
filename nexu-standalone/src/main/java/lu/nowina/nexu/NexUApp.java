@@ -63,12 +63,6 @@ public class NexUApp extends Application {
 		((BasicOperationFactory)operationFactory).setDisplay(uiDisplay);
 		uiDisplay.setOperationFactory(operationFactory);
 		
-		loader = new DatabaseWebLoader(getConfig(),
-				new HttpDataLoader(NexuLauncher.getProxyConfigurer(), getConfig().getApplicationVersion(), getConfig().isSendAnonymousInfoToProxy()));
-		if(getConfig().isEnableDatabaseWebLoader()) {
-			loader.start();
-		}
-		
 		final NexuAPI api = buildAPI(uiDisplay, operationFactory, loader);
 
 		logger.info("Start Jetty");

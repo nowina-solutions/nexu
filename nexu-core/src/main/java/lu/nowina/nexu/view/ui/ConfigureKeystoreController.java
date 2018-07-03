@@ -27,6 +27,7 @@ import javafx.scene.control.ComboBox;
 import lu.nowina.nexu.NexuException;
 import lu.nowina.nexu.api.ConfiguredKeystore;
 import lu.nowina.nexu.api.KeystoreType;
+import lu.nowina.nexu.flow.StageHelper;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 import lu.nowina.nexu.view.core.ExtensionFilter;
 
@@ -52,7 +53,14 @@ public class ConfigureKeystoreController extends AbstractUIOperationController<C
 	}
 	
 	@Override
+	public void init(Object... params) {
+		StageHelper.getInstance().setTitle((String)params[0], "save.keystore.title");
+	}
+	
+	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+
+
 		ok.setOnAction((event) -> {
 			final ConfiguredKeystore result = new ConfiguredKeystore();
 			try {
@@ -65,10 +73,8 @@ public class ConfigureKeystoreController extends AbstractUIOperationController<C
 			signalEnd(result);
 		});
 		ok.disableProperty().bind(Bindings.not(keystoreFileSpecified));
-		cancel.setOnAction((e) -> {
-			signalUserCancel();
-		});
-		selectFile.setOnAction((e) -> {
+		cancel.setOnAction(e -> signalUserCancel());
+		selectFile.setOnAction(e -> {
 			final ExtensionFilter extensionFilter;
 			switch(keystoreType.getValue()) {
 			case JKS:

@@ -3,16 +3,16 @@
 	<parent>
 		<groupId>lu.nowina.apps</groupId>
 		<artifactId>nexu</artifactId>
-		<version>1.14</version>
+		<version>1.15</version>
 	</parent>
 	<artifactId>nexu-core</artifactId>
 
 	<dependencies>
-        <dependency>
-            <groupId>lu.nowina.apps</groupId>
-            <artifactId>nexu-util</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+		<dependency>
+			<groupId>lu.nowina.apps</groupId>
+			<artifactId>nexu-util</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
 			<artifactId>nexu-api</artifactId>
@@ -22,6 +22,10 @@
 			<groupId>eu.europa.ec.joinup.sd-dss</groupId>
 			<artifactId>sscd-mocca-adapter</artifactId>
 			<version>${dss.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>at.gv.egiz</groupId>
+			<artifactId>smcc</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
@@ -54,10 +58,23 @@
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
         </dependency>
+        <dependency>
+	        <groupId>org.powermock</groupId>
+	        <artifactId>powermock-module-junit4</artifactId>
+	        <version>${powermock.version}</version>
+	        <scope>test</scope>
+	    </dependency>
+   		<dependency>
+	        <groupId>org.powermock</groupId>
+	        <artifactId>powermock-api-mockito</artifactId>
+	        <version>${powermock.version}</version>
+	        <scope>test</scope>
+  		</dependency>
 	</dependencies>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<powermock.version>1.7.1</powermock.version>
 	</properties>
 
 </project>

@@ -22,13 +22,14 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.StringUtils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 /**
  * Configuration of the NexU Platform
- * 
+ *
  * @author David Naramski
  *
  */
@@ -45,6 +46,8 @@ public class AppConfig {
 	private static final String BINDING_PORTS = "binding_ports";
 	private static final String CONNECTIONS_CACHE_MAX_SIZE = "connections_cache_max_size";
 	private static final String ENABLE_POP_UPS = "enable_pop_ups";
+	//This property is less restrictive than enable_pop_ups, since this one allows display of certificate selection
+	private static final String ENABLE_INFORMATIVE_POP_UPS = "enable_informative_pop_ups";
 	private static final String SEND_ANONYMOUS_INFO_TO_PROXY = "send_anonymous_info_to_proxy";
 	private static final String USE_SYSTEM_PROXY = "use_system_proxy";
 	private static final String PROXY_SERVER = "proxy_server";
@@ -64,6 +67,11 @@ public class AppConfig {
 	private static final String ENABLE_DATABASE_WEB_LOADER = "enable_database_web_loader";
 
 	private static final String ENABLE_SYSTRAY_MENU = "enable_systray_menu";
+	private static final String CORS_ALLOWED_ORIGIN = "cors_allowed_origin";	
+
+	private static final String TICKET_URL = "ticket_url";
+	private static final String ENABLE_INCIDENT_REPORT = "enable_incident_report";
+
 
 	private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
 
@@ -90,6 +98,7 @@ public class AppConfig {
 	private int connectionsCacheMaxSize;
 
 	private boolean enablePopUps;
+	private boolean enableInformativePopUps;
 
 	private boolean sendAnonymousInfoToProxy;
 
@@ -114,9 +123,16 @@ public class AppConfig {
 	private int rollingLogMaxFileNumber;
 
 	private boolean enableDatabaseWebLoader;
-	
+
 	private boolean enableSystrayMenu;
 	
+	private String ticketUrl;
+	
+	private boolean enableIncidentReport;
+
+	// String used for http header Access-Control-Allow-Origin. Default: "*"
+	private String corsAllowedOrigin;
+
 	public AppConfig() {
 		try {
 			final URL versionResourceURL = this.getClass().getResource("/version.txt");
@@ -317,7 +333,7 @@ public class AppConfig {
 
 	/**
 	 * This method allows to set the maximum size for a log file. Expected format : 64KB, 10MB,...
-	 * 
+	 *
 	 * @param rollingLogMaxFileSize
 	 */
 	public void setRollingLogMaxFileSize(String rollingLogMaxFileSize) {
@@ -330,7 +346,7 @@ public class AppConfig {
 
 	/**
 	 * This method allows to set the maxium number of log files to keep on the file system.
-	 * 
+	 *
 	 * @param rollingLogMaxFileNumber
 	 */
 	public void setRollingLogMaxFileNumber(int rollingLogMaxFileNumber) {
@@ -357,23 +373,24 @@ public class AppConfig {
 		if (nexuHome != null) {
 			return nexuHome;
 		}
-		final File userHome = new File(System.getProperty("user.home"));
-		if (!userHome.exists()) {
-			return null;
+		
+		ConfigurationManager configurationManager = getConfigurationManager();
+		try {
+			nexuHome = configurationManager.manageConfiguration(getApplicationName());
+		} catch (IOException e) {
+			logger.error("Error while managing Nexu config : {}", e.getMessage(), e);
+			nexuHome = null;
 		}
-		final File file = new File(userHome, "." + getApplicationName());
-		if (file.exists()) {
-			return file.canWrite() ? nexuHome = file : null;
-		} else {
-			return file.mkdir() && file.canWrite() ? nexuHome = file : null;
-		}
+		return nexuHome;
 	}
+	
+	
 
 	public void loadFromProperties(final Properties props) {
 		setApplicationName(props.getProperty(APPLICATION_NAME, "NexU"));
 		
 		final String bindingPortsStr = props.getProperty(BINDING_PORTS, "9795");
-		if(StringUtils.isNotEmpty(bindingPortsStr)) {
+		if (isNotEmpty(bindingPortsStr)) {
 			setBindingPorts(toListOfInt(bindingPortsStr));
 		}
 
@@ -386,7 +403,9 @@ public class AppConfig {
 		setAdvancedModeAvailable(Boolean.parseBoolean(props.getProperty(ADVANCED_MODE_AVAILABLE, "true")));
 		setConnectionsCacheMaxSize(Integer.parseInt(props.getProperty(CONNECTIONS_CACHE_MAX_SIZE, "50")));
 		setEnablePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_POP_UPS, "true")));
-		setSendAnonymousInfoToProxy(Boolean.parseBoolean(props.getProperty(SEND_ANONYMOUS_INFO_TO_PROXY, "true")));
+		setEnableInformativePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_INFORMATIVE_POP_UPS, "true")));
+		// Always set to false, just in case
+		setSendAnonymousInfoToProxy(false);
 
 		setUseSystemProxy(Boolean.parseBoolean(props.getProperty(USE_SYSTEM_PROXY, "false")));
 		setProxyServer(props.getProperty(PROXY_SERVER, ""));
@@ -404,18 +423,21 @@ public class AppConfig {
 		setRequestProcessorClass(props.getProperty(REQUEST_PROCESSOR_CLASS, "lu.nowina.nexu.jetty.RequestProcessor"));
 
 		final String bindingPortHttpsStr = props.getProperty(BINDING_PORTS_HTTPS, "9895");
-		if (StringUtils.isNotEmpty(bindingPortHttpsStr)) {
+		if (isNotEmpty(bindingPortHttpsStr)) {
 			setBindingPortsHttps(toListOfInt(bindingPortHttpsStr));
 		}
-		
+
 		setEnableDatabaseWebLoader(Boolean.parseBoolean(props.getProperty(ENABLE_DATABASE_WEB_LOADER, "true")));
 		setEnableSystrayMenu(Boolean.parseBoolean(props.getProperty(ENABLE_SYSTRAY_MENU, "true")));
+		setCorsAllowedOrigin(props.getProperty(CORS_ALLOWED_ORIGIN, "*"));
+		setTicketUrl(props.getProperty(TICKET_URL, "https://github.com/nowina-solutions/nexu/issues/new"));
+		setEnableIncidentReport(Boolean.parseBoolean(props.getProperty(ENABLE_INCIDENT_REPORT, "true")));
 	}
 
 	/**
 	 * Returns a list of {@link Integer} from <code>str</code> which should be
 	 * tokenized by commas.
-	 * 
+	 *
 	 * @param str
 	 *            A list of strings tokenized by commas.
 	 * @return A list of {@link Integer}.
@@ -427,4 +449,41 @@ public class AppConfig {
 		}
 		return ports;
 	}
+	
+	public ConfigurationManager getConfigurationManager() {
+		return new ConfigurationManager();
+	}
+
+	public boolean isEnableInformativePopUps() {
+		return enableInformativePopUps;
+	}
+
+	public void setEnableInformativePopUps(boolean enableInformativePopUps) {
+		this.enableInformativePopUps = enableInformativePopUps;
+	}
+
+	public String getCorsAllowedOrigin() {
+		return corsAllowedOrigin;
+	}
+
+	public void setCorsAllowedOrigin(String corsAllowedOrigin) {
+		this.corsAllowedOrigin = corsAllowedOrigin;
+	}
+
+	public String getTicketUrl() {
+		return ticketUrl;
+	}
+
+	public void setTicketUrl(String ticketUrl) {
+		this.ticketUrl = ticketUrl;
+	}
+
+	public boolean isEnableIncidentReport() {
+		return enableIncidentReport;
+	}
+
+	public void setEnableIncidentReport(boolean enableIncidentReport) {
+		this.enableIncidentReport = enableIncidentReport;
+	}
+
 }

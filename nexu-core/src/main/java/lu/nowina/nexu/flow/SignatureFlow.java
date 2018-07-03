@@ -81,7 +81,7 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 					if (selectPrivateKeyOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 						final DSSPrivateKeyEntry key = selectPrivateKeyOperationResult.getResult();
 
-						logger.info("Key " + key + " " + key.getCertificate().getSubjectDN() + " from " + key.getCertificate().getIssuerDN());
+						logger.info("Key " + key + " " + key.getCertificate().getCertificate().getSubjectDN() + " from " + key.getCertificate().getCertificate().getIssuerDN());
 						final OperationResult<SignatureValue> signOperationResult = getOperationFactory().getOperation(
 								SignOperation.class, token, req.getToBeSigned(), req.getDigestAlgorithm(), key).perform();
 						if(signOperationResult.getStatus().equals(BasicOperationStatus.SUCCESS)) {
@@ -93,9 +93,9 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 										api, map).perform();
 							}
 							
-							if(api.getAppConfig().isEnablePopUps()) {
+							if(api.getAppConfig().isEnablePopUps() && api.getAppConfig().isEnableInformativePopUps()) {
 								getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
-									new Object[]{"signature.flow.finished"}).perform();
+									"signature.flow.finished", api.getAppConfig().getApplicationName()).perform();
 							}
 							
 							return new Execution<SignatureResponse>(new SignatureResponse(value, key.getCertificate(), key.getCertificateChain()));
@@ -105,14 +105,14 @@ class SignatureFlow extends AbstractCoreFlow<SignatureRequest, SignatureResponse
 					} else {
 						if(api.getAppConfig().isEnablePopUps()) {
 							getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
-								new Object[]{"signature.flow.no.key.selected", api.getAppConfig().getApplicationName()}).perform();
+								"signature.flow.no.key.selected", api.getAppConfig().getApplicationName()).perform();
 						}
 						return handleErrorOperationResult(selectPrivateKeyOperationResult);
 					}
 				} else {
 					if(api.getAppConfig().isEnablePopUps()) {
 						getOperationFactory().getOperation(UIOperation.class, "/fxml/message.fxml",
-							new Object[]{"signature.flow.bad.token", api.getAppConfig().getApplicationName()}).perform();
+							"signature.flow.bad.token", api.getAppConfig().getApplicationName()).perform();
 					}
 					return handleErrorOperationResult(getTokenConnectionOperationResult);
 				}

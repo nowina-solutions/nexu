@@ -31,6 +31,7 @@ import at.gv.egiz.smcc.SignatureCardFactory;
 import at.gv.egiz.smcc.TimeoutException;
 import eu.europa.esig.dss.DSSException;
 import eu.europa.esig.dss.DigestAlgorithm;
+import eu.europa.esig.dss.MaskGenerationFunction;
 import eu.europa.esig.dss.SignatureValue;
 import eu.europa.esig.dss.ToBeSigned;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
@@ -125,10 +126,17 @@ public class MOCCASignatureTokenConnectionAdapter implements SignatureTokenConne
 		}
 	}
 
+	@Deprecated
 	public SignatureValue sign(ToBeSigned toBeSigned, DigestAlgorithm digestAlgorithm, DSSPrivateKeyEntry keyEntry) throws DSSException {
+		return sign(toBeSigned, digestAlgorithm,null, keyEntry);
+	}
+
+	@Override
+	public SignatureValue sign(ToBeSigned toBeSigned, DigestAlgorithm digestAlgorithm, MaskGenerationFunction mgf,
+			DSSPrivateKeyEntry keyEntry) throws DSSException {
 		try {
 			setSignatureCard();
-			return adapted.sign(toBeSigned, digestAlgorithm, keyEntry);
+			return adapted.sign(toBeSigned, digestAlgorithm, mgf,keyEntry);
 		} catch(final Exception e) {
 			Throwable t = e;
 			while(t != null) {

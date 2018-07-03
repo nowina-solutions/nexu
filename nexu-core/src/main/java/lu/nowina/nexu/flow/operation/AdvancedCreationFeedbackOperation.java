@@ -72,7 +72,7 @@ public class AdvancedCreationFeedbackOperation extends AbstractCompositeOperatio
 				final OperationResult<Feedback> result =
 						operationFactory.getOperation(UIOperation.class, "/fxml/store-result.fxml",
 								new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
-										api.getAppConfig().getApplicationName()}).perform();
+										api.getAppConfig().getApplicationName(), api.getAppConfig()}).perform();
 				if(result.getStatus().equals(BasicOperationStatus.SUCCESS)) {
 					final Feedback back = result.getResult();
 					if (back != null) {
