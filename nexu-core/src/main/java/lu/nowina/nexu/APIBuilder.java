@@ -57,11 +57,10 @@ public class APIBuilder {
 	 * @return The built instance of {@link NexuAPI}.
 	 */
 	public NexuAPI build(final UIDisplay display, final AppConfig appConfig, final FlowRegistry flowRegistry,
-			final SCDatabase localDatabase, final ProductDatabaseRefresher<SCDatabase> remoteDatabaseLoader,
-			final OperationFactory operationFactory) {
+			final SCDatabase localDatabase, final OperationFactory operationFactory) {
 		final CardDetector detector = new CardDetector(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
 
-		return new InternalAPI(display, localDatabase, detector, remoteDatabaseLoader, flowRegistry,
+		return new InternalAPI(display, localDatabase, detector, flowRegistry,
 				operationFactory, appConfig);
 	}
 

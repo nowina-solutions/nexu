@@ -34,8 +34,6 @@ import lu.nowina.nexu.flow.BasicFlowRegistry;
 import lu.nowina.nexu.flow.Flow;
 import lu.nowina.nexu.flow.FlowRegistry;
 import lu.nowina.nexu.flow.operation.BasicOperationFactory;
-import lu.nowina.nexu.generic.DatabaseWebLoader;
-import lu.nowina.nexu.generic.HttpDataLoader;
 import lu.nowina.nexu.generic.SCDatabase;
 import lu.nowina.nexu.view.core.UIDisplay;
 
@@ -44,7 +42,6 @@ public class NexUApp extends Application {
 	private static final Logger logger = LoggerFactory.getLogger(NexUApp.class.getName());
 
 	private HttpServer server;
-	private DatabaseWebLoader loader;
 	
 	private AppConfig getConfig() {
 		return NexuLauncher.getConfig();
@@ -63,14 +60,14 @@ public class NexUApp extends Application {
 		((BasicOperationFactory)operationFactory).setDisplay(uiDisplay);
 		uiDisplay.setOperationFactory(operationFactory);
 		
-		final NexuAPI api = buildAPI(uiDisplay, operationFactory, loader);
+		final NexuAPI api = buildAPI(uiDisplay, operationFactory);
 
 		logger.info("Start Jetty");
 
 		server = startHttpServer(api);
 
 		if(api.getAppConfig().isEnableSystrayMenu()) {
-			new SystrayMenu(operationFactory, loader, api, new UserPreferences(getConfig().getApplicationName()));
+			new SystrayMenu(operationFactory, api, new UserPreferences(getConfig().getApplicationName()));
 		} else {
 			logger.info("Systray menu is disabled.");
 		}
@@ -78,7 +75,7 @@ public class NexUApp extends Application {
 		logger.info("Start finished");
 	}
 
-	private NexuAPI buildAPI(final UIDisplay uiDisplay, final OperationFactory operationFactory, final DatabaseWebLoader loader) throws IOException {
+	private NexuAPI buildAPI(final UIDisplay uiDisplay, final OperationFactory operationFactory) throws IOException {
 		File nexuHome = getConfig().getNexuHome();
 		SCDatabase db = null;
 		if (nexuHome != null) {
@@ -89,7 +86,7 @@ public class NexUApp extends Application {
 			db = new SCDatabase();
 		}
 		final APIBuilder builder = new APIBuilder();
-		final NexuAPI api = builder.build(uiDisplay, getConfig(), getFlowRegistry(), db, loader, operationFactory);
+		final NexuAPI api = builder.build(uiDisplay, getConfig(), getFlowRegistry(), db, operationFactory);
 		notifyPreloader(builder.initPlugins(api, getProperties()));
 		return api;
 	}
@@ -144,14 +141,6 @@ public class NexUApp extends Application {
 			}
 		} catch (final Exception e) {
 			logger.error("Cannot stop server", e);
-		}
-		try {
-			if(loader != null) {
-				loader.stop();
-				loader = null;
-			}
-		} catch (final Exception e) {
-			logger.error("Cannot stop DatabaseLoader", e);
 		}
 	}
 

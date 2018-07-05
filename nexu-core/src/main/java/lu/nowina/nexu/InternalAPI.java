@@ -88,8 +88,6 @@ public class InternalAPI implements NexuAPI {
 
 	private SCDatabase myDatabase;
 
-	private ProductDatabaseRefresher<SCDatabase> webDatabase;
-
 	private FlowRegistry flowRegistry;
 
 	private OperationFactory operationFactory;
@@ -101,12 +99,10 @@ public class InternalAPI implements NexuAPI {
 	private Future<?> currentTask;
 	
 	public InternalAPI(UIDisplay display, SCDatabase myDatabase, CardDetector detector,
-			ProductDatabaseRefresher<SCDatabase> webDatabase, FlowRegistry flowRegistry,
-			OperationFactory operationFactory, AppConfig appConfig) {
+			FlowRegistry flowRegistry, OperationFactory operationFactory, AppConfig appConfig) {
 		this.display = display;
 		this.myDatabase = myDatabase;
 		this.detector = detector;
-		this.webDatabase = webDatabase;
 		this.flowRegistry = flowRegistry;
 		this.operationFactory = operationFactory;
 		this.appConfig = appConfig;
@@ -148,15 +144,6 @@ public class InternalAPI implements NexuAPI {
 		if (matches.isEmpty() && (p instanceof DetectedCard)) {
 			final DetectedCard d = (DetectedCard) p;
 			SCInfo info = null;
-			if (webDatabase != null && webDatabase.getDatabase() != null) {
-				info = webDatabase.getDatabase().getInfo(d.getAtr());
-				if (info == null) {
-					logger.warn("Card " + d.getAtr() + " is not in the web database");
-				} else {
-					matches.add(new Match(new GenericCardAdapter(info), d));
-				}
-
-			}
 			if (info == null && myDatabase != null) {
 				info = myDatabase.getInfo(d.getAtr());
 				if (info == null) {

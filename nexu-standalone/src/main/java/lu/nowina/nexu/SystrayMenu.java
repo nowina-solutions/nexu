@@ -26,7 +26,6 @@ import lu.nowina.nexu.api.SystrayMenuItem;
 import lu.nowina.nexu.api.flow.FutureOperationInvocation;
 import lu.nowina.nexu.api.flow.OperationFactory;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.systray.SystrayMenuInitializer;
 import lu.nowina.nexu.view.core.NonBlockingUIOperation;
 
@@ -34,13 +33,13 @@ public class SystrayMenu {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SystrayMenu.class.getName());
 
-	public SystrayMenu(OperationFactory operationFactory, DatabaseWebLoader webLoader, NexuAPI api, UserPreferences prefs) {
+	public SystrayMenu(OperationFactory operationFactory, NexuAPI api, UserPreferences prefs) {
 		final ResourceBundle resources = ResourceBundle.getBundle("bundles/nexu");
 
 		final List<SystrayMenuItem> extensionSystrayMenuItems = api.getExtensionSystrayMenuItems();
 		final SystrayMenuItem[] systrayMenuItems = new SystrayMenuItem[extensionSystrayMenuItems.size() + 2];
 
-		systrayMenuItems[0] = createAboutSystrayMenuItem(operationFactory, api, webLoader, resources);
+		systrayMenuItems[0] = createAboutSystrayMenuItem(operationFactory, api, resources);
 		systrayMenuItems[1] = createPreferencesSystrayMenuItem(operationFactory, api, prefs, resources);
 
 		int i = 2;
@@ -83,7 +82,7 @@ public class SystrayMenu {
 	}
 
 	private SystrayMenuItem createAboutSystrayMenuItem(final OperationFactory operationFactory, final NexuAPI api,
-			final DatabaseWebLoader webLoader, final ResourceBundle resources) {
+			final ResourceBundle resources) {
 		return new SystrayMenuItem() {
 			@Override
 			public String getLabel() {
@@ -97,7 +96,7 @@ public class SystrayMenu {
 					public OperationResult<Void> call(OperationFactory operationFactory) {
 						return operationFactory.getOperation(NonBlockingUIOperation.class, "/fxml/about.fxml",
 								api.getAppConfig().getApplicationName(), api.getAppConfig().getApplicationVersion(),
-								webLoader, resources).perform();
+								resources).perform();
 					}
 				};
 			}

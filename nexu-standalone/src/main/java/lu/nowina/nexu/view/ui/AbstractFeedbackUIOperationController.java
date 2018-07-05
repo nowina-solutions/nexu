@@ -15,17 +15,13 @@ package lu.nowina.nexu.view.ui;
 
 import java.util.Arrays;
 
-import lu.nowina.nexu.NexuLauncher;
-import lu.nowina.nexu.api.AppConfig;
-import lu.nowina.nexu.api.EnvironmentInfo;
-import lu.nowina.nexu.api.Feedback;
-import lu.nowina.nexu.generic.FeedbackSender;
-import lu.nowina.nexu.generic.HttpDataSender;
-import lu.nowina.nexu.view.core.AbstractUIOperationController;
-import lu.nowina.nexu.view.core.UIOperationController;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import lu.nowina.nexu.api.AppConfig;
+import lu.nowina.nexu.api.Feedback;
+import lu.nowina.nexu.view.core.AbstractUIOperationController;
+import lu.nowina.nexu.view.core.UIOperationController;
 
 /**
  * Convenient base class for {@link UIOperationController} whose result is a feedback that can be provided to {@link FeedbackClient}. 
@@ -75,23 +71,6 @@ public abstract class AbstractFeedbackUIOperationController extends AbstractUIOp
 	 */
 	protected void doInit(Object... params) {
 		// Do nothing by contract
-	}
-	
-	/**
-	 * Sends the given feedback to the given server URL and calls {@link #signalEnd(Feedback)}.
-	 */
-	protected final void sendFeedback() {
-		try {
-			feedback.setNexuVersion(applicationVersion);
-			feedback.setInfo(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
-			
-			FeedbackSender sender = new FeedbackSender(NexuLauncher.getConfig(), new HttpDataSender(NexuLauncher.getProxyConfigurer()));
-			sender.sendFeedback(feedback);
-			signalEnd(feedback);
-		} catch (Exception ex) {
-			LOGGER.error("Cannot send feedback", ex);
-			signalEnd(feedback);
-		}
 	}
 	
 	protected Feedback getFeedback() {

@@ -20,7 +20,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import lu.nowina.nexu.generic.DatabaseWebLoader;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 public class AboutController extends AbstractUIOperationController<Void> implements Initializable {
@@ -42,9 +41,7 @@ public class AboutController extends AbstractUIOperationController<Void> impleme
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		ok.setOnAction((e) -> {
-			signalEnd(null);
-		});
+		ok.setOnAction(e -> signalEnd(null));
 	}
 
 	@Override
@@ -54,11 +51,5 @@ public class AboutController extends AbstractUIOperationController<Void> impleme
 		
 		final String applicationVersion = (String) params[1];
 		this.applicationVersion.setText(applicationVersion);
-		
-		final DatabaseWebLoader loader = (DatabaseWebLoader) params[2];
-		final ResourceBundle resources = (ResourceBundle) params[3];
-		final String digest = loader.digestDatabase();
-		dbVersion.setText(digest != null ? digest : resources.getString("about.no.database"));
-		dbFile.setText(digest != null ? loader.getDatabaseFile().getAbsolutePath() : resources.getString("about.no.database"));
 	}
 }
