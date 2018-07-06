@@ -184,6 +184,8 @@ public class RequestProcessor extends AbstractHandler {
 	private void nexuInfo(HttpServletResponse response) throws IOException {
 		response.setCharacterEncoding(UTF8);
 		response.setContentType(APPLICATION_JSON);
+		response.setHeader("pragma", "no-cache");
+		response.setIntHeader("expires", -1);
 		PrintWriter writer = response.getWriter();
 		writer.write("{ \"version\": \"" + api.getAppConfig().getApplicationVersion() + "\"}");
 		writer.close();
