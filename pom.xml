@@ -58,9 +58,6 @@
 		<mocca.version>1.3.30</mocca.version>
 	</properties>
 
-	<!-- <scm> <developerConnection>scm:git:https://bitbucket.org/nowina-nexu/nexu-community.git</developerConnection> 
-		<tag>HEAD</tag> </scm> -->
-
 	<scm>
 		<connection>scm:git:git://github.com/nowina-solutions/nexu.git</connection>
 		<developerConnection>scm:git:ssh://github.com:nowina-solutions/nexu.git</developerConnection>
