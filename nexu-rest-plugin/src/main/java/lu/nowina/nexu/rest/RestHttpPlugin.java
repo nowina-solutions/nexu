@@ -13,11 +13,20 @@
  */
 package lu.nowina.nexu.rest;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.europa.esig.dss.DigestAlgorithm;
+import eu.europa.esig.dss.ToBeSigned;
 import lu.nowina.nexu.api.AuthenticateRequest;
 import lu.nowina.nexu.api.CertificateFilter;
 import lu.nowina.nexu.api.Execution;
@@ -36,14 +45,6 @@ import lu.nowina.nexu.api.plugin.HttpResponse;
 import lu.nowina.nexu.api.plugin.HttpStatus;
 import lu.nowina.nexu.api.plugin.InitializationMessage;
 import lu.nowina.nexu.json.GsonHelper;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import eu.europa.esig.dss.DigestAlgorithm;
-import eu.europa.esig.dss.ToBeSigned;
 
 /**
  * Default implementation of HttpPlugin for NexU.
@@ -143,7 +144,15 @@ public class RestHttpPlugin implements HttpPlugin {
 				final CertificateFilter certificateFilter = new CertificateFilter();
 				certificateFilter.setPurpose(purpose);
 				r.setCertificateFilter(certificateFilter);
+			}else {
+				final String nonRepudiation = req.getParameter("nonRepudiation");
+				if(isNotBlank(nonRepudiation)) {
+					final CertificateFilter certificateFilter = new CertificateFilter();
+					certificateFilter.setNonRepudationBit(Boolean.parseBoolean(nonRepudiation));
+					r.setCertificateFilter(certificateFilter);
+				}
 			}
+			
 		} else {
 			r = GsonHelper.fromJson(payload, GetCertificateRequest.class);
 		}

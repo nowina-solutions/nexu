@@ -86,7 +86,7 @@ public class WindowsKeystoreProductAdapter implements ProductAdapter {
 
 	@Override
 	public boolean supportCertificateFilter(Product product) {
-		return false;
+		return true;
 	}
 
 	@Override

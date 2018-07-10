@@ -17,6 +17,12 @@ public class CertificateFilter {
 
 	private Purpose purpose;
 	
+	/*
+	 * if false the nonRepudiation bit is not checked. If true, only certificate with nonRepudiationKeyUsage will be 
+	 * returned.
+	 */
+	private boolean nonRepudationBit = false;
+	
 	private byte[] certificateSHA1;
 
 	public CertificateFilter() {
@@ -45,6 +51,14 @@ public class CertificateFilter {
 
 	public void setCertificateSHA1(byte[] certificateSHA1) {
 		this.certificateSHA1 = certificateSHA1;
+	}
+
+	public boolean hasNonRepudationBit() {
+		return nonRepudationBit;
+	}
+
+	public void setNonRepudationBit(boolean nonRepudationBit) {
+		this.nonRepudationBit = nonRepudationBit;
 	}
 
 }
