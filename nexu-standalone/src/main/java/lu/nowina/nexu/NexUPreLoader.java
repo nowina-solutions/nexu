@@ -26,9 +26,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import lu.nowina.nexu.api.AppConfig;
-import lu.nowina.nexu.api.EnvironmentInfo;
-import lu.nowina.nexu.api.Feedback;
-import lu.nowina.nexu.view.core.UIOperation;
 
 /**
  * JavaFX {@link Preloader} used to display and log error messages during JavaFX startup.
@@ -61,10 +58,6 @@ public class NexUPreLoader extends Preloader {
 			alert.setHeaderText(preloaderMessage.getHeaderText());
 			alert.setContentText(preloaderMessage.getContentText());
 			final Optional<ButtonType> result = alert.showAndWait();
-			/*if(preloaderMessage.isSendFeedback() && (result.get() == ButtonType.OK)) {
-				// FIXME
-				sendFeedback(preloaderMessage.getException());
-			}*/
 		} else {
 			LOGGER.error("Unknown preloader notification class: " + info.getClass().getName());
 		}
@@ -80,39 +73,14 @@ public class NexUPreLoader extends Preloader {
 		// Log error messages
 		LOGGER.error("An error has occurred during startup", info.getCause());
 		
-		/* FIXME:
-		 * - remove original dialog
-		 * - call ProvideFeedbackController
-		 * - remove sendFeedback method
-		 */
-		
 		// Display dialog
-//		final Alert alert = new Alert(AlertType.CONFIRMATION);
-//		alert.setTitle(resourceBundle.getString("preloader.error"));
-//		alert.setHeaderText(MessageFormat.format(resourceBundle.getString("preloader.error.occurred"), getConfig().getApplicationName()));
-//		alert.setContentText(resourceBundle.getString("provide.feedback"));
-//		
-//		final Optional<ButtonType> result = alert.showAndWait();
-//		if(result.get() == ButtonType.OK) {
-//			sendFeedback(info.getCause());
-//		}
+		final Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle(resourceBundle.getString("preloader.error"));
+		alert.setHeaderText(MessageFormat.format(resourceBundle.getString("preloader.error.occurred"), getConfig().getApplicationName()));
+		
+		final Optional<ButtonType> result = alert.showAndWait();
 		return true;
 	}
-	
-//	private void sendFeedback(final Throwable t) {
-//		final Exception exception;
-//		if(t instanceof Exception) {
-//			exception = (Exception) t;
-//		} else {
-//			exception = new NexuException(t);
-//		}
-//		final Feedback feedback = new Feedback(exception);
-//		feedback.setNexuVersion(getConfig().getApplicationVersion());
-//		feedback.setInfo(EnvironmentInfo.buildFromSystemProperties(System.getProperties()));
-//		throw new NexuException("Dummy error");
-//		final FeedbackSender sender = new FeedbackSender(getConfig(), new HttpDataSender(NexuLauncher.getProxyConfigurer()));
-//		sender.sendFeedback(feedback);
-//	}
 	
 	/**
 	 * POJO that holds information about a message that must be displayed by {@link NexUPreLoader}.
