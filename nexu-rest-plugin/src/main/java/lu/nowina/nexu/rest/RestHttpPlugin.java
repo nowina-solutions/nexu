@@ -13,7 +13,7 @@
  */
 package lu.nowina.nexu.rest;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 import java.util.Collections;
 import java.util.List;
@@ -148,7 +148,7 @@ public class RestHttpPlugin implements HttpPlugin {
 				final String nonRepudiation = req.getParameter("nonRepudiation");
 				if(isNotBlank(nonRepudiation)) {
 					final CertificateFilter certificateFilter = new CertificateFilter();
-					certificateFilter.setNonRepudationBit(Boolean.parseBoolean(nonRepudiation));
+					certificateFilter.setNonRepudiationBit(Boolean.parseBoolean(nonRepudiation));
 					r.setCertificateFilter(certificateFilter);
 				}
 			}

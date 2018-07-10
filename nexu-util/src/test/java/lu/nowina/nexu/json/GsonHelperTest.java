@@ -42,7 +42,7 @@ public class GsonHelperTest {
 		req.setUserLocale("fr");
 		
 		String json = GsonHelper.toJson(req);
-		Assert.assertEquals("{\"certificateFilter\":{\"purpose\":\"SIGNATURE\"},\"userLocale\":\"fr\",\"externalId\":\"externalId\",\"requestSeal\":\"seal\",\"nonce\":\"nonce\"}", json);
+		Assert.assertEquals("{\"certificateFilter\":{\"purpose\":\"SIGNATURE\",\"nonRepudiationBit\":false},\"userLocale\":\"fr\",\"externalId\":\"externalId\",\"requestSeal\":\"seal\",\"nonce\":\"nonce\"}", json);
 
 	}
 	

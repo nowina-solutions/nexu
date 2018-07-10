@@ -40,7 +40,7 @@ public class CertificateFilterHelperTest {
 	@Test
 	public void testFilterSetOneEntryPassing() {
 		CertificateFilter filter = new CertificateFilter();
-		filter.setNonRepudationBit(true);
+		filter.setNonRepudiationBit(true);
 		DSSPrivateKeyEntry entry = mock(DSSPrivateKeyEntry.class, Mockito.RETURNS_DEEP_STUBS);
 		when(entry.getCertificate().checkKeyUsage(KeyUsageBit.nonRepudiation)).thenReturn(true);
 		when(entry.getCertificate().getDSSIdAsString()).thenReturn(NON_REPUDIATION);
@@ -53,7 +53,7 @@ public class CertificateFilterHelperTest {
 	@Test
 	public void testFilterSetNoEntryPassing() {
 		CertificateFilter filter = new CertificateFilter();
-		filter.setNonRepudationBit(true);
+		filter.setNonRepudiationBit(true);
 		DSSPrivateKeyEntry entry = mock(DSSPrivateKeyEntry.class, Mockito.RETURNS_DEEP_STUBS);
 		when(entry.getCertificate().checkKeyUsage(KeyUsageBit.nonRepudiation)).thenReturn(false);
 		when(entry.getCertificate().getDSSIdAsString()).thenReturn(NO_NON_REPUDIATION);
@@ -65,7 +65,7 @@ public class CertificateFilterHelperTest {
 	@Test
 	public void testFilterSetToFalseTwoEntries() {
 		CertificateFilter filter = new CertificateFilter();
-		filter.setNonRepudationBit(false);
+		filter.setNonRepudiationBit(false);
 		DSSPrivateKeyEntry entry = mock(DSSPrivateKeyEntry.class, Mockito.RETURNS_DEEP_STUBS);
 		when(entry.getCertificate().checkKeyUsage(KeyUsageBit.nonRepudiation)).thenReturn(false);
 		when(entry.getCertificate().getDSSIdAsString()).thenReturn(NON_REPUDIATION);

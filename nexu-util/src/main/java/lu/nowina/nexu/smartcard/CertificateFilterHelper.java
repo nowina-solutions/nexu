@@ -17,7 +17,7 @@ import lu.nowina.nexu.api.CertificateFilter;
 public class CertificateFilterHelper {
 
 	public List<DSSPrivateKeyEntry> filterKeys(SignatureTokenConnection token, CertificateFilter filter) {
-		if (filter.hasNonRepudationBit()) {
+		if (filter.getNonRepudiationBit()) {
 			List<DSSPrivateKeyEntry> filteredList = new ArrayList<>();
 			for (DSSPrivateKeyEntry entry : token.getKeys()) {
 				if (entry.getCertificate().checkKeyUsage(KeyUsageBit.nonRepudiation)) {
