@@ -53,7 +53,7 @@ import lu.nowina.nexu.api.OS;
 public class CardDetector {
 
 	private static final List<String> RESET_CONTEXT_ERRORS = Arrays.asList(
-			"SCARD_E_SERVICE_STOPPED", "WINDOWS_ERROR_INVALID_HANDLE", "SCARD_E_INVALID_HANDLE");
+			"SCARD_E_SERVICE_STOPPED", "WINDOWS_ERROR_INVALID_HANDLE", "SCARD_E_INVALID_HANDLE", "SCARD_E_NO_SERVICE");
 	
 	private static final Logger logger = LoggerFactory.getLogger(CardDetector.class.getSimpleName());
 
