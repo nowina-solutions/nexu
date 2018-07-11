@@ -35,16 +35,6 @@
                 	GridPane.columnIndex="0" GridPane.rowIndex="1"/>
                 <Label fx:id="applicationVersion" text="" 
                 	GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                	
-				<Label text="%about.dbVersion" 
-					GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-				<Label fx:id="dbVersion" text="" 
-					GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-				
-				<Label text="%about.dbFile" 
-					GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-				<Label fx:id="dbFile" text="" 
-					GridPane.columnIndex="1" GridPane.rowIndex="3"/>
 			</children>
 		</GridPane>
 	</top>
