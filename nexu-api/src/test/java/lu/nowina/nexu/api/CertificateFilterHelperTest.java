@@ -1,4 +1,4 @@
-package lu.nowina.nexu.smartcard;
+package lu.nowina.nexu.api;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;

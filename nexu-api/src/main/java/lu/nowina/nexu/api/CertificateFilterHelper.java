@@ -1,4 +1,4 @@
-package lu.nowina.nexu.smartcard;
+package lu.nowina.nexu.api;
 
 import java.util.ArrayList;
 import java.util.List;

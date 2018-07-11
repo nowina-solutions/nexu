@@ -25,7 +25,6 @@ import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.api.ProductAdapter;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.smartcard.CertificateFilterHelper;
 import lu.nowina.nexu.view.core.UIOperation;
 
 /**
@@ -85,7 +84,7 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 		
 		try {
 			if((productAdapter != null) && (product != null) && productAdapter.supportCertificateFilter(product) && (certificateFilter != null)) {
-				keys = new CertificateFilterHelper().filterKeys(token, certificateFilter);
+				keys = productAdapter.getKeys(token, certificateFilter);
 			} else {
 				keys = token.getKeys();
 			}
