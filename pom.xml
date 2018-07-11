@@ -13,19 +13,16 @@
 	<developers>
 		<developer>
 			<name>David Naramski</name>
-			<email>david.naramski@nowina.lu</email>
 			<organization>Nowina</organization>
 			<organizationUrl>http://nowina.lu/</organizationUrl>
 		</developer>
 		<developer>
 			<name>Jean Lepropre</name>
-			<email>jean.lepropre@nowina.lu</email>
 			<organization>Nowina</organization>
 			<organizationUrl>http://nowina.lu/</organizationUrl>
 		</developer>
 		<developer>
 			<name>Landry Soules</name>
-			<email>landry.soules@nowina.lu</email>
 			<organization>Nowina</organization>
 			<organizationUrl>http://nowina.lu/</organizationUrl>
 		</developer>
