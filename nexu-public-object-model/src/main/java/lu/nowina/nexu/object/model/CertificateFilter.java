@@ -25,6 +25,8 @@ public class CertificateFilter {
 	private Purpose purpose;
 	
 	private String certificateSHA1;
+	
+	private boolean nonRepudiationBit;
 
 	public CertificateFilter() {
 		super();
@@ -44,5 +46,13 @@ public class CertificateFilter {
 
 	public void setCertificateSHA1(String certificateSHA1) {
 		this.certificateSHA1 = certificateSHA1;
+	}
+
+	public boolean getNonRepudiationBit() {
+		return nonRepudiationBit;
+	}
+
+	public void setNonRepudiationBit(boolean nonRepudiationBit) {
+		this.nonRepudiationBit = nonRepudiationBit;
 	}
 }

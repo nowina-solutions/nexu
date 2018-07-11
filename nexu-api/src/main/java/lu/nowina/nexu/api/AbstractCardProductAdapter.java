@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import eu.europa.esig.dss.DigestAlgorithm;
+import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.PasswordInputCallback;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.api.flow.FutureOperationInvocation;
@@ -157,5 +158,10 @@ public abstract class AbstractCardProductAdapter implements ProductAdapter {
 	@Override
 	public List<Product> detectProducts() {
 		return Collections.emptyList();
+	}
+	
+	@Override
+	public List<DSSPrivateKeyEntry> getKeys(SignatureTokenConnection token, CertificateFilter certificateFilter) {
+		return new CertificateFilterHelper().filterKeys(token, certificateFilter);
 	}
 }

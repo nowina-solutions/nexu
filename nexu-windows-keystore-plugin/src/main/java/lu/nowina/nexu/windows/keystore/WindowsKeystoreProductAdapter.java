@@ -22,6 +22,7 @@ import eu.europa.esig.dss.token.MSCAPISignatureToken;
 import eu.europa.esig.dss.token.PasswordInputCallback;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 import lu.nowina.nexu.api.CertificateFilter;
+import lu.nowina.nexu.api.CertificateFilterHelper;
 import lu.nowina.nexu.api.GetIdentityInfoResponse;
 import lu.nowina.nexu.api.MessageDisplayCallback;
 import lu.nowina.nexu.api.NexuAPI;
@@ -86,12 +87,12 @@ public class WindowsKeystoreProductAdapter implements ProductAdapter {
 
 	@Override
 	public boolean supportCertificateFilter(Product product) {
-		return false;
+		return true;
 	}
 
 	@Override
 	public List<DSSPrivateKeyEntry> getKeys(SignatureTokenConnection token, CertificateFilter certificateFilter) {
-		throw new IllegalStateException("This product adapter does not support certificate filter.");
+		return new CertificateFilterHelper().filterKeys(token, certificateFilter);
 	}
 
 	@Override

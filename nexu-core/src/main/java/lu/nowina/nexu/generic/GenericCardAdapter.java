@@ -95,7 +95,7 @@ public class GenericCardAdapter extends AbstractCardProductAdapter {
 	
 	@Override
 	protected boolean supportCertificateFilter(DetectedCard card) {
-		return false;
+		return true;
 	}
 
 	@Override

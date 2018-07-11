@@ -81,6 +81,7 @@ public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPri
 	@Override
 	public OperationResult<DSSPrivateKeyEntry> perform() {
 		final List<DSSPrivateKeyEntry> keys;
+		
 		try {
 			if((productAdapter != null) && (product != null) && productAdapter.supportCertificateFilter(product) && (certificateFilter != null)) {
 				keys = productAdapter.getKeys(token, certificateFilter);
