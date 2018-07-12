@@ -24,6 +24,7 @@ import eu.europa.esig.dss.token.SignatureTokenConnection;
 import eu.europa.esig.dss.token.mocca.MOCCASignatureTokenConnection;
 import lu.nowina.nexu.api.AbstractCardProductAdapter;
 import lu.nowina.nexu.api.CertificateFilter;
+import lu.nowina.nexu.api.CertificateFilterHelper;
 import lu.nowina.nexu.api.DetectedCard;
 import lu.nowina.nexu.api.GetIdentityInfoResponse;
 import lu.nowina.nexu.api.MessageDisplayCallback;
@@ -99,11 +100,6 @@ public class GenericCardAdapter extends AbstractCardProductAdapter {
 	}
 
 	@Override
-	public List<DSSPrivateKeyEntry> getKeys(SignatureTokenConnection token, CertificateFilter certificateFilter) {
-		throw new IllegalStateException("This card adapter does not support certificate filter.");
-	}
-
-	@Override
 	protected boolean canReturnSuportedDigestAlgorithms(DetectedCard card) {
 		return false;
 	}
@@ -116,5 +112,10 @@ public class GenericCardAdapter extends AbstractCardProductAdapter {
 	@Override
 	protected DigestAlgorithm getPreferredDigestAlgorithm(DetectedCard card) {
 		throw new IllegalStateException("This card adapter cannot return list of supported digest algorithms.");
+	}
+	
+	@Override
+	public List<DSSPrivateKeyEntry> getKeys(SignatureTokenConnection token, CertificateFilter certificateFilter) {
+		return new CertificateFilterHelper().filterKeys(token, certificateFilter);
 	}
 }

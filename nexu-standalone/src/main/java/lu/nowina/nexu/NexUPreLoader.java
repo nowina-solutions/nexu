@@ -20,11 +20,18 @@ import java.util.ResourceBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.animation.PauseTransition;
 import javafx.application.Preloader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import lu.nowina.nexu.api.AppConfig;
 
 /**
@@ -62,10 +69,27 @@ public class NexUPreLoader extends Preloader {
 			LOGGER.error("Unknown preloader notification class: " + info.getClass().getName());
 		}
 	}
-
+	
+	/**
+	 * <p>
+	 * Displays splash screen at Nexu's startup.
+	 * </p>
+	 * <p>
+	 * Splash screen is activated with runtime parameter :
+	 * -Djavafx.preloader=lu.nowina.nexu.NexuPreloader
+	 * </p>
+	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		// Nothing to do
+		ImageView splash = new ImageView(new Image(NexUPreLoader.class.getResourceAsStream("/images/splash.jpg")));
+		StackPane background = new StackPane(splash);
+		Scene splashScene = new Scene(background, 600, 300);
+		primaryStage.setScene(splashScene);
+		primaryStage.initStyle(StageStyle.UNDECORATED);
+		primaryStage.show();
+		PauseTransition delay = new PauseTransition(Duration.seconds(3));
+		delay.setOnFinished(event -> primaryStage.close());
+		delay.play();
     }
 
 	@Override

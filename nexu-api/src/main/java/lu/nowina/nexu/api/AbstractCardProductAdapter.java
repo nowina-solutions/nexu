@@ -159,9 +159,4 @@ public abstract class AbstractCardProductAdapter implements ProductAdapter {
 	public List<Product> detectProducts() {
 		return Collections.emptyList();
 	}
-	
-	@Override
-	public List<DSSPrivateKeyEntry> getKeys(SignatureTokenConnection token, CertificateFilter certificateFilter) {
-		return new CertificateFilterHelper().filterKeys(token, certificateFilter);
-	}
 }
