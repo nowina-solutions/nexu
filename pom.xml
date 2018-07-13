@@ -58,6 +58,7 @@
 		<connection>scm:git:git://github.com/nowina-solutions/nexu.git</connection>
 		<developerConnection>scm:git:ssh://github.com:nowina-solutions/nexu.git</developerConnection>
 		<url>http://github.com/nowina-solutions/nexu/tree/master</url>
+        <tag>HEAD</tag>
 	</scm>
 
 	<licenses>
