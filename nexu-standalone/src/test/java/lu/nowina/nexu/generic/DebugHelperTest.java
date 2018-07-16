@@ -46,7 +46,7 @@ public class DebugHelperTest {
 		properties.setProperty("java.vendor", "Oracle");
 		properties.setProperty("os.arch", "x86_64");
 
-		AppConfig appConfig = spy(new AppConfig());
+		AppConfig appConfig = mock(AppConfig.class);
 		dummyNexuHome = Paths.get("tmp", "dummy_nexu_home").toFile();
 		assertTrue(dummyNexuHome.mkdirs());
 		assertTrue(dummyNexuHome.isDirectory());
