@@ -88,12 +88,10 @@ public class HttpsPlugin implements NexuPlugin {
 			} catch(final IOException | CertificateException e) {
 				LOGGER.warn("Exception when trying to determine if certificate has subject alternative names", e);
 				return Arrays.asList(new InitializationMessage(
-						MessageType.CONFIRMATION,
+						MessageType.WARNING,
 						resourceBundle.getString("warn.install.cert.title"),
 						MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "subjectAltNames"),
-						baseResourceBundle.getString("provide.feedback"),
-						true,
-						e
+						baseResourceBundle.getString("contact.application.provider")
 					)
 				);
 			}
@@ -216,12 +214,10 @@ public class HttpsPlugin implements NexuPlugin {
 		} catch(Exception e) {
 			LOGGER.warn("Exception when trying to install certificate in Firefox", e);
 			return Arrays.asList(new InitializationMessage(
-					MessageType.CONFIRMATION,
+					MessageType.WARNING,
 					resourceBundle.getString("warn.install.cert.title"),
 					MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "FireFox"),
-					baseResourceBundle.getString("provide.feedback"),
-					true,
-					e
+					baseResourceBundle.getString("contact.application.provider")
 				)
 			);
 		} finally {
@@ -268,12 +264,10 @@ public class HttpsPlugin implements NexuPlugin {
 		} catch(Exception e) {
 			LOGGER.warn("Exception when trying to install certificate in Firefox", e);
 			return Arrays.asList(new InitializationMessage(
-					MessageType.CONFIRMATION,
+					MessageType.WARNING,
 					resourceBundle.getString("warn.install.cert.title"),
 					MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "FireFox"),
-					baseResourceBundle.getString("provide.feedback"),
-					true,
-					e
+					baseResourceBundle.getString("contact.application.provider")
 				)
 			);
 		} finally {
@@ -309,23 +303,19 @@ public class HttpsPlugin implements NexuPlugin {
 			LOGGER.warn("KeyStoreException when trying to install certificate in Windows Store", e);
 			// Unfortunately there is no particular exception thrown in this case
 			return Arrays.asList(new InitializationMessage(
-					MessageType.CONFIRMATION,
+					MessageType.WARNING,
 					resourceBundle.getString("warn.install.cert.title"),
 					MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "Windows Store"),
-					resourceBundle.getString("warn.install.cert.windows.registry") + "\n\n" + baseResourceBundle.getString("provide.feedback"),
-					true,
-					e
+					resourceBundle.getString("warn.install.cert.windows.registry") + "\n\n" + baseResourceBundle.getString("contact.application.provider")
 				)
 			);
 		} catch(final Exception e) {
 			LOGGER.warn("Exception when trying to install certificate in Windows Store", e);
 			return Arrays.asList(new InitializationMessage(
-					MessageType.CONFIRMATION,
+					MessageType.WARNING,
 					resourceBundle.getString("warn.install.cert.title"),
 					MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "Windows Store"),
-					baseResourceBundle.getString("provide.feedback"),
-					true,
-					e
+					baseResourceBundle.getString("contact.application.provider")
 				)
 			);
 		}
@@ -359,12 +349,10 @@ public class HttpsPlugin implements NexuPlugin {
 		} catch(Exception e) {
 			LOGGER.warn("Exception when trying to install certificate in Mac user keychain", e);
 			return Arrays.asList(new InitializationMessage(
-					MessageType.CONFIRMATION,
+					MessageType.WARNING,
 					resourceBundle.getString("warn.install.cert.title"),
 					MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "Mac user keychain"),
-					baseResourceBundle.getString("provide.feedback"),
-					true,
-					e
+					baseResourceBundle.getString("contact.application.provider")
 				)
 			);
 		} finally {
@@ -406,12 +394,10 @@ public class HttpsPlugin implements NexuPlugin {
 		} catch(Exception e) {
 			LOGGER.warn("Exception when trying to install certificate in Linux FF and Chrome/Chromium stores", e);
 			return Arrays.asList(new InitializationMessage(
-					MessageType.CONFIRMATION,
+					MessageType.WARNING,
 					resourceBundle.getString("warn.install.cert.title"),
 					MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "Linux Firefox & Chrome/Chromium stores"),
-					baseResourceBundle.getString("provide.feedback"),
-					true,
-					e
+					baseResourceBundle.getString("contact.application.provider")
 				)
 			);
 		} finally {
