@@ -40,6 +40,7 @@ public class StageHelper {
 	
 	public void setTitle(final String applicationName, final String resourceBundleKey) {
 		if(isBlank(applicationName) && isBlank(resourceBundleKey)) {
+			title = "";
 			return;
 		}
 		String translatedTitle = "";
@@ -52,13 +53,13 @@ public class StageHelper {
 		}
 		if(!isBlank(applicationName) && !isBlank(translatedTitle)) {
 			title = applicationName + " - " + translatedTitle;
-		}else
-		if(isBlank(applicationName)) {
+		} else if(isBlank(applicationName)) {
 			title = translatedTitle;
-		}else
-			if(isBlank(translatedTitle)) {
-				title = applicationName;
-			}
+		} else if(isBlank(translatedTitle)) {
+			title = applicationName;
+		} else {
+			title = "";
+		}
 	}
 
 	public ResourceBundle getBundle() {
