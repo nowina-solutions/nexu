@@ -176,11 +176,13 @@ public class StandaloneUIDisplay implements UIDisplay {
 			if(Message.INPUT_PINPAD.equals(message)) {
 				StandaloneUIDisplay.this.operationFactory.getOperation(
 						NonBlockingUIOperation.class, "/fxml/message-no-button.fxml",
-						"message.display.callback." + message.name().toLowerCase().replace('_', '.'), NexuLauncher.getConfig()).perform();
+						"message.display.callback." + message.name().toLowerCase().replace('_', '.'),
+						NexuLauncher.getConfig().getApplicationName()).perform();
 			} else {
 				StandaloneUIDisplay.this.operationFactory.getOperation(
 					NonBlockingUIOperation.class, "/fxml/message.fxml",
-					"message.display.callback." + message.name().toLowerCase().replace('_', '.'), NexuLauncher.getConfig()).perform();
+					"message.display.callback." + message.name().toLowerCase().replace('_', '.'),
+					NexuLauncher.getConfig().getApplicationName()).perform();
 			}
 		}
 
