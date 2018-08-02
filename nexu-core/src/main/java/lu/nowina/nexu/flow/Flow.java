@@ -68,8 +68,8 @@ public abstract class Flow<I, O> {
 	@SuppressWarnings("unchecked")
 	protected Exception handleException(final Exception e) {
 		if (api.getAppConfig().isEnablePopUps()) {
-			final Feedback feedback = new Feedback(e);
 			if (api.getAppConfig().isEnableIncidentReport()) {
+				final Feedback feedback = new Feedback(e);
 				getOperationFactory().getOperation(UIOperation.class, "/fxml/provide-feedback.fxml",
 						new Object[] { feedback, api.getAppConfig().getServerUrl(),
 								api.getAppConfig().getApplicationVersion(), api.getAppConfig().getApplicationName(),

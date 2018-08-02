@@ -14,7 +14,6 @@
 package lu.nowina.nexu;
 
 import java.text.MessageFormat;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.slf4j.Logger;
@@ -28,7 +27,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
-import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
@@ -64,7 +62,7 @@ public class NexUPreLoader extends Preloader {
 			alert.setTitle(preloaderMessage.getTitle());
 			alert.setHeaderText(preloaderMessage.getHeaderText());
 			alert.setContentText(preloaderMessage.getContentText());
-			final Optional<ButtonType> result = alert.showAndWait();
+			alert.showAndWait();
 		} else {
 			LOGGER.error("Unknown preloader notification class: " + info.getClass().getName());
 		}
@@ -81,15 +79,17 @@ public class NexUPreLoader extends Preloader {
 	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		ImageView splash = new ImageView(new Image(NexUPreLoader.class.getResourceAsStream("/images/splash.jpg")));
-		StackPane background = new StackPane(splash);
-		Scene splashScene = new Scene(background, 600, 300);
-		primaryStage.setScene(splashScene);
-		primaryStage.initStyle(StageStyle.UNDECORATED);
-		primaryStage.show();
-		PauseTransition delay = new PauseTransition(Duration.seconds(3));
-		delay.setOnFinished(event -> primaryStage.close());
-		delay.play();
+		if(getConfig().isShowSplashScreen()) {
+			final ImageView splash = new ImageView(new Image(NexUPreLoader.class.getResourceAsStream("/images/splash.jpg")));
+			final StackPane background = new StackPane(splash);
+			final Scene splashScene = new Scene(background, 600, 300);
+			primaryStage.setScene(splashScene);
+			primaryStage.initStyle(StageStyle.UNDECORATED);
+			primaryStage.show();
+			final PauseTransition delay = new PauseTransition(Duration.seconds(3));
+			delay.setOnFinished(event -> primaryStage.close());
+			delay.play();
+		}
     }
 
 	@Override
@@ -98,11 +98,12 @@ public class NexUPreLoader extends Preloader {
 		LOGGER.error("An error has occurred during startup", info.getCause());
 		
 		// Display dialog
-		final Alert alert = new Alert(AlertType.CONFIRMATION);
+		final Alert alert = new Alert(AlertType.WARNING);
 		alert.setTitle(resourceBundle.getString("preloader.error"));
 		alert.setHeaderText(MessageFormat.format(resourceBundle.getString("preloader.error.occurred"), getConfig().getApplicationName()));
+		alert.setContentText(resourceBundle.getString("contact.application.provider"));
 		
-		final Optional<ButtonType> result = alert.showAndWait();
+		alert.showAndWait();
 		return true;
 	}
 	
@@ -116,18 +117,13 @@ public class NexUPreLoader extends Preloader {
 		private final String title;
 		private final String headerText;
 		private final String contentText;
-		private final boolean sendFeedback;
-		private final Throwable exception;
 		
-		public PreloaderMessage(AlertType messageType, String title, String headerText, String contentText, boolean sendFeedback,
-				Throwable exception) {
+		public PreloaderMessage(AlertType messageType, String title, String headerText, String contentText) {
 			super();
 			this.messageType = messageType;
 			this.title = title;
 			this.headerText = headerText;
 			this.contentText = contentText;
-			this.sendFeedback = sendFeedback;
-			this.exception = exception;
 		}
 
 		public AlertType getMessageType() {
@@ -144,14 +140,6 @@ public class NexUPreLoader extends Preloader {
 
 		public String getContentText() {
 			return contentText;
-		}
-		
-		public boolean isSendFeedback() {
-			return sendFeedback;
-		}
-		
-		public Throwable getException() {
-			return exception;
 		}
 	}
 }

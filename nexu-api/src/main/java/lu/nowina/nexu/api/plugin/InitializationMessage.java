@@ -24,18 +24,13 @@ public class InitializationMessage {
 	private final String title;
 	private final String headerText;
 	private final String contentText;
-	private final boolean sendFeedback;
-	private final Throwable exception;
 
-	public InitializationMessage(MessageType messageType, String title, String headerText, String contentText, boolean sendFeedback,
-			Throwable exception) {
+	public InitializationMessage(MessageType messageType, String title, String headerText, String contentText) {
 		super();
 		this.messageType = messageType;
 		this.title = title;
 		this.headerText = headerText;
 		this.contentText = contentText;
-		this.sendFeedback = sendFeedback;
-		this.exception = exception;
 	}
 
 	public MessageType getMessageType() {
@@ -54,15 +49,7 @@ public class InitializationMessage {
 		return contentText;
 	}
 
-	public boolean isSendFeedback() {
-		return sendFeedback;
-	}
-
-	public Throwable getException() {
-		return exception;
-	}
-	
 	public static enum MessageType {
-		CONFIRMATION, WARNING;
+		WARNING;
 	}
 }

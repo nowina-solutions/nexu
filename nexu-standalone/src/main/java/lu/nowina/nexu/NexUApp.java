@@ -148,9 +148,6 @@ public class NexUApp extends Application {
 		for(final InitializationMessage message : messages) {
 			final AlertType alertType;
 			switch(message.getMessageType()) {
-			case CONFIRMATION:
-				alertType = AlertType.CONFIRMATION;
-				break;
 			case WARNING:
 				alertType = AlertType.WARNING;
 				break;
@@ -158,7 +155,7 @@ public class NexUApp extends Application {
 				throw new IllegalArgumentException("Unknown message type: " + message.getMessageType());	
 			}
 			final PreloaderMessage preloaderMessage = new PreloaderMessage(alertType, message.getTitle(),
-					message.getHeaderText(), message.getContentText(), message.isSendFeedback(), message.getException());
+					message.getHeaderText(), message.getContentText());
 			notifyPreloader(preloaderMessage);
 		}
 	}

@@ -48,7 +48,6 @@ public class AppConfig {
 	private static final String ENABLE_POP_UPS = "enable_pop_ups";
 	//This property is less restrictive than enable_pop_ups, since this one allows display of certificate selection
 	private static final String ENABLE_INFORMATIVE_POP_UPS = "enable_informative_pop_ups";
-	private static final String SEND_ANONYMOUS_INFO_TO_PROXY = "send_anonymous_info_to_proxy";
 	private static final String USE_SYSTEM_PROXY = "use_system_proxy";
 	private static final String PROXY_SERVER = "proxy_server";
 	private static final String PROXY_PORT = "proxy_port";
@@ -72,6 +71,7 @@ public class AppConfig {
 	private static final String TICKET_URL = "ticket_url";
 	private static final String ENABLE_INCIDENT_REPORT = "enable_incident_report";
 
+	private static final String SHOW_SPLASH_SCREEN = "show_splash_screen";
 
 	private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
 
@@ -133,6 +133,8 @@ public class AppConfig {
 	// String used for http header Access-Control-Allow-Origin. Default: "*"
 	private String corsAllowedOrigin;
 
+	private boolean showSplashScreen;
+	
 	public AppConfig() {
 		try {
 			final URL versionResourceURL = this.getClass().getResource("/version.txt");
@@ -431,7 +433,8 @@ public class AppConfig {
 		setEnableSystrayMenu(Boolean.parseBoolean(props.getProperty(ENABLE_SYSTRAY_MENU, "true")));
 		setCorsAllowedOrigin(props.getProperty(CORS_ALLOWED_ORIGIN, "*"));
 		setTicketUrl(props.getProperty(TICKET_URL, "https://github.com/nowina-solutions/nexu/issues/new"));
-		setEnableIncidentReport(Boolean.parseBoolean(props.getProperty(ENABLE_INCIDENT_REPORT, "true")));
+		setEnableIncidentReport(Boolean.parseBoolean(props.getProperty(ENABLE_INCIDENT_REPORT, "false")));
+		setShowSplashScreen(Boolean.parseBoolean(props.getProperty(SHOW_SPLASH_SCREEN, "false")));
 	}
 
 	/**
@@ -486,4 +489,11 @@ public class AppConfig {
 		this.enableIncidentReport = enableIncidentReport;
 	}
 
+	public boolean isShowSplashScreen() {
+		return showSplashScreen;
+	}
+
+	public void setShowSplashScreen(boolean showSplashScreen) {
+		this.showSplashScreen = showSplashScreen;
+	}
 }
