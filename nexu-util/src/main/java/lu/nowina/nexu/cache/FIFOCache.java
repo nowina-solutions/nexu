@@ -15,26 +15,42 @@ package lu.nowina.nexu.cache;
 
 import java.util.LinkedHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * This class implements a FIFO cache whose size is bounded.
- * 
- * <p>When the maximum size is reached, the eldest inserted entry is removed from the cache.
+ * <p>
+ * When the maximum size is reached, the eldest inserted entry is removed from the cache.
  *
  * @author Jean Lepropre (jean.lepropre@nowina.lu)
  */
 public class FIFOCache<K, V> extends LinkedHashMap<K, V> {
 
-	private static final long serialVersionUID = 3868274387687593515L;
+    private static final long serialVersionUID = 3868274387687593515L;
 
-	private int maxSize;
-	
-	public FIFOCache(int maxSize) {
-		super();
-		this.maxSize = maxSize;
-	}
+    static final Logger logger = LoggerFactory.getLogger(FIFOCache.class);
 
-	@Override
-	protected boolean removeEldestEntry(java.util.Map.Entry<K, V> eldest) {
-		return size() > maxSize;
-	}
+    private final int maxSize;
+
+    public FIFOCache(final int maxSize) {
+        super();
+        this.maxSize = maxSize;
+    }
+
+    @Override
+    protected boolean removeEldestEntry(final java.util.Map.Entry<K, V> eldest) {
+        final boolean remove = (this.size() > this.maxSize);
+        if (remove && (eldest != null)) {
+            final V eldestValue = eldest.getValue();
+            if ((eldestValue != null) && (eldestValue instanceof AutoCloseable)) {
+                try {
+                    ((AutoCloseable) eldestValue).close();
+                } catch (final Exception e) {
+                    logger.error("Exception when removing eldest entry from cache: " + e.getMessage(), e);
+                }
+            }
+        }
+        return remove;
+    }
 }
