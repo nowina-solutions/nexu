@@ -52,11 +52,7 @@ public class Pkcs11ParamsController extends AbstractUIOperationController<Pkcs11
 
     @Override
     public void init(final Object... params) {
-        String applicationName = "";
-        if((params != null) && (params[0] != null)) {
-            applicationName = (String) params[0];
-        }
-        StageHelper.getInstance().setTitle(applicationName, "pkcs11.params.title");
+        StageHelper.getInstance().setTitle((String) params[0], "pkcs11.params.title");
     }
 
     @Override
