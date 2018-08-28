@@ -48,180 +48,183 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import lu.nowina.nexu.flow.operation.CoreOperationStatus;
 import lu.nowina.nexu.flow.StageHelper;
+import lu.nowina.nexu.flow.operation.CoreOperationStatus;
 import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 public class KeySelectionController extends AbstractUIOperationController<DSSPrivateKeyEntry> implements Initializable {
 
-	private static final Logger logger = LoggerFactory.getLogger(KeySelectionController.class.getName());
+    private static final Logger logger = LoggerFactory.getLogger(KeySelectionController.class.getName());
 
-	private static final String ICON_UNLOCKED = "/images/unlocked.png";
-	private static final String ICON_QC = "/images/medal.png";
-	private static final String ICON_QCSD = "/images/quality.png";
+    private static final String ICON_UNLOCKED = "/images/unlocked.png";
+    private static final String ICON_QC = "/images/medal.png";
+    private static final String ICON_QCSD = "/images/quality.png";
 
-	@FXML
-	private Button select;
+    @FXML
+    private Button select;
 
-	@FXML
-	private Button cancel;
+    @FXML
+    private Button cancel;
 
-	@FXML
-	private Button back;
+    @FXML
+    private Button back;
 
-	@FXML
-	private ListView<DSSPrivateKeyEntry> listView;
+    @FXML
+    private ListView<DSSPrivateKeyEntry> listView;
 
-	@Override
-	public void initialize(URL location, ResourceBundle resources) {
-		select.setOnAction((event) -> {
-			DSSPrivateKeyEntry selectedItem = listView.getSelectionModel().getSelectedItem();
-			logger.info("Selected item " + selectedItem);
-			if (selectedItem != null) {
-				signalEnd(selectedItem);
-			} else {
-				signalEnd(null);
-			}
-		});
-		cancel.setOnAction((e) -> {
-			signalUserCancel();
-		});
+    @Override
+    public void initialize(final URL location, final ResourceBundle resources) {
+        this.select.setOnAction((event) -> {
+            final DSSPrivateKeyEntry selectedItem = this.listView.getSelectionModel().getSelectedItem();
+            logger.info("Selected item " + selectedItem);
+            if (selectedItem != null) {
+                this.signalEnd(selectedItem);
+            } else {
+                this.signalEnd(null);
+            }
+        });
+        this.cancel.setOnAction((e) -> {
+            this.signalUserCancel();
+        });
 
-		back.setOnAction(e -> signalEndWithStatus(CoreOperationStatus.BACK));
+        this.back.setOnAction(e -> this.signalEndWithStatus(CoreOperationStatus.BACK));
 
-		listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-		listView.setCellFactory(param -> {
-			return new ListCell<DSSPrivateKeyEntry>() {
+        this.listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        this.listView.setCellFactory(param -> {
+            return new ListCell<DSSPrivateKeyEntry>() {
 
-				@Override
-				protected void updateItem(DSSPrivateKeyEntry k, boolean bln) {
-					super.updateItem(k, bln);
-					if (k != null) {
-						CertificateToken certificateToken = k.getCertificate();
+                @Override
+                protected void updateItem(final DSSPrivateKeyEntry k, final boolean bln) {
+                    super.updateItem(k, bln);
+                    if (k != null) {
+                        final CertificateToken certificateToken = k.getCertificate();
 
-						Label lSubject = new Label();
-						lSubject.setText(DSSASN1Utils.getSubjectCommonName(certificateToken));
-						lSubject.setStyle("-fx-font-weight: bold;");
+                        final Label lSubject = new Label();
+                        lSubject.setText(DSSASN1Utils.getSubjectCommonName(certificateToken));
+                        lSubject.setStyle("-fx-font-weight: bold;");
 
-						Label lEmitter = new Label();
-						lEmitter.setText(MessageFormat.format(resources.getString("key.selection.issuer.usage"),
-								DSSASN1Utils.get(certificateToken.getIssuerX500Principal()).get("2.5.4.3"),
-								createKeyUsageString(certificateToken, resources)));
-						Label lValidity = new Label();
-						SimpleDateFormat format = new SimpleDateFormat("dd MMMMMM yyyy");
-						String startDate = format.format(certificateToken.getNotBefore());
-						String endDate = format.format(certificateToken.getNotAfter());
-						lValidity.setText(
-								MessageFormat.format(resources.getString("key.selection.validity"), startDate, endDate));
+                        final Label lEmitter = new Label();
+                        lEmitter.setText(MessageFormat.format(resources.getString("key.selection.issuer.usage"),
+                                DSSASN1Utils.get(certificateToken.getIssuerX500Principal()).get("2.5.4.3"),
+                                KeySelectionController.this.createKeyUsageString(certificateToken, resources)));
+                        final Label lValidity = new Label();
+                        final SimpleDateFormat format = new SimpleDateFormat("dd MMMMMM yyyy");
+                        final String startDate = format.format(certificateToken.getNotBefore());
+                        final String endDate = format.format(certificateToken.getNotAfter());
+                        lValidity.setText(
+                                MessageFormat.format(resources.getString("key.selection.validity"), startDate, endDate));
 
-						Hyperlink link = new Hyperlink(resources.getString("key.selection.certificate.open"));
+                        final Hyperlink link = new Hyperlink(resources.getString("key.selection.certificate.open"));
 
-						link.setOnAction(actionEvent -> {
-							if (Desktop.isDesktopSupported()) {
-								try {
-									File tmpFile = File.createTempFile("certificate", ".crt");
-									tmpFile.deleteOnExit();
-									String certificateStr = DSSUtils.convertToPEM(certificateToken);
-									FileWriter writer = new FileWriter(tmpFile);
-									writer.write(certificateStr);
-									writer.close();
-									new Thread(() -> {
-										try {
-											Desktop.getDesktop().open(tmpFile);
-										} catch (IOException e) {
-											logger.error(e.getMessage(), e);
-										}
-									}).start();
-								} catch (Exception e) {
-									logger.error(e.getMessage(), e);
-								}
-							}
-						});
+                        link.setOnAction(actionEvent -> {
+                            if (Desktop.isDesktopSupported()) {
+                                try {
+                                    final File tmpFile = File.createTempFile("certificate", ".crt");
+                                    tmpFile.deleteOnExit();
+                                    final String certificateStr = DSSUtils.convertToPEM(certificateToken);
+                                    final FileWriter writer = new FileWriter(tmpFile);
+                                    writer.write(certificateStr);
+                                    writer.close();
+                                    new Thread(() -> {
+                                        try {
+                                            Desktop.getDesktop().open(tmpFile);
+                                        } catch (final IOException e) {
+                                            logger.error(e.getMessage(), e);
+                                        }
+                                    }).start();
+                                } catch (final Exception e) {
+                                    logger.error(e.getMessage(), e);
+                                }
+                            }
+                        });
 
-						VBox vBox = new VBox(lSubject, lEmitter, lValidity, link);
+                        final VBox vBox = new VBox(lSubject, lEmitter, lValidity, link);
 
-						VBox vBoxLeft;
-						try {
-							vBoxLeft = new VBox(getQCIcons(certificateToken).stream().toArray(ImageView[]::new));
-						} catch (IOException e) {
-							logger.error(e.getMessage(), e);
-							vBoxLeft = new VBox();
-						}
-						vBoxLeft.setPadding(new Insets(0, 10, 0, 0));
-						vBoxLeft.setAlignment(Pos.CENTER);
+                        VBox vBoxLeft;
+                        try {
+                            vBoxLeft = new VBox(KeySelectionController.this.getQCIcons(certificateToken).stream().toArray(ImageView[]::new));
+                        } catch (final IOException e) {
+                            logger.error(e.getMessage(), e);
+                            vBoxLeft = new VBox();
+                        }
+                        vBoxLeft.setPadding(new Insets(0, 10, 0, 0));
+                        vBoxLeft.setAlignment(Pos.CENTER);
 
-						HBox hBox = new HBox(vBoxLeft, vBox);
-						setGraphic(hBox);
-					}
-				}
+                        final HBox hBox = new HBox(vBoxLeft, vBox);
+                        this.setGraphic(hBox);
+                    }
+                }
 
-			};
+            };
 
-		});
-	}
+        });
+    }
 
-	private List<ImageView> getQCIcons(CertificateToken certificateToken) throws IOException {
-		List<ImageView> qcIconsImages = new ArrayList<>();
-		List<String> qcStatements = DSSASN1Utils.getQCStatementsIdList(certificateToken);
-		if (qcStatements.contains(QCStatementOids.QC_COMPLIANCE.getOid())) {
-			qcIconsImages.add(fetchImage(ICON_QC));
-		}
-		if (qcStatements.contains(QCStatementOids.QC_SSCD.getOid())) {
-			qcIconsImages.add(fetchImage(ICON_QCSD));
-		}
-		if (qcIconsImages.isEmpty()) {
-			qcIconsImages.add(fetchImage(ICON_UNLOCKED));
-		}
-		return qcIconsImages;
-	}
+    private List<ImageView> getQCIcons(final CertificateToken certificateToken) throws IOException {
+        final List<ImageView> qcIconsImages = new ArrayList<>();
+        final List<String> qcStatements = DSSASN1Utils.getQCStatementsIdList(certificateToken);
+        if (qcStatements.contains(QCStatementOids.QC_COMPLIANCE.getOid())) {
+            qcIconsImages.add(this.fetchImage(ICON_QC));
+        }
+        if (qcStatements.contains(QCStatementOids.QC_SSCD.getOid())) {
+            qcIconsImages.add(this.fetchImage(ICON_QCSD));
+        }
+        if (qcIconsImages.isEmpty()) {
+            qcIconsImages.add(this.fetchImage(ICON_UNLOCKED));
+        }
+        return qcIconsImages;
+    }
 
-	private ImageView fetchImage(String imagePath) throws IOException {
-		return new ImageView(new Image(getClass().getResource(imagePath).openStream()));
-	}
+    private ImageView fetchImage(final String imagePath) throws IOException {
+        return new ImageView(new Image(this.getClass().getResource(imagePath).openStream()));
+    }
 
-	private String createKeyUsageString(CertificateToken token, ResourceBundle resources) {
-		final boolean[] keyUsages = token.getCertificate().getKeyUsage();
-		if (keyUsages == null) {
-			return "";
-		}
-		final StringBuilder builder = new StringBuilder();
-		if (keyUsages[0]) {
-			builder.append(resources.getString("keyUsage.digitalSignature") + "\n");
-		}
-		if (keyUsages[1]) {
-			builder.append(resources.getString("keyUsage.nonRepudiation") + "\n");
-		}
-		if (keyUsages[2]) {
-			builder.append(resources.getString("keyUsage.keyEncipherment") + "\n");
-		}
-		if (keyUsages[3]) {
-			builder.append(resources.getString("keyUsage.dataEncipherment") + "\n");
-		}
-		if (keyUsages[4]) {
-			builder.append(resources.getString("keyUsage.keyAgreement") + "\n");
-		}
-		if (keyUsages[5]) {
-			builder.append(resources.getString("keyUsage.keyCertSign") + "\n");
-		}
-		if (keyUsages[6]) {
-			builder.append(resources.getString("keyUsage.crlSign") + "\n");
-		}
-		if (keyUsages[7]) {
-			builder.append(resources.getString("keyUsage.encipherOnly") + "\n");
-		}
-		if (keyUsages[8]) {
-			builder.append(resources.getString("keyUsage.decipherOnly") + "\n");
-		}
-		return builder.toString();
-	}
+    private String createKeyUsageString(final CertificateToken token, final ResourceBundle resources) {
+        final boolean[] keyUsages = token.getCertificate().getKeyUsage();
+        if (keyUsages == null) {
+            return "";
+        }
+        final StringBuilder builder = new StringBuilder();
+        if (keyUsages[0]) {
+            builder.append(resources.getString("keyUsage.digitalSignature") + "\n");
+        }
+        if (keyUsages[1]) {
+            builder.append(resources.getString("keyUsage.nonRepudiation") + "\n");
+        }
+        if (keyUsages[2]) {
+            builder.append(resources.getString("keyUsage.keyEncipherment") + "\n");
+        }
+        if (keyUsages[3]) {
+            builder.append(resources.getString("keyUsage.dataEncipherment") + "\n");
+        }
+        if (keyUsages[4]) {
+            builder.append(resources.getString("keyUsage.keyAgreement") + "\n");
+        }
+        if (keyUsages[5]) {
+            builder.append(resources.getString("keyUsage.keyCertSign") + "\n");
+        }
+        if (keyUsages[6]) {
+            builder.append(resources.getString("keyUsage.crlSign") + "\n");
+        }
+        if (keyUsages[7]) {
+            builder.append(resources.getString("keyUsage.encipherOnly") + "\n");
+        }
+        if (keyUsages[8]) {
+            builder.append(resources.getString("keyUsage.decipherOnly") + "\n");
+        }
+        return builder.toString();
+    }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public void init(Object... params) {
-		StageHelper.getInstance().setTitle((String) params[1], "key.selection.title");
-		List<DSSPrivateKeyEntry> keys = (List<DSSPrivateKeyEntry>) params[0];
-		ObservableList<DSSPrivateKeyEntry> items = FXCollections.observableArrayList(keys);
-		listView.setItems(items);
-	}
+    @Override
+    @SuppressWarnings("unchecked")
+    public void init(final Object... params) {
+        StageHelper.getInstance().setTitle((String) params[1], "key.selection.title");
+        final Boolean displayBackButton = (Boolean) params[2];
+        this.back.setManaged(displayBackButton);
+        this.back.setVisible(displayBackButton);
+        final List<DSSPrivateKeyEntry> keys = (List<DSSPrivateKeyEntry>) params[0];
+        final ObservableList<DSSPrivateKeyEntry> items = FXCollections.observableArrayList(keys);
+        this.listView.setItems(items);
+    }
 
 }
