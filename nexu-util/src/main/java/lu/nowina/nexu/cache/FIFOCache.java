@@ -29,7 +29,7 @@ public class FIFOCache<K, V> extends LinkedHashMap<K, V> {
 
     private static final long serialVersionUID = 3868274387687593515L;
 
-    static final Logger logger = LoggerFactory.getLogger(FIFOCache.class);
+    private static final Logger logger = LoggerFactory.getLogger(FIFOCache.class);
 
     private final int maxSize;
 
