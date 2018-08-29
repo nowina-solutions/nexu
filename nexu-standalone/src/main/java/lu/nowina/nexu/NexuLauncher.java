@@ -53,6 +53,9 @@ public class NexuLauncher {
 
 		configureLogger(config);
 
+		// Perform this work in a separate method to have the logger well configured.
+		config.initDefaultProduct(props);
+		
 		proxyConfigurer = new ProxyConfigurer(config, new UserPreferences(config.getApplicationName()));
 
 		beforeLaunch();
