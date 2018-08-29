@@ -447,40 +447,35 @@ public class AppConfig {
         this.setShowSplashScreen(Boolean.parseBoolean(props.getProperty(SHOW_SPLASH_SCREEN, "false")));
         this.setDisplayBackButton(Boolean.parseBoolean(props.getProperty(DISPLAY_BACK_BUTTON, "false")));
 
-        for (Entry<Object, Object> property : props.entrySet()) {
-            if (property.getKey().toString().startsWith(DEFAULT_PRODUCT)) {
+        for (final Entry<Object, Object> entry : props.entrySet()) {
+            if (((String) entry.getKey()).startsWith(DEFAULT_PRODUCT)) {
                 // Initialize default product
-                String osProperty = property.getKey().toString().replace(DEFAULT_PRODUCT, StringUtils.EMPTY);
-                if (StringUtils.isEmpty(osProperty) || StringUtils.isEmpty(property.getValue().toString())) {
-                    logger.warn("Nexu-config uncomplete 'default_product' property. Property:" + property.toString());
+                final String osProperty = ((String) entry.getKey()).substring(DEFAULT_PRODUCT.length());
+                if (StringUtils.isEmpty(osProperty) || StringUtils.isEmpty((String) entry.getValue())) {
+                    logger.warn("Invalid 'default_product' property. Property: " + entry.getKey());
                 } else {
-                    OS osEnum = OS.forOSName(osProperty);
-                    EnvironmentInfo environmentInfo = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
-                    if (environmentInfo.getOs().compareTo(osEnum) == 0) {
-                        switch (osEnum) {
-                            case WINDOWS:
-                                try {
-                                    Class<? extends Product> subProduct = Class.forName(property.getValue().toString()).asSubclass(Product.class);
-                                    this.defaultProduct = subProduct.newInstance();
-                                } catch (ClassNotFoundException e) {
-                                    logger.warn("Nexu-config 'default_product_WINDOWS' value does not match Product sub-class. Property value:" + property.getValue());
-                                } catch (InstantiationException | IllegalAccessException e) {
-                                    logger.error("Error occured during instantiation of product. Property:" + property.toString());
-                                }
-                                break;
-                            case LINUX:
-                            case MACOSX:
-                                logger.warn("Nexu-config 'default_product' default product is not handled for this OS. OS property: " + osProperty);
-                                break;
-                            case NOT_RECOGNIZED:
-                                logger.warn("Nexu-config 'default_product' key does not match Nexu OS. OS property: " + osProperty);
-                                break;
-                        }
-                    } else {
-                        logger.warn("Nexu-config 'default_product' does not match system OS. OS property: " + osProperty + "; System OS:" + environmentInfo.getOsName());
+                    final OS osEnum;
+                    try{
+                    	osEnum = OS.valueOf(osProperty);
+                    } catch(final IllegalArgumentException e) {
+                        logger.warn("Invalid 'default_product' property. Property: " + entry.getKey());
+                        continue;
+                    }
+                    final EnvironmentInfo environmentInfo = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
+                    if (environmentInfo.getOs().equals(osEnum)) {
+                    	try {
+                    		final Class<? extends Product> defaultProduct =
+                    				Class.forName((String) entry.getValue()).asSubclass(Product.class);
+                    		this.defaultProduct = defaultProduct.newInstance();
+                    	} catch (final ClassNotFoundException | ClassCastException e) {
+                            logger.warn("Invalid 'default_product' property. Property: " + entry.getKey() +
+                            		". Value is not a valid Product class: " + entry.getValue());
+                    	} catch (final InstantiationException | IllegalAccessException e) {
+                    		logger.error("Error occurred during instantiation of default product. Property: " + entry.getKey() +
+                            		". Product class: " + entry.getValue());
+                    	}
                     }
                 }
-                break;
             }
         }
     }
