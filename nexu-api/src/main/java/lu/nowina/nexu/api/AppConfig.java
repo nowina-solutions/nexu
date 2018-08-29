@@ -21,9 +21,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +34,6 @@ import org.slf4j.LoggerFactory;
  * Configuration of the NexU Platform
  *
  * @author David Naramski
- *
  */
 public class AppConfig {
 
@@ -75,6 +76,8 @@ public class AppConfig {
     private static final String SHOW_SPLASH_SCREEN = "show_splash_screen";
 
     private static final String DISPLAY_BACK_BUTTON = "display_back_button";
+
+    private static final String DEFAULT_PRODUCT = "default_product_";
 
     private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
 
@@ -139,6 +142,8 @@ public class AppConfig {
     private boolean showSplashScreen;
 
     private boolean displayBackButton;
+
+    private Product defaultProduct;
 
     public AppConfig() {
         try {
@@ -443,9 +448,43 @@ public class AppConfig {
         this.setDisplayBackButton(Boolean.parseBoolean(props.getProperty(DISPLAY_BACK_BUTTON, "false")));
     }
 
+    public void initDefaultProduct(final Properties props) {
+    	// Perform this work in a separate method to have the logger well configured.
+        for (final Entry<Object, Object> entry : props.entrySet()) {
+            if (((String) entry.getKey()).startsWith(DEFAULT_PRODUCT)) {
+                // Initialize default product
+                final String osProperty = ((String) entry.getKey()).substring(DEFAULT_PRODUCT.length());
+                if (StringUtils.isEmpty(osProperty) || StringUtils.isEmpty((String) entry.getValue())) {
+                    logger.warn("Invalid 'default_product' property. Property: " + entry.getKey());
+                } else {
+                    final OS osEnum;
+                    try{
+                    	osEnum = OS.valueOf(osProperty);
+                    } catch(final IllegalArgumentException e) {
+                        logger.warn("Invalid 'default_product' property. Property: " + entry.getKey());
+                        continue;
+                    }
+                    final EnvironmentInfo environmentInfo = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
+                    if (environmentInfo.getOs().equals(osEnum)) {
+                    	try {
+                    		final Class<? extends Product> defaultProduct =
+                    				Class.forName((String) entry.getValue()).asSubclass(Product.class);
+                    		this.defaultProduct = defaultProduct.newInstance();
+                    	} catch (final ClassNotFoundException | ClassCastException e) {
+                            logger.warn("Invalid 'default_product' property. Property: " + entry.getKey() +
+                            		". Value is not a valid Product class: " + entry.getValue());
+                    	} catch (final InstantiationException | IllegalAccessException e) {
+                    		logger.error("Error occurred during instantiation of default product. Property: " + entry.getKey() +
+                            		". Product class: " + entry.getValue());
+                    	}
+                    }
+                }
+            }
+        }
+    }
+    
     /**
-     * Returns a list of {@link Integer} from <code>str</code> which should be
-     * tokenized by commas.
+     * Returns a list of {@link Integer} from <code>str</code> which should be tokenized by commas.
      *
      * @param str
      *            A list of strings tokenized by commas.
@@ -510,4 +549,13 @@ public class AppConfig {
     public void setDisplayBackButton(final boolean displayBackButton) {
         this.displayBackButton = displayBackButton;
     }
+
+    public Product getDefaultProduct() {
+        return defaultProduct;
+    }
+
+    public void setDefaultProduct(Product defaultProduct) {
+        this.defaultProduct = defaultProduct;
+    }
+
 }

@@ -225,6 +225,12 @@ public class KeySelectionController extends AbstractUIOperationController<DSSPri
         final List<DSSPrivateKeyEntry> keys = (List<DSSPrivateKeyEntry>) params[0];
         final ObservableList<DSSPrivateKeyEntry> items = FXCollections.observableArrayList(keys);
         this.listView.setItems(items);
+        if(items.size()<=5) {
+        	this.listView.setPrefHeight(100.0*items.size());	
+        }else {
+        	this.listView.setPrefHeight(500);
+        }
+        
     }
 
 }
