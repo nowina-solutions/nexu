@@ -38,55 +38,51 @@ import lu.nowina.nexu.view.core.UIOperation;
  */
 public class AdvancedCreationFeedbackOperation extends AbstractCompositeOperation<Void> {
 
-	private NexuAPI api;
-	private Map<TokenOperationResultKey, Object> map;
-	
-	public AdvancedCreationFeedbackOperation() {
-		super();
-	}
+    private NexuAPI api;
+    private Map<TokenOperationResultKey, Object> map;
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public void setParams(Object... params) {
-		try {
-			api = (NexuAPI) params[0];
-			map = (Map<TokenOperationResultKey, Object>) params[1];
-		} catch(final ClassCastException | ArrayIndexOutOfBoundsException e) {
-			throw new IllegalArgumentException("Expected parameters: NexuAPI, Map");
-		}
-	}
+    public AdvancedCreationFeedbackOperation() {
+        super();
+    }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public OperationResult<Void> perform() {
-		if(api.getAppConfig().isEnablePopUps()) {
-			final Feedback feedback = new Feedback();
-			feedback.setFeedbackStatus(FeedbackStatus.SUCCESS);
-			feedback.setApiParameter((String) map.get(TokenOperationResultKey.SELECTED_API_PARAMS));
-			feedback.setSelectedAPI((ScAPI) map.get(TokenOperationResultKey.SELECTED_API));
-			feedback.setSelectedCard((DetectedCard) map.get(TokenOperationResultKey.SELECTED_PRODUCT));
+    @Override
+    @SuppressWarnings("unchecked")
+    public void setParams(final Object... params) {
+        try {
+            this.api = (NexuAPI) params[0];
+            this.map = (Map<TokenOperationResultKey, Object>) params[1];
+        } catch(final ClassCastException | ArrayIndexOutOfBoundsException e) {
+            throw new IllegalArgumentException("Expected parameters: NexuAPI, Map");
+        }
+    }
 
-			if ((feedback.getSelectedCard() != null) && (feedback.getSelectedAPI() != null) &&
-					((feedback.getSelectedAPI() == ScAPI.MOCCA) || (feedback.getSelectedAPI() == ScAPI.MSCAPI) ||
-							(feedback.getApiParameter() != null))) {
-				final OperationResult<Feedback> result =
-						operationFactory.getOperation(UIOperation.class, "/fxml/store-result.fxml",
-								new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
-										api.getAppConfig().getApplicationName(), api.getAppConfig()}).perform();
-				if(result.getStatus().equals(BasicOperationStatus.SUCCESS)) {
-					final Feedback back = result.getResult();
-					if (back != null) {
-						((InternalAPI) api).store(back.getSelectedCard().getAtr(),
-								back.getSelectedAPI(), back.getApiParameter());
-					}
-				}
-			} else {
-				operationFactory.getOperation(UIOperation.class, "/fxml/provide-feedback.fxml",
-						new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
-								api.getAppConfig().getApplicationName()}).perform();
-			}
-		}		
-		return new OperationResult<Void>((Void) null);
-	}
+    @Override
+    @SuppressWarnings("unchecked")
+    public OperationResult<Void> perform() {
+        if(this.api.getAppConfig().isEnablePopUps()) {
+            final Feedback feedback = new Feedback();
+            feedback.setFeedbackStatus(FeedbackStatus.SUCCESS);
+            feedback.setApiParameter((String) this.map.get(TokenOperationResultKey.SELECTED_API_PARAMS));
+            feedback.setSelectedAPI((ScAPI) this.map.get(TokenOperationResultKey.SELECTED_API));
+            feedback.setSelectedCard((DetectedCard) this.map.get(TokenOperationResultKey.SELECTED_PRODUCT));
+
+            if ((feedback.getSelectedCard() != null) && (feedback.getSelectedAPI() != null) &&
+                    ((feedback.getSelectedAPI() == ScAPI.MOCCA) || (feedback.getSelectedAPI() == ScAPI.MSCAPI) ||
+                            (feedback.getApiParameter() != null))) {
+                final OperationResult<Feedback> result =
+                        this.operationFactory.getOperation(UIOperation.class, "/fxml/store-result.fxml",
+                                new Object[]{feedback, this.api.getAppConfig().getServerUrl(), this.api.getAppConfig().getApplicationVersion(),
+                                        this.api.getAppConfig().getApplicationName(), this.api.getAppConfig()}).perform();
+                if(result.getStatus().equals(BasicOperationStatus.SUCCESS)) {
+                    final Feedback back = result.getResult();
+                    if (back != null) {
+                        ((InternalAPI) this.api).store(back.getSelectedCard().getAtr(),
+                                back.getSelectedAPI(), back.getApiParameter());
+                    }
+                }
+            }
+        }
+        return new OperationResult<Void>((Void) null);
+    }
 
 }

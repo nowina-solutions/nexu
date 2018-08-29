@@ -32,7 +32,7 @@
 	<bottom>
 		<HBox styleClass="btn-container">
 			<children>
-				<Button fx:id="requestSupport" wrapText="true" styleClass="btn-primary" mnemonicParsing="false" text="%button.requestSupport" />
+				<Button fx:id="cancel" wrapText="true" styleClass="btn-primary" mnemonicParsing="false" text="%button.cancel" />
 				<Button fx:id="hicSuntDracones" wrapText="true" styleClass="btn-danger" mnemonicParsing="false" text="%button.warningRead" />
 			</children>
 		</HBox>

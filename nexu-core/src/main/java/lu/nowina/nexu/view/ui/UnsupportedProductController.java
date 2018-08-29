@@ -29,32 +29,32 @@ import lu.nowina.nexu.view.core.AbstractUIOperationController;
 
 /**
  * Return true if the user want to try "Advance mode"
- * 
+ *
  * @author David Naramski
  *
  */
-public class UnsupportedProductController extends AbstractUIOperationController<Boolean> implements Initializable {
+public class UnsupportedProductController extends AbstractUIOperationController<Void> implements Initializable {
 
-	@FXML
-	private Label message;
+    @FXML
+    private Label message;
 
-	@FXML
-	private Button requestSupport;
+    @FXML
+    private Button cancel;
 
-	@FXML
-	private Button hicSuntDracones;
+    @FXML
+    private Button hicSuntDracones;
 
-	@Override
-	public void initialize(URL location, ResourceBundle resources) {
-		hicSuntDracones.setOnAction(ev -> signalEnd(true));
-		requestSupport.setOnAction(ev -> signalEnd(false));
-	}
+    @Override
+    public void initialize(final URL location, final ResourceBundle resources) {
+        this.hicSuntDracones.setOnAction(ev -> this.signalEnd(null));
+        this.cancel.setOnAction(ev -> this.signalUserCancel());
+    }
 
-	@Override
-	public final void init(Object... params) {
-		StageHelper.getInstance().setTitle((String) params[0], "unsuported.product.title");
+    @Override
+    public final void init(final Object... params) {
+        StageHelper.getInstance().setTitle((String) params[0], "unsuported.product.title");
 
-		Platform.runLater(() -> message.setText(StringEscapeUtils.unescapeJava(MessageFormat
-				.format(ResourceBundle.getBundle("bundles/nexu").getString("unsuported.product.header"), params[0]))));
-	}
+        Platform.runLater(() -> this.message.setText(StringEscapeUtils.unescapeJava(MessageFormat
+                .format(ResourceBundle.getBundle("bundles/nexu").getString("unsuported.product.header"), params[0]))));
+    }
 }

@@ -48,6 +48,7 @@ import lu.nowina.nexu.api.NewKeystore;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.api.ProductAdapter;
+import lu.nowina.nexu.api.ScAPI;
 import lu.nowina.nexu.api.TokenId;
 import lu.nowina.nexu.api.flow.BasicOperationStatus;
 import lu.nowina.nexu.api.flow.NoOpFutureOperationInvocation;
@@ -65,207 +66,234 @@ import lu.nowina.nexu.view.core.UIOperation;
 
 public class GetCertificateFlowTest extends AbstractConfigureLoggerTest {
 
-	@Rule
-	public TemporaryFolder tempFolder = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder tempFolder = new TemporaryFolder();
 
-	@Test
-	public void testNewKeystore() throws Exception {
-		final UIDisplay display = mock(UIDisplay.class);
-		when(display.getPasswordInputCallback())
-				.thenReturn(new PrefilledPasswordCallback(new PasswordProtection("password".toCharArray())));
+    @Test
+    public void testNewKeystore() throws Exception {
+        final UIDisplay display = mock(UIDisplay.class);
+        when(display.getPasswordInputCallback())
+        .thenReturn(new PrefilledPasswordCallback(new PasswordProtection("password".toCharArray())));
 
-		final NexuAPI api = mock(NexuAPI.class);
-		final AppConfig appConfig = new AppConfig();
-		appConfig.setEnablePopUps(true);
-		when(api.getAppConfig()).thenReturn(appConfig);
+        final NexuAPI api = mock(NexuAPI.class);
+        final AppConfig appConfig = new AppConfig();
+        appConfig.setEnablePopUps(true);
+        when(api.getAppConfig()).thenReturn(appConfig);
 
-		final Product selectedProduct = new NewKeystore();
-		when(api.detectCards()).thenReturn(Collections.emptyList());
-		when(api.matchingProductAdapters(selectedProduct)).thenReturn(
-				Arrays.asList(new Match(new KeystoreProductAdapter(tempFolder.getRoot()), selectedProduct)));
-		final Collection<SignatureTokenConnection> coll = new ArrayList<>();
-		when(api.registerTokenConnection(any())).then(new Answer<TokenId>() {
-			@Override
-			public TokenId answer(InvocationOnMock invocation) throws Throwable {
-				coll.add(invocation.getArgumentAt(0, SignatureTokenConnection.class));
-				return new TokenId("id");
-			}
-		});
-		when(api.getTokenConnection(new TokenId("id"))).then(new Answer<SignatureTokenConnection>() {
-			@Override
-			public SignatureTokenConnection answer(InvocationOnMock invocation) throws Throwable {
-				return coll.iterator().next();
-			}
-		});
+        final Product selectedProduct = new NewKeystore();
+        when(api.detectCards()).thenReturn(Collections.emptyList());
+        when(api.matchingProductAdapters(selectedProduct)).thenReturn(
+                Arrays.asList(new Match(new KeystoreProductAdapter(this.tempFolder.getRoot()), selectedProduct)));
+        final Collection<SignatureTokenConnection> coll = new ArrayList<>();
+        when(api.registerTokenConnection(any())).then(new Answer<TokenId>() {
+            @Override
+            public TokenId answer(final InvocationOnMock invocation) throws Throwable {
+                coll.add(invocation.getArgumentAt(0, SignatureTokenConnection.class));
+                return new TokenId("id");
+            }
+        });
+        when(api.getTokenConnection(new TokenId("id"))).then(new Answer<SignatureTokenConnection>() {
+            @Override
+            public SignatureTokenConnection answer(final InvocationOnMock invocation) throws Throwable {
+                return coll.iterator().next();
+            }
+        });
 
-		final ConfiguredKeystore configuredProduct = new ConfiguredKeystore();
-		configuredProduct.setType(KeystoreType.JKS);
-		configuredProduct.setUrl(this.getClass().getResource("/keystore.jks").toString());
-		configuredProduct.setToBeSaved(true);
-		final OperationFactory operationFactory = new NoUIOperationFactory(selectedProduct, configuredProduct);
-		((NoUIOperationFactory) operationFactory).setDisplay(display);
+        final ConfiguredKeystore configuredProduct = new ConfiguredKeystore();
+        configuredProduct.setType(KeystoreType.JKS);
+        configuredProduct.setUrl(this.getClass().getResource("/keystore.jks").toString());
+        configuredProduct.setToBeSaved(true);
+        final OperationFactory operationFactory = new NoUIOperationFactory(selectedProduct, configuredProduct);
+        ((NoUIOperationFactory) operationFactory).setDisplay(display);
 
-		final GetCertificateFlow flow = new GetCertificateFlow(display, api);
-		flow.setOperationFactory(operationFactory);
-		final Execution<GetCertificateResponse> resp = flow.process(api, new GetCertificateRequest());
+        final GetCertificateFlow flow = new GetCertificateFlow(display, api);
+        flow.setOperationFactory(operationFactory);
+        final Execution<GetCertificateResponse> resp = flow.process(api, new GetCertificateRequest());
 
-		final SignatureTokenConnection token = new JKSSignatureToken(
-				this.getClass().getResourceAsStream("/keystore.jks"), new PasswordProtection("password".toCharArray()));
-		Assert.assertNotNull(resp);
-		Assert.assertTrue(resp.isSuccess());
-		Assert.assertNotNull(resp.getResponse());
-		Assert.assertEquals(token.getKeys().get(0).getCertificate(), resp.getResponse().getCertificate());
-		Assert.assertEquals(token.getKeys().get(0).getEncryptionAlgorithm(),
-				resp.getResponse().getEncryptionAlgorithm());
-		Assert.assertEquals(new TokenId("id"), resp.getResponse().getTokenId());
-		Assert.assertEquals(token.getKeys().get(0).getCertificate().getDSSIdAsString(), resp.getResponse().getKeyId());
-		Assert.assertNull(resp.getResponse().getPreferredDigest());
-		Assert.assertNull(resp.getResponse().getSupportedDigests());
-	}
+        try(final SignatureTokenConnection token = new JKSSignatureToken(
+                this.getClass().getResourceAsStream("/keystore.jks"), new PasswordProtection("password".toCharArray()))){
+            Assert.assertNotNull(resp);
+            Assert.assertTrue(resp.isSuccess());
+            Assert.assertNotNull(resp.getResponse());
+            Assert.assertEquals(token.getKeys().get(0).getCertificate(), resp.getResponse().getCertificate());
+            Assert.assertEquals(token.getKeys().get(0).getEncryptionAlgorithm(),
+                    resp.getResponse().getEncryptionAlgorithm());
+            Assert.assertEquals(new TokenId("id"), resp.getResponse().getTokenId());
+            Assert.assertEquals(token.getKeys().get(0).getCertificate().getDSSIdAsString(), resp.getResponse().getKeyId());
+            Assert.assertNull(resp.getResponse().getPreferredDigest());
+            Assert.assertNull(resp.getResponse().getSupportedDigests());
+        }
+    }
 
-	@Test
-	@SuppressWarnings("unchecked")
-	public void testNotRecognizedRequestSupport() throws Exception {
-		final UIDisplay display = mock(UIDisplay.class);
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testNotRecognizedRequestSupport() throws Exception {
+        final UIDisplay display = mock(UIDisplay.class);
 
-		final NexuAPI api = mock(NexuAPI.class);
-		final DetectedCard product = new DetectedCard("atr", 0);
-		when(api.detectCards()).thenReturn(Arrays.asList(product));
+        final NexuAPI api = mock(NexuAPI.class);
+        final DetectedCard product = new DetectedCard("atr", 0);
+        when(api.detectCards()).thenReturn(Arrays.asList(product));
 
-		final AppConfig appConfig = new AppConfig();
-		appConfig.setAdvancedModeAvailable(true);
-		appConfig.setEnablePopUps(true);
-		appConfig.setTicketUrl("http://random.url");
-		appConfig.setApplicationName("Dummy App");
-		when(api.getAppConfig()).thenReturn(appConfig);
+        final AppConfig appConfig = new AppConfig();
+        appConfig.setAdvancedModeAvailable(true);
+        appConfig.setEnablePopUps(true);
+        appConfig.setTicketUrl("http://random.url");
+        appConfig.setApplicationName("Dummy App");
+        when(api.getAppConfig()).thenReturn(appConfig);
 
-		final OperationFactory operationFactory = mock(OperationFactory.class);
+        final OperationFactory operationFactory = mock(OperationFactory.class);
 
-		final Operation<Object> selectProductOperation = mock(Operation.class);
-		when(selectProductOperation.perform()).thenReturn(new OperationResult<Object>(product));
-		when(operationFactory.getOperation(eq(UIOperation.class), eq("/fxml/product-selection.fxml"),
-				any(Object[].class))).thenReturn(selectProductOperation);
+        final Operation<Object> selectProductOperation = mock(Operation.class);
+        when(selectProductOperation.perform()).thenReturn(new OperationResult<Object>(product));
+        when(operationFactory.getOperation(eq(UIOperation.class), eq("/fxml/product-selection.fxml"),
+                any(Object[].class))).thenReturn(selectProductOperation);
 
-		final Operation<List<Match>> getMatchingCardAdaptersOperation = mock(Operation.class);
-		when(getMatchingCardAdaptersOperation.perform())
-				.thenReturn(new OperationResult<List<Match>>(Collections.emptyList()));
-		when(operationFactory.getOperation(GetMatchingProductAdaptersOperation.class, Arrays.asList(product), api))
-				.thenReturn(getMatchingCardAdaptersOperation);
+        final Operation<List<Match>> getMatchingCardAdaptersOperation = mock(Operation.class);
+        when(getMatchingCardAdaptersOperation.perform())
+        .thenReturn(new OperationResult<List<Match>>(Collections.emptyList()));
+        when(operationFactory.getOperation(GetMatchingProductAdaptersOperation.class, Arrays.asList(product), api))
+        .thenReturn(getMatchingCardAdaptersOperation);
 
-		final Operation<List<Match>> configureProductOperation = mock(Operation.class);
-		when(configureProductOperation.perform()).thenReturn(new OperationResult<List<Match>>(Collections.emptyList()));
-		when(operationFactory.getOperation(ConfigureProductOperation.class, Collections.emptyList(), api))
-				.thenReturn(configureProductOperation);
+        final Operation<List<Match>> configureProductOperation = mock(Operation.class);
+        when(configureProductOperation.perform()).thenReturn(new OperationResult<List<Match>>(Collections.emptyList()));
+        when(operationFactory.getOperation(ConfigureProductOperation.class, Collections.emptyList(), api))
+        .thenReturn(configureProductOperation);
 
-		final CreateTokenOperation createTokenOperation = new CreateTokenOperation();
-		createTokenOperation.setParams(api, Collections.emptyList());
-		createTokenOperation.setDisplay(display);
-		createTokenOperation.setOperationFactory(operationFactory);
-		when(operationFactory.getOperation(CreateTokenOperation.class, api, Collections.emptyList()))
-				.thenReturn(createTokenOperation);
+        final CreateTokenOperation createTokenOperation = new CreateTokenOperation();
+        createTokenOperation.setParams(api, Collections.emptyList());
+        createTokenOperation.setDisplay(display);
+        createTokenOperation.setOperationFactory(operationFactory);
+        when(operationFactory.getOperation(eq(CreateTokenOperation.class), eq("/fxml/api-selection.fxml"), any(Object[].class)))
+        .thenReturn(createTokenOperation);
+        when(operationFactory.getOperation(eq(CreateTokenOperation.class), eq(api), any(Object.class)))
+        .thenReturn(createTokenOperation);
 
-		final Operation<Object> returnFalseOperation = mock(Operation.class);
-		when(returnFalseOperation.perform()).thenReturn(new OperationResult<Object>(false));
-		when(operationFactory.getOperation(eq(UIOperation.class), eq("/fxml/unsupported-product.fxml"),
-				any(Object[].class))).thenReturn(returnFalseOperation);
+        final Operation<Object> returnFalseOperation = mock(Operation.class);
+        when(returnFalseOperation.perform()).thenReturn(new OperationResult<Object>(false));
+        when(operationFactory.getOperation(eq(UIOperation.class), eq("/fxml/unsupported-product.fxml"),
+                any(Object[].class))).thenReturn(returnFalseOperation);
 
-		final Operation<Object> successOperation = mock(Operation.class);
-		when(successOperation.perform()).thenReturn(new OperationResult<Object>(BasicOperationStatus.SUCCESS));
-		when(operationFactory.getOperation(eq(UIOperation.class), eq("/fxml/provide-feedback.fxml"),
-				any(Object[].class))).thenReturn(successOperation);
+        final Operation<Object> returnScAPIOperation = mock(Operation.class);
+        when(returnScAPIOperation.perform()).thenReturn(new OperationResult<Object>(ScAPI.PKCS_11));
+        when(operationFactory.getOperation(eq(UIOperation.class), eq("/fxml/api-selection.fxml"),
+                eq("unsuported.product.message"), any(String.class))).thenReturn(returnFalseOperation);
 
-		final GetCertificateFlow flow = new GetCertificateFlow(display, api);
-		flow.setOperationFactory(operationFactory);
+        when(operationFactory.getOperation(eq(UIOperation.class), eq("/fxml/message.fxml"),
+                eq("unsuported.product.message"), any(String.class))).thenReturn(returnFalseOperation);
 
-		final GetCertificateRequest req = new GetCertificateRequest();
-		final Execution<GetCertificateResponse> resp = flow.process(api, req);
-		Assert.assertNotNull(resp);
-		Assert.assertFalse(resp.isSuccess());
-		Assert.assertEquals(CoreOperationStatus.UNSUPPORTED_PRODUCT.getCode(), resp.getError());
-	}
 
-	@Test
-	public void testCardRecognized() throws Exception {
-		final UIDisplay display = mock(UIDisplay.class);
-		final ProductAdapter adapter = mock(ProductAdapter.class);
 
-		final SignatureTokenConnection token = new JKSSignatureToken(
-				this.getClass().getResourceAsStream("/keystore.jks"), new PasswordProtection("password".toCharArray()));
+        when(operationFactory.getOperation(eq(UIOperation.class), eq("/fxml/message.fxml"),
+                any(Object[].class))).thenReturn(returnScAPIOperation);
 
-		final NexuAPI api = mock(NexuAPI.class);
-		final AppConfig appConfig = new AppConfig();
-		appConfig.setEnablePopUps(true);
-		when(api.getAppConfig()).thenReturn(appConfig);
-		final DetectedCard detectedCard = new DetectedCard("atr", 0);
-		when(adapter.getConfigurationOperation(api, detectedCard))
-				.thenReturn(new NoOpFutureOperationInvocation<Product>(detectedCard));
-		when(adapter.getSaveOperation(api, detectedCard)).thenReturn(new NoOpFutureOperationInvocation<Boolean>(true));
+        final OperationResult<Object> or =  mock(OperationResult.class);
+        when(or.getStatus()).thenReturn(BasicOperationStatus.USER_CANCEL);
+        when(or.getResult()).thenReturn(Boolean.FALSE);
+        final Operation<Object> returnOtherFalseOperation = mock(Operation.class);
+        when(returnFalseOperation.perform()).thenReturn(or);
+        when(operationFactory.getOperation(eq(UIOperation.class), eq("/fxml/pkcs11-params.fxml"),
+                any(Object[].class))).thenReturn(returnOtherFalseOperation);
 
-		when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
-		when(api.matchingProductAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
-		when(api.registerTokenConnection(token)).thenReturn(new TokenId("id"));
-		when(api.getTokenConnection(new TokenId("id"))).thenReturn(token);
-		when(adapter.connect(eq(api), eq(detectedCard), any())).thenReturn(token);
 
-		final OperationFactory operationFactory = new NoUIOperationFactory(detectedCard, null);
-		((NoUIOperationFactory) operationFactory).setDisplay(display);
 
-		GetCertificateFlow flow = new GetCertificateFlow(display, api);
-		flow.setOperationFactory(operationFactory);
-		Execution<GetCertificateResponse> resp = flow.process(api, new GetCertificateRequest());
-		final SignatureTokenConnection testToken = new JKSSignatureToken(
-				this.getClass().getResourceAsStream("/keystore.jks"), new PasswordProtection("password".toCharArray()));
-		Assert.assertNotNull(resp);
-		Assert.assertTrue(resp.isSuccess());
-		Assert.assertNotNull(resp.getResponse());
-		Assert.assertEquals(testToken.getKeys().get(0).getCertificate(), resp.getResponse().getCertificate());
-		Assert.assertEquals(testToken.getKeys().get(0).getEncryptionAlgorithm(),
-				resp.getResponse().getEncryptionAlgorithm());
-		Assert.assertEquals(new TokenId("id"), resp.getResponse().getTokenId());
-		Assert.assertEquals(testToken.getKeys().get(0).getCertificate().getDSSIdAsString(),
-				resp.getResponse().getKeyId());
-		Assert.assertNull(resp.getResponse().getPreferredDigest());
-		Assert.assertNull(resp.getResponse().getSupportedDigests());
-	}
 
-	private static class NoUIOperationFactory extends BasicOperationFactory {
+        final Operation<Object> successOperation = mock(Operation.class);
+        when(successOperation.perform()).thenReturn(new OperationResult<Object>(BasicOperationStatus.SUCCESS));
+        when(operationFactory.getOperation(eq(UIOperation.class), eq("/fxml/provide-feedback.fxml"),
+                any(Object[].class))).thenReturn(successOperation);
 
-		@SuppressWarnings("rawtypes")
-		private final Operation successOperation;
-		@SuppressWarnings("rawtypes")
-		private final Operation selectedProductOperation;
-		@SuppressWarnings("rawtypes")
-		private final Operation configureProductOperation;
+        final GetCertificateFlow flow = new GetCertificateFlow(display, api);
+        flow.setOperationFactory(operationFactory);
 
-		public NoUIOperationFactory(final Product selectedProduct, final Product configuredProduct) {
-			this.successOperation = mock(Operation.class);
-			when(successOperation.perform()).thenReturn(new OperationResult<Void>(BasicOperationStatus.SUCCESS));
-			this.selectedProductOperation = mock(Operation.class);
-			when(selectedProductOperation.perform()).thenReturn(new OperationResult<Product>(selectedProduct));
+        final GetCertificateRequest req = new GetCertificateRequest();
+        final Execution<GetCertificateResponse> resp = flow.process(api, req);
+        Assert.assertNotNull(resp);
+        Assert.assertFalse(resp.isSuccess());
+        Assert.assertEquals(CoreOperationStatus.UNSUPPORTED_PRODUCT.getCode(), resp.getError());
+    }
 
-			if (configuredProduct != null) {
-				this.configureProductOperation = mock(Operation.class);
-				when(configureProductOperation.perform()).thenReturn(new OperationResult<Product>(configuredProduct));
-			} else {
-				this.configureProductOperation = null;
-			}
-		}
+    @Test
+    public void testCardRecognized() throws Exception {
+        final UIDisplay display = mock(UIDisplay.class);
+        final ProductAdapter adapter = mock(ProductAdapter.class);
 
-		@Override
-		@SuppressWarnings("unchecked")
-		public <R, T extends Operation<R>> Operation<R> getOperation(Class<T> clazz, Object... params) {
-			if (UIOperation.class.isAssignableFrom(clazz)) {
-				switch ((String) params[0]) {
-				case "/fxml/product-selection.fxml":
-					return selectedProductOperation;
-				case "/fxml/configure-keystore.fxml":
-					return configureProductOperation;
-				default:
-					return successOperation;
-				}
-			} else {
-				return super.getOperation(clazz, params);
-			}
-		}
-	}
+        final SignatureTokenConnection token = new JKSSignatureToken(
+                this.getClass().getResourceAsStream("/keystore.jks"), new PasswordProtection("password".toCharArray()));
+
+        final NexuAPI api = mock(NexuAPI.class);
+        final AppConfig appConfig = new AppConfig();
+        appConfig.setEnablePopUps(true);
+        when(api.getAppConfig()).thenReturn(appConfig);
+        final DetectedCard detectedCard = new DetectedCard("atr", 0);
+        when(adapter.getConfigurationOperation(api, detectedCard))
+        .thenReturn(new NoOpFutureOperationInvocation<Product>(detectedCard));
+        when(adapter.getSaveOperation(api, detectedCard)).thenReturn(new NoOpFutureOperationInvocation<Boolean>(true));
+
+        when(api.detectCards()).thenReturn(Arrays.asList(detectedCard));
+        when(api.matchingProductAdapters(detectedCard)).thenReturn(Arrays.asList(new Match(adapter, detectedCard)));
+        when(api.registerTokenConnection(token)).thenReturn(new TokenId("id"));
+        when(api.getTokenConnection(new TokenId("id"))).thenReturn(token);
+        when(adapter.connect(eq(api), eq(detectedCard), any())).thenReturn(token);
+
+        final OperationFactory operationFactory = new NoUIOperationFactory(detectedCard, null);
+        ((NoUIOperationFactory) operationFactory).setDisplay(display);
+
+        final GetCertificateFlow flow = new GetCertificateFlow(display, api);
+        flow.setOperationFactory(operationFactory);
+        final Execution<GetCertificateResponse> resp = flow.process(api, new GetCertificateRequest());
+        final SignatureTokenConnection testToken = new JKSSignatureToken(
+                this.getClass().getResourceAsStream("/keystore.jks"), new PasswordProtection("password".toCharArray()));
+        Assert.assertNotNull(resp);
+        Assert.assertTrue(resp.isSuccess());
+        Assert.assertNotNull(resp.getResponse());
+        Assert.assertEquals(testToken.getKeys().get(0).getCertificate(), resp.getResponse().getCertificate());
+        Assert.assertEquals(testToken.getKeys().get(0).getEncryptionAlgorithm(),
+                resp.getResponse().getEncryptionAlgorithm());
+        Assert.assertEquals(new TokenId("id"), resp.getResponse().getTokenId());
+        Assert.assertEquals(testToken.getKeys().get(0).getCertificate().getDSSIdAsString(),
+                resp.getResponse().getKeyId());
+        Assert.assertNull(resp.getResponse().getPreferredDigest());
+        Assert.assertNull(resp.getResponse().getSupportedDigests());
+    }
+
+    private static class NoUIOperationFactory extends BasicOperationFactory {
+
+        @SuppressWarnings("rawtypes")
+        private final Operation successOperation;
+        @SuppressWarnings("rawtypes")
+        private final Operation selectedProductOperation;
+        @SuppressWarnings("rawtypes")
+        private final Operation configureProductOperation;
+
+        public NoUIOperationFactory(final Product selectedProduct, final Product configuredProduct) {
+            this.successOperation = mock(Operation.class);
+            when(this.successOperation.perform()).thenReturn(new OperationResult<Void>(BasicOperationStatus.SUCCESS));
+            this.selectedProductOperation = mock(Operation.class);
+            when(this.selectedProductOperation.perform()).thenReturn(new OperationResult<Product>(selectedProduct));
+
+            if (configuredProduct != null) {
+                this.configureProductOperation = mock(Operation.class);
+                when(this.configureProductOperation.perform()).thenReturn(new OperationResult<Product>(configuredProduct));
+            } else {
+                this.configureProductOperation = null;
+            }
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public <R, T extends Operation<R>> Operation<R> getOperation(final Class<T> clazz, final Object... params) {
+            if (UIOperation.class.isAssignableFrom(clazz)) {
+                switch ((String) params[0]) {
+                    case "/fxml/product-selection.fxml":
+                        return this.selectedProductOperation;
+                    case "/fxml/configure-keystore.fxml":
+                        return this.configureProductOperation;
+                    default:
+                        return this.successOperation;
+                }
+            } else {
+                return super.getOperation(clazz, params);
+            }
+        }
+    }
 }

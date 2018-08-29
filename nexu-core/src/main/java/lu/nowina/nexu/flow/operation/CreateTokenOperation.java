@@ -25,8 +25,6 @@ import eu.europa.esig.dss.token.MSCAPISignatureToken;
 import eu.europa.esig.dss.token.SignatureTokenConnection;
 import eu.europa.esig.dss.token.mocca.MOCCASignatureTokenConnection;
 import lu.nowina.nexu.api.DetectedCard;
-import lu.nowina.nexu.api.Feedback;
-import lu.nowina.nexu.api.FeedbackStatus;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.Product;
@@ -87,26 +85,21 @@ public class CreateTokenOperation extends AbstractCompositeOperation<Map<TokenOp
             boolean advanced = false;
             if (this.api.getAppConfig().isAdvancedModeAvailable() && this.api.getAppConfig().isEnablePopUps()) {
                 LOG.info("Advanced mode available");
-                final OperationResult<Boolean> result =
+                final OperationResult<Void> result =
                         this.operationFactory.getOperation(UIOperation.class, "/fxml/unsupported-product.fxml",
                                 new Object[]{this.api.getAppConfig().getApplicationName()}).perform();
-                if(result.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
-                    return new OperationResult<Map<TokenOperationResultKey, Object>>(BasicOperationStatus.USER_CANCEL);
+                if(result.getStatus().equals(BasicOperationStatus.SUCCESS)) {
+                    advanced = true;
                 }
-                advanced = result.getResult();
             }
 
             if (advanced) {
                 LOG.info("Advanced mode");
                 return this.createTokenAdvanced();
             } else {
-                LOG.info("Request support");
                 if(this.api.getAppConfig().isEnablePopUps()) {
-                    final Feedback feedback = new Feedback();
-                    feedback.setFeedbackStatus(FeedbackStatus.PRODUCT_NOT_SUPPORTED);
-                    this.operationFactory.getOperation(UIOperation.class, "/fxml/provide-feedback.fxml",
-                            new Object[]{feedback, this.api.getAppConfig().getServerUrl(), this.api.getAppConfig().getApplicationVersion(),
-                                    this.api.getAppConfig().getApplicationName()}).perform();
+                    this.operationFactory.getOperation(UIOperation.class, "/fxml/message.fxml",
+                            "unsuported.product.message", this.api.getAppConfig().getApplicationName()).perform();
                 }
                 return new OperationResult<Map<TokenOperationResultKey, Object>>(CoreOperationStatus.UNSUPPORTED_PRODUCT);
             }
