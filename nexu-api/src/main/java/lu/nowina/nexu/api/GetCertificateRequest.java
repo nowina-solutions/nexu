@@ -15,23 +15,32 @@ package lu.nowina.nexu.api;
 
 public class GetCertificateRequest extends NexuRequest {
 
-	private CertificateFilter certificateFilter;
+    private CertificateFilter certificateFilter;
+    private boolean closeToken = true;
 
-	public GetCertificateRequest() {
-		super();
-	}
-	
-	public GetCertificateRequest(CertificateFilter filter) {
-		super();
-		this.certificateFilter = filter;
-	}
-	
-	public CertificateFilter getCertificateFilter() {
-		return certificateFilter;
-	}
+    public GetCertificateRequest() {
+        super();
+    }
 
-	public void setCertificateFilter(CertificateFilter certificateFilter) {
-		this.certificateFilter = certificateFilter;
-	}
+    public GetCertificateRequest(final CertificateFilter filter) {
+        super();
+        this.certificateFilter = filter;
+    }
+
+    public CertificateFilter getCertificateFilter() {
+        return this.certificateFilter;
+    }
+
+    public void setCertificateFilter(final CertificateFilter certificateFilter) {
+        this.certificateFilter = certificateFilter;
+    }
+
+    public boolean isCloseToken() {
+        return this.closeToken;
+    }
+
+    public void setCloseToken(final boolean closeToken) {
+        this.closeToken = closeToken;
+    }
 
 }

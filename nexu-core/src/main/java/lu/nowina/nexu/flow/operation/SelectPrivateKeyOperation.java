@@ -45,101 +45,101 @@ import lu.nowina.nexu.view.core.UIOperation;
  */
 public class SelectPrivateKeyOperation extends AbstractCompositeOperation<DSSPrivateKeyEntry> {
 
-	private SignatureTokenConnection token;
-	private NexuAPI api;
-	private Product product;
-	private ProductAdapter productAdapter;
-	private CertificateFilter certificateFilter;
-	private String keyFilter;
-	
-	public SelectPrivateKeyOperation() {
-		super();
-	}
+    private SignatureTokenConnection token;
+    private NexuAPI api;
+    private Product product;
+    private ProductAdapter productAdapter;
+    private CertificateFilter certificateFilter;
+    private String keyFilter;
 
-	@Override
-	public void setParams(Object... params) {
-		try {
-			this.token = (SignatureTokenConnection) params[0];
-			this.api = (NexuAPI) params[1];
-			if(params.length > 2) {
-				this.product = (Product) params[2];
-			}
-			if(params.length > 3) {
-				this.productAdapter = (ProductAdapter) params[3];
-			}
-			if(params.length > 4) {
-				certificateFilter = (CertificateFilter) params[4];
-			}
-			if(params.length > 5) {
-				keyFilter = (String) params[5];
-			}
-		} catch(final ClassCastException | ArrayIndexOutOfBoundsException e) {
-			throw new IllegalArgumentException("Expected parameters: SignatureTokenConnection, NexuAPI, Product (optional), ProductAdapter (optional), CertificateFilter (optional), key filter (optional)");
-		}
-	}
-	
-	@Override
-	public OperationResult<DSSPrivateKeyEntry> perform() {
-		final List<DSSPrivateKeyEntry> keys;
-		
-		try {
-			if((productAdapter != null) && (product != null) && productAdapter.supportCertificateFilter(product) && (certificateFilter != null)) {
-				keys = productAdapter.getKeys(token, certificateFilter);
-			} else {
-				keys = token.getKeys();
-			}
-		} catch(final CancelledOperationException e) {
-			return new OperationResult<DSSPrivateKeyEntry>(BasicOperationStatus.USER_CANCEL);
-		}
-		
-		DSSPrivateKeyEntry key = null;
+    public SelectPrivateKeyOperation() {
+        super();
+    }
 
-		final Iterator<DSSPrivateKeyEntry> it = keys.iterator();
-		while (it.hasNext()) {
-			final DSSPrivateKeyEntry e = it.next();
-			if ("CN=Token Signing Public Key".equals(e.getCertificate().getCertificate().getIssuerDN().getName())) {
-				it.remove();
-			}
-		}
+    @Override
+    public void setParams(final Object... params) {
+        try {
+            this.token = (SignatureTokenConnection) params[0];
+            this.api = (NexuAPI) params[1];
+            if(params.length > 2) {
+                this.product = (Product) params[2];
+            }
+            if(params.length > 3) {
+                this.productAdapter = (ProductAdapter) params[3];
+            }
+            if(params.length > 4) {
+                this.certificateFilter = (CertificateFilter) params[4];
+            }
+            if(params.length > 5) {
+                this.keyFilter = (String) params[5];
+            }
+        } catch(final ClassCastException | ArrayIndexOutOfBoundsException e) {
+            throw new IllegalArgumentException("Expected parameters: SignatureTokenConnection, NexuAPI, Product (optional), ProductAdapter (optional), CertificateFilter (optional), key filter (optional)");
+        }
+    }
 
-		if (keys.isEmpty()) {
-			return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.NO_KEY);
-		} else if (keys.size() == 1) {
-			key = keys.get(0);
-			if((keyFilter != null) && !key.getCertificate().getDSSIdAsString().equals(keyFilter)) {
-				return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.CANNOT_SELECT_KEY);
-			} else {
-				return new OperationResult<DSSPrivateKeyEntry>(key);
-			}
-		} else {
-			if (keyFilter != null) {
-				for (final DSSPrivateKeyEntry k : keys) {
-					if (k.getCertificate().getDSSIdAsString().equals(keyFilter)) {
-						key = k;
-						break;
-					}
-				}
-				if(key == null) {
-					return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.CANNOT_SELECT_KEY);
-				}
-			} else if(api.getAppConfig().isEnablePopUps()) {
-				@SuppressWarnings("unchecked")
-				final OperationResult<DSSPrivateKeyEntry> op =
-						operationFactory.getOperation(UIOperation.class, "/fxml/key-selection.fxml", new Object[]{keys, api.getAppConfig().getApplicationName()}).perform();
-				if(op.getStatus().equals(CoreOperationStatus.BACK)) {
-					return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.BACK);
-				}
-				if(op.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
-					return new OperationResult<DSSPrivateKeyEntry>(BasicOperationStatus.USER_CANCEL);
-				}
-				key = op.getResult();
-				if(key == null) {
-					return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.NO_KEY_SELECTED);
-				}
-			} else {
-				return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.CANNOT_SELECT_KEY);
-			}
-			return new OperationResult<DSSPrivateKeyEntry>(key);
-		}
-	}
+    @Override
+    public OperationResult<DSSPrivateKeyEntry> perform() {
+        final List<DSSPrivateKeyEntry> keys;
+
+        try {
+            if((this.productAdapter != null) && (this.product != null) && this.productAdapter.supportCertificateFilter(this.product) && (this.certificateFilter != null)) {
+                keys = this.productAdapter.getKeys(this.token, this.certificateFilter);
+            } else {
+                keys = this.token.getKeys();
+            }
+        } catch(final CancelledOperationException e) {
+            return new OperationResult<DSSPrivateKeyEntry>(BasicOperationStatus.USER_CANCEL);
+        }
+
+        DSSPrivateKeyEntry key = null;
+
+        final Iterator<DSSPrivateKeyEntry> it = keys.iterator();
+        while (it.hasNext()) {
+            final DSSPrivateKeyEntry e = it.next();
+            if ("CN=Token Signing Public Key".equals(e.getCertificate().getCertificate().getIssuerDN().getName())) {
+                it.remove();
+            }
+        }
+
+        if (keys.isEmpty()) {
+            return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.NO_KEY);
+        } else if (keys.size() == 1) {
+            key = keys.get(0);
+            if((this.keyFilter != null) && !key.getCertificate().getDSSIdAsString().equals(this.keyFilter)) {
+                return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.CANNOT_SELECT_KEY);
+            } else {
+                return new OperationResult<DSSPrivateKeyEntry>(key);
+            }
+        } else {
+            if (this.keyFilter != null) {
+                for (final DSSPrivateKeyEntry k : keys) {
+                    if (k.getCertificate().getDSSIdAsString().equals(this.keyFilter)) {
+                        key = k;
+                        break;
+                    }
+                }
+                if(key == null) {
+                    return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.CANNOT_SELECT_KEY);
+                }
+            } else if(this.api.getAppConfig().isEnablePopUps()) {
+                @SuppressWarnings("unchecked")
+                final OperationResult<DSSPrivateKeyEntry> op =
+                this.operationFactory.getOperation(UIOperation.class, "/fxml/key-selection.fxml", new Object[]{keys, this.api.getAppConfig().getApplicationName(), this.api.getAppConfig().isDisplayBackButton()}).perform();
+                if(op.getStatus().equals(CoreOperationStatus.BACK)) {
+                    return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.BACK);
+                }
+                if(op.getStatus().equals(BasicOperationStatus.USER_CANCEL)) {
+                    return new OperationResult<DSSPrivateKeyEntry>(BasicOperationStatus.USER_CANCEL);
+                }
+                key = op.getResult();
+                if(key == null) {
+                    return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.NO_KEY_SELECTED);
+                }
+            } else {
+                return new OperationResult<DSSPrivateKeyEntry>(CoreOperationStatus.CANNOT_SELECT_KEY);
+            }
+            return new OperationResult<DSSPrivateKeyEntry>(key);
+        }
+    }
 }

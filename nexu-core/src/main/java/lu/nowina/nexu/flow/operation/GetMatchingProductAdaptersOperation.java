@@ -16,13 +16,10 @@ package lu.nowina.nexu.flow.operation;
 import java.util.ArrayList;
 import java.util.List;
 
-import lu.nowina.nexu.api.Feedback;
-import lu.nowina.nexu.api.FeedbackStatus;
 import lu.nowina.nexu.api.Match;
 import lu.nowina.nexu.api.NexuAPI;
 import lu.nowina.nexu.api.Product;
 import lu.nowina.nexu.api.flow.OperationResult;
-import lu.nowina.nexu.view.core.UIOperation;
 
 /**
  * This {@link CompositeOperation} allows to get a list of {@link Match}.
@@ -56,16 +53,8 @@ public class GetMatchingProductAdaptersOperation extends AbstractCompositeOperat
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public OperationResult<List<Match>> perform() {
 		if (products.size() == 0) {
-			if(api.getAppConfig().isEnablePopUps()) {
-				final Feedback feedback = new Feedback();
-				feedback.setFeedbackStatus(FeedbackStatus.NO_PRODUCT_FOUND);
-				operationFactory.getOperation(UIOperation.class, "/fxml/provide-feedback.fxml",
-						new Object[]{feedback, api.getAppConfig().getServerUrl(), api.getAppConfig().getApplicationVersion(),
-								api.getAppConfig().getApplicationName()}).perform();
-			}
 			return new OperationResult<List<Match>>(CoreOperationStatus.NO_PRODUCT_FOUND);
 		} else {
 			return getMatchingCardAdapters(products);

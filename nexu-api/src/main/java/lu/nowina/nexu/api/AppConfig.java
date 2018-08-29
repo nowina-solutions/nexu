@@ -13,6 +13,8 @@
  */
 package lu.nowina.nexu.api;
 
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -22,7 +24,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
-import static org.apache.commons.lang.StringUtils.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,465 +36,478 @@ import org.slf4j.LoggerFactory;
  */
 public class AppConfig {
 
-	private static final String ADVANCED_MODE_AVAILABLE = "advanced_mode_available";
-	private static final String APPLICATION_NAME = "application_name";
-	private static final String DEBUG = "debug";
-	private static final String HTTP_SERVER_CLASS = "http_server_class";
-	private static final String NEXU_HOSTNAME = "nexu_hostname";
-	private static final String INSTALL_URL = "install_url";
-	private static final String SERVER_URL = "server_url";
-	private static final String BINDING_IP = "binding_ip";
-	private static final String BINDING_PORTS = "binding_ports";
-	private static final String CONNECTIONS_CACHE_MAX_SIZE = "connections_cache_max_size";
-	private static final String ENABLE_POP_UPS = "enable_pop_ups";
-	//This property is less restrictive than enable_pop_ups, since this one allows display of certificate selection
-	private static final String ENABLE_INFORMATIVE_POP_UPS = "enable_informative_pop_ups";
-	private static final String USE_SYSTEM_PROXY = "use_system_proxy";
-	private static final String PROXY_SERVER = "proxy_server";
-	private static final String PROXY_PORT = "proxy_port";
-	private static final String PROXY_PROTOCOLE = "proxy_use_https";
-	private static final String PROXY_AUTHENTICATION = "proxy_authentication";
-	private static final String PROXY_USERNAME = "proxy_username";
-	private static final String PROXY_PASSWORD = "proxy_password";
-	private static final String USER_PREFERENCES_EDITABLE = "user_preferences_editable";
-	private static final String REQUEST_PROCESSOR_CLASS = "request_processor_class";
+    private static final String ADVANCED_MODE_AVAILABLE = "advanced_mode_available";
+    private static final String APPLICATION_NAME = "application_name";
+    private static final String DEBUG = "debug";
+    private static final String HTTP_SERVER_CLASS = "http_server_class";
+    private static final String NEXU_HOSTNAME = "nexu_hostname";
+    private static final String INSTALL_URL = "install_url";
+    private static final String SERVER_URL = "server_url";
+    private static final String BINDING_IP = "binding_ip";
+    private static final String BINDING_PORTS = "binding_ports";
+    private static final String CONNECTIONS_CACHE_MAX_SIZE = "connections_cache_max_size";
+    private static final String ENABLE_POP_UPS = "enable_pop_ups";
+    //This property is less restrictive than enable_pop_ups, since this one allows display of certificate selection
+    private static final String ENABLE_INFORMATIVE_POP_UPS = "enable_informative_pop_ups";
+    private static final String USE_SYSTEM_PROXY = "use_system_proxy";
+    private static final String PROXY_SERVER = "proxy_server";
+    private static final String PROXY_PORT = "proxy_port";
+    private static final String PROXY_PROTOCOLE = "proxy_use_https";
+    private static final String PROXY_AUTHENTICATION = "proxy_authentication";
+    private static final String PROXY_USERNAME = "proxy_username";
+    private static final String PROXY_PASSWORD = "proxy_password";
+    private static final String USER_PREFERENCES_EDITABLE = "user_preferences_editable";
+    private static final String REQUEST_PROCESSOR_CLASS = "request_processor_class";
 
-	private static final String ROLLING_LOG_FILE_SIZE = "rolling_log_file_size";
-	private static final String ROLLING_LOG_FILE_NUMBER = "rolling_log_file_number";
+    private static final String ROLLING_LOG_FILE_SIZE = "rolling_log_file_size";
+    private static final String ROLLING_LOG_FILE_NUMBER = "rolling_log_file_number";
 
-	private static final String BINDING_PORTS_HTTPS = "binding_ports_https";
+    private static final String BINDING_PORTS_HTTPS = "binding_ports_https";
 
-	private static final String ENABLE_DATABASE_WEB_LOADER = "enable_database_web_loader";
+    private static final String ENABLE_DATABASE_WEB_LOADER = "enable_database_web_loader";
 
-	private static final String ENABLE_SYSTRAY_MENU = "enable_systray_menu";
-	private static final String CORS_ALLOWED_ORIGIN = "cors_allowed_origin";	
+    private static final String ENABLE_SYSTRAY_MENU = "enable_systray_menu";
+    private static final String CORS_ALLOWED_ORIGIN = "cors_allowed_origin";
 
-	private static final String TICKET_URL = "ticket_url";
-	private static final String ENABLE_INCIDENT_REPORT = "enable_incident_report";
+    private static final String TICKET_URL = "ticket_url";
+    private static final String ENABLE_INCIDENT_REPORT = "enable_incident_report";
 
-	private static final String SHOW_SPLASH_SCREEN = "show_splash_screen";
+    private static final String SHOW_SPLASH_SCREEN = "show_splash_screen";
 
-	private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
+    private static final String DISPLAY_BACK_BUTTON = "display_back_button";
 
-	private String bindingIP;
+    private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
 
-	private List<Integer> bindingPorts;
+    private String bindingIP;
 
-	private String serverUrl;
+    private List<Integer> bindingPorts;
 
-	private String installUrl;
+    private String serverUrl;
 
-	private String nexuHostname;
+    private String installUrl;
 
-	private String httpServerClass;
+    private String nexuHostname;
 
-	private boolean debug;
+    private String httpServerClass;
 
-	private boolean advancedModeAvailable;
+    private boolean debug;
 
-	private String applicationName;
+    private boolean advancedModeAvailable;
 
-	private String applicationVersion;
+    private String applicationName;
 
-	private int connectionsCacheMaxSize;
+    private String applicationVersion;
 
-	private boolean enablePopUps;
-	private boolean enableInformativePopUps;
+    private int connectionsCacheMaxSize;
 
-	private boolean sendAnonymousInfoToProxy;
+    private boolean enablePopUps;
+    private boolean enableInformativePopUps;
 
-	private boolean useSystemProxy;
-	private String proxyServer;
-	private Integer proxyPort;
-	private boolean proxyUseHttps;
-	private boolean proxyAuthentication;
-	private String proxyUsername;
-	private String proxyPassword;
+    private boolean sendAnonymousInfoToProxy;
 
-	private boolean userPreferencesEditable;
+    private boolean useSystemProxy;
+    private String proxyServer;
+    private Integer proxyPort;
+    private boolean proxyUseHttps;
+    private boolean proxyAuthentication;
+    private String proxyUsername;
+    private String proxyPassword;
 
-	private String requestProcessorClass;
+    private boolean userPreferencesEditable;
 
-	private File nexuHome;
+    private String requestProcessorClass;
 
-	private List<Integer> bindingPortsHttps;
+    private File nexuHome;
 
-	private String rollingLogMaxFileSize;
+    private List<Integer> bindingPortsHttps;
 
-	private int rollingLogMaxFileNumber;
+    private String rollingLogMaxFileSize;
 
-	private boolean enableDatabaseWebLoader;
+    private int rollingLogMaxFileNumber;
 
-	private boolean enableSystrayMenu;
-	
-	private String ticketUrl;
-	
-	private boolean enableIncidentReport;
+    private boolean enableDatabaseWebLoader;
 
-	// String used for http header Access-Control-Allow-Origin. Default: "*"
-	private String corsAllowedOrigin;
+    private boolean enableSystrayMenu;
 
-	private boolean showSplashScreen;
-	
-	public AppConfig() {
-		try {
-			final URL versionResourceURL = this.getClass().getResource("/version.txt");
-			if (versionResourceURL == null) {
-				logger.error("Cannot retrieve application version: version.txt not found");
-			} else {
-				this.applicationVersion = IOUtils.toString(versionResourceURL);
-			}
-		} catch (final IOException e) {
-			logger.error("Cannot retrieve application version: " + e.getMessage(), e);
-			this.applicationVersion = "";
-		}
-	}
-
-	public String getBindingIP() {
-		return bindingIP;
-	}
-
-	public void setBindingIP(String bindingIP) {
-		this.bindingIP = bindingIP;
-	}
-
-	public List<Integer> getBindingPorts() {
-		return bindingPorts;
-	}
-
-	public void setBindingPorts(List<Integer> bindingPorts) {
-		this.bindingPorts = Collections.unmodifiableList(bindingPorts);
-	}
-
-	public String getServerUrl() {
-		return serverUrl;
-	}
-
-	public void setServerUrl(String serverUrl) {
-		this.serverUrl = serverUrl;
-	}
-
-	public String getInstallUrl() {
-		return installUrl;
-	}
-
-	public void setInstallUrl(String installUrl) {
-		this.installUrl = installUrl;
-	}
-
-	public String getNexuHostname() {
-		return nexuHostname;
-	}
-
-	public void setNexuHostname(String nexuHostname) {
-		this.nexuHostname = nexuHostname;
-	}
-
-	public String getHttpServerClass() {
-		return httpServerClass;
-	}
-
-	public void setHttpServerClass(String httpServerClass) {
-		this.httpServerClass = httpServerClass;
-	}
-
-	public boolean isDebug() {
-		return debug;
-	}
-
-	public void setDebug(boolean debug) {
-		this.debug = debug;
-	}
-
-	public boolean isAdvancedModeAvailable() {
-		return advancedModeAvailable;
-	}
-
-	public void setAdvancedModeAvailable(boolean advancedModeAvailable) {
-		this.advancedModeAvailable = advancedModeAvailable;
-	}
-
-	public String getApplicationName() {
-		return applicationName;
-	}
-
-	public void setApplicationName(String applicationName) {
-		this.applicationName = applicationName;
-	}
-
-	public String getApplicationVersion() {
-		return applicationVersion;
-	}
-
-	public int getConnectionsCacheMaxSize() {
-		return connectionsCacheMaxSize;
-	}
-
-	public void setConnectionsCacheMaxSize(int connectionsCacheMaxSize) {
-		this.connectionsCacheMaxSize = connectionsCacheMaxSize;
-	}
-
-	public boolean isEnablePopUps() {
-		return enablePopUps;
-	}
-
-	public void setEnablePopUps(boolean enablePopUps) {
-		this.enablePopUps = enablePopUps;
-	}
-
-	public boolean isSendAnonymousInfoToProxy() {
-		return sendAnonymousInfoToProxy;
-	}
-
-	public void setSendAnonymousInfoToProxy(boolean sendAnonymousInfoToProxy) {
-		this.sendAnonymousInfoToProxy = sendAnonymousInfoToProxy;
-	}
-
-	public boolean isUseSystemProxy() {
-		return useSystemProxy;
-	}
-
-	public void setUseSystemProxy(boolean useSystemProxy) {
-		this.useSystemProxy = useSystemProxy;
-	}
-
-	public String getProxyServer() {
-		return proxyServer;
-	}
-
-	public void setProxyServer(String proxyServer) {
-		this.proxyServer = proxyServer;
-	}
-
-	public Integer getProxyPort() {
-		return proxyPort;
-	}
-
-	public void setProxyPort(Integer proxyPort) {
-		this.proxyPort = proxyPort;
-	}
-
-	public boolean isProxyUseHttps() {
-		return proxyUseHttps;
-	}
-
-	public void setProxyUseHttps(boolean proxyUseHttps) {
-		this.proxyUseHttps = proxyUseHttps;
-	}
-
-	public boolean isProxyAuthentication() {
-		return proxyAuthentication;
-	}
-
-	public void setProxyAuthentication(boolean proxyAuthentication) {
-		this.proxyAuthentication = proxyAuthentication;
-	}
-
-	public String getProxyUsername() {
-		return proxyUsername;
-	}
-
-	public void setProxyUsername(String proxyUsername) {
-		this.proxyUsername = proxyUsername;
-	}
-
-	public String getProxyPassword() {
-		return proxyPassword;
-	}
-
-	public void setProxyPassword(String proxyPassword) {
-		this.proxyPassword = proxyPassword;
-	}
-
-	public boolean isUserPreferencesEditable() {
-		return userPreferencesEditable;
-	}
-
-	public void setUserPreferencesEditable(boolean userPreferencesEditable) {
-		this.userPreferencesEditable = userPreferencesEditable;
-	}
-
-	public String getRequestProcessorClass() {
-		return requestProcessorClass;
-	}
-
-	public void setRequestProcessorClass(String requestProcessorClass) {
-		this.requestProcessorClass = requestProcessorClass;
-	}
-
-	public List<Integer> getBindingPortsHttps() {
-		return bindingPortsHttps;
-	}
-
-	public void setBindingPortsHttps(List<Integer> bindingPortsHttps) {
-		this.bindingPortsHttps = Collections.unmodifiableList(bindingPortsHttps);
-	}
-
-	public String getRollingLogMaxFileSize() {
-		return rollingLogMaxFileSize;
-	}
-
-	/**
-	 * This method allows to set the maximum size for a log file. Expected format : 64KB, 10MB,...
-	 *
-	 * @param rollingLogMaxFileSize
-	 */
-	public void setRollingLogMaxFileSize(String rollingLogMaxFileSize) {
-		this.rollingLogMaxFileSize = rollingLogMaxFileSize;
-	}
-
-	public int getRollingLogMaxFileNumber() {
-		return rollingLogMaxFileNumber;
-	}
-
-	/**
-	 * This method allows to set the maxium number of log files to keep on the file system.
-	 *
-	 * @param rollingLogMaxFileNumber
-	 */
-	public void setRollingLogMaxFileNumber(int rollingLogMaxFileNumber) {
-		this.rollingLogMaxFileNumber = rollingLogMaxFileNumber;
-	}
-
-	public boolean isEnableDatabaseWebLoader() {
-		return enableDatabaseWebLoader;
-	}
-
-	public void setEnableDatabaseWebLoader(boolean enableDatabaseWebLoader) {
-		this.enableDatabaseWebLoader = enableDatabaseWebLoader;
-	}
-
-	public boolean isEnableSystrayMenu() {
-		return enableSystrayMenu;
-	}
-
-	public void setEnableSystrayMenu(boolean enableSystrayMenu) {
-		this.enableSystrayMenu = enableSystrayMenu;
-	}
-
-	public File getNexuHome() {
-		if (nexuHome != null) {
-			return nexuHome;
-		}
-		
-		ConfigurationManager configurationManager = getConfigurationManager();
-		try {
-			nexuHome = configurationManager.manageConfiguration(getApplicationName());
-		} catch (IOException e) {
-			logger.error("Error while managing Nexu config : {}", e.getMessage(), e);
-			nexuHome = null;
-		}
-		return nexuHome;
-	}
-	
-	
-
-	public void loadFromProperties(final Properties props) {
-		setApplicationName(props.getProperty(APPLICATION_NAME, "NexU"));
-		
-		final String bindingPortsStr = props.getProperty(BINDING_PORTS, "9795");
-		if (isNotEmpty(bindingPortsStr)) {
-			setBindingPorts(toListOfInt(bindingPortsStr));
-		}
-
-		setBindingIP(props.getProperty(BINDING_IP, "127.0.0.1"));
-		setServerUrl(props.getProperty(SERVER_URL, "http://lab.nowina.solutions/nexu"));
-		setInstallUrl(props.getProperty(INSTALL_URL, "http://nowina.lu/nexu/"));
-		setNexuHostname(props.getProperty(NEXU_HOSTNAME, "localhost"));
-		setHttpServerClass(props.getProperty(HTTP_SERVER_CLASS, "lu.nowina.nexu.jetty.JettyServer"));
-		setDebug(Boolean.parseBoolean(props.getProperty(DEBUG, "false")));
-		setAdvancedModeAvailable(Boolean.parseBoolean(props.getProperty(ADVANCED_MODE_AVAILABLE, "true")));
-		setConnectionsCacheMaxSize(Integer.parseInt(props.getProperty(CONNECTIONS_CACHE_MAX_SIZE, "50")));
-		setEnablePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_POP_UPS, "true")));
-		setEnableInformativePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_INFORMATIVE_POP_UPS, "true")));
-		// Always set to false, just in case
-		setSendAnonymousInfoToProxy(false);
-
-		setUseSystemProxy(Boolean.parseBoolean(props.getProperty(USE_SYSTEM_PROXY, "false")));
-		setProxyServer(props.getProperty(PROXY_SERVER, ""));
-		final String proxyPortStr = props.getProperty(PROXY_PORT, null);
-		setProxyPort((proxyPortStr != null) ? Integer.valueOf(proxyPortStr) : null);
-		setProxyUseHttps(Boolean.parseBoolean(props.getProperty(PROXY_PROTOCOLE, "false")));
-		setProxyAuthentication(Boolean.parseBoolean(props.getProperty(PROXY_AUTHENTICATION, "false")));
-		setProxyUsername(props.getProperty(PROXY_USERNAME, ""));
-		setProxyPassword(props.getProperty(PROXY_PASSWORD, ""));
-		setUserPreferencesEditable(Boolean.parseBoolean(props.getProperty(USER_PREFERENCES_EDITABLE, "true")));
-
-		setRollingLogMaxFileNumber(Integer.parseInt(props.getProperty(ROLLING_LOG_FILE_NUMBER, "5")));
-		setRollingLogMaxFileSize(props.getProperty(ROLLING_LOG_FILE_SIZE, "10MB"));
-
-		setRequestProcessorClass(props.getProperty(REQUEST_PROCESSOR_CLASS, "lu.nowina.nexu.jetty.RequestProcessor"));
-
-		final String bindingPortHttpsStr = props.getProperty(BINDING_PORTS_HTTPS, "9895");
-		if (isNotEmpty(bindingPortHttpsStr)) {
-			setBindingPortsHttps(toListOfInt(bindingPortHttpsStr));
-		}
-
-		setEnableDatabaseWebLoader(Boolean.parseBoolean(props.getProperty(ENABLE_DATABASE_WEB_LOADER, "true")));
-		setEnableSystrayMenu(Boolean.parseBoolean(props.getProperty(ENABLE_SYSTRAY_MENU, "true")));
-		setCorsAllowedOrigin(props.getProperty(CORS_ALLOWED_ORIGIN, "*"));
-		setTicketUrl(props.getProperty(TICKET_URL, "https://github.com/nowina-solutions/nexu/issues/new"));
-		setEnableIncidentReport(Boolean.parseBoolean(props.getProperty(ENABLE_INCIDENT_REPORT, "false")));
-		setShowSplashScreen(Boolean.parseBoolean(props.getProperty(SHOW_SPLASH_SCREEN, "false")));
-	}
-
-	/**
-	 * Returns a list of {@link Integer} from <code>str</code> which should be
-	 * tokenized by commas.
-	 *
-	 * @param str
-	 *            A list of strings tokenized by commas.
-	 * @return A list of {@link Integer}.
-	 */
-	protected List<Integer> toListOfInt(String str) {
-		final List<Integer> ports = new ArrayList<Integer>();
-		for (final String port : str.split(",")) {
-			ports.add(Integer.parseInt(port.trim()));
-		}
-		return ports;
-	}
-	
-	public ConfigurationManager getConfigurationManager() {
-		return new ConfigurationManager();
-	}
-
-	public boolean isEnableInformativePopUps() {
-		return enableInformativePopUps;
-	}
-
-	public void setEnableInformativePopUps(boolean enableInformativePopUps) {
-		this.enableInformativePopUps = enableInformativePopUps;
-	}
-
-	public String getCorsAllowedOrigin() {
-		return corsAllowedOrigin;
-	}
-
-	public void setCorsAllowedOrigin(String corsAllowedOrigin) {
-		this.corsAllowedOrigin = corsAllowedOrigin;
-	}
-
-	public String getTicketUrl() {
-		return ticketUrl;
-	}
-
-	public void setTicketUrl(String ticketUrl) {
-		this.ticketUrl = ticketUrl;
-	}
-
-	public boolean isEnableIncidentReport() {
-		return enableIncidentReport;
-	}
-
-	public void setEnableIncidentReport(boolean enableIncidentReport) {
-		this.enableIncidentReport = enableIncidentReport;
-	}
-
-	public boolean isShowSplashScreen() {
-		return showSplashScreen;
-	}
-
-	public void setShowSplashScreen(boolean showSplashScreen) {
-		this.showSplashScreen = showSplashScreen;
-	}
+    private String ticketUrl;
+
+    private boolean enableIncidentReport;
+
+    // String used for http header Access-Control-Allow-Origin. Default: "*"
+    private String corsAllowedOrigin;
+
+    private boolean showSplashScreen;
+
+    private boolean displayBackButton;
+
+    public AppConfig() {
+        try {
+            final URL versionResourceURL = this.getClass().getResource("/version.txt");
+            if (versionResourceURL == null) {
+                logger.error("Cannot retrieve application version: version.txt not found");
+            } else {
+                this.applicationVersion = IOUtils.toString(versionResourceURL);
+            }
+        } catch (final IOException e) {
+            logger.error("Cannot retrieve application version: " + e.getMessage(), e);
+            this.applicationVersion = "";
+        }
+    }
+
+    public String getBindingIP() {
+        return this.bindingIP;
+    }
+
+    public void setBindingIP(final String bindingIP) {
+        this.bindingIP = bindingIP;
+    }
+
+    public List<Integer> getBindingPorts() {
+        return this.bindingPorts;
+    }
+
+    public void setBindingPorts(final List<Integer> bindingPorts) {
+        this.bindingPorts = Collections.unmodifiableList(bindingPorts);
+    }
+
+    public String getServerUrl() {
+        return this.serverUrl;
+    }
+
+    public void setServerUrl(final String serverUrl) {
+        this.serverUrl = serverUrl;
+    }
+
+    public String getInstallUrl() {
+        return this.installUrl;
+    }
+
+    public void setInstallUrl(final String installUrl) {
+        this.installUrl = installUrl;
+    }
+
+    public String getNexuHostname() {
+        return this.nexuHostname;
+    }
+
+    public void setNexuHostname(final String nexuHostname) {
+        this.nexuHostname = nexuHostname;
+    }
+
+    public String getHttpServerClass() {
+        return this.httpServerClass;
+    }
+
+    public void setHttpServerClass(final String httpServerClass) {
+        this.httpServerClass = httpServerClass;
+    }
+
+    public boolean isDebug() {
+        return this.debug;
+    }
+
+    public void setDebug(final boolean debug) {
+        this.debug = debug;
+    }
+
+    public boolean isAdvancedModeAvailable() {
+        return this.advancedModeAvailable;
+    }
+
+    public void setAdvancedModeAvailable(final boolean advancedModeAvailable) {
+        this.advancedModeAvailable = advancedModeAvailable;
+    }
+
+    public String getApplicationName() {
+        return this.applicationName;
+    }
+
+    public void setApplicationName(final String applicationName) {
+        this.applicationName = applicationName;
+    }
+
+    public String getApplicationVersion() {
+        return this.applicationVersion;
+    }
+
+    public int getConnectionsCacheMaxSize() {
+        return this.connectionsCacheMaxSize;
+    }
+
+    public void setConnectionsCacheMaxSize(final int connectionsCacheMaxSize) {
+        this.connectionsCacheMaxSize = connectionsCacheMaxSize;
+    }
+
+    public boolean isEnablePopUps() {
+        return this.enablePopUps;
+    }
+
+    public void setEnablePopUps(final boolean enablePopUps) {
+        this.enablePopUps = enablePopUps;
+    }
+
+    public boolean isSendAnonymousInfoToProxy() {
+        return this.sendAnonymousInfoToProxy;
+    }
+
+    public void setSendAnonymousInfoToProxy(final boolean sendAnonymousInfoToProxy) {
+        this.sendAnonymousInfoToProxy = sendAnonymousInfoToProxy;
+    }
+
+    public boolean isUseSystemProxy() {
+        return this.useSystemProxy;
+    }
+
+    public void setUseSystemProxy(final boolean useSystemProxy) {
+        this.useSystemProxy = useSystemProxy;
+    }
+
+    public String getProxyServer() {
+        return this.proxyServer;
+    }
+
+    public void setProxyServer(final String proxyServer) {
+        this.proxyServer = proxyServer;
+    }
+
+    public Integer getProxyPort() {
+        return this.proxyPort;
+    }
+
+    public void setProxyPort(final Integer proxyPort) {
+        this.proxyPort = proxyPort;
+    }
+
+    public boolean isProxyUseHttps() {
+        return this.proxyUseHttps;
+    }
+
+    public void setProxyUseHttps(final boolean proxyUseHttps) {
+        this.proxyUseHttps = proxyUseHttps;
+    }
+
+    public boolean isProxyAuthentication() {
+        return this.proxyAuthentication;
+    }
+
+    public void setProxyAuthentication(final boolean proxyAuthentication) {
+        this.proxyAuthentication = proxyAuthentication;
+    }
+
+    public String getProxyUsername() {
+        return this.proxyUsername;
+    }
+
+    public void setProxyUsername(final String proxyUsername) {
+        this.proxyUsername = proxyUsername;
+    }
+
+    public String getProxyPassword() {
+        return this.proxyPassword;
+    }
+
+    public void setProxyPassword(final String proxyPassword) {
+        this.proxyPassword = proxyPassword;
+    }
+
+    public boolean isUserPreferencesEditable() {
+        return this.userPreferencesEditable;
+    }
+
+    public void setUserPreferencesEditable(final boolean userPreferencesEditable) {
+        this.userPreferencesEditable = userPreferencesEditable;
+    }
+
+    public String getRequestProcessorClass() {
+        return this.requestProcessorClass;
+    }
+
+    public void setRequestProcessorClass(final String requestProcessorClass) {
+        this.requestProcessorClass = requestProcessorClass;
+    }
+
+    public List<Integer> getBindingPortsHttps() {
+        return this.bindingPortsHttps;
+    }
+
+    public void setBindingPortsHttps(final List<Integer> bindingPortsHttps) {
+        this.bindingPortsHttps = Collections.unmodifiableList(bindingPortsHttps);
+    }
+
+    public String getRollingLogMaxFileSize() {
+        return this.rollingLogMaxFileSize;
+    }
+
+    /**
+     * This method allows to set the maximum size for a log file. Expected format : 64KB, 10MB,...
+     *
+     * @param rollingLogMaxFileSize
+     */
+    public void setRollingLogMaxFileSize(final String rollingLogMaxFileSize) {
+        this.rollingLogMaxFileSize = rollingLogMaxFileSize;
+    }
+
+    public int getRollingLogMaxFileNumber() {
+        return this.rollingLogMaxFileNumber;
+    }
+
+    /**
+     * This method allows to set the maxium number of log files to keep on the file system.
+     *
+     * @param rollingLogMaxFileNumber
+     */
+    public void setRollingLogMaxFileNumber(final int rollingLogMaxFileNumber) {
+        this.rollingLogMaxFileNumber = rollingLogMaxFileNumber;
+    }
+
+    public boolean isEnableDatabaseWebLoader() {
+        return this.enableDatabaseWebLoader;
+    }
+
+    public void setEnableDatabaseWebLoader(final boolean enableDatabaseWebLoader) {
+        this.enableDatabaseWebLoader = enableDatabaseWebLoader;
+    }
+
+    public boolean isEnableSystrayMenu() {
+        return this.enableSystrayMenu;
+    }
+
+    public void setEnableSystrayMenu(final boolean enableSystrayMenu) {
+        this.enableSystrayMenu = enableSystrayMenu;
+    }
+
+    public File getNexuHome() {
+        if (this.nexuHome != null) {
+            return this.nexuHome;
+        }
+
+        final ConfigurationManager configurationManager = this.getConfigurationManager();
+        try {
+            this.nexuHome = configurationManager.manageConfiguration(this.getApplicationName());
+        } catch (final IOException e) {
+            logger.error("Error while managing Nexu config : {}", e.getMessage(), e);
+            this.nexuHome = null;
+        }
+        return this.nexuHome;
+    }
+
+
+
+    public void loadFromProperties(final Properties props) {
+        this.setApplicationName(props.getProperty(APPLICATION_NAME, "NexU"));
+
+        final String bindingPortsStr = props.getProperty(BINDING_PORTS, "9795");
+        if (isNotEmpty(bindingPortsStr)) {
+            this.setBindingPorts(this.toListOfInt(bindingPortsStr));
+        }
+
+        this.setBindingIP(props.getProperty(BINDING_IP, "127.0.0.1"));
+        this.setServerUrl(props.getProperty(SERVER_URL, "http://lab.nowina.solutions/nexu"));
+        this.setInstallUrl(props.getProperty(INSTALL_URL, "http://nowina.lu/nexu/"));
+        this.setNexuHostname(props.getProperty(NEXU_HOSTNAME, "localhost"));
+        this.setHttpServerClass(props.getProperty(HTTP_SERVER_CLASS, "lu.nowina.nexu.jetty.JettyServer"));
+        this.setDebug(Boolean.parseBoolean(props.getProperty(DEBUG, "false")));
+        this.setAdvancedModeAvailable(Boolean.parseBoolean(props.getProperty(ADVANCED_MODE_AVAILABLE, "true")));
+        this.setConnectionsCacheMaxSize(Integer.parseInt(props.getProperty(CONNECTIONS_CACHE_MAX_SIZE, "50")));
+        this.setEnablePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_POP_UPS, "true")));
+        this.setEnableInformativePopUps(Boolean.parseBoolean(props.getProperty(ENABLE_INFORMATIVE_POP_UPS, "true")));
+        // Always set to false, just in case
+        this.setSendAnonymousInfoToProxy(false);
+
+        this.setUseSystemProxy(Boolean.parseBoolean(props.getProperty(USE_SYSTEM_PROXY, "false")));
+        this.setProxyServer(props.getProperty(PROXY_SERVER, ""));
+        final String proxyPortStr = props.getProperty(PROXY_PORT, null);
+        this.setProxyPort((proxyPortStr != null) ? Integer.valueOf(proxyPortStr) : null);
+        this.setProxyUseHttps(Boolean.parseBoolean(props.getProperty(PROXY_PROTOCOLE, "false")));
+        this.setProxyAuthentication(Boolean.parseBoolean(props.getProperty(PROXY_AUTHENTICATION, "false")));
+        this.setProxyUsername(props.getProperty(PROXY_USERNAME, ""));
+        this.setProxyPassword(props.getProperty(PROXY_PASSWORD, ""));
+        this.setUserPreferencesEditable(Boolean.parseBoolean(props.getProperty(USER_PREFERENCES_EDITABLE, "true")));
+
+        this.setRollingLogMaxFileNumber(Integer.parseInt(props.getProperty(ROLLING_LOG_FILE_NUMBER, "5")));
+        this.setRollingLogMaxFileSize(props.getProperty(ROLLING_LOG_FILE_SIZE, "10MB"));
+
+        this.setRequestProcessorClass(props.getProperty(REQUEST_PROCESSOR_CLASS, "lu.nowina.nexu.jetty.RequestProcessor"));
+
+        final String bindingPortHttpsStr = props.getProperty(BINDING_PORTS_HTTPS, "9895");
+        if (isNotEmpty(bindingPortHttpsStr)) {
+            this.setBindingPortsHttps(this.toListOfInt(bindingPortHttpsStr));
+        }
+
+        this.setEnableDatabaseWebLoader(Boolean.parseBoolean(props.getProperty(ENABLE_DATABASE_WEB_LOADER, "true")));
+        this.setEnableSystrayMenu(Boolean.parseBoolean(props.getProperty(ENABLE_SYSTRAY_MENU, "true")));
+        this.setCorsAllowedOrigin(props.getProperty(CORS_ALLOWED_ORIGIN, "*"));
+        this.setTicketUrl(props.getProperty(TICKET_URL, "https://github.com/nowina-solutions/nexu/issues/new"));
+        this.setEnableIncidentReport(Boolean.parseBoolean(props.getProperty(ENABLE_INCIDENT_REPORT, "false")));
+        this.setShowSplashScreen(Boolean.parseBoolean(props.getProperty(SHOW_SPLASH_SCREEN, "false")));
+        this.setDisplayBackButton(Boolean.parseBoolean(props.getProperty(DISPLAY_BACK_BUTTON, "false")));
+    }
+
+    /**
+     * Returns a list of {@link Integer} from <code>str</code> which should be
+     * tokenized by commas.
+     *
+     * @param str
+     *            A list of strings tokenized by commas.
+     * @return A list of {@link Integer}.
+     */
+    protected List<Integer> toListOfInt(final String str) {
+        final List<Integer> ports = new ArrayList<Integer>();
+        for (final String port : str.split(",")) {
+            ports.add(Integer.parseInt(port.trim()));
+        }
+        return ports;
+    }
+
+    public ConfigurationManager getConfigurationManager() {
+        return new ConfigurationManager();
+    }
+
+    public boolean isEnableInformativePopUps() {
+        return this.enableInformativePopUps;
+    }
+
+    public void setEnableInformativePopUps(final boolean enableInformativePopUps) {
+        this.enableInformativePopUps = enableInformativePopUps;
+    }
+
+    public String getCorsAllowedOrigin() {
+        return this.corsAllowedOrigin;
+    }
+
+    public void setCorsAllowedOrigin(final String corsAllowedOrigin) {
+        this.corsAllowedOrigin = corsAllowedOrigin;
+    }
+
+    public String getTicketUrl() {
+        return this.ticketUrl;
+    }
+
+    public void setTicketUrl(final String ticketUrl) {
+        this.ticketUrl = ticketUrl;
+    }
+
+    public boolean isEnableIncidentReport() {
+        return this.enableIncidentReport;
+    }
+
+    public void setEnableIncidentReport(final boolean enableIncidentReport) {
+        this.enableIncidentReport = enableIncidentReport;
+    }
+
+    public boolean isShowSplashScreen() {
+        return this.showSplashScreen;
+    }
+
+    public void setShowSplashScreen(final boolean showSplashScreen) {
+        this.showSplashScreen = showSplashScreen;
+    }
+
+    public boolean isDisplayBackButton() {
+        return this.displayBackButton;
+    }
+
+    public void setDisplayBackButton(final boolean displayBackButton) {
+        this.displayBackButton = displayBackButton;
+    }
 }

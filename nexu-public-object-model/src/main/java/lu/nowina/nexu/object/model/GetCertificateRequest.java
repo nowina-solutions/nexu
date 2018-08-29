@@ -20,6 +20,8 @@ package lu.nowina.nexu.object.model;
  */
 public class GetCertificateRequest extends NexuRequest {
 
+	private boolean closeToken;
+	
 	private CertificateFilter certificateFilter;
 
 	public GetCertificateRequest() {
@@ -37,6 +39,14 @@ public class GetCertificateRequest extends NexuRequest {
 
 	public void setCertificateFilter(CertificateFilter certificateFilter) {
 		this.certificateFilter = certificateFilter;
+	}
+
+	public boolean isCloseToken() {
+		return closeToken;
+	}
+
+	public void setCloseToken(boolean closeToken) {
+		this.closeToken = closeToken;
 	}
 
 }

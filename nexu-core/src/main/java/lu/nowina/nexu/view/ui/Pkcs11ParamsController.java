@@ -32,43 +32,43 @@ import lu.nowina.nexu.view.core.ExtensionFilter;
 
 public class Pkcs11ParamsController extends AbstractUIOperationController<Pkcs11Params> implements Initializable {
 
-	private static final OS OS = EnvironmentInfo.buildFromSystemProperties(System.getProperties()).getOs();
+    private static final OS OS = EnvironmentInfo.buildFromSystemProperties(System.getProperties()).getOs();
 
-	@FXML
-	private Button ok;
+    @FXML
+    private Button ok;
 
-	@FXML
-	private Button cancel;
+    @FXML
+    private Button cancel;
 
-	@FXML
-	private Button selectFile;
+    @FXML
+    private Button selectFile;
 
-	private File pkcs11File;
-	private BooleanProperty pkcs11FileSpecified;
+    private File pkcs11File;
+    private final BooleanProperty pkcs11FileSpecified;
 
-	public Pkcs11ParamsController() {
-		pkcs11FileSpecified = new SimpleBooleanProperty(false);
-	}
-	
-	@Override
-	public void init(Object... params) {
-		StageHelper.getInstance().setTitle((String) params[0], "pkcs11.params.title");
-	}
+    public Pkcs11ParamsController() {
+        this.pkcs11FileSpecified = new SimpleBooleanProperty(false);
+    }
 
-	@Override
-	public void initialize(URL location, ResourceBundle resources) {
-		ok.setOnAction(event -> {
-			Pkcs11Params result = new Pkcs11Params();
-			result.setPkcs11Lib(pkcs11File);
-			signalEnd(result);
-		});
-		ok.disableProperty().bind(Bindings.not(pkcs11FileSpecified));
-		cancel.setOnAction(e -> signalUserCancel());
-		selectFile.setOnAction(e -> {
-			pkcs11File = getDisplay().displayFileChooser(new ExtensionFilter(
-					OS.getNativeLibraryFileExtensionDescription(), OS.getNativeLibraryFileExtension()));
-			pkcs11FileSpecified.set(pkcs11File != null);
-		});
-	}
+    @Override
+    public void init(final Object... params) {
+        StageHelper.getInstance().setTitle((String) params[0], "pkcs11.params.title");
+    }
+
+    @Override
+    public void initialize(final URL location, final ResourceBundle resources) {
+        this.ok.setOnAction(event -> {
+            final Pkcs11Params result = new Pkcs11Params();
+            result.setPkcs11Lib(this.pkcs11File);
+            this.signalEnd(result);
+        });
+        this.ok.disableProperty().bind(Bindings.not(this.pkcs11FileSpecified));
+        this.cancel.setOnAction(e -> this.signalUserCancel());
+        this.selectFile.setOnAction(e -> {
+            this.pkcs11File = this.getDisplay().displayFileChooser(new ExtensionFilter(
+                    OS.getNativeLibraryFileExtensionDescription(), OS.getNativeLibraryFileExtension()));
+            this.pkcs11FileSpecified.set(this.pkcs11File != null);
+        });
+    }
 
 }
