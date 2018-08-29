@@ -21,9 +21,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +34,6 @@ import org.slf4j.LoggerFactory;
  * Configuration of the NexU Platform
  *
  * @author David Naramski
- *
  */
 public class AppConfig {
 
@@ -75,6 +76,8 @@ public class AppConfig {
     private static final String SHOW_SPLASH_SCREEN = "show_splash_screen";
 
     private static final String DISPLAY_BACK_BUTTON = "display_back_button";
+
+    private static final String DEFAULT_PRODUCT = "default_product_";
 
     private static final Logger logger = LoggerFactory.getLogger(AppConfig.class.getName());
 
@@ -139,6 +142,8 @@ public class AppConfig {
     private boolean showSplashScreen;
 
     private boolean displayBackButton;
+
+    private Product defaultProduct;
 
     public AppConfig() {
         try {
@@ -441,11 +446,47 @@ public class AppConfig {
         this.setEnableIncidentReport(Boolean.parseBoolean(props.getProperty(ENABLE_INCIDENT_REPORT, "false")));
         this.setShowSplashScreen(Boolean.parseBoolean(props.getProperty(SHOW_SPLASH_SCREEN, "false")));
         this.setDisplayBackButton(Boolean.parseBoolean(props.getProperty(DISPLAY_BACK_BUTTON, "false")));
+
+        for (Entry<Object, Object> property : props.entrySet()) {
+            if (property.getKey().toString().startsWith(DEFAULT_PRODUCT)) {
+                // Initialize default product
+                String osProperty = property.getKey().toString().replace(DEFAULT_PRODUCT, StringUtils.EMPTY);
+                if (StringUtils.isEmpty(osProperty) || StringUtils.isEmpty(property.getValue().toString())) {
+                    logger.warn("Nexu-config uncomplete 'default_product' property. Property:" + property.toString());
+                } else {
+                    OS osEnum = OS.forOSName(osProperty);
+                    EnvironmentInfo environmentInfo = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
+                    if (environmentInfo.getOs().compareTo(osEnum) == 0) {
+                        switch (osEnum) {
+                            case WINDOWS:
+                                try {
+                                    Class<? extends Product> subProduct = Class.forName(property.getValue().toString()).asSubclass(Product.class);
+                                    this.defaultProduct = subProduct.newInstance();
+                                } catch (ClassNotFoundException e) {
+                                    logger.warn("Nexu-config 'default_product_WINDOWS' value does not match Product sub-class. Property value:" + property.getValue());
+                                } catch (InstantiationException | IllegalAccessException e) {
+                                    logger.error("Error occured during instantiation of product. Property:" + property.toString());
+                                }
+                                break;
+                            case LINUX:
+                            case MACOSX:
+                                logger.warn("Nexu-config 'default_product' default product is not handled for this OS. OS property: " + osProperty);
+                                break;
+                            case NOT_RECOGNIZED:
+                                logger.warn("Nexu-config 'default_product' key does not match Nexu OS. OS property: " + osProperty);
+                                break;
+                        }
+                    } else {
+                        logger.warn("Nexu-config 'default_product' does not match system OS. OS property: " + osProperty + "; System OS:" + environmentInfo.getOsName());
+                    }
+                }
+                break;
+            }
+        }
     }
 
     /**
-     * Returns a list of {@link Integer} from <code>str</code> which should be
-     * tokenized by commas.
+     * Returns a list of {@link Integer} from <code>str</code> which should be tokenized by commas.
      *
      * @param str
      *            A list of strings tokenized by commas.
@@ -510,4 +551,13 @@ public class AppConfig {
     public void setDisplayBackButton(final boolean displayBackButton) {
         this.displayBackButton = displayBackButton;
     }
+
+    public Product getDefaultProduct() {
+        return defaultProduct;
+    }
+
+    public void setDefaultProduct(Product defaultProduct) {
+        this.defaultProduct = defaultProduct;
+    }
+
 }
