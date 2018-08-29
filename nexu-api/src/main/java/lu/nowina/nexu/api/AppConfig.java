@@ -446,7 +446,10 @@ public class AppConfig {
         this.setEnableIncidentReport(Boolean.parseBoolean(props.getProperty(ENABLE_INCIDENT_REPORT, "false")));
         this.setShowSplashScreen(Boolean.parseBoolean(props.getProperty(SHOW_SPLASH_SCREEN, "false")));
         this.setDisplayBackButton(Boolean.parseBoolean(props.getProperty(DISPLAY_BACK_BUTTON, "false")));
+    }
 
+    public void initDefaultProduct(final Properties props) {
+    	// Perform this work in a separate method to have the logger well configured.
         for (final Entry<Object, Object> entry : props.entrySet()) {
             if (((String) entry.getKey()).startsWith(DEFAULT_PRODUCT)) {
                 // Initialize default product
@@ -479,7 +482,7 @@ public class AppConfig {
             }
         }
     }
-
+    
     /**
      * Returns a list of {@link Integer} from <code>str</code> which should be tokenized by commas.
      *
