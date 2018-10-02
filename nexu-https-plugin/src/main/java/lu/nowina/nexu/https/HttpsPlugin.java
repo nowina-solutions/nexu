@@ -184,16 +184,16 @@ public class HttpsPlugin implements NexuPlugin {
 	private List<InitializationMessage> installCaCertInFirefoxForWindows(final NexuAPI api, final File caCert, final ResourceBundle resourceBundle, final ResourceBundle baseResourceBundle) {
 		Path tempDirPath = null;
 		try {
-			// 1. Copy and unzip firefox_add-certs-nowina-1.1.zip
+			// 1. Copy and unzip firefox_add-certs-nowina-1.2.zip
 			tempDirPath = Files.createTempDirectory("NexU-Firefox-Add_certs");
 			final File tempDirFile = tempDirPath.toFile();
-			final File zipFile = new File(tempDirFile, "firefox_add-certs-nowina-1.1.zip");
-			FileUtils.copyURLToFile(this.getClass().getResource("/firefox_add-certs-nowina-1.1.zip"), zipFile);
+			final File zipFile = new File(tempDirFile, "firefox_add-certs-nowina-1.2.zip");
+			FileUtils.copyURLToFile(this.getClass().getResource("/firefox_add-certs-nowina-1.2.zip"), zipFile);
 			new ZipFile(zipFile).extractAll(tempDirPath.toString());
 			
 			// 2. Install caCert into <unzipped_folder>/cacert
 			final File unzippedFolder = new File(tempDirFile.getAbsolutePath() + File.separator +
-					"firefox_add-certs-nowina-1.1");
+					"firefox_add-certs-nowina-1.2");
 			final File caCertDestDir = new File(unzippedFolder, "cacert");
 			FileUtils.copyFile(caCert, new File(caCertDestDir, caCert.getName()));
 			
@@ -204,7 +204,7 @@ public class HttpsPlugin implements NexuPlugin {
 			if(!p.waitFor(180, TimeUnit.SECONDS)) {
 				throw new NexuException("Timeout occurred when trying to install CA certificate in Firefox");
 			}
-			if(p.exitValue() == 1) {
+			if(p.exitValue() == -1) {
 				LOGGER.info("Mozilla Firefox not installed.");
 			} else if(p.exitValue() != 0) {
 				final String output = IOUtils.toString(p.getInputStream(), Charset.defaultCharset());
