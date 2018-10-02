@@ -238,11 +238,11 @@ public class HttpsPlugin implements NexuPlugin {
 			final ResourceBundle resourceBundle, final ResourceBundle baseResourceBundle) {
 		Path tempDirPath = null;
 		try {
-			// 1. Copy and unzip firefox_add-certs-mac-1.0.zip
+			// 1. Copy and unzip firefox_add-certs-mac-1.1.zip
 			tempDirPath = Files.createTempDirectory("NexU-Firefox-Add_certs");
 			final File tempDirFile = tempDirPath.toFile();
-			final File zipFile = new File(tempDirFile, "firefox_add-certs-mac-1.0.zip");
-			FileUtils.copyURLToFile(this.getClass().getResource("/firefox_add-certs-mac-1.0.zip"), zipFile);
+			final File zipFile = new File(tempDirFile, "firefox_add-certs-mac-1.1.zip");
+			FileUtils.copyURLToFile(this.getClass().getResource("/firefox_add-certs-mac-1.1.zip"), zipFile);
 			new ZipFile(zipFile).extractAll(tempDirPath.toString());
 			
 			// 2. Run add_certs.sh
@@ -250,7 +250,7 @@ public class HttpsPlugin implements NexuPlugin {
 					caCert.getName().substring(0, caCert.getName().lastIndexOf('.')),
 					caCert.getAbsolutePath());
 			pb.directory(new File(tempDirFile.getAbsolutePath() + File.separator +
-					"firefox_add-certs-mac-1.0" + File.separator + "bin"));
+					"firefox_add-certs-mac-1.1" + File.separator + "bin"));
 			pb.redirectErrorStream(true);
 			final Process p = pb.start();
 			if(!p.waitFor(180, TimeUnit.SECONDS)) {

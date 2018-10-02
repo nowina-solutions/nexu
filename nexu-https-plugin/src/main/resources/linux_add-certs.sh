@@ -31,6 +31,14 @@ then
         # Exit with error code
         exit $return_value
       fi
+
+      certutil -A -n "$1-localhost" -i "$2" -t "cTC,cTC,cTC", -d sql:"$profile_directory"
+      return_value=$?
+      if [ $return_value -ne 0 ]
+      then
+        # Exit with error code
+        exit $return_value
+      fi
     fi
   done
 fi
