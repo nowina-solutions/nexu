@@ -107,7 +107,18 @@ public class RequestProcessor extends AbstractHandler {
 			return;
 		}
 		
-		response.setHeader("Access-Control-Allow-Origin", api.getAppConfig().getCorsAllowedOrigin());
+		if(api.getAppConfig().isCorsAllowAllOrigins()) {
+			response.setHeader("Access-Control-Allow-Origin", "*");
+		} else {
+			if(api.getAppConfig().getCorsAllowedOrigins().contains(request.getHeader("Origin"))) {
+				response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+			} else {
+				// No match ==> use first value returned by iterator and log a warning
+				logger.warn(request.getHeader("Origin") + " does not match any value in corsAllowedOrigins: "
+						+ api.getAppConfig().getCorsAllowedOrigins());
+				response.setHeader("Access-Control-Allow-Origin", api.getAppConfig().getCorsAllowedOrigins().iterator().next());
+			}
+		}
 		response.setHeader("Vary", "Origin");
 		response.setHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST");
 		response.setHeader("Access-Control-Allow-Headers", "Content-Type");
