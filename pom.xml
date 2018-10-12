@@ -38,6 +38,7 @@
 		<module>nexu-public-object-model</module>
 		<module>nexu-https-plugin</module>
 		<module>nexu-windows-keystore-plugin</module>
+        <module>nexu-multi-user-support</module>
 	</modules>
 
 	<properties>
