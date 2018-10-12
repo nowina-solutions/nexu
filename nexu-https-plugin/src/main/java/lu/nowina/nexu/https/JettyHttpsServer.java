@@ -18,18 +18,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.Calendar;
-import java.util.Date;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -60,7 +52,7 @@ public class JettyHttpsServer extends AbstractJettyServer {
 		// Configuring SSL
 		final SslContextFactory sslContextFactory = new SslContextFactory();
 		// Generate keystore
-		sslContextFactory.setKeyStore(generateKeyStore(getApi().getAppConfig().getNexuHome(),
+		sslContextFactory.setKeyStore(openKeyStore(getApi().getAppConfig().getNexuHome(),
 				getApi().getAppConfig().getApplicationName()));
 		sslContextFactory.setKeyStorePassword("password");
 		sslContextFactory.setKeyManagerPassword("password");
@@ -73,45 +65,16 @@ public class JettyHttpsServer extends AbstractJettyServer {
 		return new Connector[] {connector, sslConnector};
 	}
 	
-	private KeyStore generateKeyStore(final File nexuHome, final String applicationName) {
+	private KeyStore openKeyStore(final File nexuHome, final String applicationName) {
 		try {
-			final File rootKeystore = new File(nexuHome, "keystore.jks");
-			final KeyStore rootKS = KeyStore.getInstance("JKS");
-			try(final FileInputStream fis = new FileInputStream(rootKeystore);
-					final BufferedInputStream bis = new BufferedInputStream(fis)) {
-				rootKS.load(bis, "password".toCharArray());
-			}
-			final PrivateKey rootPrivateKey = (PrivateKey) rootKS.getKey("localhost",
-					"password".toCharArray()); 
-
-			final PKIManager pki = new PKIManager();
-			final X509Certificate rootCert;
-			try (final FileInputStream fis =
-					new FileInputStream(pki.getRootCertificate(nexuHome, applicationName));
-					final BufferedInputStream bis = new BufferedInputStream(fis)) {
-				final CertificateFactory cf = CertificateFactory.getInstance("X.509");
-				rootCert = (X509Certificate) cf.generateCertificate(bis);
-			}
-			
-			final KeyPair keyPair = pki.createKeyPair();
-			final Calendar cal = Calendar.getInstance();
-			final Date notBefore = cal.getTime();
-			cal.add(Calendar.YEAR, 3);
-			final long notAfterMs = cal.getTime().after(rootCert.getNotAfter()) ?
-					rootCert.getNotAfter().getTime()-1 : cal.getTime().getTime();
-			final Date notAfter = new Date(notAfterMs); 
-			final X509Certificate cert = pki.generateCertificateForWebServer(rootPrivateKey,
-					rootCert, keyPair.getPrivate(), keyPair.getPublic(), notBefore,
-					notAfter, applicationName);
-			
 			final KeyStore keyStore = KeyStore.getInstance("JKS");
-			keyStore.load(null, null);
-			keyStore.setKeyEntry("localhost", keyPair.getPrivate(), "password".toCharArray(),
-					new Certificate[]{cert, rootCert});
-
+			try(final FileInputStream fis = new FileInputStream(new File(nexuHome, "web-server-keystore.jks"));
+					final BufferedInputStream bis = new BufferedInputStream(fis)) {
+				keyStore.load(bis, "password".toCharArray());
+			}
 			return keyStore;
-		} catch (UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException |
-				CertificateException | IOException e) {
+		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException |
+				IOException e) {
 			throw new NexuException(e);
 		}
 	}

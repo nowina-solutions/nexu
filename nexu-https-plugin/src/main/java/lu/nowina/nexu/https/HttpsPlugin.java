@@ -24,6 +24,9 @@ import java.nio.file.Path;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -70,27 +73,61 @@ public class HttpsPlugin implements NexuPlugin {
 		final ResourceBundle baseResourceBundle = ResourceBundle.getBundle("bundles/nexu");
 		
 		LOGGER.info("Verify if keystore is ready");
-		File nexuHome = api.getAppConfig().getNexuHome();
-		File keyStoreFile = new File(nexuHome, "keystore.jks");
+		final File nexuHome = api.getAppConfig().getNexuHome();
+		final File keyStoreFile = new File(nexuHome, "keystore.jks");
+		final File webServerKeyStoreFile = new File(nexuHome, "web-server-keystore.jks");
 		final PKIManager pki = new PKIManager();
 		final File caCert;
+		// First test if old keystore.jks file exists
 		if (!keyStoreFile.exists()) {
-			caCert = createRootCAKeystore(nexuHome, api.getAppConfig().getApplicationName(), pki);
+			// If not, test if new web-server-keystore.jks file exists
+			if(!webServerKeyStoreFile.exists()) {
+				// If not, it looks like a fresh install ==> create everything and delete root private key file
+				// after having generated the web-server-keystore.jks file
+				caCert = createRootCACert(nexuHome, api.getAppConfig().getApplicationName(), pki, webServerKeyStoreFile);
+			} else {
+				final File testCaCert = pki.getRootCertificate(nexuHome, api.getAppConfig().getApplicationName());
+				try {
+					// Test if root certificate fullfils requirements
+					if(!fulfillRequirements(testCaCert)) {
+						// If not, we must recreate everything like in a fresh install case
+						caCert = createRootCACert(nexuHome, api.getAppConfig().getApplicationName(), pki, webServerKeyStoreFile);
+					} else {
+						// Everything is setup, nothing to do except trying to install the certificate in
+						// various stores
+						caCert = testCaCert;
+					}
+				} catch(final IOException | CertificateException e) {
+					LOGGER.warn("Exception when trying to determine if certificate fulfills requirements.", e);
+					return Arrays.asList(new InitializationMessage(
+							MessageType.WARNING,
+							resourceBundle.getString("warn.install.cert.title"),
+							MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "requirements"),
+							baseResourceBundle.getString("contact.application.provider")
+						)
+					);
+				}
+			}
 		} else {
+			// Old keystore.jks exists
 			final File testCaCert = pki.getRootCertificate(nexuHome, api.getAppConfig().getApplicationName());
 			try {
+				// Test if root certificate fullfils requirements
 				if(!fulfillRequirements(testCaCert)) {
-					// Re-create key store if certificate does not have a subject alt name (NOW-122).
-					caCert = createRootCAKeystore(nexuHome, api.getAppConfig().getApplicationName(), pki);
+					// If not, we must recreate everything like in a fresh install case
+					caCert = createRootCACert(nexuHome, api.getAppConfig().getApplicationName(), pki, webServerKeyStoreFile);
 				} else {
+					// We must create the web-server-keystore.jks file and delete old keystore.jks file
+					createWebServerKeystoreAndDeleteRoot(keyStoreFile, nexuHome, api.getAppConfig().getApplicationName(),
+							webServerKeyStoreFile, pki);
 					caCert = testCaCert;
 				}
 			} catch(final IOException | CertificateException e) {
-				LOGGER.warn("Exception when trying to determine if certificate has subject alternative names", e);
+				LOGGER.warn("Exception when trying to determine if certificate fulfills requirements.", e);
 				return Arrays.asList(new InitializationMessage(
 						MessageType.WARNING,
 						resourceBundle.getString("warn.install.cert.title"),
-						MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "subjectAltNames"),
+						MessageFormat.format(resourceBundle.getString("warn.install.cert.header"), api.getAppConfig().getApplicationName(), "requirements"),
 						baseResourceBundle.getString("contact.application.provider")
 					)
 				);
@@ -100,10 +137,8 @@ public class HttpsPlugin implements NexuPlugin {
 	}
 
 	private boolean fulfillRequirements(final File caCert) throws IOException, CertificateException {
-		try (
-				final FileInputStream fis = new FileInputStream(caCert);
-				final BufferedInputStream bis = new BufferedInputStream(fis);
-				) {
+		try (final FileInputStream fis = new FileInputStream(caCert);
+				final BufferedInputStream bis = new BufferedInputStream(fis)) {
 			final CertificateFactory cf = CertificateFactory.getInstance("X.509");
 			final X509Certificate cert = (X509Certificate) cf.generateCertificate(bis);
 			if(cert.getBasicConstraints() != -1) {
@@ -114,14 +149,8 @@ public class HttpsPlugin implements NexuPlugin {
 		}
 	}
 	
-	/**
-	 * Create a keystore for root CA in the directory given in parameters.
-	 * @param nexuHome Target directory that will store the keystore.
-	 * @param applicationName Name of the application.
-	 * @param pki Instance of {@link PKIManager}.
-	 * @return A file containing the certificate of the root CA.
-	 */
-	File createRootCAKeystore(final File nexuHome, final String applicationName, final PKIManager pki) {
+	File createRootCACert(final File nexuHome, final String applicationName, final PKIManager pki,
+			final File webServerKeyStoreFile) {
 		try {
 			final File keyStoreFile = new File(nexuHome, "keystore.jks");
 			LOGGER.info("Creating keystore " + keyStoreFile.getAbsolutePath());
@@ -148,12 +177,59 @@ public class HttpsPlugin implements NexuPlugin {
 				caOutput.write(cert.getEncoded());
 			}
 
+			createWebServerKeystoreAndDeleteRoot(keyStoreFile, nexuHome, applicationName, webServerKeyStoreFile, pki);
+			
 			return caCert;
 		} catch (Exception e) {
 			throw new RuntimeException("Cannot create keystore", e);
 		}
 	}
 
+	private void createWebServerKeystoreAndDeleteRoot(final File keyStoreFile, final File nexuHome,
+			final String applicationName, final File webServerKeyStoreFile, final PKIManager pki) {
+		try {
+			final KeyStore rootKS = KeyStore.getInstance("JKS");
+			try(final FileInputStream fis = new FileInputStream(keyStoreFile);
+					final BufferedInputStream bis = new BufferedInputStream(fis)) {
+				rootKS.load(bis, "password".toCharArray());
+			}
+			final PrivateKey rootPrivateKey = (PrivateKey) rootKS.getKey("localhost",
+					"password".toCharArray()); 
+
+			final X509Certificate rootCert;
+			try (final FileInputStream fis =
+					new FileInputStream(pki.getRootCertificate(nexuHome, applicationName));
+					final BufferedInputStream bis = new BufferedInputStream(fis)) {
+				final CertificateFactory cf = CertificateFactory.getInstance("X.509");
+				rootCert = (X509Certificate) cf.generateCertificate(bis);
+			}
+			
+			final KeyPair keyPair = pki.createKeyPair();
+			final Calendar cal = Calendar.getInstance();
+			final Date notBefore = cal.getTime();
+			cal.add(Calendar.YEAR, 10);
+			final long notAfterMs = cal.getTime().after(rootCert.getNotAfter()) ?
+					rootCert.getNotAfter().getTime()-1 : cal.getTime().getTime();
+			final Date notAfter = new Date(notAfterMs); 
+			final X509Certificate cert = pki.generateCertificateForWebServer(rootPrivateKey,
+					rootCert, keyPair.getPrivate(), keyPair.getPublic(), notBefore,
+					notAfter, applicationName);
+			
+			final KeyStore keyStore = KeyStore.getInstance("JKS");
+			keyStore.load(null, null);
+			try(final FileOutputStream output = new FileOutputStream(webServerKeyStoreFile)) {
+				keyStore.setKeyEntry("localhost", keyPair.getPrivate(), "password".toCharArray(),
+						new Certificate[]{cert, rootCert});
+				keyStore.store(output, "password".toCharArray());
+			}
+			
+			Files.delete(keyStoreFile.toPath());
+		} catch (UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException |
+				CertificateException | IOException e) {
+			throw new RuntimeException("Cannot create keystore", e);
+		}
+	}
+	
 	private List<InitializationMessage> installCaCert(final NexuAPI api, final File caCert, final ResourceBundle resourceBundle, final ResourceBundle baseResourceBundle) {
 		final List<InitializationMessage> messages = new ArrayList<>();
 		final EnvironmentInfo envInfo = EnvironmentInfo.buildFromSystemProperties(System.getProperties());
