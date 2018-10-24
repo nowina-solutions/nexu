@@ -20,9 +20,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -136,8 +138,8 @@ public class AppConfig {
 
     private boolean enableIncidentReport;
 
-    // String used for http header Access-Control-Allow-Origin. Default: "*"
-    private String corsAllowedOrigin;
+    private boolean corsAllowAllOrigins;
+    private Set<String> corsAllowedOrigins;
 
     private boolean showSplashScreen;
 
@@ -441,7 +443,7 @@ public class AppConfig {
 
         this.setEnableDatabaseWebLoader(Boolean.parseBoolean(props.getProperty(ENABLE_DATABASE_WEB_LOADER, "true")));
         this.setEnableSystrayMenu(Boolean.parseBoolean(props.getProperty(ENABLE_SYSTRAY_MENU, "true")));
-        this.setCorsAllowedOrigin(props.getProperty(CORS_ALLOWED_ORIGIN, "*"));
+        this.setCorsAllowedOrigins(props.getProperty(CORS_ALLOWED_ORIGIN, "*"));
         this.setTicketUrl(props.getProperty(TICKET_URL, "https://github.com/nowina-solutions/nexu/issues/new"));
         this.setEnableIncidentReport(Boolean.parseBoolean(props.getProperty(ENABLE_INCIDENT_REPORT, "false")));
         this.setShowSplashScreen(Boolean.parseBoolean(props.getProperty(SHOW_SPLASH_SCREEN, "false")));
@@ -509,13 +511,27 @@ public class AppConfig {
     public void setEnableInformativePopUps(final boolean enableInformativePopUps) {
         this.enableInformativePopUps = enableInformativePopUps;
     }
+    
+    public boolean isCorsAllowAllOrigins() {
+		return corsAllowAllOrigins;
+	}
 
-    public String getCorsAllowedOrigin() {
-        return this.corsAllowedOrigin;
+	public Set<String> getCorsAllowedOrigins() {
+        return this.corsAllowedOrigins;
     }
 
-    public void setCorsAllowedOrigin(final String corsAllowedOrigin) {
-        this.corsAllowedOrigin = corsAllowedOrigin;
+    public void setCorsAllowedOrigins(final String corsAllowedOrigins) {
+    	if("*".equals(corsAllowedOrigins)) {
+    		this.corsAllowAllOrigins = true;
+    		this.corsAllowedOrigins = Collections.emptySet();
+    	} else {
+    		this.corsAllowAllOrigins = false;
+    		final String[] corsAllowedOriginsArray = corsAllowedOrigins.split(",");
+    		this.corsAllowedOrigins = new HashSet<String>(corsAllowedOriginsArray.length);
+    		for(final String corsAllowedOrigin : corsAllowedOriginsArray) {
+    			this.corsAllowedOrigins.add(corsAllowedOrigin.trim());
+    		}
+    	}
     }
 
     public String getTicketUrl() {

@@ -5,24 +5,18 @@
 		<artifactId>nexu</artifactId>
 		<version>1.22</version>
 	</parent>
-	<artifactId>nexu-rest-plugin</artifactId>
+	<artifactId>nexu-multi-user-support</artifactId>
 
 	<dependencies>
 		<dependency>
 			<groupId>lu.nowina.apps</groupId>
-			<artifactId>nexu-api</artifactId>
+			<artifactId>nexu-standalone</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>lu.nowina.apps</groupId>
-			<artifactId>nexu-util</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna-platform</artifactId>
+        </dependency>
 	</dependencies>
-
+	
 </project>

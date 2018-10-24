@@ -17,6 +17,6 @@ public class HttpsPluginTest {
 
 	@Test
 	public void test2() throws Exception {
-		new HttpsPlugin().createRootCAKeystore(target, "NexU", new PKIManager());
+		new HttpsPlugin().createRootCACert(target, "NexU", new PKIManager(), new File(target, "web-server-keystore.jks"));
 	}
 }
