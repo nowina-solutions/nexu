@@ -54,10 +54,9 @@
 	</properties>
 
 	<scm>
-		<!-- <connection>scm:git:https://github.com/nowina-solutions/nexu.git</connection>
+		<connection>scm:git:https://github.com/nowina-solutions/nexu.git</connection>
 		<developerConnection>scm:git:https://github.com/nowina-solutions/nexu.git</developerConnection>
-		<url>http://github.com/nowina-solutions/nexu/tree/master</url>-->
-		<developerConnection>scm:git:https://bitbucket.org/nowina-nexu/nexu-community.git</developerConnection>
+		<url>http://github.com/nowina-solutions/nexu/tree/master</url>
         <tag>HEAD</tag>
 	</scm>
 
