@@ -89,6 +89,18 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+        <!-- This will disable repository lookup that comes from transitive dependency -->
+        <!-- and that will make the build failed because of 403 HTTP error. -->
+        <repository>
+            <id>maven2-repository.dev.java.net</id>
+            <url>http://download.java.net/maven/2/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
 		<repository>
 			<id>alfresco</id>
 			<url>https://artifacts.alfresco.com/nexus/content/repositories/public</url>
