@@ -21,7 +21,16 @@ import eu.europa.esig.dss.ToBeSigned;
 import eu.europa.esig.dss.token.DSSPrivateKeyEntry;
 import eu.europa.esig.dss.token.PasswordInputCallback;
 import eu.europa.esig.dss.token.Pkcs11SignatureToken;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.Map;
 import lu.nowina.nexu.CancelledOperationException;
+import sun.security.pkcs11.SunPKCS11;
+import sun.security.pkcs11.wrapper.CK_C_INITIALIZE_ARGS;
+import sun.security.pkcs11.wrapper.PKCS11;
+import sun.security.pkcs11.wrapper.PKCS11Constants;
+import static sun.security.pkcs11.wrapper.PKCS11Constants.CKF_OS_LOCKING_OK;
+import sun.security.pkcs11.wrapper.PKCS11Exception;
 
 /**
  * This adapter class allows to manage {@link CancelledOperationException}.
@@ -49,8 +58,25 @@ public class Pkcs11SignatureTokenAdapter extends Pkcs11SignatureToken {
                 if (this.provider instanceof AuthProvider) {
                     ((AuthProvider) this.provider).logout();
                 }
+                if (this.provider instanceof SunPKCS11) {
+                    /*
+                     * IN CASE WE WANT TO USE MORE THAN ONE TOKEN WITH PKCS#11,
+                     * WE NEED TO FINALIZE AND REINITIALIZE THE MODULE EVERY
+                     * TIME. THIS REQUIRES A SMALL HACK
+                     */
+                    CK_C_INITIALIZE_ARGS initArgs = new CK_C_INITIALIZE_ARGS();
+                    initArgs.flags = CKF_OS_LOCKING_OK;
+                    PKCS11 pkcs11 = PKCS11.getInstance(this.getPkcs11Path(), "C_GetFunctionList", initArgs, true);
+                    pkcs11.C_Finalize(PKCS11Constants.NULL_PTR);
+
+                    Field privateStaticField = PKCS11.class.getDeclaredField("moduleMap");
+                    privateStaticField.setAccessible(true);
+                    ((Map) privateStaticField.get(null)).remove(this.getPkcs11Path());
+                }
             } catch (final LoginException e) {
                 LOG.error("LoginException on logout of '" + this.provider.getName() + "'", e);
+            } catch (IOException | PKCS11Exception | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+                LOG.error("Exception finalizing '" + this.provider.getName() + "'", e);
             }
             this.provider.clear();
             try {
