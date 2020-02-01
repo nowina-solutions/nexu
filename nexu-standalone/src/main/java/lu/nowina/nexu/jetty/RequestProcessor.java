@@ -52,7 +52,7 @@ public class RequestProcessor extends AbstractHandler {
 	
 	private static final String TEXT_JAVASCRIPT = "text/javascript";
 	private static final String TEXT_PLAIN = "text/plain";
-	private static final String APPLICATION_JSON = "application/json";
+	private static final String APPLICATION_JSON = "application/javascript";
 	private static final String IMAGE_PNG = "image/png";
 	
 	private static final String NEXUJS_TEMPLATE = "nexu.ftl.js";
@@ -90,7 +90,7 @@ public class RequestProcessor extends AbstractHandler {
 			response.setCharacterEncoding(UTF8);
 			response.setContentType(TEXT_PLAIN);
 			PrintWriter writer = response.getWriter();
-			writer.write("Please connect from localhost");
+			writer.write(request.getParameter("callback") + "(" + "Please connect from localhost" + ")");
 			writer.close();
 			return;
 		}
@@ -102,7 +102,7 @@ public class RequestProcessor extends AbstractHandler {
 			response.setCharacterEncoding(UTF8);
 			response.setContentType(TEXT_PLAIN);
 			PrintWriter writer = response.getWriter();
-			writer.write(errorMessage);
+			writer.write(request.getParameter("callback") + "(" + errorMessage  +")");
 			writer.close();
 			return;
 		}
@@ -136,7 +136,7 @@ public class RequestProcessor extends AbstractHandler {
 			} else if ("/nexu.js".equals(target)) {
 				nexuJs(request, response);
 			} else if ("/".equals(target) || "/nexu-info".equals(target)) {
-				nexuInfo(response);
+				nexuInfo(request, response);
 			} else {
 				httpPlugin(target, request, response);
 			}
@@ -154,7 +154,7 @@ public class RequestProcessor extends AbstractHandler {
 				execution.setFeedback(feedback);
 				
 				final PrintWriter writer = response.getWriter();
-				writer.write(GsonHelper.toJson(execution));
+				writer.write(request.getParameter("callback") + "(" + GsonHelper.toJson(execution) + ")");
 				writer.close();
 			} catch (IOException e2) {
 				logger.error("Cannot write error !?", e2);
@@ -187,18 +187,18 @@ public class RequestProcessor extends AbstractHandler {
 			response.setStatus(resp.getHttpStatus().getHttpCode());
 			response.setContentType(resp.getContentType());
 			PrintWriter writer = response.getWriter();
-			writer.write(resp.getContent());
+			writer.write(request.getParameter("callback") + "(" + resp.getContent() + ")");
 			writer.close();
 		}
 	}
 
-	private void nexuInfo(HttpServletResponse response) throws IOException {
+	private void nexuInfo(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		response.setCharacterEncoding(UTF8);
 		response.setContentType(APPLICATION_JSON);
 		response.setHeader("pragma", "no-cache");
 		response.setIntHeader("expires", -1);
 		PrintWriter writer = response.getWriter();
-		writer.write("{ \"version\": \"" + api.getAppConfig().getApplicationVersion() + "\"}");
+		writer.write(request.getParameter("callback") + "({ \"version\": \"" + api.getAppConfig().getApplicationVersion() + "\"})");
 		writer.close();
 	}
 

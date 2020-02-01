@@ -22,6 +22,8 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,31 +94,41 @@ public class RestHttpPlugin implements HttpPlugin {
 		final SignatureRequest r;
 		if (StringUtils.isEmpty(payload)) {
 			r = new SignatureRequest();
+			try {
+				logger.info(req.getParameter("data"));
+				JSONObject myjson = new JSONObject(req.getParameter("data"));
+				String data = new JSONObject(myjson.getString("toBeSigned")).getString("bytes");
+				if (data != null) {
+					logger.info("Data to sign " + data);
+					ToBeSigned tbs = new ToBeSigned();
+					tbs.setBytes(DatatypeConverter.parseBase64Binary(data));
+					r.setToBeSigned(tbs);
+				}
 
-			String data = req.getParameter("dataToSign");
-			if (data != null) {
-				logger.info("Data to sign " + data);
-				ToBeSigned tbs = new ToBeSigned();
-				tbs.setBytes(DatatypeConverter.parseBase64Binary(data));
-				r.setToBeSigned(tbs);
+				String digestAlgo = myjson.getString("digestAlgorithm");
+				if (digestAlgo != null) {
+					logger.info("digestAlgo " + digestAlgo);
+					r.setDigestAlgorithm(DigestAlgorithm.forName(digestAlgo, DigestAlgorithm.SHA256));
+				}
+
+				String tokenIdString = new JSONObject(myjson.getString("tokenId")).getString("id");
+				if (tokenIdString != null) {
+					logger.info("tokenId " + tokenIdString);
+
+					TokenId tokenId = new TokenId(tokenIdString);
+					r.setTokenId(tokenId);
+				}
+
+				String keyId = new JSONObject(myjson.getString("tokenId")).getString("keyId");
+				if (keyId != null) {
+					logger.info("keyId " + keyId);
+
+					r.setKeyId(keyId);
+				}
+			} catch (JSONException e) {
+				e.printStackTrace();
 			}
 
-			String digestAlgo = req.getParameter("digestAlgo");
-			if (digestAlgo != null) {
-				logger.info("digestAlgo " + digestAlgo);
-				r.setDigestAlgorithm(DigestAlgorithm.forName(digestAlgo, DigestAlgorithm.SHA256));
-			}
-
-			String tokenIdString = req.getParameter("tokenId");
-			if (tokenIdString != null) {
-				TokenId tokenId = new TokenId(tokenIdString);
-				r.setTokenId(tokenId);
-			}
-
-			String keyId = req.getParameter("keyId");
-			if (keyId != null) {
-				r.setKeyId(keyId);
-			}
 		} else {
 			r = GsonHelper.fromJson(payload, SignatureRequest.class);
 		}
@@ -233,10 +245,7 @@ public class RestHttpPlugin implements HttpPlugin {
 	}
 	
 	private HttpResponse toHttpResponse(final Execution<?> respObj) {
-		if (respObj.isSuccess()) {
-			return new HttpResponse(GsonHelper.toJson(respObj), "application/json;charset=UTF-8", HttpStatus.OK);
-		} else {
-			return new HttpResponse(GsonHelper.toJson(respObj), "application/json;charset=UTF-8", HttpStatus.ERROR);
-		}
+		//JSONP request can not handle error
+		return new HttpResponse(GsonHelper.toJson(respObj), "application/javascript;charset=UTF-8", HttpStatus.OK);
 	}
 }

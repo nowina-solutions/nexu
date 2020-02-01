@@ -37,19 +37,21 @@ function transmitRequest(service, data, success_callback, error_callback) {
 }
 
 function callUrl(url, type, data, success_callback, error_callback) {
+	console.log("call : " + url + " " + type);
 	$.ajax({
-		  type: type,
-		  url: url,
-		  data: data,
-		  crossDomain: true, 
-		  contentType: "application/json; charset=utf-8",
-		  dataType: "json",
-		  success: function (result) {
-			  console.log(url + " : OK");
-			  success_callback.call(this, result);
-		  }
-		}).fail(function (error) {
-			console.log(url + " : KO");
-			error_callback.call(this, error);
+		type: type,
+		url: url,
+		data: {data : data},
+		crossDomain: true,
+		dataType: "jsonp",
+		context : this,
+		success: function (result) {
+			console.log(url + " : success = " + result.success);
+			if (result.success == false) {
+				error_callback.call(this, result);
+				return;
+			}
+			success_callback.call(this, result);
+		}
 		});
-} 
+}
