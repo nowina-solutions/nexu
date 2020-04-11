@@ -28,7 +28,7 @@ public class CheckUserRequestProcessor extends RequestProcessor {
 	private static final String EXPECTED_USERNAME = System.getProperty("user.name");
 	
 	private static final String PORT_TO_PID_PATTERN_PREFIX = "\\s+TCP\\s+[0-9a-f\\.]+:";
-	private static final String PORT_TO_PID_PATTERN_SUFFIX = "\\s+[0-9a-f\\.:]+\\s+ESTABLISHED\\s+([0-9]+)";
+	private static final String PORT_TO_PID_PATTERN_SUFFIX = "\\s+[0-9a-f\\.:]+\\s+((ESTABLISHED)|(HERGESTELLT))\\s+([0-9]+)";
 
 	private final UserByPIDStrategy userByPIDStrategy;
 	
