@@ -24,7 +24,6 @@ public class CheckUserRequestProcessor extends RequestProcessor {
 	
 	private static final String EXPECTED_USERNAME = System.getProperty("user.name");
 	
-
 	private final UserByPIDStrategy userByPIDStrategy;
 	private final PIDByPortStrategy pidByPortStrategy;
 	
