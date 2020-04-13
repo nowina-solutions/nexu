@@ -9,9 +9,9 @@ USER gitpod
 #
 # More information: https://www.gitpod.io/docs/config-docker/
 
-# Setup Java 8 JDK
+# Setup Java 8 JDK with JavaFX
 RUN bash -c ". /home/gitpod/.sdkman/bin/sdkman-init.sh \
-             && sdk install java 8.0.242.j9-adpt"
+             && sdk install java 8.0.242.fx-librca"
 # Clone and compile smcc artefact             
 # RUN bash -c "cd /tmp && rm -rf mocca && git clone --branch mocca-1.3.30  https://git.egiz.gv.at/git/mocca && cd /tmp/mocca && sed -i 's/http:\/\/repo1\.maven\.org/https:\/\/repo1\.maven\.org/g' pom.xml && mvn validate && cd smcc && mvn install"
-# MOVE to init stage
+# MOVED to init stage
