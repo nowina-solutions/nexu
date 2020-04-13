@@ -71,7 +71,10 @@ public class CheckUserRequestProcessor extends RequestProcessor {
 		}
 		
 		final int port = request.getRemotePort();
-		final int pid = getPID(port);
+        final int pid = getPID(port);
+        if (pid <= 0) {
+            return "No PID for port " + port + " found!";
+        }
 		final String username = getUsername(pid);
 		if(!EXPECTED_USERNAME.equals(username)) {
 			return "Request comes from user " + username;
@@ -81,7 +84,9 @@ public class CheckUserRequestProcessor extends RequestProcessor {
 	}
 	
 	private int getPID(final int port) {
-                return pidByPortStrategy.getPIDForPort(port);
+                int pid = pidByPortStrategy.getPIDForPort(port);
+                LOGGER.info("PID for port " + port + " : " + pid);
+                return pid;
 	}
 	
 	private String getUsername(final int pid) {
